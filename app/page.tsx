@@ -1,4 +1,27 @@
-export default function Home() {
+import { SignOutButton } from "@/components/sign-out-button";
+import { createClient } from "@/lib/supabase/server";
+
+export default async function Home() {
+  const supabase = createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { data: profile } = user
+    ? await supabase
+        .from("profiles")
+        .select("full_name, positioning")
+        .eq("id", user.id)
+        .single()
+    : { data: null };
+
+  const displayName =
+    profile?.full_name ||
+    user?.user_metadata?.full_name ||
+    user?.email?.split("@")[0] ||
+    "there";
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-page px-6">
       <div className="flex max-w-lg flex-col items-center text-center">
@@ -6,21 +29,16 @@ export default function Home() {
           R
         </div>
         <h1 className="font-display text-3xl font-semibold tracking-tight text-ink">
-          Resume Studio
+          Welcome, {displayName}
         </h1>
         <p className="mt-3 text-[15px] leading-relaxed text-muted">
-          AI-assisted resumes and job applications — scaffold deployed.
-          Feature build starts in PR #2.
+          You&apos;re signed in. PR #2 auth is working — the full app UI lands in
+          PR #3.
         </p>
-        <p className="mt-8 rounded-lg border border-border bg-white px-4 py-3 text-sm text-muted">
-          Health check:{" "}
-          <a
-            href="/api/health"
-            className="font-semibold text-accent hover:text-accent-dark"
-          >
-            /api/health
-          </a>
-        </p>
+        <p className="mt-2 text-sm text-muted">{user?.email}</p>
+        <div className="mt-8 flex items-center gap-3">
+          <SignOutButton />
+        </div>
       </div>
     </main>
   );

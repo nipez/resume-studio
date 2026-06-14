@@ -1,6 +1,6 @@
-import { createClient } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr";
 
-export function createBrowserClient() {
+export function createClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -10,5 +10,5 @@ export function createBrowserClient() {
     );
   }
 
-  return createClient(url, anonKey);
+  return createBrowserClient(url, anonKey);
 }
