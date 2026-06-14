@@ -19,7 +19,7 @@ export function ComparisonTable() {
             How we compare
           </h2>
           <p className="mt-3 text-[15px] leading-relaxed text-muted">
-            Resume Studio vs. the tools job seekers stitch together today.
+            The application OS vs. the tools job seekers stitch together today.
             Feature-level view — not a paid placement.
           </p>
         </div>
@@ -29,7 +29,9 @@ export function ComparisonTable() {
             <thead className="bg-page text-[12px] font-bold uppercase tracking-wider text-muted">
               <tr>
                 <th className="px-5 py-4">Feature</th>
-                <th className="px-5 py-4 text-accent">Resume Studio</th>
+                <th className="px-5 py-4 text-accent">
+                  Resume Studio · Application OS
+                </th>
                 <th className="px-5 py-4">Teal</th>
                 <th className="px-5 py-4">Jobscan</th>
                 <th className="px-5 py-4">Resume.io</th>

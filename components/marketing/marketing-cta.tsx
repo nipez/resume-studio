@@ -7,7 +7,7 @@ type MarketingCtaProps = {
 
 export function MarketingCta({
   title = "Ready when you are",
-  description = "Sign in with a magic link and start building your resume library in minutes. Free during beta.",
+  description = "Sign in with a magic link and run your job search from one application OS. Free during beta.",
 }: MarketingCtaProps) {
   return (
     <section className="bg-gradient-to-br from-sidebar via-[#1b2740] to-sidebar">

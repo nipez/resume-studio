@@ -169,6 +169,7 @@ export const POSITIONING_PILLARS = [
 ] as const;
 
 export const COMPETITOR_COMPARISON = [
+  { feature: "Full application OS (6 modules)", studio: true, teal: "Partial", jobscan: false, resumeio: false },
   { feature: "Resume library + versions", studio: true, teal: true, jobscan: false, resumeio: true },
   { feature: "AI tailor per job description", studio: true, teal: true, jobscan: "Limited", resumeio: true },
   { feature: "Cover letter generator", studio: true, teal: true, jobscan: false, resumeio: true },
@@ -322,10 +323,164 @@ export const STUDENT_HIGHLIGHTS = [
   },
 ];
 
+export const STUDENT_PERSONAS = [
+  "Honor society kid with a sticky note of activities",
+  "Varsity captain applying for first part-time job",
+  "Senior sending resumes with college applications",
+  "Recent grad hunting a summer internship",
+] as const;
+
+export const STUDENT_START_STEPS = [
+  {
+    step: "01",
+    title: "Pick a template",
+    description:
+      "Classic, Two-Column, or Editorial — all three look professional on paper and export cleanly to PDF.",
+  },
+  {
+    step: "02",
+    title: "Answer guided questions",
+    description:
+      "No blank-page panic. Calm prompts walk you through contact info, school, and what you've actually done.",
+  },
+  {
+    step: "03",
+    title: "Add activities & clubs",
+    description:
+      "Sports, NHS, debate, volunteering, part-time jobs — each becomes a real bullet, not filler.",
+  },
+  {
+    step: "04",
+    title: "Export your PDF",
+    description:
+      "Print-ready in one click. Hand it to a counselor, attach to an application, or bring to an interview.",
+  },
+  {
+    step: "05",
+    title: "Write a cover letter",
+    description:
+      "AI drafts a tight letter for retail, camp, internship, or campus jobs — in your voice, not corporate jargon.",
+  },
+] as const;
+
+export const STUDENT_RESUME_SECTIONS = [
+  "Clubs & leadership",
+  "Sports & athletics",
+  "Volunteering",
+  "Honors & awards",
+  "Part-time jobs",
+  "Internships",
+  "GPA & coursework",
+  "Skills & languages",
+] as const;
+
+export const STUDENT_USE_CASES = [
+  {
+    title: "No job experience",
+    scenario: "Honor roll, soccer captain, food bank shifts — but zero paid work.",
+    outcome:
+      "Activities and volunteering become strong experience bullets. The resume looks complete, not empty.",
+    icon: "spark" as const,
+  },
+  {
+    title: "First part-time job",
+    scenario: "Applying to a coffee shop, grocery store, or retail counter for the first time.",
+    outcome:
+      "A one-page PDF plus a short cover letter that sounds like a reliable teenager — not a LinkedIn influencer.",
+    icon: "briefcase" as const,
+  },
+  {
+    title: "College application supplement",
+    scenario: "Some schools ask for a resume alongside essays and activity lists.",
+    outcome:
+      "One polished document that matches your Common App activities — formatted and ready to upload.",
+    icon: "graduation" as const,
+  },
+  {
+    title: "Summer internship",
+    scenario: "Local business, nonprofit, or research lab wants a resume with your high school experience.",
+    outcome:
+      "Professional template with real bullets from clubs, coursework, and any prior work — ready to email.",
+    icon: "sun" as const,
+  },
+] as const;
+
+export const STUDENT_COVER_LETTER_SCENARIOS = [
+  {
+    role: "Retail & food service",
+    example: "Barista, cashier, host, stock associate",
+    tip: "Lead with reliability and customer-facing experience — even school projects count if you frame them right.",
+  },
+  {
+    role: "Camp counselor",
+    example: "Day camp, sports camp, tutoring program",
+    tip: "Highlight leadership, safety awareness, and working with kids — captain and tutor roles translate directly.",
+  },
+  {
+    role: "Summer internship",
+    example: "Local office, nonprofit, lab assistant",
+    tip: "Connect coursework and club work to what the employer needs. Keep it short — half a page is fine.",
+  },
+  {
+    role: "On-campus job",
+    example: "Dining hall, library desk, tour guide",
+    tip: "For college freshmen: high school activities still count. Show up ready on day one.",
+  },
+] as const;
+
+export const STUDENT_TESTIMONIALS = [
+  {
+    quote:
+      "I had NHS, soccer captain, and a food bank shift on a sticky note. Twenty minutes later I had a real resume — my counselor said it was better than most seniors.",
+    name: "Maya T.",
+    role: "High school junior · first resume",
+  },
+  {
+    quote:
+      "My son needed a resume for a summer camp counselor job. The guided questions pulled out stuff he didn't think counted as 'experience.'",
+    name: "David L.",
+    role: "Parent · high school sophomore",
+  },
+  {
+    quote:
+      "Applied to three coffee shops with the same resume and tweaked cover letters. Got two callbacks — first job ever.",
+    name: "Alex K.",
+    role: "Recent grad · first part-time job",
+  },
+] as const;
+
+export const STUDENT_FAQ_ITEMS = [
+  {
+    question: "I've never had a job. Can I still make a resume?",
+    answer:
+      "Yes — that's exactly who the Student plan is for. Clubs, sports, volunteering, honors, and school projects all become real bullets. You don't need paid work to have a strong one-page resume.",
+  },
+  {
+    question: "How is the guided builder different from a template?",
+    answer:
+      "Templates give you layout. The guided builder (coming soon) asks simple questions — what school, what clubs, any jobs — and writes the bullets for you. Pick a template first; the builder fills it in.",
+  },
+  {
+    question: "Do I need a cover letter for a part-time job?",
+    answer:
+      "Often yes, even for retail or food service. The Student plan includes 2 AI cover letters per month — tuned for entry-level roles, not executive jargon. Short, honest, and editable.",
+  },
+  {
+    question: "Can I use this for college applications?",
+    answer:
+      "Many schools accept or request a resume supplement. Export a PDF from any of the three templates and upload alongside your application materials.",
+  },
+  {
+    question: "How much does the Student plan cost?",
+    answer:
+      "$2.99/month at launch — less than a latte. Free during beta while we build. Includes guided builder, activities sections, 3 templates, PDF export, and 2 AI cover letters per month.",
+  },
+] as const;
+
 export const TESTIMONIALS = [
   {
     quote:
-      "I was juggling Teal for tracking, Jobscan for keywords, and a Google Doc for cover letters. Resume Studio is the first place that felt like one system.",
+      "I was juggling Teal for tracking, Jobscan for keywords, and a Google Doc for cover letters. Resume Studio is the first application OS that felt like one system — not five tabs.",
     name: "Jordan M.",
     role: "Product marketing · 47 applications tracked",
   },

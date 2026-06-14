@@ -4,7 +4,8 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "FAQ — Resume Studio",
-  description: "Common questions about Resume Studio, AI tailoring, privacy, and sign-in.",
+  description:
+    "What is an application OS? How Resume Studio differs from AI generators, Teal, and Jobscan. Snapshots, pricing, and honest AI.",
 };
 
 export default function FaqPage() {
@@ -16,8 +17,8 @@ export default function FaqPage() {
             Frequently asked questions
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-[16px] leading-relaxed text-muted">
-            Straight answers about how Resume Studio works, what the AI does, and
-            how your data is handled.
+            Straight answers about the application OS, snapshots, honest AI, and
+            how we differ from credit-based generators.
           </p>
         </div>
       </section>

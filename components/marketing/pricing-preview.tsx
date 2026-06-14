@@ -11,8 +11,8 @@ export function PricingPreview() {
               Pricing that won&apos;t punish your job search
             </h2>
             <p className="mt-3 text-[15px] leading-relaxed text-muted">
-              Student from $2.99. Workspace without AI for $4.99. Pro AI when
-              you need it — not $50/mo for a keyword scanner.
+              Subscription access to the application OS — not credit packs.
+              Student from $2.99. Full workspace without AI for $4.99.
             </p>
           </div>
           <Link

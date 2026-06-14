@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Pricing — Resume Studio",
   description:
-    "Student $2.99/mo. Essentials $4.99/mo without AI. Pro $12/mo with unlimited tailoring. Free during beta.",
+    "Subscription pricing for the application OS — not credit packs. Student $2.99/mo. Essentials $4.99/mo. Pro $12/mo. Free during beta.",
 };
 
 export default function PricingPage() {
@@ -17,9 +17,9 @@ export default function PricingPage() {
             Honest pricing for a tough job market
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-[16px] leading-relaxed text-muted">
-            Competitors charge $13/week for AI or $50/mo for keyword scans.
-            Resume Studio starts at $2.99 for students and $4.99 for a full
-            workspace — AI only when you choose Pro.
+            AI generators charge per credit. Scanners charge $50/mo. Resume
+            Studio is subscription pricing for the full application OS — from
+            $2.99 for students and $4.99 for the workspace without AI.
           </p>
           <p className="mx-auto mt-4 max-w-xl rounded-xl border border-[#CDEBD9] bg-[#EAF7F0] px-4 py-3 text-[14px] font-medium text-[#0E7C4B]">
             Pro tip: Job Search Pass — $39 for 3 months of unlimited Pro (coming
