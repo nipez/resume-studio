@@ -1,5 +1,4 @@
 import { requireAIUser } from "@/lib/ai/auth";
-import { PDFParse } from "pdf-parse";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -8,7 +7,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
 
-  let parser: PDFParse | null = null;
+  const { PDFParse } = await import("pdf-parse");
+  let parser: InstanceType<typeof PDFParse> | null = null;
   try {
     const form = await request.formData();
     const file = form.get("file");
