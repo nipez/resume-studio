@@ -1,0 +1,2006 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;forced-color-adjust:none;}
+  html body input,html body textarea{background-color:#fff !important;color-scheme:light;}
+  select{color-scheme:light;}
+  html,body{margin:0;padding:0;background:#F5F6F8 !important;color-scheme:light !important;}
+  .appshell{background:#F5F6F8 !important;}
+  .bg-soft{background:#FAFBFC !important;}
+  .bg-white{background:#fff !important;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  textarea,input,button,select{font-family:inherit;}
+  textarea:focus,input:focus,select:focus{outline:none;}
+  ::placeholder{color:#9AA3AF;}
+  .scroll::-webkit-scrollbar{width:11px;height:11px}
+  .scroll::-webkit-scrollbar-thumb{background:#D2D7DE;border-radius:8px;border:3px solid transparent;background-clip:content-box}
+  .scroll::-webkit-scrollbar-track{background:transparent}
+</style>
+</helmet>
+<div class="appshell" style="display:flex;height:100vh;width:100vw;overflow:hidden;background:#F5F6F8;color:#0E1116;font-family:'Instrument Sans',system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.5;">
+
+  <aside style="width:264px;flex:none;background:#0D0F14;color:#C7CDD6;display:flex;flex-direction:column;padding:20px 14px;">
+    <div style="display:flex;align-items:center;gap:11px;padding:6px 8px 22px;">
+      <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#2F6BFF,#7A53FF);display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Space Grotesk';font-weight:700;font-size:17px;box-shadow:0 4px 14px rgba(47,107,255,.4);">N</div>
+      <div>
+        <div style="font-family:'Space Grotesk';font-weight:600;color:#fff;font-size:15.5px;letter-spacing:-.01em;">Resume Studio</div>
+        <div style="font-size:11.5px;color:#6E7686;margin-top:1px;">Nick Perez</div>
+      </div>
+    </div>
+    <nav style="display:flex;flex-direction:column;gap:3px;">
+      <sc-for list="{{navItems}}" as="item" hint-placeholder-count="4">
+        <button onClick="{{item.onClick}}" style="{{item.style}}">
+          <span style="display:flex;width:18px;height:18px;align-items:center;justify-content:center;">{{item.icon}}</span>
+          <span>{{item.label}}</span>
+        </button>
+      </sc-for>
+    </nav>
+    <div style="margin-top:auto;border-top:1px solid rgba(255,255,255,.07);padding-top:14px;">
+      <div style="font-size:11px;color:#5C6473;line-height:1.55;padding:0 8px;">Growth operator · systems thinker. Every draft is positioned as a builder &amp; revenue leader — not just a marketer.</div>
+    </div>
+  </aside>
+
+  <main style="flex:1;display:flex;flex-direction:column;min-width:0;">
+
+    <!-- ===================== LIBRARY ===================== -->
+    <sc-if value="{{isLibrary}}" hint-placeholder-val="{{true}}">
+    <div class="scroll" style="flex:1;overflow:auto;">
+      <div style="max-width:1120px;margin:0 auto;padding:42px 48px 64px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:30px;flex-wrap:wrap;">
+          <div>
+            <h1 style="font-family:'Space Grotesk';font-weight:600;font-size:30px;margin:0;letter-spacing:-.025em;">Resume Library</h1>
+            <p style="margin:8px 0 0;color:#5A6573;font-size:14.5px;max-width:560px;">Keep a set of resume cuts for different roles. Duplicate one to riff on it, or tailor a fresh version to a specific job description.</p>
+          </div>
+          <div style="display:flex;gap:10px;">
+            <button onClick="{{openImport}}" style="display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid #DCE0E6;color:#0E1116;padding:11px 16px;border-radius:11px;font-weight:600;font-size:13.5px;cursor:pointer;" style-hover="border-color:#2F6BFF;color:#2F6BFF;">↑&nbsp; Import resume</button>
+            <button onClick="{{startGuided}}" style="display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid #DCE0E6;color:#0E1116;padding:11px 16px;border-radius:11px;font-weight:600;font-size:13.5px;cursor:pointer;" style-hover="border-color:#2F6BFF;color:#2F6BFF;">✎&nbsp; Build from scratch</button>
+            <button onClick="{{newVersion}}" style="display:inline-flex;align-items:center;gap:7px;background:#2F6BFF;border:none;color:#fff;padding:11px 17px;border-radius:11px;font-weight:600;font-size:13.5px;cursor:pointer;box-shadow:0 4px 14px rgba(47,107,255,.32);" style-hover="background:#1E54E6;">+&nbsp; New version</button>
+          </div>
+        </div>
+        <div onClick="{{startGuided}}" style="display:flex;align-items:center;gap:18px;background:linear-gradient(120deg,#0D0F14,#1b2740);border-radius:16px;padding:19px 22px;margin-bottom:22px;color:#fff;cursor:pointer;" style-hover="box-shadow:0 10px 30px rgba(13,15,20,.22);">
+          <div style="flex:none;width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#2F6BFF,#7A53FF);display:flex;align-items:center;justify-content:center;font-size:23px;box-shadow:0 6px 18px rgba(47,107,255,.4);">✎</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-family:'Space Grotesk';font-weight:600;font-size:16.5px;">No resume yet — or want a fresh start?</div>
+            <div style="font-size:13.3px;color:#AEB6C2;margin-top:3px;line-height:1.5;">Don’t love the one you have, or starting from a blank page? I’ll guide you through it one small step at a time. It’s easier than it feels.</div>
+          </div>
+          <button onClick="{{startGuided}}" style="flex:none;background:#fff;border:none;color:#0E1116;padding:11px 18px;border-radius:11px;font-weight:600;font-size:13.5px;cursor:pointer;white-space:nowrap;" style-hover="background:#EAF1FF;color:#1E54E6;">Build step by step →</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:18px;">
+          <sc-for list="{{versionCards}}" as="v" hint-placeholder-count="2">
+            <div style="background:#fff;border:1px solid #E6E8EC;border-radius:16px;padding:20px 20px 16px;display:flex;flex-direction:column;" style-hover="border-color:#CDD3DB;box-shadow:0 8px 26px rgba(15,17,22,.07);">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+                <div style="font-family:'Space Grotesk';font-weight:600;font-size:17px;letter-spacing:-.01em;line-height:1.25;">{{v.name}}</div>
+                <div style="display:flex;gap:6px;flex:none;align-items:center;">
+                  <sc-if value="{{v.isDefault}}"><span style="display:inline-flex;align-items:center;gap:4px;background:#EEF3FF;color:#1E54E6;font-size:10.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:4px 8px;border-radius:6px;">★ Default</span></sc-if>
+                  <span style="{{v.badgeStyle}}">{{v.badge}}</span>
+                </div>
+              </div>
+              <div style="color:#5A6573;font-size:12.8px;margin-top:7px;line-height:1.45;min-height:36px;">{{v.headline}}</div>
+              <sc-if value="{{v.tailored}}"><div style="display:inline-flex;align-items:center;gap:6px;align-self:flex-start;background:#EAF1FF;color:#2456D6;font-size:11.5px;font-weight:600;padding:4px 9px;border-radius:7px;margin-top:10px;">⌖ {{v.tailored}}</div></sc-if>
+              <div style="display:flex;gap:12px;color:#8A92A0;font-size:12px;margin-top:12px;padding-top:12px;border-top:1px solid #F0F1F4;align-items:center;">
+                <span>{{v.meta}}</span>
+                <span style="margin-left:auto;">
+                  <sc-if value="{{v.isDefault}}"><span style="color:#9AA3AF;">Your starting point</span></sc-if>
+                  <sc-if value="{{v.notDefault}}"><button onClick="{{v.onSetDefault}}" style="background:none;border:none;cursor:pointer;color:#2456D6;font-weight:600;font-size:12px;padding:0;" style-hover="text-decoration:underline;">☆ Set as default</button></sc-if>
+                </span>
+              </div>
+              <sc-if value="{{v.noApps}}">
+                <button onClick="{{v.onLogApp}}" style="margin-top:12px;display:flex;align-items:center;justify-content:center;gap:7px;width:100%;background:#fff;border:1px dashed #C6D8CC;color:#0E7C4B;padding:8px;border-radius:9px;font-weight:600;font-size:12.5px;cursor:pointer;" style-hover="border-color:#0E9F6E;background:#F2FBF6;">✓ Log application</button>
+              </sc-if>
+              <sc-if value="{{v.hasApps}}">
+                <div style="margin-top:12px;display:flex;align-items:center;gap:9px;background:#EAF7F0;border:1px solid #CDEBD9;border-radius:9px;padding:8px 11px;">
+                  <span style="display:inline-flex;align-items:center;gap:6px;color:#0E7C4B;font-weight:700;font-size:12.3px;">✓ Used in {{v.appCountLabel}}</span>
+                  <button onClick="{{v.onViewApps}}" style="margin-left:auto;background:none;border:none;color:#0E7C4B;font-size:11.5px;font-weight:600;cursor:pointer;padding:0;" style-hover="text-decoration:underline;">View</button>
+                  <button onClick="{{v.onLogApp}}" style="background:none;border:none;color:#5d7a69;font-size:11.5px;font-weight:600;cursor:pointer;padding:0;" style-hover="color:#0E7C4B;text-decoration:underline;">+ Log again</button>
+                </div>
+              </sc-if>
+              <div style="display:flex;gap:8px;margin-top:10px;">
+                <button onClick="{{v.onOpen}}" style="flex:1;background:#0E1116;color:#fff;border:none;padding:9px 12px;border-radius:9px;font-weight:600;font-size:13px;cursor:pointer;" style-hover="background:#272b33;">Open &amp; edit</button>
+                <button onClick="{{v.onDuplicate}}" title="Duplicate" style="background:#fff;border:1px solid #E0E3E8;color:#3a4350;padding:9px 11px;border-radius:9px;cursor:pointer;font-size:13px;" style-hover="border-color:#2F6BFF;color:#2F6BFF;">Duplicate</button>
+                <button onClick="{{v.onDelete}}" title="Delete" style="background:#fff;border:1px solid #E0E3E8;color:#B23B3B;padding:9px 11px;border-radius:9px;cursor:pointer;font-size:13px;" style-hover="border-color:#E0A0A0;background:#FFF6F6;">✕</button>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ===================== EDITOR ===================== -->
+    <sc-if value="{{isEditor}}" hint-placeholder-val="{{true}}">
+    <div style="flex:1;display:flex;flex-direction:column;min-height:0;">
+      <div style="height:64px;flex:none;border-bottom:1px solid #E6E8EC;background:#fff;display:flex;align-items:center;gap:12px;padding:0 20px;">
+        <button onClick="{{backToLibrary}}" style="background:#F2F3F5;border:none;width:36px;height:36px;border-radius:10px;cursor:pointer;font-size:17px;color:#3a4350;display:flex;align-items:center;justify-content:center;" style-hover="background:#E6E8EC;">←</button>
+        <input value="{{vName}}" onChange="{{onVName}}" placeholder="Version name" style="font-family:'Space Grotesk';font-weight:600;font-size:16.5px;border:1px solid transparent;background:transparent;padding:7px 10px;border-radius:9px;min-width:200px;color:#0E1116;" style-focus="border-color:#DCE0E6;background:#F7F8FA;" />
+        <div style="display:flex;gap:4px;margin-left:6px;background:#F1F2F4;padding:4px;border-radius:11px;">
+          <sc-for list="{{templateButtons}}" as="t" hint-placeholder-count="3"><button onClick="{{t.onClick}}" style="{{t.style}}">{{t.label}}</button></sc-for>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:9px;">
+          <button onClick="{{exportResume}}" style="display:inline-flex;align-items:center;gap:7px;background:#2F6BFF;border:none;color:#fff;padding:10px 16px;border-radius:10px;font-weight:600;font-size:13.5px;cursor:pointer;box-shadow:0 4px 12px rgba(47,107,255,.3);" style-hover="background:#1E54E6;">↓ Export PDF</button>
+        </div>
+      </div>
+      <div style="flex:1;display:flex;min-height:0;">
+        <div class="scroll" style="width:47%;max-width:640px;overflow:auto;padding:26px 28px 60px;border-right:1px solid #E6E8EC;background:#fff;">
+
+          <div style="font-family:'Space Grotesk';font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:#8A92A0;margin-bottom:14px;">Header</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <label style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:#5A6573;">Full name<input value="{{f.name}}" onChange="{{f.onName}}" style="border:1px solid #DFE3E8;border-radius:9px;padding:9px 11px;font-size:14px;color:#0E1116;" style-focus="border-color:#2F6BFF;" /></label>
+            <label style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:#5A6573;">Phone<input value="{{f.phone}}" onChange="{{f.onPhone}}" style="border:1px solid #DFE3E8;border-radius:9px;padding:9px 11px;font-size:14px;color:#0E1116;" style-focus="border-color:#2F6BFF;" /></label>
+            <label style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:#5A6573;">Email<input value="{{f.email}}" onChange="{{f.onEmail}}" style="border:1px solid #DFE3E8;border-radius:9px;padding:9px 11px;font-size:14px;color:#0E1116;" style-focus="border-color:#2F6BFF;" /></label>
+            <label style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:#5A6573;">Location<input value="{{f.location}}" onChange="{{f.onLocation}}" style="border:1px solid #DFE3E8;border-radius:9px;padding:9px 11px;font-size:14px;color:#0E1116;" style-focus="border-color:#2F6BFF;" /></label>
+          </div>
+          <label style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:#5A6573;margin-top:12px;">LinkedIn / website (optional)<input value="{{f.linkedin}}" onChange="{{f.onLinkedin}}" placeholder="linkedin.com/in/…" style="border:1px solid #DFE3E8;border-radius:9px;padding:9px 11px;font-size:14px;color:#0E1116;" style-focus="border-color:#2F6BFF;" /></label>
+          <label style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:#5A6573;margin-top:12px;">Headline<input value="{{f.headline}}" onChange="{{f.onHeadline}}" style="border:1px solid #DFE3E8;border-radius:9px;padding:9px 11px;font-size:14px;color:#0E1116;" style-focus="border-color:#2F6BFF;" /></label>
+
+          <div style="font-family:'Space Grotesk';font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:#8A92A0;margin:26px 0 12px;">Summary</div>
+          <textarea value="{{f.summary}}" onChange="{{f.onSummary}}" rows="4" style="width:100%;border:1px solid #DFE3E8;border-radius:10px;padding:11px 12px;font-size:13.5px;line-height:1.55;color:#1a1f29;resize:vertical;" style-focus="border-color:#2F6BFF;"></textarea>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;margin:26px 0 12px;">
+            <div style="font-family:'Space Grotesk';font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:#8A92A0;">Skills</div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            <sc-for list="{{skillChips}}" as="s" hint-placeholder-count="6">
+              <span style="display:inline-flex;align-items:center;gap:7px;background:#F2F4F7;border:1px solid #E6E9EE;border-radius:8px;padding:6px 9px 6px 11px;font-size:12.8px;color:#2b3140;">{{s.text}}<button onClick="{{s.onRemove}}" style="background:none;border:none;cursor:pointer;color:#9aa3af;font-size:13px;padding:0;line-height:1;" style-hover="color:#B23B3B;">✕</button></span>
+            </sc-for>
+          </div>
+          <input onKeyDown="{{onSkillKey}}" placeholder="Add a skill, press Enter" style="margin-top:10px;width:100%;border:1px dashed #CFD5DD;border-radius:9px;padding:9px 11px;font-size:13.5px;color:#0E1116;background:#FAFBFC;" style-focus="border-color:#2F6BFF;border-style:solid;" />
+
+          <div style="display:flex;align-items:center;justify-content:space-between;margin:28px 0 12px;">
+            <div style="font-family:'Space Grotesk';font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:#8A92A0;">Experience</div>
+            <button onClick="{{addExperience}}" style="background:#EAF1FF;border:none;color:#2456D6;padding:6px 11px;border-radius:8px;font-weight:600;font-size:12.5px;cursor:pointer;" style-hover="background:#dbe7ff;">+ Add role</button>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <sc-for list="{{expItems}}" as="e" hint-placeholder-count="3">
+              <div style="border:1px solid #E6E8EC;border-radius:13px;padding:15px;background:#FCFCFD;">
+                <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
+                  <input value="{{e.company}}" onChange="{{e.onCompany}}" placeholder="Company" style="flex:1;border:none;border-bottom:1px solid #E2E5EA;background:transparent;padding:5px 2px;font-weight:700;font-size:14.5px;font-family:'Space Grotesk';color:#0E1116;" style-focus="border-color:#2F6BFF;" />
+                  <button onClick="{{e.onUp}}" title="Move up" style="background:#F2F3F5;border:none;width:28px;height:28px;border-radius:7px;cursor:pointer;color:#5a6573;font-size:12px;">↑</button>
+                  <button onClick="{{e.onDown}}" title="Move down" style="background:#F2F3F5;border:none;width:28px;height:28px;border-radius:7px;cursor:pointer;color:#5a6573;font-size:12px;">↓</button>
+                  <button onClick="{{e.onRemove}}" title="Remove role" style="background:#FFF4F4;border:none;width:28px;height:28px;border-radius:7px;cursor:pointer;color:#B23B3B;font-size:12px;">✕</button>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 130px;gap:9px;margin-bottom:9px;">
+                  <input value="{{e.title}}" onChange="{{e.onTitle}}" placeholder="Title" style="border:1px solid #E2E5EA;border-radius:8px;padding:7px 9px;font-size:13px;color:#2b3140;" style-focus="border-color:#2F6BFF;" />
+                  <input value="{{e.dates}}" onChange="{{e.onDates}}" placeholder="2024 – Present" style="border:1px solid #E2E5EA;border-radius:8px;padding:7px 9px;font-size:13px;color:#2b3140;text-align:center;" style-focus="border-color:#2F6BFF;" />
+                </div>
+                <textarea value="{{e.blurb}}" onChange="{{e.onBlurb}}" rows="2" placeholder="One-line role summary (optional)" style="width:100%;border:1px solid #E2E5EA;border-radius:8px;padding:8px 10px;font-size:12.8px;line-height:1.5;color:#3a4350;resize:vertical;margin-bottom:9px;" style-focus="border-color:#2F6BFF;"></textarea>
+                <div style="display:flex;flex-direction:column;gap:6px;">
+                  <sc-for list="{{e.bullets}}" as="b" hint-placeholder-count="3">
+                    <div style="display:flex;gap:7px;align-items:flex-start;">
+                      <span style="color:#2F6BFF;font-size:15px;line-height:1.7;flex:none;">•</span>
+                      <textarea value="{{b.text}}" onChange="{{b.onChange}}" rows="1" style="flex:1;border:1px solid #EAEDF1;border-radius:7px;padding:6px 9px;font-size:12.8px;line-height:1.45;color:#2b3140;resize:vertical;min-height:34px;" style-focus="border-color:#2F6BFF;"></textarea>
+                      <button onClick="{{b.onRemove}}" style="background:none;border:none;cursor:pointer;color:#b9bfc8;font-size:13px;padding:6px 2px;" style-hover="color:#B23B3B;">✕</button>
+                    </div>
+                  </sc-for>
+                  <button onClick="{{e.onAddBullet}}" style="align-self:flex-start;background:none;border:none;color:#2456D6;font-weight:600;font-size:12.3px;cursor:pointer;padding:3px 0;">+ Add bullet</button>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;margin:28px 0 12px;">
+            <div style="font-family:'Space Grotesk';font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:#8A92A0;">Education</div>
+            <button onClick="{{addEducation}}" style="background:#EAF1FF;border:none;color:#2456D6;padding:6px 11px;border-radius:8px;font-weight:600;font-size:12.5px;cursor:pointer;" style-hover="background:#dbe7ff;">+ Add</button>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:9px;">
+            <sc-for list="{{eduItems}}" as="ed" hint-placeholder-count="2">
+              <div style="display:grid;grid-template-columns:1fr 1fr 90px 32px;gap:8px;align-items:center;">
+                <input value="{{ed.school}}" onChange="{{ed.onSchool}}" placeholder="School" style="border:1px solid #E2E5EA;border-radius:8px;padding:7px 9px;font-size:13px;" style-focus="border-color:#2F6BFF;" />
+                <input value="{{ed.degree}}" onChange="{{ed.onDegree}}" placeholder="Degree" style="border:1px solid #E2E5EA;border-radius:8px;padding:7px 9px;font-size:13px;" style-focus="border-color:#2F6BFF;" />
+                <input value="{{ed.year}}" onChange="{{ed.onYear}}" placeholder="Year" style="border:1px solid #E2E5EA;border-radius:8px;padding:7px 9px;font-size:13px;text-align:center;" style-focus="border-color:#2F6BFF;" />
+                <button onClick="{{ed.onRemove}}" style="background:#FFF4F4;border:none;height:34px;border-radius:7px;cursor:pointer;color:#B23B3B;font-size:12px;">✕</button>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div class="scroll" style="flex:1;overflow:auto;background:#EAECEF;padding:28px;display:flex;justify-content:center;align-items:flex-start;">
+          <div style="width:820px;max-width:100%;height:1060px;background:#fff;box-shadow:0 6px 30px rgba(15,17,22,.13);border-radius:5px;overflow:hidden;flex:none;">
+            {{previewFrame}}
+          </div>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ===================== TAILOR ===================== -->
+    <sc-if value="{{isTailor}}" hint-placeholder-val="{{true}}">
+    <div class="scroll" style="flex:1;overflow:auto;">
+      <div style="max-width:1180px;margin:0 auto;padding:40px 44px 64px;">
+        <h1 style="font-family:'Space Grotesk';font-weight:600;font-size:28px;margin:0;letter-spacing:-.025em;">Tailor to a Job</h1>
+        <p style="margin:8px 0 26px;color:#5A6573;font-size:14.5px;max-width:640px;">Paste a job description and I'll rewrite a version's summary, prioritize the right skills, surface the most relevant roles, and sharpen bullets — positioned as a growth operator and builder.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;">
+          <div style="background:#fff;border:1px solid #E6E8EC;border-radius:16px;padding:22px;">
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;font-weight:600;color:#5A6573;">Base version<select value="{{tailorBaseId}}" onChange="{{onTailorBase}}" style="border:1px solid #DFE3E8;border-radius:9px;padding:10px 11px;font-size:14px;color:#0E1116;background:#fff;"><sc-for list="{{baseOptions}}" as="o" hint-placeholder-count="2"><option value="{{o.id}}">{{o.name}}</option></sc-for></select></label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;">
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;font-weight:600;color:#5A6573;">Role title<input value="{{jobRole}}" onChange="{{onJobRole}}" placeholder="VP of Growth" style="border:1px solid #DFE3E8;border-radius:9px;padding:10px 11px;font-size:14px;" style-focus="border-color:#2F6BFF;" /></label>
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;font-weight:600;color:#5A6573;">Company<input value="{{jobCompany}}" onChange="{{onJobCompany}}" placeholder="Acme Health" style="border:1px solid #DFE3E8;border-radius:9px;padding:10px 11px;font-size:14px;" style-focus="border-color:#2F6BFF;" /></label>
+            </div>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;font-weight:600;color:#5A6573;margin-top:14px;">Job description<textarea value="{{jobDesc}}" onChange="{{onJobDesc}}" rows="12" placeholder="Paste the full job description here…" style="border:1px solid #DFE3E8;border-radius:11px;padding:12px;font-size:13.5px;line-height:1.55;color:#1a1f29;resize:vertical;" style-focus="border-color:#2F6BFF;"></textarea></label>
+            <div style="margin-top:16px;">
+              <div style="font-size:12.5px;font-weight:600;color:#5A6573;margin-bottom:8px;">Tailoring depth</div>
+              <div style="display:flex;gap:8px;">
+                <sc-for list="{{depthOptions}}" as="o" hint-placeholder-count="2">
+                  <button onClick="{{o.onClick}}" style="{{o.style}}">
+                    <div style="font-weight:700;font-size:13px;">{{o.title}}</div>
+                    <div style="font-size:11.5px;line-height:1.35;margin-top:3px;opacity:.85;">{{o.desc}}</div>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+            <sc-if value="{{tailorError}}"><div style="margin-top:12px;background:#FFF4F4;border:1px solid #F3D2D2;color:#B23B3B;padding:10px 12px;border-radius:9px;font-size:13px;">{{tailorError}}</div></sc-if>
+            <button onClick="{{runTailor}}" disabled="{{tailorBusy}}" style="{{tailorBtnStyle}}"><sc-if value="{{tailorBusy}}"><span style="display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;"></span></sc-if><span>{{tailorBtnLabel}}</span></button>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:16px;min-height:300px;">
+            <sc-if value="{{tailorHasResult}}" hint-placeholder-val="{{true}}">
+              <div style="background:#0D0F14;color:#E4E8EE;border-radius:16px;padding:20px 22px;animation:fadeUp .4s ease both;">
+                <div style="display:flex;align-items:center;gap:8px;font-family:'Space Grotesk';font-weight:600;font-size:14px;color:#9FC0FF;margin-bottom:9px;">✦ Why this fits</div>
+                <div style="font-size:13.6px;line-height:1.6;color:#C7CDD6;">{{tailorNotes}}</div>
+                <div style="display:flex;gap:9px;margin-top:16px;">
+                  <button onClick="{{openTailorResult}}" style="background:#2F6BFF;border:none;color:#fff;padding:9px 15px;border-radius:9px;font-weight:600;font-size:13px;cursor:pointer;" style-hover="background:#1E54E6;">Open in editor</button>
+                  <button onClick="{{exportTailor}}" style="background:rgba(255,255,255,.1);border:none;color:#fff;padding:9px 15px;border-radius:9px;font-weight:600;font-size:13px;cursor:pointer;" style-hover="background:rgba(255,255,255,.18);">↓ Export PDF</button>
+                </div>
+              </div>
+              <div style="background:#EAECEF;border-radius:16px;padding:16px;height:760px;overflow:hidden;">
+                <div style="width:100%;height:100%;background:#fff;border-radius:5px;overflow:hidden;box-shadow:0 4px 20px rgba(15,17,22,.1);">{{tailorPreviewFrame}}</div>
+              </div>
+            </sc-if>
+            <sc-if value="{{tailorNoResult}}" hint-placeholder-val="{{true}}">
+              <div style="border:1.5px dashed #D2D7DE;border-radius:16px;padding:48px 28px;text-align:center;color:#8A92A0;background:#FBFBFC;">
+                <div style="font-size:34px;margin-bottom:10px;opacity:.6;">⌖</div>
+                <div style="font-family:'Space Grotesk';font-weight:600;font-size:15px;color:#5A6573;">Your tailored resume appears here</div>
+                <div style="font-size:13px;margin-top:6px;">It's saved as a new version in your library, so the original stays untouched.</div>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ===================== COVER LETTER ===================== -->
+    <sc-if value="{{isCover}}" hint-placeholder-val="{{true}}">
+    <div class="scroll" style="flex:1;overflow:auto;">
+      <div style="max-width:1180px;margin:0 auto;padding:40px 44px 64px;">
+        <h1 style="font-family:'Space Grotesk';font-weight:600;font-size:28px;margin:0;letter-spacing:-.025em;">Cover Letter</h1>
+        <p style="margin:8px 0 26px;color:#5A6573;font-size:14.5px;max-width:640px;">Generate a concise, confident letter tied to outcomes — then edit it inline and export. Shares the job description with the Tailor tab.</p>
+        <div style="display:grid;grid-template-columns:420px 1fr;gap:24px;align-items:start;">
+          <div style="background:#fff;border:1px solid #E6E8EC;border-radius:16px;padding:22px;">
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;font-weight:600;color:#5A6573;">Base version<select value="{{coverBaseId}}" onChange="{{onCoverBase}}" style="border:1px solid #DFE3E8;border-radius:9px;padding:10px 11px;font-size:14px;background:#fff;"><sc-for list="{{baseOptions}}" as="o" hint-placeholder-count="2"><option value="{{o.id}}">{{o.name}}</option></sc-for></select></label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;">
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;font-weight:600;color:#5A6573;">Role<input value="{{jobRole}}" onChange="{{onJobRole}}" placeholder="VP of Growth" style="border:1px solid #DFE3E8;border-radius:9px;padding:10px 11px;font-size:14px;" style-focus="border-color:#2F6BFF;" /></label>
+              <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;font-weight:600;color:#5A6573;">Company<input value="{{jobCompany}}" onChange="{{onJobCompany}}" placeholder="Acme Health" style="border:1px solid #DFE3E8;border-radius:9px;padding:10px 11px;font-size:14px;" style-focus="border-color:#2F6BFF;" /></label>
+            </div>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;font-weight:600;color:#5A6573;margin-top:14px;">Hiring manager (optional)<input value="{{coverHM}}" onChange="{{onCoverHM}}" placeholder="e.g. Dr. Jane Smith" style="border:1px solid #DFE3E8;border-radius:9px;padding:10px 11px;font-size:14px;" style-focus="border-color:#2F6BFF;" /></label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;font-weight:600;color:#5A6573;margin-top:14px;">Job description<textarea value="{{jobDesc}}" onChange="{{onJobDesc}}" rows="9" placeholder="Paste the job description…" style="border:1px solid #DFE3E8;border-radius:11px;padding:12px;font-size:13.5px;line-height:1.55;resize:vertical;" style-focus="border-color:#2F6BFF;"></textarea></label>
+            <sc-if value="{{coverError}}"><div style="margin-top:12px;background:#FFF4F4;border:1px solid #F3D2D2;color:#B23B3B;padding:10px 12px;border-radius:9px;font-size:13px;">{{coverError}}</div></sc-if>
+            <button onClick="{{runCover}}" disabled="{{coverBusy}}" style="{{coverBtnStyle}}"><sc-if value="{{coverBusy}}"><span style="display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;"></span></sc-if><span>{{coverBtnLabel}}</span></button>
+          </div>
+
+          <div style="background:#fff;border:1px solid #E6E8EC;border-radius:16px;padding:8px;display:flex;flex-direction:column;min-height:560px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px 10px;">
+              <div style="font-family:'Space Grotesk';font-weight:600;font-size:14px;color:#5A6573;">Letter</div>
+              <div style="display:flex;gap:8px;">
+                <button onClick="{{copyCover}}" style="background:#F2F3F5;border:none;color:#3a4350;padding:7px 13px;border-radius:8px;font-weight:600;font-size:12.5px;cursor:pointer;" style-hover="background:#E6E8EC;">Copy</button>
+                <button onClick="{{exportCover}}" style="background:#2F6BFF;border:none;color:#fff;padding:7px 13px;border-radius:8px;font-weight:600;font-size:12.5px;cursor:pointer;" style-hover="background:#1E54E6;">↓ Export PDF</button>
+              </div>
+            </div>
+            <textarea value="{{coverText}}" onChange="{{onCoverText}}" placeholder="Your generated cover letter will appear here — fully editable." style="flex:1;border:none;background:#FCFCFD;border-radius:11px;margin:0 6px 6px;padding:22px 26px;font-size:14.5px;line-height:1.75;color:#1a1f29;resize:none;font-family:'Instrument Sans',sans-serif;min-height:480px;"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ===================== Q&A ===================== -->
+    <sc-if value="{{isQuestions}}" hint-placeholder-val="{{true}}">
+    <div class="scroll" style="flex:1;overflow:auto;">
+      <div style="max-width:920px;margin:0 auto;padding:40px 44px 64px;">
+        <h1 style="font-family:'Space Grotesk';font-weight:600;font-size:28px;margin:0;letter-spacing:-.025em;">Application Q&amp;A</h1>
+        <p style="margin:8px 0 22px;color:#5A6573;font-size:14.5px;max-width:640px;">Drop in the application's questions and generate answers in Nick's voice — confident, specific, tied to real outcomes. Uses the shared job description for context.</p>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;background:#fff;border:1px solid #E6E8EC;border-radius:14px;padding:16px 18px;margin-bottom:18px;">
+          <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;font-weight:600;color:#5A6573;flex:1;min-width:200px;">Resume context<select value="{{qBaseId}}" onChange="{{onQBase}}" style="border:1px solid #DFE3E8;border-radius:9px;padding:9px 11px;font-size:14px;background:#fff;"><sc-for list="{{baseOptions}}" as="o" hint-placeholder-count="2"><option value="{{o.id}}">{{o.name}}</option></sc-for></select></label>
+          <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;font-weight:600;color:#5A6573;flex:2;min-width:260px;">Job description (optional context)<input value="{{jobDesc}}" onChange="{{onJobDesc}}" placeholder="Paste or reuse from the Tailor tab" style="border:1px solid #DFE3E8;border-radius:9px;padding:9px 11px;font-size:13.5px;" style-focus="border-color:#2F6BFF;" /></label>
+          <button onClick="{{answerAll}}" disabled="{{qBusyAny}}" style="{{answerAllStyle}}">{{answerAllLabel}}</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <sc-for list="{{questionItems}}" as="q" hint-placeholder-count="2">
+            <div style="background:#fff;border:1px solid #E6E8EC;border-radius:14px;padding:16px 18px;">
+              <div style="display:flex;gap:10px;align-items:flex-start;">
+                <textarea value="{{q.q}}" onChange="{{q.onText}}" rows="1" placeholder="Paste an application question…" style="flex:1;border:1px solid #E2E5EA;border-radius:9px;padding:10px 12px;font-size:14px;font-weight:600;color:#1a1f29;resize:vertical;min-height:42px;line-height:1.4;" style-focus="border-color:#2F6BFF;"></textarea>
+                <button onClick="{{q.onAnswer}}" disabled="{{q.busy}}" style="{{q.btnStyle}}">{{q.btnLabel}}</button>
+                <button onClick="{{q.onRemove}}" style="background:#FFF4F4;border:none;width:38px;height:42px;border-radius:9px;cursor:pointer;color:#B23B3B;font-size:13px;flex:none;">✕</button>
+              </div>
+              <sc-if value="{{q.err}}"><div style="margin-top:10px;color:#B23B3B;font-size:12.5px;">{{q.err}}</div></sc-if>
+              <sc-if value="{{q.hasAnswer}}" hint-placeholder-val="{{true}}">
+                <div style="margin-top:12px;background:#F7F9FC;border:1px solid #EAEEF3;border-radius:11px;padding:14px 16px;position:relative;animation:fadeUp .3s ease both;">
+                  <textarea value="{{q.a}}" onChange="{{q.onEdit}}" style="width:100%;border:none;background:transparent;font-size:13.8px;line-height:1.65;color:#1a1f29;resize:vertical;min-height:120px;font-family:'Instrument Sans',sans-serif;"></textarea>
+                  <button onClick="{{q.onCopy}}" style="position:absolute;top:10px;right:10px;background:#fff;border:1px solid #E2E5EA;color:#3a4350;padding:5px 11px;border-radius:7px;font-weight:600;font-size:11.5px;cursor:pointer;" style-hover="border-color:#2F6BFF;color:#2F6BFF;">Copy</button>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+          <button onClick="{{addQuestion}}" style="align-self:flex-start;background:#EAF1FF;border:none;color:#2456D6;padding:10px 16px;border-radius:10px;font-weight:600;font-size:13.5px;cursor:pointer;" style-hover="background:#dbe7ff;">+ Add question</button>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ===================== APPLICATIONS ===================== -->
+    <sc-if value="{{isApplications}}" hint-placeholder-val="{{true}}">
+    <div class="scroll" style="flex:1;overflow:auto;">
+      <div style="max-width:1080px;margin:0 auto;padding:42px 48px 64px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;">
+          <div>
+            <h1 style="font-family:'Space Grotesk';font-weight:600;font-size:28px;margin:0;letter-spacing:-.025em;">Applications</h1>
+            <p style="margin:8px 0 0;color:#5A6573;font-size:14.5px;max-width:600px;">Each application keeps a snapshot of the exact resume, cover letter, and answers you sent. Open one to track its outcome, schedule follow-ups, and see why it fits.</p>
+          </div>
+          <button onClick="{{logNewApplication}}" style="display:inline-flex;align-items:center;gap:7px;background:#2F6BFF;border:none;color:#fff;padding:11px 17px;border-radius:11px;font-weight:600;font-size:13.5px;cursor:pointer;box-shadow:0 4px 14px rgba(47,107,255,.32);" style-hover="background:#1E54E6;">+&nbsp; Log application</button>
+        </div>
+
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin:26px 0 24px;">
+          <sc-for list="{{appStats}}" as="st" hint-placeholder-count="5">
+            <div style="{{st.style}}">
+              <div style="font-family:'Space Grotesk';font-weight:600;font-size:25px;line-height:1;">{{st.value}}</div>
+              <div style="font-size:12px;font-weight:600;margin-top:6px;opacity:.85;">{{st.label}}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{hasApplications}}" hint-placeholder-val="{{true}}">
+        <div style="background:#fff;border:1px solid #E6E8EC;border-radius:16px;overflow:hidden;">
+          <div style="display:grid;grid-template-columns:1fr 120px 150px 96px;gap:14px;padding:13px 22px;background:#FAFBFC;border-bottom:1px solid #EEF0F3;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#8A92A0;">
+            <div>Role / Company</div><div>Applied</div><div>Status</div><div style="text-align:right;">Actions</div>
+          </div>
+          <sc-for list="{{applicationItems}}" as="a" hint-placeholder-count="3">
+            <div style="display:grid;grid-template-columns:1fr 120px 150px 96px;gap:14px;align-items:center;padding:15px 22px;border-bottom:1px solid #F2F3F5;">
+              <div onClick="{{a.onOpen}}" style="min-width:0;cursor:pointer;">
+                <div style="font-weight:700;font-size:14.5px;color:#141821;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{a.title}}<sc-if value="{{a.company}}"><span style="color:#8A92A0;font-weight:600;"> · {{a.company}}</span></sc-if></div>
+                <div style="font-size:12.3px;color:#8A92A0;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{a.sub}}</div>
+                <sc-if value="{{a.hasNext}}"><div style="display:inline-flex;align-items:center;gap:5px;margin-top:6px;background:#F5F7FA;border:1px solid #E8ECF1;color:#5A6573;font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;">📅 {{a.nextLabel}}</div></sc-if>
+              </div>
+              <div style="font-size:13px;color:#3a4350;">{{a.appliedDate}}</div>
+              <div>
+                <select value="{{a.status}}" onChange="{{a.onStatus}}" style="{{a.statusStyle}}">
+                  <sc-for list="{{a.statusOptions}}" as="o" hint-placeholder-count="6"><option value="{{o.id}}">{{o.label}}</option></sc-for>
+                </select>
+              </div>
+              <div style="display:flex;gap:7px;justify-content:flex-end;">
+                <button onClick="{{a.onOpen}}" title="Open" style="background:#0E1116;color:#fff;border:none;padding:7px 12px;border-radius:8px;font-weight:600;font-size:12px;cursor:pointer;" style-hover="background:#272b33;">Open</button>
+                <button onClick="{{a.onRemove}}" title="Delete application" style="background:#fff;border:1px solid #E0E3E8;color:#B23B3B;padding:7px 10px;border-radius:8px;cursor:pointer;font-size:12px;" style-hover="border-color:#E0A0A0;background:#FFF6F6;">✕</button>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        </sc-if>
+        <sc-if value="{{noApplications}}" hint-placeholder-val="{{true}}">
+          <div style="border:1.5px dashed #D2D7DE;border-radius:16px;padding:48px 28px;text-align:center;color:#8A92A0;background:#FBFBFC;">
+            <div style="font-size:32px;margin-bottom:10px;opacity:.55;">✓</div>
+            <div style="font-family:'Space Grotesk';font-weight:600;font-size:15px;color:#5A6573;">No applications tracked yet</div>
+            <div style="font-size:13px;margin-top:6px;">Hit “Log application” here, or “Log application” on any resume in your Library — it captures a snapshot and shows up here.</div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ===================== APPLICATION DETAIL ===================== -->
+    <sc-if value="{{isAppDetail}}" hint-placeholder-val="{{true}}">
+    <sc-if value="{{hasDetail}}" hint-placeholder-val="{{true}}">
+    <div class="scroll" style="flex:1;overflow:auto;background:#F5F6F8;">
+      <div style="max-width:1180px;margin:0 auto;padding:26px 40px 64px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
+          <button onClick="{{backToApplications}}" style="background:#fff;border:1px solid #E2E5EA;width:36px;height:36px;border-radius:10px;cursor:pointer;font-size:17px;color:#3a4350;display:flex;align-items:center;justify-content:center;" style-hover="border-color:#2F6BFF;color:#2F6BFF;">←</button>
+          <div style="flex:1;min-width:0;">
+            <div style="font-family:'Space Grotesk';font-weight:600;font-size:21px;letter-spacing:-.02em;color:#0E1116;">{{detail.title}}</div>
+            <div style="font-size:12.5px;color:#8A92A0;margin-top:2px;">Applied {{detail.appliedDate}}</div>
+          </div>
+          <span style="{{detail.statusPillStyle}}">{{detail.statusLabel}}</span>
+          <button onClick="{{detail.onDelete}}" style="background:#fff;border:1px solid #E0E3E8;color:#B23B3B;padding:9px 13px;border-radius:9px;cursor:pointer;font-size:12.5px;font-weight:600;" style-hover="border-color:#E0A0A0;background:#FFF6F6;">Delete</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start;">
+          <!-- LEFT: status, insight, timeline, notes -->
+          <div style="display:flex;flex-direction:column;gap:18px;">
+            <div style="background:#fff;border:1px solid #E6E8EC;border-radius:16px;padding:20px;">
+              <div style="font-family:'Space Grotesk';font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.07em;color:#8A92A0;margin-bottom:13px;">Outcome</div>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                <sc-for list="{{detail.steps}}" as="st" hint-placeholder-count="6"><button onClick="{{st.onClick}}" style="{{st.style}}">{{st.label}}</button></sc-for>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;">
+                <label style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:#5A6573;">Role<input value="{{detail.role}}" onChange="{{detail.onRole}}" placeholder="Role" style="border:1px solid #DFE3E8;border-radius:9px;padding:8px 10px;font-size:13.5px;color:#0E1116;" style-focus="border-color:#2F6BFF;" /></label>
+                <label style="display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600;color:#5A6573;">Company<input value="{{detail.company}}" onChange="{{detail.onCompany}}" placeholder="Company" style="border:1px solid #DFE3E8;border-radius:9px;padding:8px 10px;font-size:13.5px;color:#0E1116;" style-focus="border-color:#2F6BFF;" /></label>
+              </div>
+            </div>
+
+            <div style="background:#0D0F14;border-radius:16px;padding:20px 22px;color:#E4E8EE;">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px;">
+                <div style="display:flex;align-items:center;gap:8px;font-family:'Space Grotesk';font-weight:600;font-size:14px;color:#9FC0FF;">✦ Fit & gaps</div>
+                <sc-if value="{{detail.hasInsight}}"><div style="{{detail.fitStyle}}"><span style="font-size:18px;line-height:1;">{{detail.fitScore}}</span><span style="font-size:8.5px;font-weight:600;letter-spacing:.05em;opacity:.8;margin-top:2px;">FIT</span></div></sc-if>
+              </div>
+              <sc-if value="{{detail.insightError}}"><div style="color:#FF9B9B;font-size:12.5px;margin:8px 0;">{{detail.insightError}}</div></sc-if>
+              <sc-if value="{{detail.hasInsight}}">
+                <div style="margin-top:8px;font-size:12px;font-weight:700;color:#7FE0B0;text-transform:uppercase;letter-spacing:.05em;">Strengths</div>
+                <ul style="margin:6px 0 0;padding-left:18px;font-size:13px;line-height:1.55;color:#C7CDD6;"><sc-for list="{{detail.insight.strengths}}" as="x" hint-placeholder-count="3"><li>{{x}}</li></sc-for></ul>
+                <div style="margin-top:12px;font-size:12px;font-weight:700;color:#F2C97A;text-transform:uppercase;letter-spacing:.05em;">Gaps</div>
+                <ul style="margin:6px 0 0;padding-left:18px;font-size:13px;line-height:1.55;color:#C7CDD6;"><sc-for list="{{detail.insight.gaps}}" as="x" hint-placeholder-count="3"><li>{{x}}</li></sc-for></ul>
+                <div style="margin-top:12px;background:rgba(159,192,255,.12);border-radius:10px;padding:11px 13px;font-size:13px;line-height:1.55;color:#DCE6FF;">💡 {{detail.insight.advice}}</div>
+              </sc-if>
+              <button onClick="{{detail.onAnalyze}}" disabled="{{detail.insightBusy}}" style="margin-top:14px;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(255,255,255,.1);border:none;color:#fff;padding:11px;border-radius:10px;font-weight:600;font-size:13px;cursor:pointer;" style-hover="background:rgba(255,255,255,.18);"><sc-if value="{{detail.insightBusy}}"><span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;"></span></sc-if><span>{{detail.analyzeLabel}}</span></button>
+            </div>
+
+            <div style="background:#fff;border:1px solid #E6E8EC;border-radius:16px;padding:20px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;">
+                <div style="font-family:'Space Grotesk';font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.07em;color:#8A92A0;">Timeline & reminders</div>
+                <div style="display:flex;gap:7px;">
+                  <button onClick="{{detail.onAddInterview}}" style="background:#FEF3DA;border:none;color:#9A6212;padding:6px 11px;border-radius:8px;font-weight:600;font-size:12px;cursor:pointer;" style-hover="background:#fbe9c2;">+ Interview</button>
+                  <button onClick="{{detail.onAddFollowup}}" style="background:#EAF1FF;border:none;color:#2456D6;padding:6px 11px;border-radius:8px;font-weight:600;font-size:12px;cursor:pointer;" style-hover="background:#dbe7ff;">+ Follow-up</button>
+                </div>
+              </div>
+              <sc-if value="{{detail.hasEvents}}">
+                <div style="display:flex;flex-direction:column;gap:9px;">
+                  <sc-for list="{{detail.events}}" as="e" hint-placeholder-count="2">
+                    <div style="display:flex;gap:10px;align-items:flex-start;border:1px solid #EEF0F3;border-radius:11px;padding:11px 12px;">
+                      <button onClick="{{e.onToggle}}" style="{{e.checkStyle}}">✓</button>
+                      <div style="flex:1;min-width:0;">
+                        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                          <span style="display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:13px;color:#141821;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:{{e.dotColor}};"></span>{{e.typeLabel}}</span>
+                          <input type="date" value="{{e.date}}" onChange="{{e.onDate}}" style="border:1px solid #E2E5EA;border-radius:7px;padding:4px 7px;font-size:12px;color:#3a4350;" />
+                          <input value="{{e.time}}" onChange="{{e.onTime}}" placeholder="time" style="width:78px;border:1px solid #E2E5EA;border-radius:7px;padding:4px 7px;font-size:12px;color:#3a4350;" />
+                          <sc-if value="{{e.overdue}}"><span style="background:#FCECEC;color:#B23B3B;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:5px;">OVERDUE</span></sc-if>
+                        </div>
+                        <input value="{{e.notes}}" onChange="{{e.onNotes}}" placeholder="Add a note…" style="margin-top:7px;width:100%;border:none;border-bottom:1px solid #EEF0F3;background:transparent;padding:4px 1px;font-size:12.5px;color:#3a4350;" style-focus="border-color:#2F6BFF;" />
+                      </div>
+                      <button onClick="{{e.onRemove}}" style="background:none;border:none;color:#b9bfc8;cursor:pointer;font-size:13px;padding:2px;" style-hover="color:#B23B3B;">✕</button>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </div>
+
+            <div style="background:#fff;border:1px solid #E6E8EC;border-radius:16px;padding:20px;">
+              <div style="font-family:'Space Grotesk';font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.07em;color:#8A92A0;margin-bottom:11px;">Notes</div>
+              <textarea value="{{detail.notes}}" onChange="{{detail.onNotes}}" rows="3" placeholder="Recruiter name, referral, salary range, where you found it…" style="width:100%;border:1px solid #DFE3E8;border-radius:10px;padding:11px 12px;font-size:13.5px;line-height:1.55;color:#1a1f29;resize:vertical;" style-focus="border-color:#2F6BFF;"></textarea>
+            </div>
+          </div>
+
+          <!-- RIGHT: snapshot artifacts -->
+          <div style="display:flex;flex-direction:column;gap:18px;">
+            <div style="background:#fff;border:1px solid #E6E8EC;border-radius:16px;padding:16px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                <div><div style="font-family:'Space Grotesk';font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.07em;color:#8A92A0;">Resume sent</div><div style="font-size:12.5px;color:#5A6573;margin-top:3px;">{{detail.resumeName}} · {{detail.templateLabel}}</div></div>
+                <button onClick="{{detail.onExportResume}}" style="background:#2F6BFF;border:none;color:#fff;padding:8px 13px;border-radius:9px;font-weight:600;font-size:12.5px;cursor:pointer;" style-hover="background:#1E54E6;">↓ Export</button>
+              </div>
+              <div style="display:flex;justify-content:center;padding:2px 0 4px;">{{detail.resumeFrame}}</div>
+            </div>
+
+            <div style="background:#fff;border:1px solid #E6E8EC;border-radius:16px;padding:16px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;">
+                <div style="font-family:'Space Grotesk';font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.07em;color:#8A92A0;">Cover letter sent</div>
+                <div style="display:flex;gap:7px;"><button onClick="{{detail.onCopyCover}}" style="background:#F2F3F5;border:none;color:#3a4350;padding:6px 11px;border-radius:8px;font-weight:600;font-size:12px;cursor:pointer;" style-hover="background:#E6E8EC;">Copy</button><button onClick="{{detail.onExportCover}}" style="background:#2F6BFF;border:none;color:#fff;padding:6px 11px;border-radius:8px;font-weight:600;font-size:12px;cursor:pointer;" style-hover="background:#1E54E6;">↓ PDF</button></div>
+              </div>
+              <textarea value="{{detail.coverLetter}}" onChange="{{detail.onCover}}" rows="6" placeholder="No cover letter was attached to this application." style="width:100%;border:1px solid #EEF0F3;background:#FCFCFD;border-radius:10px;padding:12px 14px;font-size:13.3px;line-height:1.65;color:#1a1f29;resize:vertical;" style-focus="border-color:#2F6BFF;"></textarea>
+            </div>
+
+            <sc-if value="{{detail.hasAnswers}}">
+            <div style="background:#fff;border:1px solid #E6E8EC;border-radius:16px;padding:16px;">
+              <div style="font-family:'Space Grotesk';font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.07em;color:#8A92A0;margin-bottom:12px;">Application answers sent</div>
+              <div style="display:flex;flex-direction:column;gap:11px;">
+                <sc-for list="{{detail.answers}}" as="qa" hint-placeholder-count="2">
+                  <div style="border:1px solid #EEF0F3;border-radius:11px;padding:12px 14px;background:#FCFCFD;">
+                    <div style="font-weight:700;font-size:13px;color:#141821;margin-bottom:5px;">{{qa.q}}</div>
+                    <div style="font-size:13px;line-height:1.6;color:#3a4350;white-space:pre-wrap;">{{qa.a}}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            </sc-if>
+
+            <div style="background:#fff;border:1px solid #E6E8EC;border-radius:16px;padding:16px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;">
+                <div style="font-family:'Space Grotesk';font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.07em;color:#8A92A0;">Interview prep</div>
+                <button onClick="{{detail.onGenPrep}}" disabled="{{detail.prepBusy}}" style="background:#0E1116;border:none;color:#fff;padding:7px 13px;border-radius:9px;font-weight:600;font-size:12.5px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;" style-hover="background:#272b33;"><sc-if value="{{detail.prepBusy}}"><span style="display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;"></span></sc-if><span>{{detail.prepLabel}}</span></button>
+              </div>
+              <sc-if value="{{detail.prepError}}"><div style="color:#B23B3B;font-size:12.5px;margin-bottom:8px;">{{detail.prepError}}</div></sc-if>
+              <sc-if value="{{detail.hasPrep}}">
+                <div style="font-size:11.5px;font-weight:700;color:#9A6212;text-transform:uppercase;letter-spacing:.05em;">Likely questions</div>
+                <ul style="margin:6px 0 0;padding-left:18px;font-size:13px;line-height:1.55;color:#2b3140;"><sc-for list="{{detail.prep.questions}}" as="x" hint-placeholder-count="4"><li>{{x}}</li></sc-for></ul>
+                <div style="margin-top:12px;font-size:11.5px;font-weight:700;color:#0E7C4B;text-transform:uppercase;letter-spacing:.05em;">Lead with</div>
+                <ul style="margin:6px 0 0;padding-left:18px;font-size:13px;line-height:1.55;color:#2b3140;"><sc-for list="{{detail.prep.talkingPoints}}" as="x" hint-placeholder-count="3"><li>{{x}}</li></sc-for></ul>
+                <div style="margin-top:12px;font-size:11.5px;font-weight:700;color:#2456D6;text-transform:uppercase;letter-spacing:.05em;">Ask them</div>
+                <ul style="margin:6px 0 0;padding-left:18px;font-size:13px;line-height:1.55;color:#2b3140;"><sc-for list="{{detail.prep.ask}}" as="x" hint-placeholder-count="2"><li>{{x}}</li></sc-for></ul>
+              </sc-if>
+              <sc-if value="{{detail.noPrep}}"><div style="font-size:12.8px;color:#8A92A0;line-height:1.5;">Generate likely questions, proof points to lead with, and smart questions to ask — drawn from this role's JD and the resume you sent.</div></sc-if>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+    </sc-if>
+
+    <!-- ===================== INSIGHTS ===================== -->
+    <sc-if value="{{isInsights}}" hint-placeholder-val="{{true}}">
+    <div class="scroll" style="flex:1;overflow:auto;">
+      <div style="max-width:1080px;margin:0 auto;padding:42px 48px 64px;">
+        <h1 style="font-family:'Space Grotesk';font-weight:600;font-size:28px;margin:0;letter-spacing:-.025em;">Insights</h1>
+        <p style="margin:8px 0 26px;color:#5A6573;font-size:14.5px;max-width:640px;">Your application pipeline, what's coming up, and an AI read on what's actually getting responses.</p>
+
+        <!-- Upcoming -->
+        <div style="background:#fff;border:1px solid #E6E8EC;border-radius:16px;padding:20px 22px;margin-bottom:18px;">
+          <div style="font-family:'Space Grotesk';font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.07em;color:#8A92A0;margin-bottom:13px;">Coming up</div>
+          <sc-if value="{{hasUpcoming}}" hint-placeholder-val="{{true}}">
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              <sc-for list="{{upcoming}}" as="e" hint-placeholder-count="2">
+                <div onClick="{{e.onOpen}}" style="display:flex;align-items:center;gap:12px;border:1px solid #EEF0F3;border-radius:11px;padding:12px 14px;cursor:pointer;" style-hover="border-color:#2F6BFF;background:#FAFBFF;">
+                  <span style="{{e.dotStyle}}"></span>
+                  <div style="flex:1;min-width:0;">
+                    <div style="font-weight:700;font-size:13.5px;color:#141821;">{{e.typeLabel}} — {{e.who}}</div>
+                    <sc-if value="{{e.hasNotes}}"><div style="font-size:12.3px;color:#8A92A0;margin-top:2px;">{{e.notes}}</div></sc-if>
+                  </div>
+                  <div style="text-align:right;flex:none;">
+                    <div style="font-size:12.8px;font-weight:600;color:#3a4350;">{{e.when}}</div>
+                    <sc-if value="{{e.overdue}}"><div style="font-size:10.5px;font-weight:700;color:#B23B3B;margin-top:2px;">OVERDUE</div></sc-if>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{noUpcoming}}" hint-placeholder-val="{{true}}"><div style="font-size:13px;color:#8A92A0;">No interviews or follow-ups scheduled. Add them from any application's timeline.</div></sc-if>
+        </div>
+
+        <!-- Funnel -->
+        <div style="background:#fff;border:1px solid #E6E8EC;border-radius:16px;padding:20px 22px;margin-bottom:18px;">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:15px;">
+            <div style="font-family:'Space Grotesk';font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.07em;color:#8A92A0;">Pipeline funnel</div>
+            <div style="font-size:12.5px;color:#5A6573;">Response rate <b style="color:#0C7C8C;">{{respRateLabel}}</b> &nbsp;·&nbsp; Interview rate <b style="color:#9A6212;">{{interviewRateLabel}}</b></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:11px;">
+            <sc-for list="{{funnel}}" as="fn" hint-placeholder-count="4">
+              <div style="display:flex;align-items:center;gap:14px;">
+                <div style="width:78px;flex:none;font-size:13px;font-weight:700;color:{{fn.fg}};">{{fn.label}}</div>
+                <div style="{{fn.trackStyle}}"><div style="{{fn.barStyle}}"></div></div>
+                <div style="width:88px;flex:none;text-align:right;font-size:13px;color:#3a4350;"><b>{{fn.value}}</b> <span style="color:#9AA3AF;">· {{fn.pctLabel}}</span></div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- AI insight engine -->
+        <div style="background:#0D0F14;border-radius:16px;padding:22px 24px;margin-bottom:18px;color:#E4E8EE;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:9px;font-family:'Space Grotesk';font-weight:600;font-size:15.5px;color:#fff;">✦ What's making interviews happen</div>
+            <button onClick="{{runInsights}}" disabled="{{insightBusy}}" style="display:inline-flex;align-items:center;gap:8px;background:#2F6BFF;border:none;color:#fff;padding:10px 16px;border-radius:10px;font-weight:600;font-size:13px;cursor:pointer;" style-hover="background:#1E54E6;"><sc-if value="{{insightBusy}}"><span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;"></span></sc-if><span>{{insightBtnLabel}}</span></button>
+          </div>
+          <sc-if value="{{insightError}}"><div style="margin-top:12px;background:rgba(255,107,107,.12);border-radius:10px;color:#FF9B9B;padding:11px 13px;font-size:13px;">{{insightError}}</div></sc-if>
+          <sc-if value="{{hasCrossInsight}}">
+            <div style="margin-top:14px;font-size:14px;line-height:1.6;color:#DCE6FF;background:rgba(159,192,255,.1);border-radius:11px;padding:13px 15px;">{{insight.summary}}</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;">
+              <div>
+                <div style="font-size:12px;font-weight:700;color:#7FE0B0;text-transform:uppercase;letter-spacing:.05em;">What worked</div>
+                <ul style="margin:7px 0 0;padding-left:18px;font-size:13px;line-height:1.55;color:#C7CDD6;"><sc-for list="{{insight.worked}}" as="x" hint-placeholder-count="3"><li>{{x}}</li></sc-for></ul>
+              </div>
+              <div>
+                <div style="font-size:12px;font-weight:700;color:#F2C97A;text-transform:uppercase;letter-spacing:.05em;">What the misses lacked</div>
+                <ul style="margin:7px 0 0;padding-left:18px;font-size:13px;line-height:1.55;color:#C7CDD6;"><sc-for list="{{insight.missing}}" as="x" hint-placeholder-count="3"><li>{{x}}</li></sc-for></ul>
+              </div>
+            </div>
+            <div style="margin-top:16px;font-size:12px;font-weight:700;color:#9FC0FF;text-transform:uppercase;letter-spacing:.05em;">Do this next</div>
+            <ul style="margin:7px 0 0;padding-left:18px;font-size:13.5px;line-height:1.6;color:#E4E8EE;"><sc-for list="{{insight.next}}" as="x" hint-placeholder-count="3"><li>{{x}}</li></sc-for></ul>
+          </sc-if>
+          <sc-if value="{{insightNone}}"><div style="margin-top:12px;font-size:13.5px;line-height:1.6;color:#9AA3B2;">Log a few applications and set their outcomes (response, interview, rejected, no-response). Once there's something to compare, I'll surface the patterns that correlate with getting a response.</div></sc-if>
+        </div>
+
+        <!-- By resume version -->
+        <sc-if value="{{hasVersionData}}">
+        <div style="background:#fff;border:1px solid #E6E8EC;border-radius:16px;overflow:hidden;">
+          <div style="padding:16px 22px 4px;font-family:'Space Grotesk';font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.07em;color:#8A92A0;">Performance by resume version</div>
+          <div style="display:grid;grid-template-columns:1fr 90px 90px 110px;gap:14px;padding:11px 22px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#A4ABB6;">
+            <div>Version</div><div style="text-align:center;">Sent</div><div style="text-align:center;">Responses</div><div style="text-align:center;">Resp. rate</div>
+          </div>
+          <sc-for list="{{byVersion}}" as="r" hint-placeholder-count="2">
+            <div style="display:grid;grid-template-columns:1fr 90px 90px 110px;gap:14px;padding:13px 22px;border-top:1px solid #F2F3F5;align-items:center;">
+              <div style="font-weight:600;font-size:13.5px;color:#141821;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{r.name}}</div>
+              <div style="text-align:center;font-size:13.5px;color:#3a4350;">{{r.n}}</div>
+              <div style="text-align:center;font-size:13.5px;color:#3a4350;">{{r.resp}}</div>
+              <div style="text-align:center;font-size:13.5px;font-weight:700;color:#0C7C8C;">{{r.rate}}</div>
+            </div>
+          </sc-for>
+        </div>
+        </sc-if>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ===================== GUIDED BUILDER ===================== -->
+    <sc-if value="{{isGuided}}" hint-placeholder-val="{{true}}">
+    <div class="bg-soft" style="flex:1;display:flex;flex-direction:column;min-height:0;background:#FAFBFC;">
+      <div class="bg-white" style="flex:none;height:60px;display:flex;align-items:center;gap:16px;padding:0 24px;border-bottom:1px solid #ECEEF1;background:#fff;">
+        <div style="font-family:'Space Grotesk';font-weight:600;font-size:14px;color:#0E1116;white-space:nowrap;">Guided builder</div>
+        <div style="flex:1;max-width:380px;height:7px;background:#EDEFF2;border-radius:99px;overflow:hidden;"><div style="height:100%;width:{{gPct}}%;background:linear-gradient(90deg,#2F6BFF,#7A53FF);border-radius:99px;transition:width .35s;"></div></div>
+        <div style="font-size:12.5px;color:#8A92A0;font-weight:600;white-space:nowrap;">Step {{gStepNum}} of {{gStepTotal}} · {{gStepLabel}}</div>
+        <button onClick="{{exitGuided}}" style="margin-left:auto;background:#F2F3F5;border:none;color:#5a6573;padding:8px 14px;border-radius:9px;font-weight:600;font-size:12.5px;cursor:pointer;white-space:nowrap;" style-hover="background:#E6E8EC;">Save &amp; exit</button>
+      </div>
+
+      <div class="scroll" style="flex:1;overflow:auto;">
+        <div style="max-width:640px;margin:0 auto;padding:42px 28px 36px;">
+
+          <!-- WELCOME -->
+          <sc-if value="{{gIsWelcome}}" hint-placeholder-val="{{true}}">
+          <div style="text-align:center;padding-top:14px;">
+            <div style="width:66px;height:66px;border-radius:19px;margin:0 auto 22px;background:linear-gradient(135deg,#2F6BFF,#7A53FF);display:flex;align-items:center;justify-content:center;color:#fff;font-size:28px;box-shadow:0 12px 32px rgba(47,107,255,.32);">✎</div>
+            <h1 style="font-family:'Space Grotesk';font-weight:600;font-size:30px;letter-spacing:-.025em;margin:0;color:#0E1116;line-height:1.15;">Let’s build your resume, together.</h1>
+            <p style="margin:15px auto 0;max-width:486px;color:#5A6573;font-size:15.5px;line-height:1.62;">Starting from a blank page is the hardest part — so we won’t. I’ll ask a few simple questions, one at a time. There’s nothing to prepare, no wrong answers, and you can change anything later.</p>
+            <div style="display:flex;flex-direction:column;gap:10px;max-width:430px;margin:28px auto 0;text-align:left;">
+              <div style="display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #ECEEF1;border-radius:12px;padding:13px 15px;"><span style="flex:none;width:26px;height:26px;border-radius:8px;background:#EAF1FF;color:#2456D6;display:flex;align-items:center;justify-content:center;font-size:14px;">1</span><span style="font-size:13.8px;color:#2b3140;">One small step at a time — never everything at once.</span></div>
+              <div style="display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #ECEEF1;border-radius:12px;padding:13px 15px;"><span style="flex:none;width:26px;height:26px;border-radius:8px;background:#EAF1FF;color:#2456D6;display:flex;align-items:center;justify-content:center;font-size:14px;">2</span><span style="font-size:13.8px;color:#2b3140;">Just tell me what you did in plain words — I’ll polish it.</span></div>
+              <div style="display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #ECEEF1;border-radius:12px;padding:13px 15px;"><span style="flex:none;width:26px;height:26px;border-radius:8px;background:#EAF1FF;color:#2456D6;display:flex;align-items:center;justify-content:center;font-size:14px;">3</span><span style="font-size:13.8px;color:#2b3140;">About 5 minutes. Pause anytime — your progress is saved.</span></div>
+            </div>
+            <button onClick="{{openImport}}" style="margin-top:22px;background:none;border:none;color:#2456D6;font-weight:600;font-size:13px;cursor:pointer;" style-hover="text-decoration:underline;">Already have a resume? Import it instead</button>
+          </div>
+          </sc-if>
+
+          <!-- BASICS -->
+          <sc-if value="{{gIsBasics}}" hint-placeholder-val="{{true}}">
+          <h1 style="font-family:'Space Grotesk';font-weight:600;font-size:26px;letter-spacing:-.02em;margin:0;color:#0E1116;">First, the basics</h1>
+          <p style="margin:10px 0 26px;color:#5A6573;font-size:15px;line-height:1.55;">Just the essentials so people can reach you. Leave anything blank for now — you can add it later.</p>
+          <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;font-weight:600;color:#5A6573;">Your name<input value="{{gName}}" onChange="{{gOnName}}" placeholder="Jordan Rivera" style="border:1px solid #DFE3E8;border-radius:11px;padding:13px 14px;font-size:16px;color:#0E1116;" style-focus="border-color:#2F6BFF;" /></label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-top:14px;">
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;font-weight:600;color:#5A6573;">Email<input value="{{gEmail}}" onChange="{{gOnEmail}}" placeholder="you@email.com" style="border:1px solid #DFE3E8;border-radius:11px;padding:11px 13px;font-size:14.5px;" style-focus="border-color:#2F6BFF;" /></label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;font-weight:600;color:#5A6573;">Phone<input value="{{gPhone}}" onChange="{{gOnPhone}}" placeholder="(555) 123-4567" style="border:1px solid #DFE3E8;border-radius:11px;padding:11px 13px;font-size:14.5px;" style-focus="border-color:#2F6BFF;" /></label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;font-weight:600;color:#5A6573;">Location<input value="{{gLocation}}" onChange="{{gOnLocation}}" placeholder="City, State" style="border:1px solid #DFE3E8;border-radius:11px;padding:11px 13px;font-size:14.5px;" style-focus="border-color:#2F6BFF;" /></label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;font-weight:600;color:#5A6573;">LinkedIn / site (optional)<input value="{{gLinkedin}}" onChange="{{gOnLinkedin}}" placeholder="linkedin.com/in/…" style="border:1px solid #DFE3E8;border-radius:11px;padding:11px 13px;font-size:14.5px;" style-focus="border-color:#2F6BFF;" /></label>
+          </div>
+          </sc-if>
+
+          <!-- HEADLINE -->
+          <sc-if value="{{gIsHeadline}}" hint-placeholder-val="{{true}}">
+          <h1 style="font-family:'Space Grotesk';font-weight:600;font-size:26px;letter-spacing:-.02em;margin:0;color:#0E1116;">What do you do, in a few words?</h1>
+          <p style="margin:10px 0 24px;color:#5A6573;font-size:15px;line-height:1.55;">This is the short line at the very top of your resume — who you are at a glance. Don’t overthink it, and feel free to skip if you’re not sure.</p>
+          <input value="{{gHeadline}}" onChange="{{gOnHeadline}}" placeholder="e.g. Customer Success Manager · SaaS &amp; fintech" style="width:100%;border:1px solid #DFE3E8;border-radius:11px;padding:14px;font-size:16px;color:#0E1116;" style-focus="border-color:#2F6BFF;" />
+          <div style="margin-top:14px;font-size:12.5px;color:#8A92A0;">A few examples: <span style="color:#5A6573;">“Registered Nurse, 8 years in pediatrics” · “Marketing generalist who loves data” · “Recent grad, eager to learn”</span></div>
+          </sc-if>
+
+          <!-- EXPERIENCE -->
+          <sc-if value="{{gIsExperience}}" hint-placeholder-val="{{true}}">
+          <h1 style="font-family:'Space Grotesk';font-weight:600;font-size:26px;letter-spacing:-.02em;margin:0;color:#0E1116;">Now, your experience</h1>
+          <p style="margin:10px 0 22px;color:#5A6573;font-size:15px;line-height:1.55;">One role at a time — start with your most recent. Tell me what you did in plain words, and I’ll shape it into strong resume bullets for you.</p>
+          <div style="display:flex;flex-direction:column;gap:16px;">
+            <sc-for list="{{gRoles}}" as="r" hint-placeholder-count="1">
+              <div style="background:#fff;border:1px solid #E6E8EC;border-radius:14px;padding:17px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                  <span style="font-family:'Space Grotesk';font-weight:600;font-size:13px;color:#8A92A0;text-transform:uppercase;letter-spacing:.05em;">{{r.label}}</span>
+                  <button onClick="{{r.onRemove}}" style="background:none;border:none;color:#b9bfc8;cursor:pointer;font-size:13px;" style-hover="color:#B23B3B;">Remove</button>
+                </div>
+                <input value="{{r.company}}" onChange="{{r.onCompany}}" placeholder="Company" style="width:100%;border:1px solid #E2E5EA;border-radius:9px;padding:10px 12px;font-size:14.5px;font-weight:600;color:#0E1116;margin-bottom:9px;" style-focus="border-color:#2F6BFF;" />
+                <div style="display:grid;grid-template-columns:1fr 130px;gap:9px;margin-bottom:11px;">
+                  <input value="{{r.title}}" onChange="{{r.onTitle}}" placeholder="Your title" style="border:1px solid #E2E5EA;border-radius:9px;padding:10px 12px;font-size:13.5px;color:#2b3140;" style-focus="border-color:#2F6BFF;" />
+                  <input value="{{r.dates}}" onChange="{{r.onDates}}" placeholder="2022 – Now" style="border:1px solid #E2E5EA;border-radius:9px;padding:10px 12px;font-size:13.5px;color:#2b3140;text-align:center;" style-focus="border-color:#2F6BFF;" />
+                </div>
+                <textarea value="{{r.raw}}" onChange="{{r.onRaw}}" rows="3" placeholder="What did you do here? Plain words are perfect — e.g. “ran the email program, grew signups about 40%, managed two people”." style="width:100%;border:1px solid #E2E5EA;border-radius:10px;padding:11px 12px;font-size:13.5px;line-height:1.55;color:#2b3140;resize:vertical;" style-focus="border-color:#2F6BFF;"></textarea>
+                <button onClick="{{r.onPolish}}" disabled="{{r.busy}}" style="margin-top:10px;display:inline-flex;align-items:center;gap:8px;background:#0E1116;border:none;color:#fff;padding:9px 14px;border-radius:9px;font-weight:600;font-size:12.8px;cursor:pointer;" style-hover="background:#272b33;"><sc-if value="{{r.busy}}"><span style="display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;"></span></sc-if><span>{{r.polishLabel}}</span></button>
+                <sc-if value="{{r.hasBullets}}">
+                  <div style="margin-top:13px;display:flex;flex-direction:column;gap:7px;">
+                    <sc-for list="{{r.bullets}}" as="b" hint-placeholder-count="3">
+                      <div style="display:flex;gap:8px;align-items:flex-start;">
+                        <span style="color:#2F6BFF;font-size:15px;line-height:1.7;flex:none;">•</span>
+                        <textarea value="{{b.text}}" onChange="{{b.onChange}}" rows="1" style="flex:1;border:1px solid #EAEDF1;border-radius:7px;padding:7px 9px;font-size:13px;line-height:1.45;color:#2b3140;resize:vertical;min-height:34px;" style-focus="border-color:#2F6BFF;"></textarea>
+                        <button onClick="{{b.onRemove}}" style="background:none;border:none;cursor:pointer;color:#b9bfc8;font-size:12px;padding:6px 2px;" style-hover="color:#B23B3B;">✕</button>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <button onClick="{{gAddRole}}" style="margin-top:14px;width:100%;background:#fff;border:1px dashed #CFD5DD;color:#2456D6;padding:13px;border-radius:11px;font-weight:600;font-size:13.5px;cursor:pointer;" style-hover="border-color:#2F6BFF;background:#F5F8FF;">+ Add a role</button>
+          </sc-if>
+
+          <!-- EDUCATION -->
+          <sc-if value="{{gIsEducation}}" hint-placeholder-val="{{true}}">
+          <h1 style="font-family:'Space Grotesk';font-weight:600;font-size:26px;letter-spacing:-.02em;margin:0;color:#0E1116;">Any education to add?</h1>
+          <p style="margin:10px 0 22px;color:#5A6573;font-size:15px;line-height:1.55;">Totally optional. Add a degree, certificate, or course — or skip straight ahead.</p>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <sc-for list="{{gEdus}}" as="ed" hint-placeholder-count="1">
+              <div style="display:grid;grid-template-columns:1fr 1fr 96px 34px;gap:9px;align-items:center;">
+                <input value="{{ed.school}}" onChange="{{ed.onSchool}}" placeholder="School" style="border:1px solid #E2E5EA;border-radius:9px;padding:10px 11px;font-size:13.5px;" style-focus="border-color:#2F6BFF;" />
+                <input value="{{ed.degree}}" onChange="{{ed.onDegree}}" placeholder="Degree / program" style="border:1px solid #E2E5EA;border-radius:9px;padding:10px 11px;font-size:13.5px;" style-focus="border-color:#2F6BFF;" />
+                <input value="{{ed.year}}" onChange="{{ed.onYear}}" placeholder="Year" style="border:1px solid #E2E5EA;border-radius:9px;padding:10px 11px;font-size:13.5px;text-align:center;" style-focus="border-color:#2F6BFF;" />
+                <button onClick="{{ed.onRemove}}" style="background:#FFF4F4;border:none;height:38px;border-radius:8px;cursor:pointer;color:#B23B3B;font-size:12px;">✕</button>
+              </div>
+            </sc-for>
+          </div>
+          <button onClick="{{gAddEdu}}" style="margin-top:12px;background:#EAF1FF;border:none;color:#2456D6;padding:10px 15px;border-radius:9px;font-weight:600;font-size:13px;cursor:pointer;" style-hover="background:#dbe7ff;">+ Add education</button>
+          </sc-if>
+
+          <!-- SKILLS -->
+          <sc-if value="{{gIsSkills}}" hint-placeholder-val="{{true}}">
+          <h1 style="font-family:'Space Grotesk';font-weight:600;font-size:26px;letter-spacing:-.02em;margin:0;color:#0E1116;">What are you great at?</h1>
+          <p style="margin:10px 0 22px;color:#5A6573;font-size:15px;line-height:1.55;">Add a handful of skills — press Enter after each. Or let me suggest some based on the experience you just added.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            <sc-for list="{{gSkills}}" as="sk" hint-placeholder-count="4">
+              <span style="display:inline-flex;align-items:center;gap:7px;background:#F2F4F7;border:1px solid #E6E9EE;border-radius:8px;padding:7px 10px 7px 12px;font-size:13px;color:#2b3140;">{{sk.text}}<button onClick="{{sk.onRemove}}" style="background:none;border:none;cursor:pointer;color:#9aa3af;font-size:13px;padding:0;line-height:1;" style-hover="color:#B23B3B;">✕</button></span>
+            </sc-for>
+          </div>
+          <input onKeyDown="{{gOnSkillKey}}" placeholder="Type a skill and press Enter" style="margin-top:12px;width:100%;border:1px dashed #CFD5DD;border-radius:10px;padding:12px 13px;font-size:14px;color:#0E1116;background:#fff;" style-focus="border-color:#2F6BFF;border-style:solid;" />
+          <button onClick="{{gSuggestSkills}}" disabled="{{gBusySkills}}" style="margin-top:13px;display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid #DCE0E6;color:#2456D6;padding:11px 16px;border-radius:10px;font-weight:600;font-size:13.3px;cursor:pointer;" style-hover="border-color:#2F6BFF;"><sc-if value="{{gBusySkills}}"><span style="display:inline-block;width:13px;height:13px;border:2px solid rgba(36,86,214,.3);border-top-color:#2456D6;border-radius:50%;animation:spin .7s linear infinite;"></span></sc-if><span>{{gSuggestLabel}}</span></button>
+          </sc-if>
+
+          <!-- SUMMARY -->
+          <sc-if value="{{gIsSummary}}" hint-placeholder-val="{{true}}">
+          <h1 style="font-family:'Space Grotesk';font-weight:600;font-size:26px;letter-spacing:-.02em;margin:0;color:#0E1116;">Last piece — your summary</h1>
+          <p style="margin:10px 0 20px;color:#5A6573;font-size:15px;line-height:1.55;">This is the short intro at the very top. I’ll write a first draft from everything you’ve told me — then you can tweak it until it sounds like you.</p>
+          <button onClick="{{gDraftSummary}}" disabled="{{gBusySummary}}" style="display:inline-flex;align-items:center;gap:8px;background:#2F6BFF;border:none;color:#fff;padding:12px 18px;border-radius:11px;font-weight:600;font-size:14px;cursor:pointer;box-shadow:0 4px 14px rgba(47,107,255,.3);" style-hover="background:#1E54E6;"><sc-if value="{{gBusySummary}}"><span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;"></span></sc-if><span>{{gSummaryLabel}}</span></button>
+          <textarea value="{{gSummary}}" onChange="{{gOnSummary}}" rows="5" placeholder="Your summary will appear here — fully editable. Or write your own; even a sentence is a great start." style="margin-top:14px;width:100%;border:1px solid #DFE3E8;border-radius:12px;padding:14px;font-size:14.5px;line-height:1.65;color:#1a1f29;resize:vertical;" style-focus="border-color:#2F6BFF;"></textarea>
+          </sc-if>
+
+          <!-- FINISH -->
+          <sc-if value="{{gIsFinish}}" hint-placeholder-val="{{true}}">
+          <div style="text-align:center;">
+            <h1 style="font-family:'Space Grotesk';font-weight:600;font-size:27px;letter-spacing:-.02em;margin:0;color:#0E1116;">Beautiful work, {{gFirstName}}.</h1>
+            <p style="margin:11px auto 0;max-width:480px;color:#5A6573;font-size:15px;line-height:1.55;">Here’s your resume. Pick a look you like, then save it to your library — you can keep editing, tailor it to jobs, and track applications from there.</p>
+          </div>
+          <div style="display:flex;justify-content:center;gap:9px;margin:22px 0 18px;flex-wrap:wrap;">
+            <sc-for list="{{gTemplateButtons}}" as="t" hint-placeholder-count="3"><button onClick="{{t.onClick}}" style="{{t.style}}">{{t.label}}</button></sc-for>
+          </div>
+          <div style="display:flex;justify-content:center;">{{gPreviewFrame}}</div>
+          <button onClick="{{gToggleDefault}}" style="display:flex;align-items:center;gap:11px;background:#fff;border:1px solid #E2E5EA;border-radius:12px;padding:13px 15px;cursor:pointer;width:100%;max-width:430px;margin:20px auto 0;text-align:left;" style-hover="border-color:#2F6BFF;">
+            <span style="flex:none;width:21px;height:21px;border-radius:6px;border:1.5px solid #2F6BFF;display:flex;align-items:center;justify-content:center;color:#2F6BFF;font-size:12px;"><sc-if value="{{gMakeDefault}}">✓</sc-if></span>
+            <span style="font-size:13.5px;color:#2b3140;line-height:1.4;">Set this as my <b>default resume</b> — the base for tailoring and applications</span>
+          </button>
+          </sc-if>
+
+          <sc-if value="{{gErr}}"><div style="margin-top:18px;background:#FFF4F4;border:1px solid #F3D2D2;color:#B23B3B;padding:11px 13px;border-radius:10px;font-size:13px;">{{gErr}}</div></sc-if>
+        </div>
+      </div>
+
+      <div class="bg-white" style="flex:none;border-top:1px solid #ECEEF1;background:#fff;padding:14px 24px;display:flex;align-items:center;gap:12px;">
+        <sc-if value="{{gShowBack}}"><button onClick="{{gBack}}" style="background:#fff;border:1px solid #DCE0E6;color:#3a4350;padding:12px 18px;border-radius:11px;font-weight:600;font-size:13.5px;cursor:pointer;" style-hover="background:#F4F5F7;">← Back</button></sc-if>
+        <button onClick="{{gPrimary}}" style="margin-left:auto;display:inline-flex;align-items:center;gap:8px;white-space:nowrap;background:#2F6BFF;border:none;color:#fff;padding:12px 26px;border-radius:11px;font-weight:600;font-size:14px;cursor:pointer;box-shadow:0 4px 14px rgba(47,107,255,.3);" style-hover="background:#1E54E6;">{{gPrimaryLabel}}</button>
+      </div>
+    </div>
+    </sc-if>
+
+  </main>
+
+  <sc-if value="{{importOpen}}">
+    <div style="position:fixed;inset:0;background:rgba(13,15,20,.55);backdrop-filter:blur(3px);z-index:200;display:flex;align-items:center;justify-content:center;padding:24px;" onClick="{{closeImport}}">
+      <div onClick="{{stop}}" style="width:640px;max-width:100%;max-height:90vh;overflow:auto;background:#fff;border-radius:18px;box-shadow:0 24px 70px rgba(0,0,0,.4);padding:28px 30px;animation:fadeUp .25s ease both;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;">
+          <div>
+            <h2 style="font-family:'Space Grotesk';font-weight:600;font-size:21px;margin:0;letter-spacing:-.02em;">Import your default resume</h2>
+            <p style="margin:7px 0 0;color:#5A6573;font-size:13.5px;line-height:1.5;max-width:480px;">Upload a PDF or text file, or paste your resume below. I'll structure it into editable sections and set it as your <b style="color:#2456D6;">default starting point</b> — the base every tailored version begins from.</p>
+          </div>
+          <button onClick="{{closeImport}}" style="background:#F2F3F5;border:none;width:34px;height:34px;border-radius:9px;cursor:pointer;font-size:16px;color:#5a6573;flex:none;" style-hover="background:#E6E8EC;">✕</button>
+        </div>
+
+        <label style="display:flex;align-items:center;gap:12px;margin-top:20px;border:1.5px dashed #CFD5DD;border-radius:12px;padding:16px 18px;cursor:pointer;background:#FAFBFC;" style-hover="border-color:#2F6BFF;background:#F5F8FF;">
+          <span style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;background:#EEF3FF;color:#2456D6;font-size:18px;flex:none;">↑</span>
+          <span style="flex:1;">
+            <span style="display:block;font-weight:600;font-size:13.5px;color:#2b3140;">Upload a file</span>
+            <span style="display:block;font-size:12px;color:#8A92A0;margin-top:2px;">PDF, TXT or Markdown — I'll pull the text automatically</span>
+          </span>
+          <sc-if value="{{importFileName}}"><span style="font-size:12px;color:#0E9F6E;font-weight:600;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">✓ {{importFileName}}</span></sc-if>
+          <input type="file" accept=".pdf,.txt,.md,.markdown,text/plain" onChange="{{onImportFile}}" style="display:none;" />
+        </label>
+
+        <div style="display:flex;align-items:center;gap:12px;margin:16px 0 12px;color:#A4ABB6;font-size:12px;font-weight:600;">
+          <span style="flex:1;height:1px;background:#E6E8EC;"></span>OR PASTE<span style="flex:1;height:1px;background:#E6E8EC;"></span>
+        </div>
+        <textarea value="{{importText}}" onChange="{{onImportText}}" rows="9" placeholder="Paste your full resume text here…" style="width:100%;border:1px solid #DFE3E8;border-radius:12px;padding:13px 14px;font-size:13.5px;line-height:1.55;color:#1a1f29;resize:vertical;" style-focus="border-color:#2F6BFF;"></textarea>
+
+        <sc-if value="{{importError}}"><div style="margin-top:12px;background:#FFF4F4;border:1px solid #F3D2D2;color:#B23B3B;padding:10px 12px;border-radius:9px;font-size:13px;">{{importError}}</div></sc-if>
+
+        <div style="display:flex;gap:10px;margin-top:20px;justify-content:space-between;align-items:center;flex-wrap:wrap;">
+          <button onClick="{{startGuided}}" style="background:none;border:none;color:#2456D6;font-weight:600;font-size:13px;cursor:pointer;padding:0;" style-hover="text-decoration:underline;">Don’t have a resume? Build one step by step →</button>
+          <div style="display:flex;gap:10px;">
+            <button onClick="{{closeImport}}" style="background:#fff;border:1px solid #DCE0E6;color:#3a4350;padding:11px 18px;border-radius:11px;font-weight:600;font-size:13.5px;cursor:pointer;" style-hover="background:#F4F5F7;">Cancel</button>
+            <button onClick="{{runImport}}" disabled="{{importBusy}}" style="{{importBtnStyle}}"><sc-if value="{{importBusy}}"><span style="display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;"></span></sc-if><span>{{importBtnLabel}}</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{toast}}"><div style="position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:#0D0F14;color:#fff;padding:11px 20px;border-radius:11px;font-size:13.5px;font-weight:500;box-shadow:0 8px 28px rgba(0,0,0,.28);z-index:300;animation:fadeUp .25s ease both;">{{toast}}</div></sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  KEY(){ return 'nperez_resume_studio_v2'; }
+  uid(){ return 'v'+Math.random().toString(36).slice(2,9); }
+  esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  positioning(){
+    return [
+      "NICK PEREZ — POSITIONING CONTEXT (use to inform all generated content; never invent facts beyond this):",
+      "- 20+ years marketing, growth & operations exec across healthcare, SaaS, fintech, cybersecurity, consumer, marketplaces, and agencies.",
+      "- Position him as: growth operator, business builder, systems thinker, marketing & revenue leader, technology-savvy executive, cross-functional partner. NOT 'just a marketer,' and NOT a brand/creative/communications/corporate marketer.",
+      "- Greatest strength: connecting strategy, technology, operations, sales, and marketing into ONE growth system.",
+      "- Energized by: building new systems, repeatable playbooks, scaling orgs, ambiguous problems, experimentation, finding product-market fit, founder-facing work.",
+      "- Philosophy: growth = finding and removing bottlenecks, not a channel; tie marketing to business outcomes; experimentation beats prolonged planning; retention often beats acquisition; marketing/sales/product/ops should run as one system; thinks in systems, not channels.",
+      "- Speaks in metrics: CAC, LTV, payback period, pipeline, revenue, conversion rates, show rates, retention, cohort performance, funnel progression.",
+      "- Signature wins: Bitwage US ARR scaled from ~$0 to ~$25M in 12 months; Capital One Shopping 600%+ user growth and +$10M partner revenue; ESW/Aurea +250% revenue across 12+ SaaS products leading a 25+ person demand-gen org; Bridgeview Eye Partners multi-location healthcare growth across 75+ locations.",
+      "- Especially strong in healthcare / multi-location / provider-based growth, patient acquisition & retention, CRM & marketing operations.",
+      "- Best-fit roles: VP/Head of Growth, VP Marketing, Demand Gen, RevOps, growth consulting, founder-facing builder/operator roles."
+    ].join("\n");
+  }
+
+  seedGeneral(){
+    return {
+      id: this.uid(),
+      name: 'General — All-Purpose',
+      templateStyle: 'twocol',
+      tailoredFor: null,
+      updatedAt: Date.now(),
+      data: {
+        name: 'Nick Perez',
+        headline: 'Growth Operator & Marketing Executive · Builder of Revenue Systems',
+        phone: '231.642.0306',
+        email: 'nickperez@gmail.com',
+        location: 'Traverse City, Michigan',
+        linkedin: '',
+        summary: "Growth operator and marketing executive with 20+ years connecting strategy, technology, operations, sales, and marketing into a single revenue system. I build new growth engines, repeatable playbooks, and demand-generation orgs from the ground up across healthcare, SaaS, and fintech — and I think in systems, not channels.",
+        skills: ['Growth Strategy & Operations','Demand Generation','Marketing Technology Stacks','Revenue Operations','Lifecycle & Retention Marketing','Search Engine Marketing (SEM)','Conversion Rate Optimization','Data Reporting & Dashboards','Experimentation & A/B Testing','Team Building & Leadership','CRM & Marketing Automation','Channel & Partner Growth','Healthcare / Multi-Location Growth','Enterprise Sales / Business Development','SEO'],
+        experience: [
+          { company:'Bridgeview Eye Partners', title:'Vice President of Marketing', dates:'2024 – Present',
+            blurb:'Led a data-driven marketing strategy across a PE-backed, multi-state eyecare platform — increasing patient acquisition, referral networks, and brand visibility.',
+            bullets:[
+              'Spearheaded comprehensive marketing strategies that grew visibility and patient acquisition across 75+ Midwest and Oklahoma/Nebraska locations.',
+              'Implemented data-driven digital campaigns (SEO, PPC, targeted advertising) to optimize lead generation and patient retention.',
+              'Directed a rebranding initiative for surgical and LASIK centers, driving a 25% increase in patient inquiries.',
+              'Partnered with operations to streamline optometrist and physician referral processes, strengthening network engagement 15%.',
+              'Integrated advanced analytics to monitor ROI and improve efficiency, reducing cost-per-acquisition 20%.',
+              'Led mobile-first website redesigns that boosted traffic and appointment bookings 30%.'
+            ] },
+          { company:'Galactic Advisors', title:'Head of Growth & Partner Success', dates:'2023 – 2024',
+            blurb:'Built a brand-new partner success function for a cybersecurity company, driving partner engagement, retention, and recurring revenue.',
+            bullets:[
+              'Built partner awareness programs that drove adoption and excitement around new product features.',
+              'Managed the CRM platform, tracking client and prospect activity to improve list engagement.',
+              'Drove partner retention, renewal, and upsell into additional product offerings.',
+              'Supported at-risk partners with proactive outreach and enablement.',
+              'Enabled the sales team via email testing, funnel reviews, testimonials, and material organization.'
+            ] },
+          { company:'Bitwage', title:'VP Growth', dates:'2021 – 2023',
+            blurb:'Executive leader of an 8-person direct / 20-person indirect team executing growth strategy for a fintech & insurtech platform.',
+            bullets:[
+              'Grew SaaS ARR from scratch to $25M in 12 months in the US market; hired, developed, and trained US and international growth teams.',
+              'Built and executed channel partner growth strategies leveraging new APIs.',
+              'Optimized sales, email, social, SEO, PR, referral, content, co-marketing, and affiliate channels while scaling new ones.',
+              'Managed B2B and B2C growth teams hands-on against aggressive targets.',
+              'Drove record revenue with the primary target market growing over 3,100% in 2022.'
+            ] },
+          { company:'Bumped', title:'Director of Growth', dates:'2019 – 2021',
+            blurb:'Led growth marketing for a consumer fintech mobile app and key enterprise B2B programs.',
+            bullets:[
+              'Owned the full growth funnel from awareness through acquisition, engagement, and retention.',
+              'Built social and email campaigns, nurture flows, landing pages, and creative.',
+              'Expanded channel strategy across SEO, SEM, display, social, content, and affiliates.',
+              'Built dashboards and A/B testing to measure and improve marketing performance.',
+              'Guided strategy for scaling key enterprise brand and bank partnerships.'
+            ] },
+          { company:'ESW Capital / Aurea Software', title:'VP Growth', dates:'2017 – 2019',
+            blurb:'Led a 25+ person demand-generation org driving pipeline and revenue for 12+ SaaS products.',
+            bullets:[
+              'Grew company revenue over 250% while reducing cost-per-acquisition more than 25%.',
+              'Built closed-loop, full-funnel demand gen across paid search and SEO.',
+              'Led lead nurturing and marketing automation that improved conversion, close rates, and funnel velocity.',
+              'Reported weekly performance and quarterly KPIs to product, sales, content, and executives.'
+            ] },
+          { company:'Capital One — Shopping Platform', title:'Director of Growth', dates:'2017 – 2019',
+            blurb:'Owned paid acquisition across social, search, and display for the shopping platform.',
+            bullets:[
+              'Achieved over 600% user growth in six months through strategic spend allocation.',
+              'Increased partner revenue by more than $10M.',
+              'Built custom dashboards with SQL, Mode, and Google Data Studio.',
+              'Led the transition from agency to in-house marketing resources.'
+            ] },
+          { company:'Solution Studio', title:'Full-Funnel Growth Marketing Consultant', dates:'2012 – Present',
+            blurb:'Growth advisor to US and international companies across SaaS, healthcare, fintech, and DTC.',
+            bullets:[
+              'Advise growth companies worldwide, drawing on in-house, agency, and consulting experience plus an MBA.',
+              'Build marketing technology stacks with Salesforce, Pardot, HubSpot, and more.',
+              'Manage $1M+ in digital ad spend across medical, DTC, and B2B (clients spending $100K+/month).',
+              'Expert in email, multivariate testing, content, social, PPC, and conversion rate optimization.'
+            ] },
+          { company:'FINE, A Brand Agency', title:'VP Growth', dates:'2010 – 2012',
+            blurb:'Ran the online marketing division of a San Francisco digital branding firm after it acquired Big Daylight.',
+            bullets:[
+              'Established online marketing strategy for world-class brands.',
+              'Clients included Apple, Symantec, Hitachi, Transamerica, Coppola, Ste. Michelle Wine Estates, and Auberge du Soleil.'
+            ] },
+          { company:'Big Daylight', title:'Co-Founder / Managing Partner', dates:'2009 – 2010',
+            blurb:'Co-founded a digital marketing firm focused on agency relationships nationwide.',
+            bullets:[
+              'Managed multi-million-dollar online marketing budgets, increasing client ROI and profit.',
+              'Built agency partnerships across the country.',
+              'Acquired by FINE Design Group in 2010.'
+            ] },
+          { company:'Midmark RTLS', title:'Project Manager / Process Engineer', dates:'2007 – 2009',
+            blurb:'Led enterprise RFID/IR (RTLS) healthcare technology implementations nationwide.',
+            bullets:[
+              'Managed large-scale RTLS deployments at major medical institutions.',
+              'Project lead for the Cleveland Clinic implementation at the Glickman Urological & Kidney Institute.',
+              'Led a project team collaborating daily with sales, marketing, and IT.'
+            ] },
+          { company:'Oneupweb', title:'Paid Search / SEM Project Manager', dates:'2005 – 2007',
+            blurb:'Managed medium-to-large paid search campaigns.',
+            bullets:[
+              'Ran PPC campaigns across Google, Yahoo, and MSN.',
+              'Managed multi-million-dollar annual paid search accounts.'
+            ] },
+          { company:'Dynamic Edge, Inc.', title:'Enterprise IT / Project Manager', dates:'2003 – 2005',
+            blurb:'Managed technology projects and enterprise infrastructure for mid-to-large clients.',
+            bullets:[
+              'Coordinated software deployment and custom software projects.',
+              'Supported macOS Server/desktop, Windows Enterprise Server, and Citrix.',
+              'Led a multi-location migration from POTS phones to Cisco VoIP.'
+            ] }
+        ],
+        education: [
+          { school:'University of Michigan', degree:'B.A.', year:'2004' },
+          { school:'Lawrence Technological University', degree:'M.B.A.', year:'2010' }
+        ]
+      }
+    };
+  }
+
+  initialState(){
+    const general = this.seedGeneral();
+    const seed = {
+      versions: [general],
+      defaultId: general.id,
+      activeId: null, view: 'library',
+      jobRole: '', jobCompany: '', jobDesc: '', coverHM: '',
+      coverText: '', coverBaseId: null, tailorBaseId: null, qBaseId: null, tailorDepth: 'light',
+      questions: [{ id:this.uid(), q:'', a:'', busy:false, err:'' }],
+      tailorBusy:false, tailorError:'', tailorResultId:null, tailorNotes:'', tailorPreviewHTML:'',
+      coverBusy:false, coverError:'', previewHTML:'', toast:'',
+      applications: [], activeAppId: null, insightText: '', insightBusy:false, insightError:'',
+      guided: this.guidedDefault(),
+      importOpen:false, importText:'', importFileName:'', importBusy:false, importError:''
+    };
+    try {
+      const raw = localStorage.getItem(this.KEY());
+      if (raw) {
+        const p = JSON.parse(raw);
+        if (p && Array.isArray(p.versions) && p.versions.length) {
+          const merged = Object.assign({}, seed, p, { tailorBusy:false, coverBusy:false, tailorError:'', coverError:'', previewHTML:'', toast:'', importOpen:false, importBusy:false, importError:'', importText:'', importFileName:'' });
+          if(!merged.defaultId || !merged.versions.some(v=>v.id===merged.defaultId)) merged.defaultId = merged.versions[0].id;
+          if(!Array.isArray(merged.applications)) merged.applications = [];
+          // migrate the old per-version 'applied' flag into first-class application records
+          merged.versions.forEach(v=>{
+            if(v.application && v.application.applied && !merged.applications.some(a=>a.resumeVersionId===v.id)){
+              merged.applications.unshift(this.makeAppFromVersion(v, merged));
+            }
+          });
+          merged.applications = merged.applications.map(a=>Object.assign({events:[],statusHistory:[],answers:[]}, a, {insightBusy:false, prepBusy:false, insightError:'', prepError:''}));
+          merged.insightBusy=false; merged.insightError='';
+          if(typeof merged.insightText==='undefined') merged.insightText='';
+          if(!merged.guided || !merged.guided.data){ merged.guided=this.guidedDefault(); }
+          else { merged.guided=Object.assign(this.guidedDefault(), merged.guided, {busyRole:-1, busySkills:false, busySummary:false, err:''}); }
+          return merged;
+        }
+      }
+    } catch(e){}
+    return seed;
+  }
+
+  state = this.initialState();
+
+  componentDidMount(){
+    try {
+      document.documentElement.style.setProperty('color-scheme','light','important');
+      if(document.body) document.body.style.setProperty('color-scheme','light','important');
+    } catch(e){}
+    this.schedulePreview(true);
+  }
+
+  persist(){
+    try {
+      const s = this.state;
+      localStorage.setItem(this.KEY(), JSON.stringify({
+        versions:s.versions, defaultId:s.defaultId, activeId:s.activeId, view:s.view,
+        jobRole:s.jobRole, jobCompany:s.jobCompany, jobDesc:s.jobDesc, coverHM:s.coverHM,
+        coverText:s.coverText, coverBaseId:s.coverBaseId, tailorBaseId:s.tailorBaseId, qBaseId:s.qBaseId, tailorDepth:s.tailorDepth,
+        questions:s.questions, tailorResultId:s.tailorResultId, tailorNotes:s.tailorNotes,
+        applications:s.applications, activeAppId:s.activeAppId, insightText:s.insightText,
+        guided:s.guided
+      }));
+    } catch(e){}
+  }
+  commit(updater, cb){ this.setState(updater, ()=>{ this.persist(); cb && cb(); }); }
+
+  activeVersion(){ const s=this.state; return s.versions.find(v=>v.id===s.activeId) || s.versions[0]; }
+  byId(id){ return this.state.versions.find(v=>v.id===id) || this.state.versions[0]; }
+
+  setView(v){ this.commit(()=>({view:v})); }
+  backToLibrary(){ this.commit(()=>({view:'library'})); }
+
+  openEditor(id){ this.setState({activeId:id, view:'editor'}, ()=>{ this.persist(); this.schedulePreview(true); }); }
+
+  newVersion(){
+    const base = this.byId(this.state.defaultId);
+    const v = JSON.parse(JSON.stringify(base));
+    v.id=this.uid(); v.name='Untitled Resume'; v.updatedAt=Date.now(); v.tailoredFor=null;
+    this.setState(s=>({versions:[v,...s.versions], activeId:v.id, view:'editor'}), ()=>{ this.persist(); this.schedulePreview(true); });
+  }
+  setDefault(id){ this.commit(()=>({defaultId:id}), ()=>this.flash('Set as your default starting resume')); }
+  duplicateVersion(id){
+    this.setState(s=>{
+      const src=s.versions.find(x=>x.id===id); if(!src) return {};
+      const copy=JSON.parse(JSON.stringify(src)); copy.id=this.uid(); copy.name=src.name+' (copy)'; copy.updatedAt=Date.now();
+      const i=s.versions.findIndex(x=>x.id===id);
+      const versions=s.versions.slice(); versions.splice(i+1,0,copy);
+      return {versions};
+    }, ()=>this.persist());
+  }
+  deleteVersion(id){
+    if(this.state.versions.length<=1){ this.flash('You need at least one resume'); return; }
+    if(!confirm('Delete this resume version? This cannot be undone.')) return;
+    this.setState(s=>{
+      const versions=s.versions.filter(x=>x.id!==id);
+      let activeId=s.activeId; if(activeId===id) activeId=versions[0]?versions[0].id:null;
+      let defaultId=s.defaultId; if(defaultId===id) defaultId=versions[0]?versions[0].id:null;
+      return {versions, activeId, defaultId};
+    }, ()=>this.persist());
+  }
+
+  // ---------- application records ----------
+  appStatuses(){ return [
+    {id:'applied',label:'Applied'},
+    {id:'response',label:'Response'},
+    {id:'interview',label:'Interview'},
+    {id:'offer',label:'Offer'},
+    {id:'rejected',label:'Rejected'},
+    {id:'ghosted',label:'No response'}
+  ]; }
+  appStatusMeta(id){
+    const m={
+      applied:{label:'Applied', fg:'#1E54E6', bg:'#EAF1FF', bd:'#CFE0FF'},
+      response:{label:'Response', fg:'#0C7C8C', bg:'#E1F6F9', bd:'#BDE6EC'},
+      interview:{label:'Interview', fg:'#9A6212', bg:'#FEF3DA', bd:'#F1DDA6'},
+      offer:{label:'Offer', fg:'#0E7C4B', bg:'#E6F7EE', bd:'#BFE8D1'},
+      rejected:{label:'Rejected', fg:'#B23B3B', bg:'#FCECEC', bd:'#F2D2D2'},
+      ghosted:{label:'No response', fg:'#8A92A0', bg:'#F2F3F5', bd:'#E2E5EA'}
+    };
+    return m[id]||m.applied;
+  }
+  // 'Got past the void' — counts as a positive signal for analytics/insights.
+  isPositive(status){ return status==='response'||status==='interview'||status==='offer'; }
+  fitStyle(score){
+    const n=Number(score);
+    let fg='#8A92A0', bg='#F2F3F5', bd='#E2E5EA';
+    if(!isNaN(n)){ if(n>=75){fg='#0E7C4B';bg='#E6F7EE';bd='#BFE8D1';} else if(n>=50){fg='#9A6212';bg='#FEF3DA';bd='#F1DDA6';} else {fg='#B23B3B';bg='#FCECEC';bd='#F2D2D2';} }
+    return 'display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:62px;height:62px;border-radius:14px;background:'+bg+';color:'+fg+';border:1px solid '+bd+';font-family:\'Space Grotesk\';font-weight:700;flex:none;';
+  }
+  appEventLabel(type){ return type==='interview'?'Interview':(type==='followup'?'Follow-up':'Reminder'); }
+  fmtDate(ts){ if(!ts) return '—'; return new Date(ts).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}); }
+  fmtDay(dateStr){ if(!dateStr) return '—'; const d=new Date(dateStr+'T00:00:00'); if(isNaN(d)) return dateStr; return d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'}); }
+  todayISO(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+
+  makeAppFromVersion(v, st){
+    const tf=v.tailoredFor||{};
+    const appliedAt=(v.application&&v.application.appliedAt)||Date.now();
+    const status=(v.application&&v.application.status)||'applied';
+    return {
+      id:this.uid(), role: tf.role||'', company: tf.company||'',
+      jobDesc: (st&&st.jobDesc)||'',
+      appliedAt, createdAt:appliedAt,
+      resumeVersionId:v.id, resumeVersionName:v.name,
+      resumeSnapshot:{ name:v.name, templateStyle:v.templateStyle||'classic', data:JSON.parse(JSON.stringify(v.data)) },
+      coverLetter: (st&&st.coverText)||'',
+      answers: (((st&&st.questions)||[]).filter(q=>q&&q.q&&q.q.trim()&&q.a&&q.a.trim()).map(q=>({q:q.q,a:q.a}))),
+      status, statusHistory:[{status, at:appliedAt}],
+      events:[], insight:null, prep:null, notes:'',
+      insightBusy:false, insightError:'', prepBusy:false, prepError:''
+    };
+  }
+  mutateApp(id, fn, cb){
+    this.setState(s=>({applications:s.applications.map(a=>{ if(a.id!==id) return a; const na=JSON.parse(JSON.stringify(a)); fn(na); return na; })}), ()=>{ this.persist(); cb&&cb(); });
+  }
+  logApplication(versionId){
+    const v=this.byId(versionId); if(!v) return;
+    const app=this.makeAppFromVersion(v, this.state);
+    this.setState(s=>({applications:[app,...s.applications], view:'appDetail', activeAppId:app.id}), ()=>{ this.persist(); this.flash('Application logged — snapshot saved'); });
+  }
+  logNewApplication(){ this.logApplication(this.state.defaultId); }
+  openApp(id){ this.commit(()=>({view:'appDetail', activeAppId:id})); }
+  backToApplications(){ this.commit(()=>({view:'applications'})); }
+  deleteApplication(id){
+    if(!confirm('Delete this application and its snapshot? This cannot be undone.')) return;
+    this.setState(s=>({applications:s.applications.filter(a=>a.id!==id), view: s.activeAppId===id?'applications':s.view}), ()=>this.persist());
+  }
+  setAppStatus(id, status){
+    this.mutateApp(id, a=>{
+      if(a.status!==status){ a.status=status; a.statusHistory=a.statusHistory||[]; a.statusHistory.push({status, at:Date.now()}); }
+    });
+  }
+  setAppField(id, field, val){ this.mutateApp(id, a=>{ a[field]=val; }); }
+
+  addEvent(id, type){
+    this.mutateApp(id, a=>{
+      a.events=a.events||[];
+      a.events.unshift({id:this.uid(), type, title:this.appEventLabel(type), date:this.todayISO(), time:'', notes:'', done:false});
+    });
+  }
+  setEvent(id, evId, patch){ this.mutateApp(id, a=>{ a.events=(a.events||[]).map(e=>e.id===evId?Object.assign({},e,patch):e); }); }
+  removeEvent(id, evId){ this.mutateApp(id, a=>{ a.events=(a.events||[]).filter(e=>e.id!==evId); }); }
+
+  async analyzeApp(id){
+    const a=this.state.applications.find(x=>x.id===id); if(!a) return;
+    this.mutateApp(id, x=>{ x.insightBusy=true; x.insightError=''; });
+    try {
+      const d=a.resumeSnapshot.data;
+      const prompt = this.positioning() +
+        "\n\nTASK: Assess how well this application's materials fit the target job and what would most increase the odds of a response or interview. Be specific and candid. Return ONLY valid minified JSON, no markdown:\n" +
+        '{"fitScore":<integer 0-100>,"strengths":["2-4 short bullets on what aligns well with the JD"],"gaps":["2-4 short bullets on what is missing or weak vs the JD"],"advice":"1-2 sentences naming the single highest-impact change"}\n\n' +
+        "TARGET ROLE: "+(a.role||'(n/a)')+" at "+(a.company||'(n/a)')+"\n" +
+        "JOB DESCRIPTION:\n"+(a.jobDesc||'(none provided)')+"\n\n" +
+        "RESUME SUMMARY: "+(d.summary||'')+"\n" +
+        "RESUME SKILLS: "+((d.skills||[]).join(', '))+"\n" +
+        "COVER LETTER:\n"+(a.coverLetter||'(none)');
+      const j=this.extractJSON(await this.ai(prompt));
+      if(!j) throw new Error('Could not analyze right now. Please try again.');
+      this.mutateApp(id, x=>{ x.insightBusy=false; x.insight=j; });
+    } catch(err){ this.mutateApp(id, x=>{ x.insightBusy=false; x.insightError=err.message||'Something went wrong.'; }); }
+  }
+  async genPrep(id){
+    const a=this.state.applications.find(x=>x.id===id); if(!a) return;
+    this.mutateApp(id, x=>{ x.prepBusy=true; x.prepError=''; });
+    try {
+      const d=a.resumeSnapshot.data;
+      const prompt = this.positioning() +
+        "\n\nTASK: Prepare Nick for an interview for this role. Ground everything in his real background. Return ONLY valid minified JSON, no markdown:\n" +
+        '{"questions":["6-8 likely interview questions for THIS role, mixing behavioral and role-specific"],"talkingPoints":["4-6 concise proof points/stories Nick should lead with, tied to real wins"],"ask":["2-3 sharp questions for Nick to ask them"]}\n\n' +
+        "TARGET ROLE: "+(a.role||'(n/a)')+" at "+(a.company||'(n/a)')+"\n" +
+        "JOB DESCRIPTION:\n"+(a.jobDesc||'(none)')+"\n\n" +
+        "RESUME SUMMARY: "+(d.summary||'');
+      const j=this.extractJSON(await this.ai(prompt));
+      if(!j) throw new Error('Could not generate prep right now. Please try again.');
+      this.mutateApp(id, x=>{ x.prepBusy=false; x.prep=j; });
+    } catch(err){ this.mutateApp(id, x=>{ x.prepBusy=false; x.prepError=err.message||'Something went wrong.'; }); }
+  }
+  async runInsights(){
+    const apps=this.state.applications;
+    if(apps.length<2){ this.setState({insightError:'Log at least two applications (and set their outcomes) so there is something to compare.'}); return; }
+    this.setState({insightBusy:true, insightError:''});
+    try {
+      const line=a=>{
+        const d=a.resumeSnapshot.data;
+        return '- '+(a.role||'role')+' @ '+(a.company||'co')+' | resume:"'+a.resumeVersionName+'" ('+(a.resumeSnapshot.templateStyle||'classic')+') | outcome:'+this.appStatusMeta(a.status||'applied').label+' | led-with skills: '+((d.skills||[]).slice(0,8).join(', '))+' | summary: '+String(d.summary||'').slice(0,220);
+      };
+      const got=apps.filter(a=>this.isPositive(a.status));
+      const none=apps.filter(a=>!this.isPositive(a.status));
+      const prompt = this.positioning() +
+        "\n\nTASK: Analyze Nick's job applications to find what correlates with getting a response/interview versus silence or rejection. Be concrete and honest; if the sample is small, say so plainly. Return ONLY valid minified JSON, no markdown:\n" +
+        '{"summary":"2-3 sentences on the clearest pattern","worked":["3-5 specific things the responded-to applications shared"],"missing":["3-5 things the no-response/rejected applications lacked or did differently"],"next":["2-3 prioritized, concrete recommendations for the next application"]}\n\n' +
+        "GOT A RESPONSE / INTERVIEW / OFFER ("+got.length+"):\n"+(got.map(line).join('\n')||'(none yet)')+"\n\n" +
+        "NO RESPONSE / REJECTED ("+none.length+"):\n"+(none.map(line).join('\n')||'(none yet)');
+      const j=this.extractJSON(await this.ai(prompt));
+      if(!j) throw new Error('Could not generate insights right now. Please try again.');
+      this.setState({insightBusy:false, insightText:j}, ()=>this.persist());
+    } catch(err){ this.setState({insightBusy:false, insightError:err.message||'Something went wrong.'}); }
+  }
+
+  // ---------- guided builder (from scratch) ----------
+  guidedDefault(){
+    return { step:0, templateStyle:'twocol', makeDefault:true, busyRole:-1, busySkills:false, busySummary:false, err:'',
+      data:{ name:'', email:'', phone:'', location:'', linkedin:'', headline:'', summary:'', skills:[], experience:[], education:[] } };
+  }
+  guidedSteps(){ return [
+    {key:'welcome',label:'Welcome'},{key:'basics',label:'About you'},{key:'headline',label:'Headline'},
+    {key:'experience',label:'Experience'},{key:'education',label:'Education'},{key:'skills',label:'Skills'},
+    {key:'summary',label:'Summary'},{key:'finish',label:'Finish'}
+  ]; }
+  mutG(fn, cb){ this.setState(s=>{ const g=JSON.parse(JSON.stringify(s.guided||this.guidedDefault())); fn(g); return {guided:g}; }, ()=>{ this.persist(); cb&&cb(); }); }
+  startGuided(){
+    const g=this.state.guided;
+    const has = g && ((g.step||0)>0 || (g.data && (g.data.name || g.data.headline || (g.data.experience||[]).length)));
+    this.setState({view:'guided', importOpen:false, guided: has?g:this.guidedDefault()}, ()=>this.persist());
+  }
+  restartGuided(){ if(!confirm('Start your resume over from the beginning? Your current answers will be cleared.')) return; this.setState({guided:this.guidedDefault()}, ()=>this.persist()); }
+  exitGuided(){ this.commit(()=>({view:'library'})); }
+  gGo(d){ const n=this.guidedSteps().length; this.mutG(g=>{ g.step=Math.max(0,Math.min(n-1,(g.step||0)+d)); }); }
+  gSet(field,val){ this.mutG(g=>{ g.data[field]=val; }); }
+  gSetTemplate(t){ this.mutG(g=>{ g.templateStyle=t; }); }
+  gToggleDefault(){ this.mutG(g=>{ g.makeDefault=!g.makeDefault; }); }
+  gAddRole(){ this.mutG(g=>{ g.data.experience.push({company:'',title:'',dates:'',raw:'',bullets:[]}); }); }
+  gSetRole(i,patch){ this.mutG(g=>{ g.data.experience[i]=Object.assign({},g.data.experience[i],patch); }); }
+  gRemoveRole(i){ this.mutG(g=>{ g.data.experience.splice(i,1); }); }
+  gSetBullet(i,j,val){ this.mutG(g=>{ g.data.experience[i].bullets[j]=val; }); }
+  gRemoveBullet(i,j){ this.mutG(g=>{ g.data.experience[i].bullets.splice(j,1); }); }
+  gAddBullet(i){ this.mutG(g=>{ g.data.experience[i].bullets=g.data.experience[i].bullets||[]; g.data.experience[i].bullets.push(''); }); }
+  gAddEdu(){ this.mutG(g=>{ g.data.education.push({school:'',degree:'',year:''}); }); }
+  gSetEdu(i,patch){ this.mutG(g=>{ g.data.education[i]=Object.assign({},g.data.education[i],patch); }); }
+  gRemoveEdu(i){ this.mutG(g=>{ g.data.education.splice(i,1); }); }
+  gAddSkill(val){ const v=(val||'').trim(); if(!v) return; this.mutG(g=>{ g.data.skills=g.data.skills||[]; if(!g.data.skills.some(s=>String(s).toLowerCase()===v.toLowerCase())) g.data.skills.push(v); }); }
+  gRemoveSkill(i){ this.mutG(g=>{ g.data.skills.splice(i,1); }); }
+  async gPolishRole(i){
+    const r=this.state.guided.data.experience[i]; if(!r || !(r.raw && r.raw.trim())) return;
+    this.mutG(g=>{ g.busyRole=i; g.err=''; });
+    try{
+      const prompt="Turn the following plain-language description of a job into 3-5 concise, strong resume bullet points. Start each bullet with a strong action verb, keep them truthful, and quantify impact ONLY where the text implies numbers (never invent specific figures). Return ONLY valid minified JSON, no markdown: {\"bullets\":[\"...\"]}\n\nROLE: "+(r.title||'')+(r.company?(' at '+r.company):'')+"\nIN THEIR OWN WORDS:\n"+r.raw;
+      const j=this.extractJSON(await this.ai(prompt));
+      if(!j || !Array.isArray(j.bullets) || !j.bullets.length) throw new Error('Could not polish that just now — you can also type bullets yourself.');
+      this.mutG(g=>{ g.busyRole=-1; g.data.experience[i].bullets=j.bullets.filter(Boolean); });
+    }catch(err){ this.mutG(g=>{ g.busyRole=-1; g.err=err.message||'Something went wrong.'; }); }
+  }
+  async gSuggestSkills(){
+    const d=this.state.guided.data;
+    this.mutG(g=>{ g.busySkills=true; g.err=''; });
+    try{
+      const roles=d.experience.map(e=>e.title+(e.company?(' at '+e.company):'')).filter(Boolean).join('; ');
+      const prompt="Suggest 10 concise, relevant professional skills for someone with the background below. Single words or short phrases. Return ONLY valid minified JSON, no markdown: {\"skills\":[\"...\"]}\n\nHEADLINE: "+(d.headline||'(none)')+"\nROLES: "+(roles||'(none)')+"\nALREADY LISTED: "+(d.skills.join(', ')||'(none)');
+      const j=this.extractJSON(await this.ai(prompt));
+      if(!j || !Array.isArray(j.skills)) throw new Error('Could not suggest skills right now.');
+      this.mutG(g=>{ g.busySkills=false; const have=new Set((g.data.skills||[]).map(s=>String(s).toLowerCase())); j.skills.forEach(s=>{ if(s && !have.has(String(s).toLowerCase())){ g.data.skills.push(s); have.add(String(s).toLowerCase()); } }); });
+    }catch(err){ this.mutG(g=>{ g.busySkills=false; g.err=err.message||'Something went wrong.'; }); }
+  }
+  async gDraftSummary(){
+    const d=this.state.guided.data;
+    this.mutG(g=>{ g.busySummary=true; g.err=''; });
+    try{
+      const roles=d.experience.map(e=>e.title+(e.company?(' at '+e.company):'')+(e.dates?(' ('+e.dates+')'):'')).filter(Boolean).join('; ');
+      const prompt="Write a warm, confident, first-person professional summary (2-3 sentences) for a resume based on the details below. Make it natural and specific; avoid clichés and buzzword stacking. Return ONLY the summary text — no quotes, labels, or markdown.\n\nNAME: "+(d.name||'')+"\nHEADLINE: "+(d.headline||'')+"\nROLES: "+(roles||'(none)')+"\nSKILLS: "+(d.skills.join(', ')||'(none)');
+      const txt=await this.ai(prompt);
+      this.mutG(g=>{ g.busySummary=false; g.data.summary=(txt||'').trim(); });
+    }catch(err){ this.mutG(g=>{ g.busySummary=false; g.err=err.message||'Something went wrong.'; }); }
+  }
+  guidedToVersion(){
+    const g=this.state.guided, d=g.data;
+    return { id:this.uid(), name:(d.name?(d.name.trim().split(/\s+/)[0]+'\u2019s Resume'):'My Resume'), templateStyle:g.templateStyle||'twocol', tailoredFor:null, updatedAt:Date.now(),
+      data:{ name:d.name||'', headline:d.headline||'', phone:d.phone||'', email:d.email||'', location:d.location||'', linkedin:d.linkedin||'', summary:d.summary||'',
+        skills:(d.skills||[]).filter(Boolean),
+        experience:(d.experience||[]).filter(e=>e.company||e.title||e.raw||(e.bullets&&e.bullets.length)).map(e=>({company:e.company||'',title:e.title||'',dates:e.dates||'',blurb:'',bullets:((e.bullets&&e.bullets.length)?e.bullets:(e.raw?[e.raw]:[])).filter(Boolean)})),
+        education:(d.education||[]).filter(ed=>ed.school||ed.degree).map(ed=>({school:ed.school||'',degree:ed.degree||'',year:ed.year||''})) } };
+  }
+  finishGuided(){
+    const v=this.guidedToVersion();
+    const makeDefault=!!this.state.guided.makeDefault;
+    this.setState(s=>({ versions:[v,...s.versions], activeId:v.id, defaultId: makeDefault?v.id:s.defaultId, view:'editor', guided:this.guidedDefault() }),
+      ()=>{ this.persist(); this.schedulePreview(true); this.flash('Your resume is ready — nicely done.'); });
+  }
+
+  // ---------- import a default/master resume ----------
+  openImport(){ this.setState({importOpen:true, importError:'', importText:'', importFileName:''}); }
+  closeImport(){ this.setState({importOpen:false, importBusy:false}); }
+  async readResumeFile(file){
+    const name=(file.name||'').toLowerCase();
+    if(name.endsWith('.pdf')){
+      const data=new Uint8Array(await file.arrayBuffer());
+      const pdfjs=await import('https://cdn.jsdelivr.net/npm/pdfjs-dist@4.2.67/build/pdf.min.mjs');
+      try { pdfjs.GlobalWorkerOptions.workerSrc='https://cdn.jsdelivr.net/npm/pdfjs-dist@4.2.67/build/pdf.worker.min.mjs'; } catch(e){}
+      const doc=await pdfjs.getDocument({data}).promise;
+      let out='';
+      for(let i=1;i<=doc.numPages;i++){ const pg=await doc.getPage(i); const tc=await pg.getTextContent(); out+=tc.items.map(it=>it.str).join(' ')+'\n'; }
+      return out.trim();
+    }
+    return (await file.text());
+  }
+  async onImportFile(e){
+    const file=e.target.files && e.target.files[0]; if(!file) return;
+    this.setState({importBusy:true, importError:'', importFileName:file.name});
+    try {
+      const text=await this.readResumeFile(file);
+      if(!text || !text.trim()) throw new Error('empty');
+      this.setState({importText:text, importBusy:false});
+    } catch(err){
+      this.setState({importBusy:false, importError:'Could not read that file automatically — paste the text below instead.'});
+    }
+  }
+  async runImport(){
+    const raw=(this.state.importText||'').trim();
+    if(!raw){ this.setState({importError:'Paste your resume text or upload a file first.'}); return; }
+    this.setState({importBusy:true, importError:''});
+    try {
+      const prompt = "You are parsing a resume into structured JSON for a resume builder. Return ONLY valid minified JSON — no markdown, no commentary.\n\n" +
+        "RESUME TEXT:\n" + raw + "\n\n" +
+        'Return JSON with this exact shape: {"name":"","headline":"","phone":"","email":"","location":"","linkedin":"","summary":"","skills":[],"experience":[{"company":"","title":"","dates":"","blurb":"","bullets":[]}],"education":[{"school":"","degree":"","year":""}]}\n' +
+        "Rules: keep ALL roles in reverse-chronological order (most recent first); keep bullets as concise outcome statements exactly as written; do NOT invent facts — leave a field empty if it is not present. If there is no written summary or headline, craft a short professional one from the content. Skills should be an array of short skill phrases.";
+      const txt=await this.ai(prompt);
+      const j=this.extractJSON(txt);
+      if(!j || !(j.name || (Array.isArray(j.experience) && j.experience.length))) throw new Error('Could not parse that resume. Try pasting cleaner text.');
+      const v={ id:this.uid(), name:'Master Resume', templateStyle:'twocol', tailoredFor:null, updatedAt:Date.now(),
+        data:{
+          name:j.name||'', headline:j.headline||'', phone:j.phone||'', email:j.email||'', location:j.location||'', linkedin:j.linkedin||'', summary:j.summary||'',
+          skills:Array.isArray(j.skills)?j.skills.filter(Boolean):[],
+          experience:Array.isArray(j.experience)?j.experience.map(e=>({company:e.company||'',title:e.title||'',dates:e.dates||'',blurb:e.blurb||'',bullets:Array.isArray(e.bullets)?e.bullets.filter(Boolean):[]})):[],
+          education:Array.isArray(j.education)?j.education.map(ed=>({school:ed.school||'',degree:ed.degree||'',year:ed.year||''})):[]
+        } };
+      this.setState(st=>({versions:[v,...st.versions], defaultId:v.id, activeId:v.id, view:'editor', importOpen:false, importBusy:false}),
+        ()=>{ this.persist(); this.schedulePreview(true); this.flash('Imported and set as your default resume'); });
+    } catch(err){
+      this.setState({importBusy:false, importError: err.message || 'Something went wrong. Try again.'});
+    }
+  }
+
+  setTemplate(style){ this.mutateActive(v=>{ v.templateStyle=style; }); }
+
+  mutateActive(fn){
+    this.setState(s=>{
+      const aid = s.activeId || (s.versions[0] && s.versions[0].id);
+      const versions = s.versions.map(v=>{
+        if(v.id!==aid) return v;
+        const nv=JSON.parse(JSON.stringify(v)); fn(nv); nv.updatedAt=Date.now(); return nv;
+      });
+      return {versions};
+    }, ()=>{ this.persist(); this.schedulePreview(); });
+  }
+
+  schedulePreview(immediate){
+    clearTimeout(this._pt);
+    const run=()=>{ const v=this.activeVersion(); this.setState({previewHTML: v? this.buildResumeHTML(v,false):''}); };
+    if(immediate) run(); else this._pt=setTimeout(run, 320);
+  }
+
+  flash(msg){ this.setState({toast:msg}); clearTimeout(this._tt); this._tt=setTimeout(()=>this.setState({toast:''}),1700); }
+  copyText(t){ if(!t) return; try{ navigator.clipboard.writeText(t); }catch(e){} this.flash('Copied to clipboard'); }
+
+  field(name){ return (e)=>this.commit(()=>({[name]: e.target.value})); }
+
+  // ---------- AI ----------
+  async ai(prompt){
+    if(!(window.claude && window.claude.complete)) throw new Error('AI generation is unavailable in this preview environment. Open the published app to generate.');
+    const t = await window.claude.complete(prompt);
+    return t;
+  }
+  extractJSON(t){
+    if(!t) return null;
+    let s=String(t).trim();
+    // strip ```json fences if present
+    s=s.replace(/^```(?:json)?\s*/i,'').replace(/```\s*$/,'').trim();
+    try { return JSON.parse(s); } catch(e){}
+    const start=s.indexOf('{');
+    if(start<0) return null;
+    const sub=s.slice(start);
+    try { return JSON.parse(sub); } catch(e){}
+    // The 1024-token cap can truncate the JSON mid-object — try to repair it.
+    const repaired=this.repairJSON(sub);
+    if(repaired){ try { return JSON.parse(repaired); } catch(e){} }
+    return null;
+  }
+  // Best-effort close of a truncated JSON string: shut any open string,
+  // drop a dangling trailing key/comma, then close all open arrays/objects.
+  repairJSON(s){
+    let inStr=false, esc=false; const stack=[];
+    for(let i=0;i<s.length;i++){
+      const c=s[i];
+      if(inStr){
+        if(esc){ esc=false; }
+        else if(c==='\\'){ esc=true; }
+        else if(c==='"'){ inStr=false; }
+      } else {
+        if(c==='"'){ inStr=true; }
+        else if(c==='{'||c==='['){ stack.push(c); }
+        else if(c==='}'||c===']'){ stack.pop(); }
+      }
+    }
+    let out=s;
+    out=out.replace(/\\+$/,'');           // drop a trailing escape char
+    if(inStr) out+='"';                   // close a dangling string
+    out=out.replace(/[\s,]+$/,'');        // trailing whitespace / commas
+    if(/:\s*$/.test(out)) out+='null';    // dangling "key":  -> give it a value
+    out=out.replace(/([{\[,])\s*"[^"]*"$/,'$1'); // drop a dangling key with no value
+    out=out.replace(/[\s,]+$/,'');        // re-trim
+    for(let i=stack.length-1;i>=0;i--){ out+=(stack[i]==='{'?'}':']'); }
+    return out;
+  }
+
+  async runTailor(){
+    const s=this.state;
+    if(!s.jobDesc.trim()){ this.setState({tailorError:'Paste a job description first.'}); return; }
+    const base = this.byId(s.tailorBaseId);
+    const deep = s.tailorDepth === 'deep';
+    this.setState({tailorBusy:true, tailorError:''});
+    try {
+      const d=base.data;
+      const norm=x=>String(x||'').toLowerCase();
+      // The AI helper is capped at 1024 OUTPUT tokens, so we never ask for the whole
+      // resume at once — each call returns a small JSON blob that comfortably fits.
+      const ctx = this.positioning() +
+        "\n\nTARGET ROLE: " + (s.jobRole||'(not specified)') + " at " + (s.jobCompany||'(not specified)') + "\n\n" +
+        "JOB DESCRIPTION:\n" + s.jobDesc + "\n\n" +
+        "CURRENT SUMMARY: " + d.summary + "\n" +
+        "CURRENT SKILLS: " + d.skills.join(', ') + "\n\n";
+
+      // ---- Call 1: meta (headline, summary, skills, match notes) — always one small call ----
+      const metaPrompt = ctx +
+        "TASK: Tailor the META of Nick's resume for this role. Do not invent facts. Return ONLY valid minified JSON, no markdown:\n" +
+        '{"headline":"short role-aligned headline","summary":"3-4 sentence first-person summary emphasizing fit for THIS role","skills":["~12 most relevant skills, reordered/rephrased for this role"],"matchNotes":"2-3 sentences on what you emphasized and why Nick fits"}';
+      const meta = this.extractJSON(await this.ai(metaPrompt)) || {};
+      if(!meta.summary && !meta.headline && !(Array.isArray(meta.skills) && meta.skills.length)){
+        throw new Error('The tailoring response came back empty. Please try again.');
+      }
+
+      const nv = JSON.parse(JSON.stringify(base));
+      nv.id=this.uid();
+      nv.name=(s.jobRole?s.jobRole:'Tailored')+(s.jobCompany?' · '+s.jobCompany:'');
+      nv.updatedAt=Date.now();
+      nv.tailoredFor={role:s.jobRole, company:s.jobCompany, depth:s.tailorDepth};
+      if(meta.headline) nv.data.headline=meta.headline;
+      if(meta.summary) nv.data.summary=meta.summary;
+      if(Array.isArray(meta.skills) && meta.skills.length) nv.data.skills=meta.skills;
+      const notes = meta.matchNotes || 'Tailored to emphasize the most relevant experience for this role.';
+
+      if(deep){
+        // ---- Rewrite every role, in small batches so each response fits the token cap ----
+        const exp=nv.data.experience;
+        const BATCH=3;
+        for(let start=0; start<exp.length; start+=BATCH){
+          const slice=exp.slice(start, start+BATCH);
+          const block=slice.map((e,k)=>{
+            const i=start+k;
+            return '['+i+'] '+e.company+' — '+e.title+' — '+e.dates+'\n   current bullets:\n'+(e.bullets||[]).map(b=>'    - '+b).join('\n');
+          }).join('\n');
+          const rp = ctx +
+            "TASK: Rewrite ONLY these "+slice.length+" role(s) so each speaks to the target job. Keep outcomes truthful — reframe and re-emphasize existing facts to mirror the JD, but do NOT fabricate metrics, companies, titles, or dates. Keep roles in place; do not reorder.\n\n" +
+            "ROLES (with original index):\n" + block + "\n\n" +
+            'Return ONLY valid minified JSON, no markdown: {"roles":[{"i":<original index>,"blurb":"rewritten one-line summary tuned to the JD","bullets":["3-5 rewritten bullets tuned to the JD"]}]}\n' +
+            "Include exactly one object per role above, using the given indices.";
+          let part=null;
+          try { part=this.extractJSON(await this.ai(rp)); } catch(e){ part=null; }
+          if(part && Array.isArray(part.roles)){
+            part.roles.forEach(r=>{
+              const i=Number(r && r.i);
+              if(!isNaN(i) && exp[i]){
+                if(typeof r.blurb==='string' && r.blurb.trim()) exp[i].blurb=r.blurb.trim();
+                if(Array.isArray(r.bullets) && r.bullets.length) exp[i].bullets=r.bullets;
+              }
+            });
+          }
+        }
+      } else {
+        // ---- Light: rewrite bullets for the up-to-3 most relevant roles, one call ----
+        const lp = ctx +
+          "WORK HISTORY (company — title — dates):\n" + d.experience.map(e=>'- '+e.company+' — '+e.title+' — '+e.dates).join('\n') + "\n\n" +
+          "TASK (LIGHT): pick the up-to-3 roles MOST relevant to this JD and rewrite their bullets. The resume stays reverse-chronological — do NOT reorder roles, only rewrite bullets in place. Do not fabricate facts.\n" +
+          'Return ONLY valid minified JSON, no markdown: {"highlights":{"<exact company name from the list above>":["up to 4 rewritten, quantified bullets tuned to the JD"]}}';
+        let lj=null;
+        try { lj=this.extractJSON(await this.ai(lp)); } catch(e){ lj=null; }
+        if(lj && lj.highlights && typeof lj.highlights==='object'){
+          nv.data.experience=nv.data.experience.map(e=>{
+            const key=Object.keys(lj.highlights).find(k=>norm(e.company).includes(norm(k))||norm(k).includes(norm(e.company)));
+            if(key && Array.isArray(lj.highlights[key]) && lj.highlights[key].length) return Object.assign({}, e, {bullets:lj.highlights[key]});
+            return e;
+          });
+        }
+      }
+
+      this.setState(st=>({
+        versions:[nv,...st.versions], tailorBusy:false, tailorResultId:nv.id,
+        tailorNotes:notes, tailorPreviewHTML:this.buildResumeHTML(nv,false)
+      }), ()=>this.persist());
+    } catch(err){
+      this.setState({tailorBusy:false, tailorError: err.message || 'Something went wrong. Try again.'});
+    }
+  }
+
+  async runCover(){
+    const s=this.state;
+    if(!s.jobDesc.trim()){ this.setState({coverError:'Paste a job description first.'}); return; }
+    const base=this.byId(s.coverBaseId);
+    this.setState({coverBusy:true, coverError:''});
+    try {
+      const d=base.data;
+      const prompt = this.positioning() +
+        "\n\nWrite a concise, confident cover letter (250-320 words) for Nick Perez applying to " + (s.jobRole||'this role') + " at " + (s.jobCompany||'the company') + ". " +
+        "First person. Specific and tied to business outcomes and his growth-systems approach. Avoid clichés, buzzword stacking, and generic filler. Reference 1-2 concrete wins only if genuinely relevant to the JD. " +
+        (s.coverHM ? ('Address it to '+s.coverHM+'.') : 'Use a simple greeting like "Dear Hiring Team,".') +
+        "\n\nJOB DESCRIPTION:\n" + s.jobDesc +
+        "\n\nNICK'S SUMMARY: " + d.summary +
+        "\n\nReturn ONLY the letter body text (greeting through sign-off \"Nick Perez\"). No subject line, no markdown, no notes.";
+      const txt = await this.ai(prompt);
+      this.setState({coverBusy:false, coverText:(txt||'').trim()}, ()=>this.persist());
+    } catch(err){
+      this.setState({coverBusy:false, coverError: err.message || 'Something went wrong. Try again.'});
+    }
+  }
+
+  setQItem(id,patch){ this.setState(s=>({questions:s.questions.map(q=>q.id===id?Object.assign({},q,patch):q)}), ()=>this.persist()); }
+  setQText(id,val){ this.setQItem(id,{q:val}); }
+  setQAnswer(id,val){ this.setQItem(id,{a:val}); }
+  addQuestion(){ this.setState(s=>({questions:[...s.questions,{id:this.uid(),q:'',a:'',busy:false,err:''}]}), ()=>this.persist()); }
+  removeQuestion(id){ this.setState(s=>({questions:s.questions.length>1?s.questions.filter(q=>q.id!==id):s.questions}), ()=>this.persist()); }
+  async answerOne(id){
+    const s=this.state; const item=s.questions.find(q=>q.id===id);
+    if(!item || !item.q.trim()) return;
+    const base=this.byId(s.qBaseId);
+    this.setQItem(id,{busy:true, err:''});
+    try {
+      const d=base.data;
+      const prompt = this.positioning() +
+        "\n\nAnswer the following job-application question as Nick Perez — first person, confident and specific, 120-180 words. Tie it to his growth-systems philosophy and concrete outcomes where relevant. No generic filler, no markdown.\n\n" +
+        "TARGET ROLE: " + (s.jobRole||'(n/a)') + " at " + (s.jobCompany||'(n/a)') + "\n" +
+        "JOB DESCRIPTION (context):\n" + (s.jobDesc||'(none provided)') + "\n\n" +
+        "QUESTION: " + item.q + "\n\nReturn only the answer text.";
+      const txt = await this.ai(prompt);
+      this.setQItem(id,{busy:false, a:(txt||'').trim()});
+    } catch(err){
+      this.setQItem(id,{busy:false, err: err.message || 'Something went wrong.'});
+    }
+  }
+  async answerAll(){
+    const ids=this.state.questions.filter(q=>q.q.trim()).map(q=>q.id);
+    for(const id of ids){ await this.answerOne(id); }
+  }
+
+  // ---------- export ----------
+  openPrint(html){
+    const w=window.open('','_blank');
+    if(!w){ this.flash('Allow pop-ups to export the PDF'); return; }
+    w.document.open(); w.document.write(html); w.document.close();
+  }
+  exportResume(){ const v=this.activeVersion(); if(v) this.openPrint(this.buildResumeHTML(v,true)); }
+  exportTailor(){ const v=this.byId(this.state.tailorResultId); if(v) this.openPrint(this.buildResumeHTML(v,true)); }
+  exportCover(){ const base=this.byId(this.state.coverBaseId); this.openPrint(this.buildCoverHTML(this.state.coverText, base)); }
+
+  fontLink(style){
+    if(style==='editorial') return '<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">';
+    if(style==='twocol') return '<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">';
+    return '<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">';
+  }
+  printScript(forPrint){ return forPrint ? '<scr'+'ipt>window.addEventListener("load",function(){setTimeout(function(){try{window.focus();}catch(e){}window.print();},450);});</scr'+'ipt>' : ''; }
+
+  buildResumeHTML(v, forPrint){
+    const d=v.data, esc=(s)=>this.esc(s);
+    const contactParts=[d.phone,d.email,d.location,d.linkedin].filter(Boolean).map(esc);
+    const skills=(d.skills||[]);
+    const exp=(d.experience||[]);
+    const edu=(d.education||[]);
+    const style=v.templateStyle||'classic';
+    let css='', body='';
+
+    if(style==='twocol'){
+      css = "*{box-sizing:border-box}body{margin:0;font-family:'Public Sans',Arial,sans-serif;color:#1f2430;font-size:10.4pt;line-height:1.45}"+
+        ".wrap{max-width:8.5in;margin:0 auto;min-height:11in;display:grid;grid-template-columns:2.55in 1fr}"+
+        ".side{background:#0E1116;color:#cfd6e0;padding:.5in .34in}"+
+        ".side .nm{color:#fff;font-size:19pt;font-weight:800;line-height:1.05;letter-spacing:-.4px}"+
+        ".side .hl{color:#7FA6FF;font-size:9.8pt;font-weight:600;margin-top:7px;line-height:1.35}"+
+        ".side h3{font-size:8.4pt;text-transform:uppercase;letter-spacing:1.5px;color:#8A93A3;margin:22px 0 8px;font-weight:700}"+
+        ".side .ci{font-size:9.3pt;margin-bottom:5px;color:#e6eaf0;word-break:break-word}"+
+        ".side .sk{font-size:9.2pt;padding:3.5px 0;border-bottom:1px solid rgba(255,255,255,.08);color:#dde3ec}"+
+        ".side .edu{font-size:9.3pt;margin-bottom:9px;color:#cfd6e0}.side .edu b{color:#fff;display:block;font-size:9.6pt}"+
+        ".main{padding:.5in .45in}.main h3{font-size:9.2pt;text-transform:uppercase;letter-spacing:1.5px;color:#2F6BFF;font-weight:800;margin:0 0 9px}"+
+        ".sm{font-size:10.2pt;color:#33394a;margin-bottom:18px;line-height:1.5}"+
+        ".exp{margin-bottom:13px}.exp .co{font-weight:800;font-size:11pt;color:#141821}.exp .ti{font-size:9.7pt;color:#2F6BFF;font-weight:700}"+
+        ".exp .dt{float:right;font-size:8.8pt;color:#8a90a0;font-weight:600}.exp .bl{font-size:9.5pt;color:#4a5161;margin:3px 0;font-style:italic}"+
+        ".main ul{margin:4px 0 0;padding-left:15px}.main li{font-size:9.6pt;margin-bottom:3px;color:#2b3140}"+
+        "@page{size:letter;margin:0}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}";
+      const eduH = edu.map(e=>'<div class="edu"><b>'+esc(e.degree)+'</b>'+esc(e.school)+(e.year?' · '+esc(e.year):'')+'</div>').join('');
+      const expH = exp.map(e=>'<div class="exp">'+(e.dates?'<span class="dt">'+esc(e.dates)+'</span>':'')+'<div class="co">'+esc(e.company)+'</div>'+(e.title?'<div class="ti">'+esc(e.title)+'</div>':'')+(e.blurb?'<div class="bl">'+esc(e.blurb)+'</div>':'')+((e.bullets&&e.bullets.length)?'<ul>'+e.bullets.map(b=>'<li>'+esc(b)+'</li>').join('')+'</ul>':'')+'</div>').join('');
+      body='<div class="wrap"><div class="side"><div class="nm">'+esc(d.name)+'</div>'+(d.headline?'<div class="hl">'+esc(d.headline)+'</div>':'')+
+        '<h3>Contact</h3>'+contactParts.map(c=>'<div class="ci">'+c+'</div>').join('')+
+        (skills.length?'<h3>Skills</h3>'+skills.map(s=>'<div class="sk">'+esc(s)+'</div>').join(''):'')+
+        (eduH?'<h3>Education</h3>'+eduH:'')+
+        '</div><div class="main"><h3>Profile</h3><div class="sm">'+esc(d.summary)+'</div><h3>Experience</h3>'+expH+'</div></div>';
+    } else if(style==='editorial'){
+      css="*{box-sizing:border-box}body{margin:0;font-family:'Source Sans 3',Arial,sans-serif;color:#262626;font-size:10.6pt;line-height:1.5}"+
+        ".page{max-width:7.8in;margin:0 auto;padding:.62in .8in}"+
+        ".nm{font-family:'Source Serif 4',Georgia,serif;font-size:31pt;font-weight:600;text-align:center;letter-spacing:.4px;margin:0;color:#1a1a1a}"+
+        ".hl{text-align:center;font-family:'Source Serif 4',serif;font-style:italic;font-size:12pt;color:#555;margin:7px 0 0}"+
+        ".ct{text-align:center;font-size:9.3pt;letter-spacing:.5px;color:#666;margin-top:10px}"+
+        ".rule{height:1px;background:#1a1a1a;margin:16px 0 0}"+
+        ".sec{margin-top:20px}.sh{font-family:'Source Serif 4',serif;font-size:13pt;font-weight:600;color:#1a1a1a;margin-bottom:9px;border-bottom:1px solid #ddd;padding-bottom:4px}"+
+        ".sk{columns:2;column-gap:30px;font-size:10pt}.sk span{display:block;margin-bottom:3px;color:#333}.sk span::before{content:'— ';color:#aaa}"+
+        ".exp{margin-bottom:13px}.eh{display:flex;justify-content:space-between;align-items:baseline;gap:12px}"+
+        ".co{font-weight:700;font-size:11.2pt;color:#1a1a1a}.ti{color:#444;font-size:10.2pt}.dt{font-size:9.2pt;color:#888;font-style:italic;white-space:nowrap}"+
+        ".bl{font-size:10pt;color:#444;margin:3px 0 2px;font-style:italic}ul{padding-left:17px;margin:4px 0 0}li{font-size:10pt;margin-bottom:3px;color:#333}"+
+        ".edu{font-size:10.2pt;margin-bottom:3px}.edu b{font-weight:700}"+
+        "@page{size:letter;margin:0}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}";
+      const expH=exp.map(e=>'<div class="exp"><div class="eh"><div><span class="co">'+esc(e.company)+'</span>'+(e.title?' <span class="ti">— '+esc(e.title)+'</span>':'')+'</div>'+(e.dates?'<div class="dt">'+esc(e.dates)+'</div>':'')+'</div>'+(e.blurb?'<div class="bl">'+esc(e.blurb)+'</div>':'')+((e.bullets&&e.bullets.length)?'<ul>'+e.bullets.map(b=>'<li>'+esc(b)+'</li>').join('')+'</ul>':'')+'</div>').join('');
+      const eduH=edu.map(e=>'<div class="edu"><b>'+esc(e.school)+'</b> — '+esc(e.degree)+(e.year?', '+esc(e.year):'')+'</div>').join('');
+      body='<div class="page"><div class="nm">'+esc(d.name)+'</div>'+(d.headline?'<div class="hl">'+esc(d.headline)+'</div>':'')+'<div class="ct">'+contactParts.join(' &nbsp;·&nbsp; ')+'</div><div class="rule"></div>'+
+        '<div class="sec"><div class="sh">Summary</div><div>'+esc(d.summary)+'</div></div>'+
+        (skills.length?'<div class="sec"><div class="sh">Core Skills</div><div class="sk">'+skills.map(s=>'<span>'+esc(s)+'</span>').join('')+'</div></div>':'')+
+        '<div class="sec"><div class="sh">Experience</div>'+expH+'</div>'+
+        (eduH?'<div class="sec"><div class="sh">Education</div>'+eduH+'</div>':'')+'</div>';
+    } else {
+      css="*{box-sizing:border-box}body{margin:0;font-family:'Source Sans 3',Arial,sans-serif;color:#1a1a1a;font-size:10.7pt;line-height:1.42}"+
+        ".page{max-width:8.5in;margin:0 auto;padding:.52in .62in}"+
+        ".nm{font-size:23pt;font-weight:700;letter-spacing:.4px;margin:0;color:#111}"+
+        ".hl{font-size:11pt;color:#3b3b3b;margin:3px 0 6px;font-weight:600}"+
+        ".ct{font-size:9.5pt;color:#555}"+
+        ".sec{margin-top:15px}.sh{font-size:10.3pt;font-weight:700;text-transform:uppercase;letter-spacing:1.3px;color:#111;border-bottom:1.5px solid #222;padding-bottom:3px;margin-bottom:8px}"+
+        ".sk{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px 18px;font-size:9.6pt}.sk span::before{content:'▪ ';color:#999}"+
+        ".exp{margin-bottom:11px}.eh{display:flex;justify-content:space-between;align-items:baseline;gap:10px}"+
+        ".co{font-weight:700;font-size:11pt}.ti{font-style:italic;color:#333;font-weight:600;font-size:10.2pt}.dt{font-size:9.2pt;color:#666;white-space:nowrap;font-weight:600}"+
+        ".bl{font-size:9.7pt;color:#333;margin:2px 0 2px}ul{margin:3px 0 0;padding-left:16px}li{margin-bottom:2.5px;font-size:9.8pt}"+
+        ".edu{font-size:10pt;margin-bottom:2px}.edu b{font-weight:700}"+
+        "@page{size:letter;margin:0}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}";
+      const expH=exp.map(e=>'<div class="exp"><div class="eh"><div><span class="co">'+esc(e.company)+'</span>'+(e.title?' <span class="ti">— '+esc(e.title)+'</span>':'')+'</div>'+(e.dates?'<div class="dt">'+esc(e.dates)+'</div>':'')+'</div>'+(e.blurb?'<div class="bl">'+esc(e.blurb)+'</div>':'')+((e.bullets&&e.bullets.length)?'<ul>'+e.bullets.map(b=>'<li>'+esc(b)+'</li>').join('')+'</ul>':'')+'</div>').join('');
+      const eduH=edu.map(e=>'<div class="edu"><b>'+esc(e.school)+'</b> — '+esc(e.degree)+(e.year?', '+esc(e.year):'')+'</div>').join('');
+      body='<div class="page"><div class="nm">'+esc(d.name)+'</div>'+(d.headline?'<div class="hl">'+esc(d.headline)+'</div>':'')+'<div class="ct">'+contactParts.join(' &nbsp;•&nbsp; ')+'</div>'+
+        '<div class="sec"><div class="sh">Summary</div><div>'+esc(d.summary)+'</div></div>'+
+        (skills.length?'<div class="sec"><div class="sh">Core Skills</div><div class="sk">'+skills.map(s=>'<span>'+esc(s)+'</span>').join('')+'</div></div>':'')+
+        '<div class="sec"><div class="sh">Professional Experience</div>'+expH+'</div>'+
+        (eduH?'<div class="sec"><div class="sh">Education</div>'+eduH+'</div>':'')+'</div>';
+    }
+    return '<!doctype html><html><head><meta charset="utf-8"><title>'+esc(d.name)+' — Resume</title>'+this.fontLink(style)+'<style>html,body{background:#fff;color-scheme:light;}'+css+'</style></head><body>'+body+this.printScript(forPrint)+'</body></html>';
+  }
+
+  buildCoverHTML(text, v){
+    const d=(v&&v.data)||{};
+    const esc=(s)=>this.esc(s);
+    const contact=[d.phone,d.email,d.location].filter(Boolean).map(esc).join(' &nbsp;·&nbsp; ');
+    const css="*{box-sizing:border-box}body{margin:0;font-family:'Source Sans 3',Arial,sans-serif;color:#222;font-size:11pt;line-height:1.7}"+
+      ".page{max-width:8.5in;margin:0 auto;padding:.8in .9in}"+
+      ".nm{font-size:22pt;font-weight:700;color:#111;letter-spacing:.3px}"+
+      ".ct{font-size:9.6pt;color:#555;margin-top:5px;border-bottom:1.5px solid #222;padding-bottom:12px}"+
+      ".body{white-space:pre-wrap;margin-top:22px}"+
+      "@page{size:letter;margin:0}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}";
+    return '<!doctype html><html><head><meta charset="utf-8"><title>'+esc(d.name)+' — Cover Letter</title>'+this.fontLink('classic')+'<style>html,body{background:#fff;color-scheme:light;}'+css+'</style></head><body><div class="page"><div class="nm">'+esc(d.name)+'</div><div class="ct">'+contact+'</div><div class="body">'+esc(text)+'</div></div>'+this.printScript(true)+'</body></html>';
+  }
+
+  // ---------- icons ----------
+  mkIcon(name){
+    const R=React.createElement;
+    const c={width:18,height:18,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:1.8,strokeLinecap:'round',strokeLinejoin:'round'};
+    if(name==='library') return R('svg',c,[R('path',{key:1,d:'M3 7l9-4 9 4-9 4-9-4Z'}),R('path',{key:2,d:'M3 12l9 4 9-4'}),R('path',{key:3,d:'M3 17l9 4 9-4'})]);
+    if(name==='target') return R('svg',c,[R('circle',{key:1,cx:12,cy:12,r:9}),R('circle',{key:2,cx:12,cy:12,r:5}),R('circle',{key:3,cx:12,cy:12,r:1.4,fill:'currentColor'})]);
+    if(name==='mail') return R('svg',c,[R('rect',{key:1,x:3,y:5,width:18,height:14,rx:2}),R('path',{key:2,d:'M3 7l9 6 9-6'})]);
+    if(name==='chat') return R('svg',c,[R('path',{key:1,d:'M21 15a2 2 0 0 1-2 2H8l-4 4V5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2Z'})]);
+    if(name==='briefcase') return R('svg',c,[R('rect',{key:1,x:3,y:7,width:18,height:13,rx:2}),R('path',{key:2,d:'M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2'}),R('path',{key:3,d:'M3 12h18'})]);
+    if(name==='chart') return R('svg',c,[R('path',{key:1,d:'M3 3v18h18'}),R('rect',{key:2,x:7,y:11,width:3,height:6}),R('rect',{key:3,x:12,y:7,width:3,height:10}),R('rect',{key:4,x:17,y:13,width:3,height:4})]);
+    return null;
+  }
+
+  relTime(ts){
+    if(!ts) return 'just now';
+    const diff=Date.now()-ts, m=60000, h=3600000, day=86400000;
+    if(diff<m) return 'just now';
+    if(diff<h) return Math.floor(diff/m)+'m ago';
+    if(diff<day) return Math.floor(diff/h)+'h ago';
+    if(diff<day*7) return Math.floor(diff/day)+'d ago';
+    return new Date(ts).toLocaleDateString(undefined,{month:'short',day:'numeric'});
+  }
+
+  templateLabel(s){ return s==='twocol'?'Two-Column':(s==='editorial'?'Editorial':'Classic'); }
+
+  renderVals(){
+    const s=this.state;
+    const view=s.view;
+    const navDefs=[{id:'library',label:'Resume Library',icon:'library'},{id:'tailor',label:'Tailor to a Job',icon:'target'},{id:'cover',label:'Cover Letter',icon:'mail'},{id:'questions',label:'Application Q&A',icon:'chat'},{id:'applications',label:'Applications',icon:'briefcase'},{id:'insights',label:'Insights',icon:'chart'}];
+    const navItems=navDefs.map(it=>{
+      const active = view===it.id || (it.id==='library' && view==='editor') || (it.id==='applications' && view==='appDetail');
+      return {
+        label: it.label, icon: this.mkIcon(it.icon),
+        onClick: ()=>this.setView(it.id),
+        style: 'display:flex;align-items:center;gap:11px;width:100%;text-align:left;padding:10px 12px;border-radius:10px;border:none;cursor:pointer;font-size:13.5px;font-weight:'+(active?600:500)+';color:'+(active?'#fff':'#AEB6C2')+';background:'+(active?'rgba(47,107,255,0.18)':'transparent')+';transition:background .15s,color .15s;'
+      };
+    });
+
+    const A=this.activeVersion();
+    const baseOptions=s.versions.map(v=>({id:v.id,name:v.name}));
+    const firstId=s.versions[0]?s.versions[0].id:'';
+    const defId = (s.defaultId && s.versions.some(v=>v.id===s.defaultId)) ? s.defaultId : firstId;
+
+    // editor fields
+    const f = A ? {
+      name:A.data.name, phone:A.data.phone, email:A.data.email, location:A.data.location, linkedin:A.data.linkedin, headline:A.data.headline, summary:A.data.summary,
+      onName:(e)=>this.mutateActive(v=>{v.data.name=e.target.value}),
+      onPhone:(e)=>this.mutateActive(v=>{v.data.phone=e.target.value}),
+      onEmail:(e)=>this.mutateActive(v=>{v.data.email=e.target.value}),
+      onLocation:(e)=>this.mutateActive(v=>{v.data.location=e.target.value}),
+      onLinkedin:(e)=>this.mutateActive(v=>{v.data.linkedin=e.target.value}),
+      onHeadline:(e)=>this.mutateActive(v=>{v.data.headline=e.target.value}),
+      onSummary:(e)=>this.mutateActive(v=>{v.data.summary=e.target.value})
+    } : {};
+
+    const skillChips=(A?A.data.skills:[]).map((sk,i)=>({text:sk, onRemove:()=>this.mutateActive(v=>{v.data.skills.splice(i,1)})}));
+    const onSkillKey=(e)=>{ if(e.key==='Enter'){ e.preventDefault(); const val=e.target.value.trim(); if(val){ this.mutateActive(v=>{ v.data.skills=v.data.skills||[]; v.data.skills.push(val); }); e.target.value=''; } } };
+
+    const expItems=(A?A.data.experience:[]).map((e,i)=>({
+      company:e.company, title:e.title, dates:e.dates, blurb:e.blurb||'',
+      bullets:(e.bullets||[]).map((b,j)=>({ text:b,
+        onChange:(ev)=>this.mutateActive(v=>{v.data.experience[i].bullets[j]=ev.target.value}),
+        onRemove:()=>this.mutateActive(v=>{v.data.experience[i].bullets.splice(j,1)}) })),
+      onCompany:(ev)=>this.mutateActive(v=>{v.data.experience[i].company=ev.target.value}),
+      onTitle:(ev)=>this.mutateActive(v=>{v.data.experience[i].title=ev.target.value}),
+      onDates:(ev)=>this.mutateActive(v=>{v.data.experience[i].dates=ev.target.value}),
+      onBlurb:(ev)=>this.mutateActive(v=>{v.data.experience[i].blurb=ev.target.value}),
+      onAddBullet:()=>this.mutateActive(v=>{ v.data.experience[i].bullets=v.data.experience[i].bullets||[]; v.data.experience[i].bullets.push(''); }),
+      onRemove:()=>this.mutateActive(v=>{v.data.experience.splice(i,1)}),
+      onUp:()=>{ if(i>0) this.mutateActive(v=>{ const a=v.data.experience; const t=a[i-1]; a[i-1]=a[i]; a[i]=t; }); },
+      onDown:()=>this.mutateActive(v=>{ const a=v.data.experience; if(i<a.length-1){ const t=a[i+1]; a[i+1]=a[i]; a[i]=t; } })
+    }));
+    const addExperience=()=>this.mutateActive(v=>{ v.data.experience.unshift({company:'',title:'',dates:'',blurb:'',bullets:['']}); });
+
+    const eduItems=(A?A.data.education:[]).map((ed,i)=>({
+      school:ed.school, degree:ed.degree, year:ed.year,
+      onSchool:(ev)=>this.mutateActive(v=>{v.data.education[i].school=ev.target.value}),
+      onDegree:(ev)=>this.mutateActive(v=>{v.data.education[i].degree=ev.target.value}),
+      onYear:(ev)=>this.mutateActive(v=>{v.data.education[i].year=ev.target.value}),
+      onRemove:()=>this.mutateActive(v=>{v.data.education.splice(i,1)})
+    }));
+    const addEducation=()=>this.mutateActive(v=>{ v.data.education=v.data.education||[]; v.data.education.push({school:'',degree:'',year:''}); });
+
+    const tplDefs=[{id:'classic',label:'Classic'},{id:'twocol',label:'Two-Column'},{id:'editorial',label:'Editorial'}];
+    const curTpl=A?A.templateStyle:'classic';
+    const templateButtons=tplDefs.map(t=>{
+      const active=curTpl===t.id;
+      return { label:t.label, onClick:()=>this.setTemplate(t.id),
+        style:'border:none;cursor:pointer;padding:7px 13px;border-radius:8px;font-size:12.5px;font-weight:600;background:'+(active?'#fff':'transparent')+';color:'+(active?'#0E1116':'#7A828F')+';box-shadow:'+(active?'0 1px 3px rgba(0,0,0,.12)':'none')+';' };
+    });
+
+    const previewFrame=React.createElement('iframe',{srcDoc:s.previewHTML||'', style:{width:'100%',height:'100%',border:'none',background:'#fff',display:'block'}, title:'Resume preview'});
+    const tailorPreviewFrame=React.createElement('iframe',{srcDoc:s.tailorPreviewHTML||'', style:{width:'100%',height:'100%',border:'none',background:'#fff',display:'block'}, title:'Tailored resume preview'});
+
+    const versionCards=s.versions.map(v=>({
+      id:v.id, name:v.name, headline:v.data.headline||'No headline yet',
+      badge:this.templateLabel(v.templateStyle),
+      badgeStyle:'flex:none;background:#F1F3F6;color:#6B7480;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:4px 8px;border-radius:6px;',
+      meta:(v.data.experience.length)+' roles · '+(v.data.skills.length)+' skills',
+      updated:'Updated '+this.relTime(v.updatedAt),
+      tailored: v.tailoredFor ? ('Tailored: '+((v.tailoredFor.role||'role')+(v.tailoredFor.company?' @ '+v.tailoredFor.company:''))) : '',
+      isDefault: v.id===s.defaultId,
+      notDefault: v.id!==s.defaultId,
+      appCount: s.applications.filter(a=>a.resumeVersionId===v.id).length,
+      hasApps: s.applications.some(a=>a.resumeVersionId===v.id),
+      noApps: !s.applications.some(a=>a.resumeVersionId===v.id),
+      appCountLabel: (cnt=>cnt===1?'1 application':cnt+' applications')(s.applications.filter(a=>a.resumeVersionId===v.id).length),
+      onSetDefault:()=>this.setDefault(v.id),
+      onLogApp:()=>this.logApplication(v.id), onViewApps:()=>this.setView('applications'),
+      onOpen:()=>this.openEditor(v.id), onDuplicate:()=>this.duplicateVersion(v.id), onDelete:()=>this.deleteVersion(v.id)
+    }));
+
+    // ===== Applications data (first-class records) =====
+    const apps=s.applications||[];
+    const statusOptions=this.appStatuses();
+    const total=apps.length;
+    const respondedCount=apps.filter(a=>this.isPositive(a.status)).length;
+    const interviewCount=apps.filter(a=>a.status==='interview'||a.status==='offer').length;
+    const offerCount=apps.filter(a=>a.status==='offer').length;
+    const respRate=total?Math.round(respondedCount/total*100):0;
+    const statCard=(label,value,m)=>({label, value:String(value),
+      style:'flex:1;min-width:120px;border-radius:14px;padding:16px 18px;'+(m?('background:'+m.bg+';color:'+m.fg+';border:1px solid '+m.bd+';'):'background:#0E1116;color:#fff;')});
+    const appStats=[
+      statCard('Total', total, null),
+      statCard('Responses', respondedCount, this.appStatusMeta('response')),
+      statCard('Interviews', interviewCount, this.appStatusMeta('interview')),
+      statCard('Offers', offerCount, this.appStatusMeta('offer')),
+      statCard('Response rate', respRate+'%', this.appStatusMeta('applied'))
+    ];
+    const selStyle=m=>'cursor:pointer;border-radius:8px;padding:7px 11px;font-size:12.5px;font-weight:700;border:1px solid '+m.bd+';background:'+m.bg+';color:'+m.fg+';';
+    const applicationItems=apps.slice().sort((a,b)=>(b.appliedAt||0)-(a.appliedAt||0)).map(a=>{
+      const m=this.appStatusMeta(a.status||'applied');
+      const nextEv=(a.events||[]).filter(e=>!e.done).slice().sort((x,y)=>String(x.date).localeCompare(String(y.date)))[0];
+      const tags=['Resume: '+a.resumeVersionName]; if(a.coverLetter&&a.coverLetter.trim()) tags.push('Cover letter'); if(a.answers&&a.answers.length) tags.push(a.answers.length+' Q&A');
+      return {
+        id:a.id, title:a.role||a.resumeVersionName, company:a.company||'',
+        sub:tags.join('  ·  '), appliedDate:this.fmtDate(a.appliedAt),
+        status:a.status||'applied', statusOptions, statusStyle:selStyle(m),
+        onStatus:(e)=>this.setAppStatus(a.id, e.target.value),
+        nextLabel: nextEv?(this.appEventLabel(nextEv.type)+' · '+this.fmtDay(nextEv.date)):'', hasNext:!!nextEv,
+        onOpen:()=>this.openApp(a.id), onRemove:()=>this.deleteApplication(a.id)
+      };
+    });
+
+    // ----- Application detail -----
+    const AA=apps.find(a=>a.id===s.activeAppId);
+    let detail=null;
+    if(AA){
+      const m=this.appStatusMeta(AA.status||'applied');
+      const steps=statusOptions.map(st=>{ const sm=this.appStatusMeta(st.id); const on=(AA.status||'applied')===st.id; return {
+        id:st.id, label:st.label, onClick:()=>this.setAppStatus(AA.id, st.id),
+        style:'cursor:pointer;border:1px solid '+(on?sm.bd:'#E2E5EA')+';background:'+(on?sm.bg:'#fff')+';color:'+(on?sm.fg:'#7A828F')+';font-weight:'+(on?700:600)+';font-size:12.5px;padding:8px 13px;border-radius:9px;transition:all .12s;'
+      };});
+      const snapHTML=this.buildResumeHTML({templateStyle:AA.resumeSnapshot.templateStyle, data:AA.resumeSnapshot.data}, false);
+      const events=(AA.events||[]).slice().sort((x,y)=>String(x.date).localeCompare(String(y.date))).map(e=>{
+        const overdue = !e.done && e.date < this.todayISO();
+        return { id:e.id, typeLabel:this.appEventLabel(e.type), date:e.date, time:e.time||'', notes:e.notes||'', done:!!e.done, overdue,
+          dotColor: e.type==='interview'?'#9A6212':(e.type==='followup'?'#2F6BFF':'#8A92A0'),
+          onDate:(ev)=>this.setEvent(AA.id, e.id, {date:ev.target.value}),
+          onTime:(ev)=>this.setEvent(AA.id, e.id, {time:ev.target.value}),
+          onNotes:(ev)=>this.setEvent(AA.id, e.id, {notes:ev.target.value}),
+          onToggle:()=>this.setEvent(AA.id, e.id, {done:!e.done}),
+          onRemove:()=>this.removeEvent(AA.id, e.id),
+          checkStyle:'flex:none;width:20px;height:20px;border-radius:6px;border:1.5px solid '+(e.done?'#0E9F6E':'#CBD2DB')+';background:'+(e.done?'#0E9F6E':'#fff')+';color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;'
+        };
+      });
+      detail={
+        id:AA.id, role:AA.role||'', company:AA.company||'',
+        title:(AA.role||AA.resumeVersionName)+(AA.company?(' · '+AA.company):''),
+        appliedDate:this.fmtDate(AA.appliedAt), statusLabel:m.label,
+        statusPillStyle:'display:inline-flex;align-items:center;gap:6px;background:'+m.bg+';color:'+m.fg+';border:1px solid '+m.bd+';font-size:12px;font-weight:700;padding:5px 11px;border-radius:8px;',
+        onRole:(e)=>this.setAppField(AA.id,'role',e.target.value),
+        onCompany:(e)=>this.setAppField(AA.id,'company',e.target.value),
+        steps,
+        resumeName:AA.resumeVersionName, templateLabel:this.templateLabel(AA.resumeSnapshot.templateStyle),
+        resumeFrame:React.createElement('div',{style:{width:'100%',maxWidth:'334px',height:'431px',overflow:'hidden',borderRadius:'9px',border:'1px solid #EEF0F3',background:'#fff',boxShadow:'0 2px 10px rgba(15,17,22,.07)'}},
+          React.createElement('iframe',{srcDoc:snapHTML, scrolling:'no', style:{width:'816px',height:'1052px',border:'none',background:'#fff',transform:'scale(0.41)',transformOrigin:'top left',display:'block'}, title:'Resume snapshot'})),
+        onExportResume:()=>this.openPrint(this.buildResumeHTML({templateStyle:AA.resumeSnapshot.templateStyle,data:AA.resumeSnapshot.data}, true)),
+        coverLetter:AA.coverLetter||'', hasCover: !!(AA.coverLetter&&AA.coverLetter.trim()),
+        onCover:(e)=>this.setAppField(AA.id,'coverLetter',e.target.value),
+        onCopyCover:()=>this.copyText(AA.coverLetter),
+        onExportCover:()=>this.openPrint(this.buildCoverHTML(AA.coverLetter, {data:AA.resumeSnapshot.data})),
+        answers:(AA.answers||[]).map(qa=>({q:qa.q, a:qa.a})), hasAnswers:(AA.answers||[]).length>0,
+        jobDesc:AA.jobDesc||'', onJobDesc:(e)=>this.setAppField(AA.id,'jobDesc',e.target.value),
+        notes:AA.notes||'', onNotes:(e)=>this.setAppField(AA.id,'notes',e.target.value),
+        events, hasEvents:events.length>0,
+        onAddInterview:()=>this.addEvent(AA.id,'interview'), onAddFollowup:()=>this.addEvent(AA.id,'followup'),
+        insight:AA.insight||null, hasInsight: !!AA.insight, insightBusy:!!AA.insightBusy, insightError:AA.insightError||'',
+        fitScore: AA.insight?String(AA.insight.fitScore):'', fitStyle: this.fitStyle(AA.insight&&AA.insight.fitScore),
+        onAnalyze:()=>this.analyzeApp(AA.id),
+        analyzeLabel: AA.insightBusy?'Analyzing…':(AA.insight?'↻ Re-analyze fit':'✦ Analyze fit & gaps'),
+        prep:AA.prep||null, hasPrep: !!AA.prep, noPrep: !AA.prep, prepBusy:!!AA.prepBusy, prepError:AA.prepError||'',
+        onGenPrep:()=>this.genPrep(AA.id),
+        prepLabel: AA.prepBusy?'Preparing…':(AA.prep?'↻ Regenerate prep':'✦ Generate interview prep'),
+        onDelete:()=>this.deleteApplication(AA.id)
+      };
+    }
+
+    // ----- Insights / analytics -----
+    const reachedResp=apps.filter(a=>this.isPositive(a.status)).length;
+    const reachedInt=apps.filter(a=>a.status==='interview'||a.status==='offer').length;
+    const reachedOff=offerCount;
+    const pct=(n)=>total?Math.round(n/total*100):0;
+    const funnel=[
+      {label:'Applied', value:total, pct:100, fg:'#1E54E6', bg:'#EAF1FF'},
+      {label:'Response', value:reachedResp, pct:pct(reachedResp), fg:'#0C7C8C', bg:'#E1F6F9'},
+      {label:'Interview', value:reachedInt, pct:pct(reachedInt), fg:'#9A6212', bg:'#FEF3DA'},
+      {label:'Offer', value:reachedOff, pct:pct(reachedOff), fg:'#0E7C4B', bg:'#E6F7EE'}
+    ].map(x=>({label:x.label, value:String(x.value), pctLabel:x.pct+'%',
+      barStyle:'height:100%;width:'+Math.max(x.pct,3)+'%;background:'+x.fg+';border-radius:8px;transition:width .3s;',
+      trackStyle:'flex:1;height:30px;background:'+x.bg+';border-radius:8px;overflow:hidden;',
+      fg:x.fg}));
+    // by resume version
+    const vmap={};
+    apps.forEach(a=>{ const k=a.resumeVersionId||a.resumeVersionName; if(!vmap[k]) vmap[k]={name:a.resumeVersionName, n:0, resp:0, intv:0}; vmap[k].n++; if(this.isPositive(a.status)) vmap[k].resp++; if(a.status==='interview'||a.status==='offer') vmap[k].intv++; });
+    const byVersion=Object.values(vmap).sort((a,b)=>b.n-a.n).map(r=>({ name:r.name, n:String(r.n), resp:String(r.resp), intv:String(r.intv), rate:(r.n?Math.round(r.resp/r.n*100):0)+'%' }));
+    const hasVersionData=byVersion.length>0;
+    // upcoming agenda
+    const allEvents=[];
+    apps.forEach(a=>(a.events||[]).forEach(e=>{ if(!e.done) allEvents.push(Object.assign({}, e, {appId:a.id, appTitle:(a.role||a.resumeVersionName), appCompany:a.company||''})); }));
+    allEvents.sort((x,y)=>String(x.date).localeCompare(String(y.date)));
+    const tIso=this.todayISO();
+    const upcoming=allEvents.map(e=>({
+      id:e.id, typeLabel:this.appEventLabel(e.type),
+      when:this.fmtDay(e.date)+(e.time?(' · '+e.time):''),
+      who:e.appTitle+(e.appCompany?(' @ '+e.appCompany):''), notes:e.notes||'', hasNotes:!!(e.notes&&e.notes.trim()),
+      overdue: e.date<tIso,
+      dotStyle:'flex:none;width:9px;height:9px;border-radius:50%;background:'+(e.type==='interview'?'#9A6212':(e.type==='followup'?'#2F6BFF':'#8A92A0'))+';',
+      onOpen:()=>this.openApp(e.appId)
+    }));
+    const insightObj = (s.insightText && typeof s.insightText==='object') ? s.insightText : null;
+
+    // ===== Guided builder bindings =====
+    const gd = s.guided || this.guidedDefault();
+    const gsteps = this.guidedSteps();
+    const gstep = Math.max(0, Math.min(gsteps.length-1, gd.step||0));
+    const gkey = gsteps[gstep].key;
+    const gD = gd.data;
+    const gInput=(field)=>(e)=>this.gSet(field, e.target.value);
+    const gRoles = (gD.experience||[]).map((e,i)=>({
+      company:e.company||'', title:e.title||'', dates:e.dates||'', raw:e.raw||'',
+      busy: gd.busyRole===i, polishLabel: gd.busyRole===i?'Polishing…':((e.bullets&&e.bullets.length)?'↻ Re-polish':'✦ Polish into bullets'),
+      bullets:(e.bullets||[]).map((b,j)=>({ text:b, onChange:(ev)=>this.gSetBullet(i,j,ev.target.value), onRemove:()=>this.gRemoveBullet(i,j) })),
+      hasBullets:(e.bullets||[]).length>0,
+      onCompany:(ev)=>this.gSetRole(i,{company:ev.target.value}),
+      onTitle:(ev)=>this.gSetRole(i,{title:ev.target.value}),
+      onDates:(ev)=>this.gSetRole(i,{dates:ev.target.value}),
+      onRaw:(ev)=>this.gSetRole(i,{raw:ev.target.value}),
+      onPolish:()=>this.gPolishRole(i), onAddBullet:()=>this.gAddBullet(i), onRemove:()=>this.gRemoveRole(i),
+      label:'Role '+(i+1)
+    }));
+    const gEdus = (gD.education||[]).map((ed,i)=>({
+      school:ed.school||'', degree:ed.degree||'', year:ed.year||'',
+      onSchool:(ev)=>this.gSetEdu(i,{school:ev.target.value}), onDegree:(ev)=>this.gSetEdu(i,{degree:ev.target.value}),
+      onYear:(ev)=>this.gSetEdu(i,{year:ev.target.value}), onRemove:()=>this.gRemoveEdu(i)
+    }));
+    const gSkills = (gD.skills||[]).map((sk,i)=>({ text:sk, onRemove:()=>this.gRemoveSkill(i) }));
+    const gv = { templateStyle: gd.templateStyle||'twocol', data: this.guidedToVersion().data };
+    const gPreviewFrame = React.createElement('div',{style:{width:'100%',maxWidth:'360px',height:'466px',overflow:'hidden',borderRadius:'10px',border:'1px solid #E6E8EC',background:'#fff',boxShadow:'0 6px 24px rgba(15,17,22,.1)'}},
+      React.createElement('iframe',{srcDoc:this.buildResumeHTML(gv,false), scrolling:'no', style:{width:'816px',height:'1056px',border:'none',background:'#fff',transform:'scale(0.441)',transformOrigin:'top left',display:'block'}, title:'Resume preview'}));
+    const gTplDefs=[{id:'twocol',label:'Two-Column'},{id:'classic',label:'Classic'},{id:'editorial',label:'Editorial'}];
+    const gTemplateButtons=gTplDefs.map(t=>{ const on=(gd.templateStyle||'twocol')===t.id; return { label:t.label, onClick:()=>this.gSetTemplate(t.id),
+      style:'border:1px solid '+(on?'#2F6BFF':'#E2E5EA')+';cursor:pointer;padding:9px 15px;border-radius:9px;font-size:13px;font-weight:600;background:'+(on?'#F3F7FF':'#fff')+';color:'+(on?'#1E54E6':'#5A6573')+';' }; });
+    const gFirstName = (gD.name||'').trim().split(/\s+/)[0] || 'there';
+
+    const primaryBtn='display:flex;align-items:center;justify-content:center;gap:9px;width:100%;margin-top:18px;background:#2F6BFF;border:none;color:#fff;padding:13px 16px;border-radius:11px;font-weight:600;font-size:14px;cursor:pointer;box-shadow:0 4px 14px rgba(47,107,255,.32);';
+    const busyBtn='display:flex;align-items:center;justify-content:center;gap:9px;width:100%;margin-top:18px;background:#7CA0F0;border:none;color:#fff;padding:13px 16px;border-radius:11px;font-weight:600;font-size:14px;cursor:default;';
+
+    const questionItems=s.questions.map(q=>({
+      id:q.id, q:q.q, a:q.a, err:q.err, busy:q.busy, hasAnswer: !!(q.a && q.a.trim()),
+      onText:(e)=>this.setQText(q.id,e.target.value),
+      onEdit:(e)=>this.setQAnswer(q.id,e.target.value),
+      onAnswer:()=>this.answerOne(q.id),
+      onRemove:()=>this.removeQuestion(q.id),
+      onCopy:()=>this.copyText(q.a),
+      btnLabel: q.busy?'…':'Generate',
+      btnStyle:'background:'+(q.busy?'#7CA0F0':'#2F6BFF')+';border:none;color:#fff;padding:0 16px;height:42px;border-radius:9px;font-weight:600;font-size:13px;cursor:'+(q.busy?'default':'pointer')+';flex:none;white-space:nowrap;'
+    }));
+    const qBusyAny=s.questions.some(q=>q.busy);
+
+    return {
+      navItems,
+      isLibrary: view==='library', isEditor: view==='editor', isTailor: view==='tailor', isCover: view==='cover', isQuestions: view==='questions', isApplications: view==='applications', isAppDetail: view==='appDetail', isInsights: view==='insights', isGuided: view==='guided',
+      startGuided:()=>this.startGuided(), restartGuided:()=>this.restartGuided(), exitGuided:()=>this.exitGuided(),
+      gPct: gsteps.length>1?Math.round(gstep/(gsteps.length-1)*100):0, gStepNum: gstep+1, gStepTotal: gsteps.length, gStepLabel: gsteps[gstep].label,
+      gIsWelcome:gkey==='welcome', gIsBasics:gkey==='basics', gIsHeadline:gkey==='headline', gIsExperience:gkey==='experience', gIsEducation:gkey==='education', gIsSkills:gkey==='skills', gIsSummary:gkey==='summary', gIsFinish:gkey==='finish',
+      gShowBack: gstep>0,
+      gPrimaryLabel: gkey==='welcome'?'Let us begin':(gkey==='finish'?'Save to my library':'Continue'),
+      gPrimary: gkey==='finish'?(()=>this.finishGuided()):(()=>this.gGo(1)),
+      gBack:()=>this.gGo(-1),
+      gName:gD.name, gEmail:gD.email, gPhone:gD.phone, gLocation:gD.location, gLinkedin:gD.linkedin, gHeadline:gD.headline, gSummary:gD.summary,
+      gOnName:gInput('name'), gOnEmail:gInput('email'), gOnPhone:gInput('phone'), gOnLocation:gInput('location'), gOnLinkedin:gInput('linkedin'), gOnHeadline:gInput('headline'), gOnSummary:gInput('summary'),
+      gRoles, gAddRole:()=>this.gAddRole(), gHasRoles:gRoles.length>0, gNoRoles:gRoles.length===0,
+      gEdus, gAddEdu:()=>this.gAddEdu(), gHasEdus:gEdus.length>0,
+      gSkills, gHasSkills:gSkills.length>0, gOnSkillKey:(e)=>{ if(e.key==='Enter'){ e.preventDefault(); const v=e.target.value; e.target.value=''; this.gAddSkill(v); } },
+      gSuggestSkills:()=>this.gSuggestSkills(), gBusySkills:gd.busySkills, gSuggestLabel: gd.busySkills?'Thinking…':'✦ Suggest skills from my experience',
+      gDraftSummary:()=>this.gDraftSummary(), gBusySummary:gd.busySummary, gSummaryLabel: gd.busySummary?'Writing…':((gD.summary&&gD.summary.trim())?'↻ Rewrite my summary':'✦ Write my summary for me'),
+      gErr:gd.err, gFirstName,
+      gPreviewFrame, gTemplateButtons, gMakeDefault:!!gd.makeDefault, gToggleDefault:()=>this.gToggleDefault(),
+      appStats, applicationItems, hasApplications: applicationItems.length>0, noApplications: applicationItems.length===0,
+      logNewApplication:()=>this.logNewApplication(),
+      // application detail
+      detail, hasDetail: !!detail, backToApplications:()=>this.backToApplications(),
+      // insights
+      funnel, byVersion, hasVersionData, respRateLabel: respRate+'%', interviewRateLabel: (total?Math.round(interviewCount/total*100):0)+'%',
+      upcoming, hasUpcoming: upcoming.length>0, noUpcoming: upcoming.length===0,
+      runInsights:()=>this.runInsights(), insightBusy:s.insightBusy, insightError:s.insightError,
+      insight: insightObj, hasCrossInsight: !!insightObj, insightNone: !insightObj, canRunInsights: apps.length>=2,
+      insightBtnLabel: s.insightBusy?'Analyzing your applications…':(insightObj?'↻ Refresh insights':'✦ Find what works'),
+      toast: s.toast,
+      // library
+      versionCards, newVersion:()=>this.newVersion(), goTailor:()=>this.setView('tailor'),
+      openImport:()=>this.openImport(),
+      // import modal
+      importOpen:s.importOpen, importText:s.importText, importFileName:s.importFileName,
+      importBusy:s.importBusy, importError:s.importError,
+      onImportText:(e)=>this.setState({importText:e.target.value}),
+      onImportFile:(e)=>this.onImportFile(e), runImport:()=>this.runImport(), closeImport:()=>this.closeImport(),
+      stop:(e)=>{ e.stopPropagation(); },
+      importBtnLabel: s.importBusy?'Structuring resume…':'Import & set as default',
+      importBtnStyle: 'display:inline-flex;align-items:center;justify-content:center;gap:9px;border:none;color:#fff;padding:11px 20px;border-radius:11px;font-weight:600;font-size:13.5px;background:'+(s.importBusy?'#7CA0F0':'#2F6BFF')+';cursor:'+(s.importBusy?'default':'pointer')+';box-shadow:0 4px 14px rgba(47,107,255,.32);',
+      // editor
+      vName: A?A.name:'', onVName:(e)=>this.mutateActive(v=>{v.name=e.target.value}),
+      backToLibrary:()=>this.backToLibrary(), exportResume:()=>this.exportResume(),
+      templateButtons, previewFrame, f, skillChips, onSkillKey, expItems, addExperience, eduItems, addEducation,
+      // shared job
+      jobRole:s.jobRole, jobCompany:s.jobCompany, jobDesc:s.jobDesc,
+      onJobRole:this.field('jobRole'), onJobCompany:this.field('jobCompany'), onJobDesc:this.field('jobDesc'),
+      // tailor
+      tailorBaseId: s.tailorBaseId || defId, onTailorBase:(e)=>this.commit(()=>({tailorBaseId:e.target.value})),
+      baseOptions, runTailor:()=>this.runTailor(), tailorBusy:s.tailorBusy, tailorError:s.tailorError,
+      depthOptions: [
+        {id:'light', title:'Light', desc:'Summary, skills & top 3 roles'},
+        {id:'deep', title:'Deep', desc:'Rewrites every role to fit'}
+      ].map(o=>{ const active=(s.tailorDepth||'light')===o.id; return {
+        title:o.title, desc:o.desc, onClick:()=>this.commit(()=>({tailorDepth:o.id})),
+        style:'flex:1;text-align:left;cursor:pointer;border-radius:11px;padding:11px 13px;border:1.5px solid '+(active?'#2F6BFF':'#E2E5EA')+';background:'+(active?'#F3F7FF':'#fff')+';color:'+(active?'#1E54E6':'#3a4350')+';transition:border-color .15s,background .15s;'
+      }; }),
+      tailorBtnLabel: s.tailorBusy?'Tailoring resume…':'✦ Generate tailored resume', tailorBtnStyle: s.tailorBusy?busyBtn:primaryBtn,
+      tailorHasResult: !!s.tailorResultId, tailorNoResult: !s.tailorResultId, tailorNotes:s.tailorNotes, tailorPreviewFrame,
+      openTailorResult:()=>this.openEditor(s.tailorResultId), exportTailor:()=>this.exportTailor(),
+      // cover
+      coverBaseId: s.coverBaseId || defId, onCoverBase:(e)=>this.commit(()=>({coverBaseId:e.target.value})),
+      coverHM:s.coverHM, onCoverHM:this.field('coverHM'),
+      runCover:()=>this.runCover(), coverBusy:s.coverBusy, coverError:s.coverError,
+      coverBtnLabel: s.coverBusy?'Writing letter…':'✦ Generate cover letter', coverBtnStyle: s.coverBusy?busyBtn:primaryBtn,
+      coverText:s.coverText, onCoverText:this.field('coverText'),
+      copyCover:()=>this.copyText(s.coverText), exportCover:()=>this.exportCover(),
+      // questions
+      qBaseId: s.qBaseId || defId, onQBase:(e)=>this.commit(()=>({qBaseId:e.target.value})),
+      questionItems, addQuestion:()=>this.addQuestion(), answerAll:()=>this.answerAll(), qBusyAny,
+      answerAllLabel: qBusyAny?'Generating…':'✦ Answer all',
+      answerAllStyle:'background:'+(qBusyAny?'#7CA0F0':'#0E1116')+';border:none;color:#fff;padding:0 18px;height:42px;border-radius:9px;font-weight:600;font-size:13.5px;cursor:'+(qBusyAny?'default':'pointer')+';white-space:nowrap;'
+    };
+  }
+}
+</script>
+</body>
+</html>

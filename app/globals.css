@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-page: #f5f6f8;
+  --color-ink: #0e1116;
+  --color-muted: #5a6573;
+  --color-accent: #2f6bff;
+  --color-accent-dark: #1e54e6;
+  --color-border: #e6e8ec;
+}
+
+body {
+  color: var(--color-ink);
+  background: var(--color-page);
+  font-family: var(--font-instrument-sans), system-ui, -apple-system, sans-serif;
+}
