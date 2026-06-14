@@ -27,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${spaceGrotesk.variable} ${instrumentSans.variable} antialiased`}
+        className={`${spaceGrotesk.variable} ${instrumentSans.variable} min-h-screen font-sans antialiased`}
       >
         {children}
       </body>
