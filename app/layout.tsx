@@ -15,8 +15,9 @@ const instrumentSans = Instrument_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Resume Studio",
-  description: "AI-assisted resume and job-application platform",
+  title: "Resume Studio — AI resumes, applications & insights",
+  description:
+    "Build resume versions, tailor to jobs, track applications with snapshots, and learn what gets interviews. From $2.99/mo for students.",
 };
 
 export default function RootLayout({

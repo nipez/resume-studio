@@ -5,7 +5,7 @@ export function MarketingFooter() {
   return (
     <footer className="border-t border-border bg-white">
       <div className="mx-auto max-w-6xl px-6 py-12">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-gradient-to-br from-accent to-[#7A53FF] font-display text-base font-bold text-white shadow-accent">
@@ -49,17 +49,13 @@ export function MarketingFooter() {
 
           <div>
             <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-ink">
-              Get started
+              Compare
             </h3>
-            <p className="mt-4 text-[14px] leading-relaxed text-muted">
-              Free during beta. No credit card required.
-            </p>
-            <Link
-              href="/login"
-              className="mt-4 inline-flex rounded-[11px] bg-accent px-4 py-2.5 text-[13.5px] font-semibold text-white shadow-accent transition hover:bg-accent-dark"
-            >
-              Open Resume Studio
-            </Link>
+            <ul className="mt-4 space-y-3 text-[14px] text-muted">
+              <li>vs. Teal — full loop + snapshots</li>
+              <li>vs. Jobscan — 8× cheaper entry</li>
+              <li>vs. Resume.io — no trial traps</li>
+            </ul>
           </div>
         </div>
 
