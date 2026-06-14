@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { NAV_LINKS, SITE_NAME } from "@/lib/marketing/content";
+import { NAV_LINKS, SITE_NAME, SITE_TAGLINE } from "@/lib/marketing/content";
 
 export function MarketingHeader() {
   return (
@@ -9,9 +9,14 @@ export function MarketingHeader() {
           <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-gradient-to-br from-accent to-[#7A53FF] font-display text-base font-bold text-white shadow-accent">
             R
           </div>
-          <span className="font-display text-lg font-semibold tracking-tight text-ink">
-            {SITE_NAME}
-          </span>
+          <div>
+            <span className="font-display text-lg font-semibold tracking-tight text-ink">
+              {SITE_NAME}
+            </span>
+            <span className="hidden text-[11px] font-semibold uppercase tracking-wider text-accent sm:block">
+              {SITE_TAGLINE}
+            </span>
+          </div>
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">

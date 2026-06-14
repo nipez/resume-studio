@@ -1,6 +1,7 @@
 import { ScaledResumePreview } from "@/components/resume/resume-preview";
 import { buildResumeHTML } from "@/lib/resume/build-resume-html";
 import { SAMPLE_RESUME_DATA } from "@/lib/resume/sample-data";
+import { SITE_TAGLINE } from "@/lib/marketing/content";
 import Link from "next/link";
 
 const previewHtml = buildResumeHTML({
@@ -21,19 +22,20 @@ export function MarketingHero() {
           <div>
             <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-[#AEB6C2]">
               <span className="h-1.5 w-1.5 rounded-full bg-[#0E7C4B] shadow-[0_0_8px_#0E7C4B]" />
-              Replace Teal + Jobscan + Google Docs
+              {SITE_TAGLINE}
             </p>
             <h1 className="font-display text-[2.6rem] font-semibold leading-[1.06] tracking-[-0.035em] text-white sm:text-5xl lg:text-[3.55rem]">
-              Stop guessing.
+              One system for your
               <br />
               <span className="bg-gradient-to-r from-[#7FA6FF] to-[#B89DFF] bg-clip-text text-transparent">
-                Start landing interviews.
+                entire job search.
               </span>
             </h1>
             <p className="mt-6 max-w-xl text-[16px] leading-relaxed text-[#AEB6C2] sm:text-[17px]">
-              One workspace to build resume versions, tailor to each job, write
-              cover letters, answer application questions, and track what you
-              actually sent — so you know what&apos;s working.
+              Resume Studio is the application OS — library, tailor, cover
+              letters, Q&A, tracking, and insights connected in one workspace.
+              Every send is snapshotted so you know what&apos;s actually
+              working.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
@@ -43,25 +45,27 @@ export function MarketingHero() {
                 Get started free
               </Link>
               <Link
-                href="/students"
+                href="/application-os"
                 className="rounded-[11px] border border-white/15 bg-white/5 px-6 py-3.5 text-[14px] font-semibold text-white transition hover:bg-white/10"
               >
-                I&apos;m a student
+                See the application OS →
               </Link>
             </div>
             <p className="mt-5 text-[12.5px] text-[#6E7686]">
-              From $2.99/mo for students · $4.99 workspace without AI · No
-              trial traps
+              Not another PDF generator · From $2.99/mo students · $4.99
+              workspace without AI
             </p>
           </div>
 
           <div className="relative mx-auto w-full max-w-[400px] lg:mx-0 lg:max-w-none lg:justify-self-end">
             <div className="absolute -left-6 top-8 z-10 hidden rounded-xl border border-white/10 bg-sidebar/90 px-4 py-3 text-white shadow-xl backdrop-blur-md lg:block">
               <div className="text-[11px] font-bold uppercase tracking-wider text-[#7FA6FF]">
-                Fit score
+                Application OS
               </div>
-              <div className="font-display text-2xl font-semibold">84</div>
-              <div className="text-[11px] text-[#AEB6C2]">3 strengths · 1 gap</div>
+              <div className="font-display text-2xl font-semibold">6 → 1</div>
+              <div className="text-[11px] text-[#AEB6C2]">
+                modules · one login
+              </div>
             </div>
             <div className="absolute -right-4 bottom-12 z-10 hidden rounded-xl border border-[#CDEBD9] bg-[#EAF7F0] px-4 py-3 shadow-lg lg:block">
               <div className="text-[12px] font-bold text-[#0E7C4B]">

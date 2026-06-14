@@ -1,6 +1,11 @@
-import { TemplateShowcase } from "@/components/design/template-showcase";
+import { LibraryToolbar } from "@/components/library/library-toolbar";
+import { VersionCard } from "@/components/library/version-card";
+import { getLibraryData } from "@/lib/resume/actions";
 
-export default function LibraryPage() {
+export default async function LibraryPage() {
+  const { versions, defaultVersionId } = await getLibraryData();
+  const hasVersions = versions.length > 0;
+
   return (
     <div className="scroll flex-1 overflow-auto">
       <div className="mx-auto max-w-[1120px] px-12 pb-16 pt-[42px]">
@@ -15,6 +20,7 @@ export default function LibraryPage() {
               description.
             </p>
           </div>
+          <LibraryToolbar />
         </div>
 
         <div className="mb-[22px] flex cursor-default items-center gap-[18px] rounded-2xl bg-gradient-to-br from-sidebar to-[#1b2740] px-[22px] py-[19px] text-white">
@@ -36,11 +42,25 @@ export default function LibraryPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-dashed border-border bg-white px-6 py-10 text-center text-[14px] text-muted">
-          Your resume versions will appear here in PR #4.
-        </div>
-
-        <TemplateShowcase />
+        {hasVersions ? (
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(330px,1fr))] gap-[18px]">
+            {versions.map((version) => (
+              <VersionCard
+                key={version.id}
+                version={version}
+                isDefault={version.id === defaultVersionId}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-dashed border-border bg-white px-6 py-10 text-center">
+            <p className="text-[14px] text-muted">
+              No resume versions yet. Click{" "}
+              <span className="font-semibold text-ink">+ New version</span> to
+              create your first one.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

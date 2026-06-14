@@ -1,23 +1,153 @@
 export const SITE_NAME = "Resume Studio";
 
+export const SITE_TAGLINE = "The application OS";
+
+export const SITE_DESCRIPTION =
+  "The application OS for serious job searches — resume library, tailor, cover letters, Q&A, tracking, and insights in one workspace with immutable snapshots.";
+
 export const BETA_BANNER =
   "Free during beta — all plans unlocked while we build. Pricing below is what launches at GA.";
 
 export const NAV_LINKS = [
+  { href: "/application-os", label: "Application OS" },
   { href: "/features", label: "Features" },
   { href: "/pricing", label: "Pricing" },
   { href: "/students", label: "Students" },
+  { href: "/blog", label: "Blog" },
   { href: "/faq", label: "FAQ" },
 ] as const;
 
 export const HERO_STATS = [
-  { value: "6-in-1", label: "Resume to insights" },
-  { value: "3", label: "Print-ready templates" },
-  { value: "$2.99", label: "Student plan from" },
-  { value: "0", label: "Fabricated credentials" },
+  { value: "6", label: "Modules in the apply loop" },
+  { value: "100%", label: "Snapshot fidelity" },
+  { value: "$4.99", label: "Full workspace from" },
+  { value: "1", label: "Login — not 5 tools" },
+] as const;
+
+export const APPLICATION_OS_LOOP = [
+  {
+    step: "01",
+    title: "Resume Library",
+    description:
+      "Master resume + role-specific cuts. Duplicate, version, and set your default starting point.",
+    icon: "library" as const,
+    connectsTo: "Tailor",
+  },
+  {
+    step: "02",
+    title: "Tailor to a Job",
+    description:
+      "Paste a job description. AI reframes your real experience into a matched version — without touching your master.",
+    icon: "target" as const,
+    connectsTo: "Cover",
+  },
+  {
+    step: "03",
+    title: "Cover Letter",
+    description:
+      "Generate a tight, editable letter in your voice from the resume and posting — not generic filler.",
+    icon: "mail" as const,
+    connectsTo: "Q&A",
+  },
+  {
+    step: "04",
+    title: "Application Q&A",
+    description:
+      "Answer screening questions one-by-one or in batch. Copy what you need, keep what you wrote.",
+    icon: "chat" as const,
+    connectsTo: "Track",
+  },
+  {
+    step: "05",
+    title: "Applications",
+    description:
+      "Log every send with status, timeline, and an immutable snapshot of exactly what went out the door.",
+    icon: "briefcase" as const,
+    connectsTo: "Insights",
+  },
+  {
+    step: "06",
+    title: "Insights",
+    description:
+      "See your funnel, upcoming events, and which resume versions actually get interviews.",
+    icon: "chart" as const,
+    connectsTo: "Loop",
+  },
+] as const;
+
+export const FRAGMENTED_STACK = [
+  {
+    tool: "Resume builder",
+    problem: "Great PDF, zero memory of what you sent where.",
+    cost: "$10–25/mo",
+  },
+  {
+    tool: "ATS scanner",
+    problem: "Keyword score, no cover letter, no tracking, no versions.",
+    cost: "$50/mo",
+  },
+  {
+    tool: "Application tracker",
+    problem: "Spreadsheet of companies — not what you actually submitted.",
+    cost: "$9–13/wk",
+  },
+  {
+    tool: "Cover letter doc",
+    problem: "Lost in Google Drive. Wrong version attached. Again.",
+    cost: "Your sanity",
+  },
+  {
+    tool: "AI resume generator",
+    problem: "One PDF per credit. No library. No history. No learning.",
+    cost: "$5 per 10 runs",
+  },
+] as const;
+
+export const GENERATOR_VS_OS = [
+  {
+    dimension: "What you get",
+    generator: "One optimized PDF per job",
+    applicationOs: "Full workspace across your entire search",
+  },
+  {
+    dimension: "Resume versions",
+    generator: "Download and start over",
+    applicationOs: "Library with duplicate, default, and tailor branches",
+  },
+  {
+    dimension: "After you click send",
+    generator: "Gone — no record of what you submitted",
+    applicationOs: "Immutable snapshot: resume + cover + Q&A frozen",
+  },
+  {
+    dimension: "Learning over time",
+    generator: "None — each run is isolated",
+    applicationOs: "Cross-application insights tied to real sends",
+  },
+  {
+    dimension: "Pricing model",
+    generator: "Credits that burn fast ($5–20 packs)",
+    applicationOs: "Subscription from $2.99–$12/mo — predictable",
+  },
+  {
+    dimension: "AI approach",
+    generator: "Keyword match optimization",
+    applicationOs: "Reframe real experience — never invent credentials",
+  },
+  {
+    dimension: "Best for",
+    generator: "5 quick applications",
+    applicationOs: "30–100+ applications over months",
+  },
 ] as const;
 
 export const POSITIONING_PILLARS = [
+  {
+    title: "An operating system — not a one-shot generator",
+    description:
+      "Credit-based tools give you a PDF and move on. Resume Studio is the application OS: six connected modules from first draft to interview prep, with one login and one source of truth.",
+    accent: "Application OS",
+  },
   {
     title: "The only app that snapshots what you sent",
     description:
@@ -31,15 +161,9 @@ export const POSITIONING_PILLARS = [
     accent: "Honest AI",
   },
   {
-    title: "The full apply loop, not just a builder",
-    description:
-      "Resume, tailor, cover letter, application Q&A, tracking, interview prep, and cross-application insights — one calm workspace instead of 4–5 subscriptions.",
-    accent: "All-in-one",
-  },
-  {
     title: "Pricing that respects job search",
     description:
-      "No $50/mo scanner tax. No $13/week surprise bills. A $4.99 workspace plan without AI, a $2.99 student plan, and Pro only when you need unlimited tailoring.",
+      "No $50/mo scanner tax. No credit packs that vanish in a week. A $4.99 workspace plan without AI, a $2.99 student plan, and Pro only when you need unlimited tailoring.",
     accent: "Fair pricing",
   },
 ] as const;
@@ -221,9 +345,19 @@ export const TESTIMONIALS = [
 
 export const FAQ_ITEMS = [
   {
+    question: "What is an 'application OS'?",
+    answer:
+      "An application OS is a single system for your entire job search — not just resume generation. Resume Studio connects library, tailoring, cover letters, Q&A, application tracking, and insights in one workspace. Every send is snapshotted so you can learn what actually works over a multi-month search.",
+  },
+  {
+    question: "How is this different from resumestudio.ai or other AI generators?",
+    answer:
+      "AI generators optimize one PDF per job and charge per credit. They're fast for a handful of applications. Resume Studio is built for serious searches: multiple resume versions, application tracking, immutable snapshots, and cross-app insights — with subscription pricing that doesn't punish volume.",
+  },
+  {
     question: "How is Resume Studio different from Teal or Jobscan?",
     answer:
-      "Teal is a strong tracker + resume matcher ($9–13/week for AI). Jobscan is an ATS scanner ($50/mo). Resume Studio covers the full loop — tailor, cover letter, Q&A, tracking, and insights — with immutable snapshots of what you actually sent. Plus honest AI that won't invent experience.",
+      "Teal is a strong tracker + resume matcher ($9–13/week for AI). Jobscan is an ATS scanner ($50/mo). Resume Studio is the application OS that covers the full loop — tailor, cover letter, Q&A, tracking, and insights — with immutable snapshots of what you actually sent. Plus honest AI that won't invent experience.",
   },
   {
     question: "Does Resume Studio invent experience I don't have?",

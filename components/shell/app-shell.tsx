@@ -23,7 +23,11 @@ type AppShellProps = {
 
 function isNavActive(pathname: string, href: string): boolean {
   if (href === "/library") {
-    return pathname === "/library" || pathname.startsWith("/library/");
+    return (
+      pathname === "/library" ||
+      pathname.startsWith("/library/") ||
+      pathname.startsWith("/editor/")
+    );
   }
   if (href === "/applications") {
     return (

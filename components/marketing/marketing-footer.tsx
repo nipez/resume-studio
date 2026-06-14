@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { NAV_LINKS, SITE_NAME } from "@/lib/marketing/content";
+import { NAV_LINKS, SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE } from "@/lib/marketing/content";
 
 export function MarketingFooter() {
   return (
@@ -11,13 +11,17 @@ export function MarketingFooter() {
               <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-gradient-to-br from-accent to-[#7A53FF] font-display text-base font-bold text-white shadow-accent">
                 R
               </div>
-              <span className="font-display text-lg font-semibold text-ink">
-                {SITE_NAME}
-              </span>
+              <div>
+                <span className="font-display text-lg font-semibold text-ink">
+                  {SITE_NAME}
+                </span>
+                <span className="block text-[11px] font-semibold uppercase tracking-wider text-accent">
+                  {SITE_TAGLINE}
+                </span>
+              </div>
             </div>
-            <p className="mt-4 max-w-sm text-[14px] leading-relaxed text-muted">
-              AI-assisted resumes and job applications — built for clarity,
-              truthfulness, and a calmer job search.
+            <p className="mt-4 max-w-md text-[14px] leading-relaxed text-muted">
+              {SITE_DESCRIPTION}
             </p>
           </div>
 
@@ -52,6 +56,11 @@ export function MarketingFooter() {
               Compare
             </h3>
             <ul className="mt-4 space-y-3 text-[14px] text-muted">
+              <li>
+                <Link href="/application-os" className="transition hover:text-accent">
+                  vs. AI generators
+                </Link>
+              </li>
               <li>vs. Teal — full loop + snapshots</li>
               <li>vs. Jobscan — 8× cheaper entry</li>
               <li>vs. Resume.io — no trial traps</li>

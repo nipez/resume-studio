@@ -9,7 +9,7 @@ export function PositioningSection() {
             Why Resume Studio
           </p>
           <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
-            Built for the whole job search — not just another resume builder
+            Why an application OS beats another resume builder
           </h2>
           <p className="mt-4 text-[15px] leading-relaxed text-muted">
             The market is split between expensive ATS scanners ($50/mo),

@@ -1,0 +1,52 @@
+import type { ResumeData } from "@/lib/types/resume";
+
+export function createEmptyResumeData(
+  name = "",
+  email = ""
+): ResumeData {
+  return {
+    name,
+    headline: "",
+    phone: "",
+    email,
+    location: "",
+    linkedin: "",
+    summary: "",
+    skills: [],
+    experience: [],
+    education: [],
+  };
+}
+
+export function normalizeResumeData(raw: unknown): ResumeData {
+  const base = createEmptyResumeData();
+  if (!raw || typeof raw !== "object") return base;
+
+  const d = raw as Partial<ResumeData>;
+  return {
+    name: d.name ?? base.name,
+    headline: d.headline ?? base.headline,
+    phone: d.phone ?? base.phone,
+    email: d.email ?? base.email,
+    location: d.location ?? base.location,
+    linkedin: d.linkedin ?? base.linkedin,
+    summary: d.summary ?? base.summary,
+    skills: Array.isArray(d.skills) ? d.skills : base.skills,
+    experience: Array.isArray(d.experience)
+      ? d.experience.map((e) => ({
+          company: e?.company ?? "",
+          title: e?.title ?? "",
+          dates: e?.dates ?? "",
+          blurb: e?.blurb ?? "",
+          bullets: Array.isArray(e?.bullets) ? e.bullets : [""],
+        }))
+      : base.experience,
+    education: Array.isArray(d.education)
+      ? d.education.map((ed) => ({
+          school: ed?.school ?? "",
+          degree: ed?.degree ?? "",
+          year: ed?.year ?? "",
+        }))
+      : base.education,
+  };
+}
