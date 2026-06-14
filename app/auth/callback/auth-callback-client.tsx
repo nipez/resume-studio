@@ -20,7 +20,7 @@ export default function AuthCallbackClient() {
       if (code) {
         const { error } = await supabase.auth.exchangeCodeForSession(code);
         if (!error) {
-          router.replace("/");
+          router.replace("/library");
           router.refresh();
           return;
         }
@@ -32,7 +32,7 @@ export default function AuthCallbackClient() {
           type: type as EmailOtpType,
         });
         if (!error) {
-          router.replace("/");
+          router.replace("/library");
           router.refresh();
           return;
         }
