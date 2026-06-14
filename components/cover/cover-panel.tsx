@@ -1,0 +1,174 @@
+"use client";
+
+import {
+  JobCompanyField,
+  JobDescField,
+  JobRoleField,
+  VersionSelect,
+  errorBoxClass,
+  mockBannerClass,
+  primaryBtnClass,
+} from "@/components/shared/job-fields";
+import { Spinner } from "@/components/ui/spinner";
+import { Toast } from "@/components/ui/toast";
+import { useJobDraft } from "@/lib/job-draft/use-job-draft";
+import { buildCoverHTML, openPrintHtml } from "@/lib/resume/build-cover-html";
+import type { ResumeVersion } from "@/lib/resume/db-types";
+import { useState } from "react";
+
+type CoverPanelProps = {
+  versions: ResumeVersion[];
+  defaultVersionId: string | null;
+};
+
+export function CoverPanel({ versions, defaultVersionId }: CoverPanelProps) {
+  const { draft, update } = useJobDraft();
+  const [baseId, setBaseId] = useState(
+    defaultVersionId ?? versions[0]?.id ?? ""
+  );
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [mockMode, setMockMode] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+
+  const base = versions.find((v) => v.id === baseId) ?? versions[0];
+
+  async function handleGenerate() {
+    if (!draft.jobDesc.trim()) {
+      setError("Paste a job description first.");
+      return;
+    }
+    if (!base) return;
+    setBusy(true);
+    setError("");
+    try {
+      const res = await fetch("/api/ai/cover-letter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          jobRole: draft.jobRole,
+          jobCompany: draft.jobCompany,
+          jobDesc: draft.jobDesc,
+          hiringManager: draft.coverHM,
+          summary: base.data.summary,
+        }),
+      });
+      const j = await res.json();
+      if (!res.ok) throw new Error(j.error || "Generation failed");
+      setMockMode(Boolean(j.mock));
+      update({ coverText: j.letter });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong. Try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function handleCopy() {
+    if (!draft.coverText) return;
+    navigator.clipboard.writeText(draft.coverText).catch(() => {});
+    setToast("Copied to clipboard");
+  }
+
+  function handleExport() {
+    if (!draft.coverText || !base) return;
+    openPrintHtml(
+      buildCoverHTML(draft.coverText, {
+        name: base.data.name,
+        phone: base.data.phone,
+        email: base.data.email,
+        location: base.data.location,
+      })
+    );
+  }
+
+  if (!versions.length) {
+    return (
+      <div className="rounded-2xl border border-dashed border-border bg-white px-6 py-10 text-center text-[14px] text-muted">
+        Create a resume in your library first.
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[420px_1fr]">
+        <div className="rounded-2xl border border-[#E6E8EC] bg-white p-[22px]">
+          {mockMode ? (
+            <div className={mockBannerClass}>
+              Demo mode — add ANTHROPIC_API_KEY for production-quality letters.
+            </div>
+          ) : null}
+          <VersionSelect versions={versions} value={baseId} onChange={setBaseId} />
+          <div className="mt-3.5 grid grid-cols-2 gap-3">
+            <JobRoleField
+              value={draft.jobRole}
+              onChange={(v) => update({ jobRole: v })}
+            />
+            <JobCompanyField
+              value={draft.jobCompany}
+              onChange={(v) => update({ jobCompany: v })}
+            />
+          </div>
+          <label className="mt-3.5 flex flex-col gap-1.5 text-[12.5px] font-semibold text-[#5A6573]">
+            Hiring manager (optional)
+            <input
+              value={draft.coverHM}
+              onChange={(e) => update({ coverHM: e.target.value })}
+              placeholder="e.g. Dr. Jane Smith"
+              className="rounded-[9px] border border-[#DFE3E8] px-[11px] py-2.5 text-sm focus:border-accent focus:outline-none"
+            />
+          </label>
+          <JobDescField
+            value={draft.jobDesc}
+            onChange={(v) => update({ jobDesc: v })}
+            rows={9}
+          />
+          {error ? <div className={errorBoxClass}>{error}</div> : null}
+          <button
+            type="button"
+            onClick={handleGenerate}
+            disabled={busy}
+            className={primaryBtnClass}
+          >
+            {busy ? <Spinner /> : null}
+            {busy ? "Writing…" : "Generate cover letter"}
+          </button>
+        </div>
+
+        <div className="flex min-h-[560px] flex-col rounded-2xl border border-[#E6E8EC] bg-white p-2">
+          <div className="flex items-center justify-between px-3.5 py-2.5">
+            <div className="font-display text-sm font-semibold text-[#5A6573]">
+              Letter
+            </div>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={handleCopy}
+                disabled={!draft.coverText}
+                className="rounded-lg bg-[#F2F3F5] px-[13px] py-[7px] text-[12.5px] font-semibold text-[#3a4350] hover:bg-[#E6E8EC] disabled:opacity-50"
+              >
+                Copy
+              </button>
+              <button
+                type="button"
+                onClick={handleExport}
+                disabled={!draft.coverText}
+                className="rounded-lg bg-accent px-[13px] py-[7px] text-[12.5px] font-semibold text-white hover:bg-[#1E54E6] disabled:opacity-50"
+              >
+                ↓ Export PDF
+              </button>
+            </div>
+          </div>
+          <textarea
+            value={draft.coverText}
+            onChange={(e) => update({ coverText: e.target.value })}
+            placeholder="Your generated cover letter will appear here — fully editable."
+            className="mx-1.5 mb-1.5 min-h-[480px] flex-1 resize-none rounded-[11px] border-none bg-[#FCFCFD] p-[22px_26px] font-sans text-[14.5px] leading-[1.75] text-[#1a1f29] focus:outline-none"
+          />
+        </div>
+      </div>
+      {toast ? <Toast message={toast} onDone={() => setToast(null)} /> : null}
+    </>
+  );
+}

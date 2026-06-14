@@ -1,10 +1,22 @@
-import { PlaceholderPage } from "@/components/shell/placeholder-page";
+import { QAPanel } from "@/components/questions/qa-panel";
+import { getLibraryData } from "@/lib/resume/actions";
 
-export default function QuestionsPage() {
+export default async function QuestionsPage() {
+  const { versions, defaultVersionId } = await getLibraryData();
+
   return (
-    <PlaceholderPage
-      title="Application Q&A"
-      description="Answer application questions in your voice — one at a time or all at once — then copy what you need."
-    />
+    <div className="scroll flex-1 overflow-auto">
+      <div className="mx-auto max-w-[920px] px-11 pb-16 pt-10">
+        <h1 className="font-display text-[28px] font-semibold tracking-[-0.025em] text-ink">
+          Application Q&amp;A
+        </h1>
+        <p className="mt-2 mb-[22px] max-w-[640px] text-[14.5px] text-muted">
+          Drop in the application&apos;s questions and generate answers in your
+          voice — confident, specific, tied to real outcomes. Uses the shared job
+          description for context.
+        </p>
+        <QAPanel versions={versions} defaultVersionId={defaultVersionId} />
+      </div>
+    </div>
   );
 }

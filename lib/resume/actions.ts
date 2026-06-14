@@ -214,3 +214,76 @@ export async function setDefaultResumeVersion(id: string) {
   if (error) throw new Error(error.message);
   revalidatePath("/library");
 }
+
+export async function importResumeVersion(data: ResumeData) {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not authenticated");
+
+  const { data: created, error } = await supabase
+    .from("resume_versions")
+    .insert({
+      user_id: user.id,
+      name: "Master Resume",
+      template_style: "twocol" as TemplateStyle,
+      tailored_for: null,
+      data: normalizeResumeData(data),
+    })
+    .select("*")
+    .single();
+
+  if (error || !created) throw new Error(error?.message ?? "Failed to import");
+
+  await supabase
+    .from("profiles")
+    .update({ default_version_id: created.id })
+    .eq("id", user.id);
+
+  revalidatePath("/library");
+  return mapRow(created);
+}
+
+export async function saveTailoredVersion(input: {
+  baseId: string;
+  jobRole: string;
+  jobCompany: string;
+  depth: "light" | "deep";
+  data: ResumeData;
+}) {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not authenticated");
+
+  const base = await getResumeVersion(input.baseId);
+  if (!base) throw new Error("Base version not found");
+
+  const name =
+    (input.jobRole ? input.jobRole : "Tailored") +
+    (input.jobCompany ? " · " + input.jobCompany : "");
+
+  const { data: created, error } = await supabase
+    .from("resume_versions")
+    .insert({
+      user_id: user.id,
+      name,
+      template_style: base.template_style,
+      tailored_for: {
+        role: input.jobRole,
+        company: input.jobCompany,
+        depth: input.depth,
+      },
+      data: normalizeResumeData(input.data),
+    })
+    .select("*")
+    .single();
+
+  if (error || !created) throw new Error(error?.message ?? "Failed to save");
+
+  revalidatePath("/library");
+  revalidatePath("/tailor");
+  return mapRow(created);
+}

@@ -1,4 +1,4 @@
-import { LibraryToolbar } from "@/components/library/library-toolbar";
+import { LibraryActions } from "@/components/library/library-actions";
 import { VersionCard } from "@/components/library/version-card";
 import { getLibraryData } from "@/lib/resume/actions";
 
@@ -20,7 +20,7 @@ export default async function LibraryPage() {
               description.
             </p>
           </div>
-          <LibraryToolbar />
+          <LibraryActions />
         </div>
 
         <div className="mb-[22px] flex cursor-default items-center gap-[18px] rounded-2xl bg-gradient-to-br from-sidebar to-[#1b2740] px-[22px] py-[19px] text-white">
