@@ -1,5 +1,6 @@
 import { FaqList } from "@/components/marketing/faq-list";
 import { MarketingCta } from "@/components/marketing/marketing-cta";
+import { MeshBackground } from "@/components/marketing/primitives";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -11,19 +12,24 @@ export const metadata: Metadata = {
 export default function FaqPage() {
   return (
     <main>
-      <section className="border-b border-border bg-white">
-        <div className="mx-auto max-w-6xl px-6 py-16 text-center sm:py-20">
-          <h1 className="font-display text-4xl font-semibold tracking-tight text-ink">
+      <section className="relative overflow-hidden border-b border-border">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#EEF3FF] via-white to-page" />
+        <MeshBackground />
+        <div className="relative mx-auto max-w-6xl px-6 py-20 text-center sm:py-28">
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-accent">
+            FAQ
+          </p>
+          <h1 className="mt-4 font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
             Frequently asked questions
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-[16px] leading-relaxed text-muted">
+          <p className="mx-auto mt-5 max-w-2xl text-[16px] leading-relaxed text-muted">
             Straight answers about the application OS, snapshots, honest AI, and
             how we differ from credit-based generators.
           </p>
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-16 sm:py-20">
+      <section className="mx-auto max-w-6xl px-6 py-20 sm:py-24">
         <FaqList />
       </section>
 

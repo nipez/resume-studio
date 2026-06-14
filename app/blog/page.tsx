@@ -13,52 +13,64 @@ export default function BlogIndexPage() {
 
   return (
     <main>
-      <section className="border-b border-border bg-white">
-        <div className="mx-auto max-w-3xl px-6 py-16 sm:py-20">
-          <h1 className="font-display text-4xl font-semibold tracking-tight text-ink">
+      <section className="relative overflow-hidden border-b border-border">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#EEF3FF] via-white to-page" />
+        <div className="relative mx-auto max-w-3xl px-6 py-20 sm:py-28">
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-accent">
+            Blog
+          </p>
+          <h1 className="mt-4 font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
             Blog
           </h1>
-          <p className="mt-4 text-[16px] leading-relaxed text-muted">
+          <p className="mt-5 text-[16px] leading-relaxed text-muted">
             Updates from the team building the application OS for serious job
             searches.
           </p>
         </div>
       </section>
 
-      <section className="mx-auto max-w-3xl px-6 py-12">
-        <div className="flex flex-col gap-8">
-          {posts.map((post) => (
+      <section className="mx-auto max-w-3xl px-6 py-14">
+        <div className="flex flex-col gap-6">
+          {posts.map((post, i) => (
             <article
               key={post.slug}
-              className="rounded-2xl border border-border bg-white p-6 transition-shadow hover:shadow-[0_8px_26px_rgba(15,17,22,0.06)]"
+              className="group overflow-hidden rounded-2xl border border-border bg-white transition hover:-translate-y-0.5 hover:border-accent/20 hover:shadow-[0_14px_36px_rgba(47,107,255,0.08)]"
             >
-              <time
-                dateTime={post.publishedAt}
-                className="text-xs font-semibold uppercase tracking-wide text-[#8A92A0]"
-              >
-                {new Date(post.publishedAt).toLocaleDateString(undefined, {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </time>
-              <h2 className="mt-2 font-display text-2xl font-semibold tracking-tight text-ink">
+              <div className="h-1 bg-gradient-to-r from-accent to-[#7A53FF] opacity-0 transition group-hover:opacity-100" />
+              <div className="p-6">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#EEF3FF] font-display text-[11px] font-bold text-accent">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <time
+                    dateTime={post.publishedAt}
+                    className="text-xs font-semibold uppercase tracking-wide text-[#8A92A0]"
+                  >
+                    {new Date(post.publishedAt).toLocaleDateString(undefined, {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </time>
+                </div>
+                <h2 className="mt-3 font-display text-2xl font-semibold tracking-tight text-ink">
+                  <Link
+                    href={`/blog/${post.slug}`}
+                    className="transition-colors hover:text-accent"
+                  >
+                    {post.title}
+                  </Link>
+                </h2>
+                <p className="mt-3 text-[15px] leading-relaxed text-muted">
+                  {post.excerpt}
+                </p>
                 <Link
                   href={`/blog/${post.slug}`}
-                  className="transition-colors hover:text-accent"
+                  className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-accent hover:text-accent-dark"
                 >
-                  {post.title}
+                  Read more →
                 </Link>
-              </h2>
-              <p className="mt-3 text-[15px] leading-relaxed text-muted">
-                {post.excerpt}
-              </p>
-              <Link
-                href={`/blog/${post.slug}`}
-                className="mt-4 inline-block text-sm font-semibold text-accent hover:text-[#1E54E6]"
-              >
-                Read more →
-              </Link>
+              </div>
             </article>
           ))}
         </div>

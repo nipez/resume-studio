@@ -1,4 +1,5 @@
 import { NavIcon, type NavIconName } from "@/components/icons/nav-icons";
+import { GlowCard, SectionHeader } from "@/components/marketing/primitives";
 import { FEATURES } from "@/lib/marketing/content";
 
 type FeatureGridProps = {
@@ -15,23 +16,16 @@ export function FeatureGrid({
   const items = limit ? FEATURES.slice(0, limit) : FEATURES;
 
   return (
-    <section className="mx-auto max-w-6xl px-6 py-16 sm:py-20">
-      <div className="max-w-2xl">
-        <h2 className="font-display text-3xl font-semibold tracking-tight text-ink">
-          {title}
-        </h2>
-        <p className="mt-3 text-[15px] leading-relaxed text-muted">
-          {description}
-        </p>
-      </div>
+    <section className="mx-auto max-w-6xl px-6 py-20 sm:py-24">
+      <SectionHeader title={title} description={description} />
 
-      <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {items.map((feature) => (
-          <div
+      <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {items.map((feature, i) => (
+          <GlowCard
             key={feature.title}
-            className="rounded-2xl border border-border bg-white p-6 shadow-[0_8px_26px_rgba(15,17,22,0.04)] transition hover:border-[#CDD3DB] hover:shadow-[0_8px_26px_rgba(15,17,22,0.07)]"
+            className={`p-6 ${i === 2 ? "lg:-mt-4" : i === 4 ? "lg:mt-4" : ""}`}
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-[#EEF3FF] text-accent">
+            <div className="flex h-11 w-11 items-center justify-center rounded-[11px] bg-gradient-to-br from-[#EEF3FF] to-white text-accent ring-1 ring-accent/15">
               <NavIcon name={feature.icon as NavIconName} />
             </div>
             <h3 className="mt-4 font-display text-[17px] font-semibold tracking-[-0.01em] text-ink">
@@ -40,7 +34,7 @@ export function FeatureGrid({
             <p className="mt-2 text-[13.5px] leading-relaxed text-muted">
               {feature.description}
             </p>
-          </div>
+          </GlowCard>
         ))}
       </div>
     </section>
