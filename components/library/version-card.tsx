@@ -1,5 +1,6 @@
 "use client";
 
+import { LogApplicationButton } from "@/components/applications/log-application-button";
 import {
   createResumeVersion,
   deleteResumeVersion,
@@ -14,9 +15,10 @@ import { useState, useTransition } from "react";
 type VersionCardProps = {
   version: ResumeVersion;
   isDefault: boolean;
+  appCount?: number;
 };
 
-export function VersionCard({ version, isDefault }: VersionCardProps) {
+export function VersionCard({ version, isDefault, appCount = 0 }: VersionCardProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -119,6 +121,33 @@ export function VersionCard({ version, isDefault }: VersionCardProps) {
           Delete
         </button>
       </div>
+
+      {appCount === 0 ? (
+        <LogApplicationButton
+          versionId={version.id}
+          className="mt-3 flex w-full items-center justify-center gap-[7px] rounded-[9px] border border-dashed border-[#C6D8CC] bg-white px-2 py-2 text-[12.5px] font-semibold text-[#0E7C4B] transition-colors hover:border-[#0E9F6E] hover:bg-[#F2FBF6] disabled:opacity-50"
+        >
+          ✓ Log application
+        </LogApplicationButton>
+      ) : (
+        <div className="mt-3 flex items-center gap-2 rounded-[9px] border border-[#CDEBD9] bg-[#EAF7F0] px-[11px] py-2">
+          <span className="inline-flex items-center gap-1.5 text-[12.3px] font-bold text-[#0E7C4B]">
+            ✓ Used in {appCount === 1 ? "1 application" : `${appCount} applications`}
+          </span>
+          <Link
+            href="/applications"
+            className="ml-auto text-[11.5px] font-semibold text-[#0E7C4B] no-underline hover:underline"
+          >
+            View
+          </Link>
+          <LogApplicationButton
+            versionId={version.id}
+            className="border-none bg-transparent p-0 text-[11.5px] font-semibold text-[#5d7a69] shadow-none hover:bg-transparent hover:text-[#0E7C4B] hover:underline disabled:opacity-50"
+          >
+            + Log again
+          </LogApplicationButton>
+        </div>
+      )}
 
       <div className="mt-2 text-[11px] text-[#9AA3AF]">{meta.updated}</div>
       {error && <p className="mt-2 text-xs text-[#B23B3B]">{error}</p>}

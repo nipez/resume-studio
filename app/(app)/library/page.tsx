@@ -1,9 +1,13 @@
 import { LibraryActions } from "@/components/library/library-actions";
 import { VersionCard } from "@/components/library/version-card";
+import { getApplicationCountsByVersion } from "@/lib/applications/actions";
 import { getLibraryData } from "@/lib/resume/actions";
 
 export default async function LibraryPage() {
-  const { versions, defaultVersionId } = await getLibraryData();
+  const [{ versions, defaultVersionId }, versionCounts] = await Promise.all([
+    getLibraryData(),
+    getApplicationCountsByVersion(),
+  ]);
   const hasVersions = versions.length > 0;
 
   return (
@@ -49,6 +53,7 @@ export default async function LibraryPage() {
                 key={version.id}
                 version={version}
                 isDefault={version.id === defaultVersionId}
+                appCount={versionCounts[version.id] ?? 0}
               />
             ))}
           </div>

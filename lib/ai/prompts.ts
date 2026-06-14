@@ -217,3 +217,63 @@ export function answerQuestionPrompt(
     "\n\nReturn only the answer text."
   );
 }
+
+export function appInsightPrompt(
+  positioning: string,
+  userName: string,
+  jobRole: string,
+  jobCompany: string,
+  jobDesc: string,
+  summary: string,
+  skills: string[],
+  coverLetter: string
+): string {
+  return (
+    buildPositioningContext(positioning, userName) +
+    "\n\nTASK: Assess how well this application's materials fit the target job and what would most increase the odds of a response or interview. Be specific and candid. Return ONLY valid minified JSON, no markdown:\n" +
+    '{"fitScore":<integer 0-100>,"strengths":["2-4 short bullets on what aligns well with the JD"],"gaps":["2-4 short bullets on what is missing or weak vs the JD"],"advice":"1-2 sentences naming the single highest-impact change"}\n\n' +
+    "TARGET ROLE: " +
+    (jobRole || "(n/a)") +
+    " at " +
+    (jobCompany || "(n/a)") +
+    "\n" +
+    "JOB DESCRIPTION:\n" +
+    (jobDesc || "(none provided)") +
+    "\n\n" +
+    "RESUME SUMMARY: " +
+    summary +
+    "\n" +
+    "RESUME SKILLS: " +
+    skills.join(", ") +
+    "\n" +
+    "COVER LETTER:\n" +
+    (coverLetter || "(none)")
+  );
+}
+
+export function interviewPrepPrompt(
+  positioning: string,
+  userName: string,
+  jobRole: string,
+  jobCompany: string,
+  jobDesc: string,
+  summary: string
+): string {
+  return (
+    buildPositioningContext(positioning, userName) +
+    "\n\nTASK: Prepare " +
+    userName +
+    " for an interview for this role. Ground everything in their real background. Return ONLY valid minified JSON, no markdown:\n" +
+    '{"questions":["6-8 likely interview questions for THIS role, mixing behavioral and role-specific"],"talkingPoints":["4-6 concise proof points/stories to lead with, tied to real wins"],"ask":["2-3 sharp questions to ask them"]}\n\n' +
+    "TARGET ROLE: " +
+    (jobRole || "(n/a)") +
+    " at " +
+    (jobCompany || "(n/a)") +
+    "\n" +
+    "JOB DESCRIPTION:\n" +
+    (jobDesc || "(none)") +
+    "\n\n" +
+    "RESUME SUMMARY: " +
+    summary
+  );
+}

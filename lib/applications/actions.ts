@@ -1,0 +1,355 @@
+"use server";
+
+import type {
+  AppInsight,
+  AppPrep,
+  Application,
+  ApplicationEvent,
+  ApplicationStatus,
+  EventType,
+  LogApplicationInput,
+  StatusHistoryEntry,
+} from "@/lib/applications/types";
+import { normalizeResumeSnapshot } from "@/lib/applications/utils";
+import { getResumeVersion } from "@/lib/resume/actions";
+import { createClient } from "@/lib/supabase/server";
+import { revalidatePath } from "next/cache";
+
+function mapEvent(row: Record<string, unknown>): ApplicationEvent {
+  return {
+    id: row.id as string,
+    application_id: row.application_id as string,
+    user_id: row.user_id as string,
+    type: row.type as EventType,
+    title: String(row.title ?? ""),
+    date: row.date ? String(row.date) : null,
+    time: String(row.time ?? ""),
+    notes: String(row.notes ?? ""),
+    done: Boolean(row.done),
+    created_at: row.created_at as string,
+  };
+}
+
+function mapApplication(
+  row: Record<string, unknown>,
+  events?: ApplicationEvent[]
+): Application {
+  return {
+    id: row.id as string,
+    user_id: row.user_id as string,
+    role: String(row.role ?? ""),
+    company: String(row.company ?? ""),
+    job_desc: String(row.job_desc ?? ""),
+    applied_at: row.applied_at as string,
+    resume_version_id: (row.resume_version_id as string | null) ?? null,
+    resume_version_name: (row.resume_version_name as string | null) ?? null,
+    resume_snapshot: normalizeResumeSnapshot(row.resume_snapshot),
+    cover_letter: String(row.cover_letter ?? ""),
+    answers: Array.isArray(row.answers)
+      ? (row.answers as { q: string; a: string }[])
+      : [],
+    status: row.status as ApplicationStatus,
+    status_history: Array.isArray(row.status_history)
+      ? (row.status_history as StatusHistoryEntry[])
+      : [],
+    insight: (row.insight as AppInsight | null) ?? null,
+    prep: (row.prep as AppPrep | null) ?? null,
+    notes: String(row.notes ?? ""),
+    created_at: row.created_at as string,
+    events,
+  };
+}
+
+export async function getApplicationsList(): Promise<{
+  applications: Application[];
+  versionCounts: Record<string, number>;
+}> {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { applications: [], versionCounts: {} };
+  }
+
+  const [{ data: rows }, { data: events }] = await Promise.all([
+    supabase
+      .from("applications")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("applied_at", { ascending: false }),
+    supabase
+      .from("application_events")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("date", { ascending: true }),
+  ]);
+
+  const eventsByApp = new Map<string, ApplicationEvent[]>();
+  for (const row of events ?? []) {
+    const ev = mapEvent(row);
+    const list = eventsByApp.get(ev.application_id) ?? [];
+    list.push(ev);
+    eventsByApp.set(ev.application_id, list);
+  }
+
+  const applications = (rows ?? []).map((row) =>
+    mapApplication(row, eventsByApp.get(row.id as string) ?? [])
+  );
+
+  const versionCounts: Record<string, number> = {};
+  for (const app of applications) {
+    if (app.resume_version_id) {
+      versionCounts[app.resume_version_id] =
+        (versionCounts[app.resume_version_id] ?? 0) + 1;
+    }
+  }
+
+  return { applications, versionCounts };
+}
+
+export async function getApplicationCountsByVersion(): Promise<
+  Record<string, number>
+> {
+  const { versionCounts } = await getApplicationsList();
+  return versionCounts;
+}
+
+export async function getApplication(id: string): Promise<Application | null> {
+  const supabase = createClient();
+  const { data: row, error } = await supabase
+    .from("applications")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error || !row) return null;
+
+  const { data: events } = await supabase
+    .from("application_events")
+    .select("*")
+    .eq("application_id", id)
+    .order("date", { ascending: true });
+
+  return mapApplication(row, (events ?? []).map(mapEvent));
+}
+
+export async function logApplication(input: LogApplicationInput) {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not authenticated");
+
+  const version = await getResumeVersion(input.versionId);
+  if (!version) throw new Error("Resume version not found");
+
+  const tf = version.tailored_for;
+  const role = input.role?.trim() || tf?.role || "";
+  const company = input.company?.trim() || tf?.company || "";
+  const now = new Date().toISOString();
+  const status: ApplicationStatus = "applied";
+
+  const answers = (input.answers ?? []).filter(
+    (a) => a.q?.trim() && a.a?.trim()
+  );
+
+  const { data: created, error } = await supabase
+    .from("applications")
+    .insert({
+      user_id: user.id,
+      role,
+      company,
+      job_desc: input.jobDesc?.trim() ?? "",
+      applied_at: now,
+      resume_version_id: version.id,
+      resume_version_name: version.name,
+      resume_snapshot: {
+        name: version.name,
+        template_style: version.template_style,
+        data: version.data,
+      },
+      cover_letter: input.coverLetter?.trim() ?? "",
+      answers,
+      status,
+      status_history: [{ status, at: now }],
+    })
+    .select("*")
+    .single();
+
+  if (error || !created) {
+    throw new Error(error?.message ?? "Failed to log application");
+  }
+
+  revalidatePath("/applications");
+  revalidatePath("/library");
+  return mapApplication(created);
+}
+
+export async function updateApplicationStatus(
+  id: string,
+  status: ApplicationStatus
+) {
+  const supabase = createClient();
+  const app = await getApplication(id);
+  if (!app) throw new Error("Application not found");
+
+  const history = [...app.status_history];
+  if (app.status !== status) {
+    history.push({ status, at: new Date().toISOString() });
+  }
+
+  const { error } = await supabase
+    .from("applications")
+    .update({ status, status_history: history })
+    .eq("id", id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/applications");
+  revalidatePath(`/applications/${id}`);
+}
+
+export async function updateApplicationMeta(
+  id: string,
+  patch: {
+    role?: string;
+    company?: string;
+    job_desc?: string;
+    notes?: string;
+  }
+) {
+  const supabase = createClient();
+  const payload: Record<string, unknown> = {};
+  if (patch.role !== undefined) payload.role = patch.role;
+  if (patch.company !== undefined) payload.company = patch.company;
+  if (patch.job_desc !== undefined) payload.job_desc = patch.job_desc;
+  if (patch.notes !== undefined) payload.notes = patch.notes;
+
+  const { error } = await supabase
+    .from("applications")
+    .update(payload)
+    .eq("id", id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/applications");
+  revalidatePath(`/applications/${id}`);
+}
+
+export async function updateApplicationInsight(id: string, insight: AppInsight) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("applications")
+    .update({ insight })
+    .eq("id", id);
+
+  if (error) throw new Error(error.message);
+  revalidatePath(`/applications/${id}`);
+}
+
+export async function updateApplicationPrep(id: string, prep: AppPrep) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("applications")
+    .update({ prep })
+    .eq("id", id);
+
+  if (error) throw new Error(error.message);
+  revalidatePath(`/applications/${id}`);
+}
+
+export async function deleteApplication(id: string) {
+  const supabase = createClient();
+  const { error } = await supabase.from("applications").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/applications");
+  revalidatePath("/library");
+}
+
+export async function addApplicationEvent(
+  applicationId: string,
+  type: EventType
+) {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not authenticated");
+
+  const labels: Record<EventType, string> = {
+    interview: "Interview",
+    followup: "Follow-up",
+    note: "Reminder",
+  };
+
+  const today = new Date();
+  const date = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+
+  const { data, error } = await supabase
+    .from("application_events")
+    .insert({
+      application_id: applicationId,
+      user_id: user.id,
+      type,
+      title: labels[type],
+      date,
+      time: "",
+      notes: "",
+      done: false,
+    })
+    .select("*")
+    .single();
+
+  if (error || !data) throw new Error(error?.message ?? "Failed to add event");
+
+  revalidatePath(`/applications/${applicationId}`);
+  revalidatePath("/applications");
+  return mapEvent(data);
+}
+
+export async function updateApplicationEvent(
+  eventId: string,
+  applicationId: string,
+  patch: {
+    date?: string | null;
+    time?: string;
+    notes?: string;
+    done?: boolean;
+  }
+) {
+  const supabase = createClient();
+  const payload: Record<string, unknown> = {};
+  if (patch.date !== undefined) payload.date = patch.date || null;
+  if (patch.time !== undefined) payload.time = patch.time;
+  if (patch.notes !== undefined) payload.notes = patch.notes;
+  if (patch.done !== undefined) payload.done = patch.done;
+
+  const { error } = await supabase
+    .from("application_events")
+    .update(payload)
+    .eq("id", eventId);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/applications/${applicationId}`);
+  revalidatePath("/applications");
+}
+
+export async function deleteApplicationEvent(
+  eventId: string,
+  applicationId: string
+) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("application_events")
+    .delete()
+    .eq("id", eventId);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/applications/${applicationId}`);
+  revalidatePath("/applications");
+}

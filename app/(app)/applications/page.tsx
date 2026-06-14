@@ -1,10 +1,17 @@
-import { PlaceholderPage } from "@/components/shell/placeholder-page";
+import { ApplicationsList } from "@/components/applications/applications-list";
+import { getApplicationsList } from "@/lib/applications/actions";
+import { getLibraryData } from "@/lib/resume/actions";
 
-export default function ApplicationsPage() {
+export default async function ApplicationsPage() {
+  const [{ applications }, { defaultVersionId }] = await Promise.all([
+    getApplicationsList(),
+    getLibraryData(),
+  ]);
+
   return (
-    <PlaceholderPage
-      title="Applications"
-      description="Track every application as a first-class record with status, timeline, and snapshots of exactly what you sent."
+    <ApplicationsList
+      applications={applications}
+      defaultVersionId={defaultVersionId}
     />
   );
 }

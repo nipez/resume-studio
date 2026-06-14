@@ -93,6 +93,42 @@ export function mockComplete(prompt: string): string {
     );
   }
 
+  if (prompt.includes("Assess how well this application's materials fit")) {
+    return JSON.stringify({
+      fitScore: 68,
+      strengths: [
+        "Resume summary aligns with the role's core responsibilities (demo mode).",
+        "Skills section covers several keywords from the job description.",
+      ],
+      gaps: [
+        "Demo mode — configure AI for a candid gap analysis vs the JD.",
+        "Cover letter could tie outcomes more directly to this company's priorities.",
+      ],
+      advice:
+        "Add ANTHROPIC_API_KEY for a real fit assessment tied to your materials.",
+    });
+  }
+
+  if (prompt.includes("Prepare") && prompt.includes("for an interview for this role")) {
+    return JSON.stringify({
+      questions: [
+        "Walk me through a recent project where you drove measurable outcomes.",
+        "How do you prioritize when multiple stakeholders want different things?",
+        "What draws you to this role and company specifically?",
+        "Tell me about a time you had to learn something quickly on the job.",
+      ],
+      talkingPoints: [
+        "Lead with a concrete win from your most relevant role (demo mode).",
+        "Emphasize cross-functional collaboration if the JD mentions it.",
+        "Connect your summary themes to this company's stated priorities.",
+      ],
+      ask: [
+        "What does success look like in the first 90 days?",
+        "How does this team measure impact on the business?",
+      ],
+    });
+  }
+
   return "Demo AI response — configure ANTHROPIC_API_KEY for real generation.";
 }
 
