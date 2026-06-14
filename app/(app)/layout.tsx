@@ -7,7 +7,7 @@ export default async function AppLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, profile, displayName, avatarLetter } =
+  const { user, profile, displayName } =
     await getSessionProfile();
 
   if (!user) {
@@ -17,7 +17,6 @@ export default async function AppLayout({
   return (
     <AppShell
       userName={displayName}
-      avatarLetter={avatarLetter}
       positioning={profile?.positioning}
     >
       {children}

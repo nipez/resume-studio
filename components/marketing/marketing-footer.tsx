@@ -1,3 +1,4 @@
+import { Logo } from "@/components/brand/logo";
 import Link from "next/link";
 import { NAV_LINKS, SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE } from "@/lib/marketing/content";
 
@@ -8,9 +9,7 @@ export function MarketingFooter() {
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-gradient-to-br from-accent to-[#7A53FF] font-display text-base font-bold text-white shadow-accent">
-                R
-              </div>
+              <Logo size={36} className="shrink-0 shadow-accent" />
               <div>
                 <span className="font-display text-lg font-semibold text-white">
                   {SITE_NAME}

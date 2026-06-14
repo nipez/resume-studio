@@ -1,3 +1,4 @@
+import { Logo } from "@/components/brand/logo";
 import Link from "next/link";
 import { NAV_LINKS, SITE_NAME, SITE_TAGLINE } from "@/lib/marketing/content";
 
@@ -6,9 +7,10 @@ export function MarketingHeader() {
     <header className="sticky top-0 z-50 border-b border-border/60 bg-white/85 backdrop-blur-xl">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3.5">
         <Link href="/" className="group flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-gradient-to-br from-accent to-[#7A53FF] font-display text-base font-bold text-white shadow-accent transition group-hover:shadow-[0_6px_20px_rgba(47,107,255,0.4)]">
-            R
-          </div>
+          <Logo
+            size={36}
+            className="shrink-0 shadow-accent transition group-hover:shadow-[0_6px_20px_rgba(47,107,255,0.4)]"
+          />
           <div>
             <span className="font-display text-lg font-semibold tracking-tight text-ink">
               {SITE_NAME}

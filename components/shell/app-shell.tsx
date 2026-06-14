@@ -1,5 +1,6 @@
 "use client";
 
+import { Logo } from "@/components/brand/logo";
 import { NavIcon, type NavIconName } from "@/components/icons/nav-icons";
 import { SignOutButton } from "@/components/sign-out-button";
 import Link from "next/link";
@@ -17,7 +18,6 @@ const NAV_ITEMS: { href: string; label: string; icon: NavIconName }[] = [
 type AppShellProps = {
   children: React.ReactNode;
   userName: string;
-  avatarLetter: string;
   positioning?: string | null;
 };
 
@@ -40,7 +40,6 @@ function isNavActive(pathname: string, href: string): boolean {
 export function AppShell({
   children,
   userName,
-  avatarLetter,
   positioning,
 }: AppShellProps) {
   const pathname = usePathname();
@@ -49,9 +48,10 @@ export function AppShell({
     <div className="appshell flex h-screen w-screen overflow-hidden bg-page text-ink">
       <aside className="flex w-[264px] flex-none flex-col bg-sidebar px-3.5 py-5 text-sidebar-muted">
         <div className="flex items-center gap-[11px] px-2 pb-[22px]">
-          <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-gradient-to-br from-accent to-[#7A53FF] font-display text-[17px] font-bold text-white shadow-[0_4px_14px_rgba(47,107,255,0.4)]">
-            {avatarLetter}
-          </div>
+          <Logo
+            size={36}
+            className="shrink-0 shadow-[0_4px_14px_rgba(47,107,255,0.4)]"
+          />
           <div>
             <div className="font-display text-[15.5px] font-semibold tracking-[-0.01em] text-white">
               Resume Studio
