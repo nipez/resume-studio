@@ -36,6 +36,7 @@ const config: Config = {
       fontFamily: {
         sans: ["var(--font-instrument-sans)", "system-ui", "sans-serif"],
         display: ["var(--font-space-grotesk)", "system-ui", "sans-serif"],
+        serif: ["var(--font-instrument-serif)", "Georgia", "serif"],
       },
       boxShadow: {
         accent: "0 4px 14px rgba(47, 107, 255, 0.32)",
