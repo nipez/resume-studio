@@ -1,14 +1,16 @@
 import { requireAIUser } from "@/lib/ai/auth";
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 export async function POST(request: Request) {
   const auth = await requireAIUser();
   if ("error" in auth) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
 
-  const { PDFParse } = await import("pdf-parse");
-  let parser: InstanceType<typeof PDFParse> | null = null;
+  let parser: { getText: () => Promise<{ text?: string }>; destroy: () => Promise<void> } | null = null;
   try {
     const form = await request.formData();
     const file = form.get("file");
@@ -16,6 +18,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
     const buffer = Buffer.from(await file.arrayBuffer());
+    const { PDFParse } = await import("pdf-parse");
     parser = new PDFParse({ data: buffer });
     const parsed = await parser.getText();
     const text = parsed.text?.trim() ?? "";
