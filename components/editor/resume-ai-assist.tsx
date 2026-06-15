@@ -49,6 +49,8 @@ export function ResumeAiAssist({
   const [activePanel, setActivePanel] = useState<ResultPanel>(null);
   const [suggestPass, setSuggestPass] = useState(0);
 
+  const activeSectionKey = sectionKey(section);
+
   useEffect(() => {
     setError("");
     setAnswer("");
@@ -57,7 +59,7 @@ export function ResumeAiAssist({
     setAppliedSuggestion(null);
     setActivePanel(null);
     setSuggestPass(0);
-  }, [sectionKey(section)]);
+  }, [activeSectionKey]);
 
   async function run(
     action: string,
