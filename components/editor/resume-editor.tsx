@@ -83,6 +83,17 @@ export function ResumeEditor({ version }: ResumeEditorProps) {
     []
   );
 
+  const updateActivity = useCallback(
+    (index: number, patch: Partial<ResumeExperience>) => {
+      setData((prev) => {
+        const activities = [...(prev.activities ?? [])];
+        activities[index] = { ...activities[index], ...patch };
+        return { ...prev, activities };
+      });
+    },
+    []
+  );
+
   const handleSectionSelect = useCallback((section: ResumeEditSection) => {
     setActiveSection(section);
   }, []);
@@ -118,6 +129,16 @@ export function ResumeEditor({ version }: ResumeEditorProps) {
       ],
     });
     setActiveSection({ id: "experience", index: 0 });
+  }
+
+  function addActivity() {
+    updateData({
+      activities: [
+        { company: "", title: "", dates: "", blurb: "", bullets: [""] },
+        ...(data.activities ?? []),
+      ],
+    });
+    setActiveSection({ id: "activities", index: 0 });
   }
 
   return (
@@ -161,6 +182,13 @@ export function ResumeEditor({ version }: ResumeEditorProps) {
         >
           + Role
         </button>
+        <button
+          type="button"
+          onClick={addActivity}
+          className="cursor-pointer rounded-[10px] border border-[#DFE3E8] bg-white px-3 py-2 text-[12.5px] font-semibold text-[#5A6573] hover:border-[#C8CED6]"
+        >
+          + Activity
+        </button>
         <span className="hidden text-xs text-[#9AA3AF] lg:inline">
           {saveState === "saving"
             ? "Saving…"
@@ -202,6 +230,7 @@ export function ResumeEditor({ version }: ResumeEditorProps) {
           onSectionChange={setActiveSection}
           onUpdateData={updateData}
           onUpdateExperience={updateExperience}
+          onUpdateActivity={updateActivity}
         />
       </div>
     </div>

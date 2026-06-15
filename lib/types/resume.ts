@@ -24,6 +24,8 @@ export type ResumeData = {
   summary: string;
   skills: string[];
   experience: ResumeExperience[];
+  /** Activities & leadership — clubs, sports, volunteering (same shape as experience). */
+  activities?: ResumeExperience[];
   education: ResumeEducation[];
   /** Honors & awards — short standalone lines (e.g. "National Honor Society, 2024"). */
   awards?: string[];

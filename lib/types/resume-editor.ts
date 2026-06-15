@@ -3,6 +3,7 @@ export type ResumeEditSectionId =
   | "summary"
   | "skills"
   | "experience"
+  | "activities"
   | "education"
   | "awards";
 
@@ -25,6 +26,11 @@ export function sectionLabel(section: ResumeEditSection): string {
     return section.index !== undefined
       ? `Experience · Role ${section.index + 1}`
       : "Experience";
+  }
+  if (section.id === "activities") {
+    return section.index !== undefined
+      ? `Activities · Entry ${section.index + 1}`
+      : "Activities & Leadership";
   }
   if (section.id === "education") return "Education";
   if (section.id === "awards") return "Honors & Awards";
