@@ -1,54 +1,242 @@
 import { Reveal } from "./reveal-on-scroll";
+import "./marketing-home-templates.css";
 
 export function MarketingHomeTemplates() {
   return (
     <Reveal className="tgrid">
       <div className="tcard">
-        <div className="tpaper">
-          <div className="bar" style={{ height: 14, width: "55%", background: "var(--ink)" }} />
-          <div className="bar" style={{ height: 7, width: "38%", background: "var(--coral)", marginTop: 8 }} />
-          <div style={{ height: 1, background: "rgba(40,20,30,.12)", margin: "16px 0" }} />
-          <div className="bar" style={{ height: 6, width: "90%", background: "rgba(40,20,30,.14)", marginBottom: 7 }} />
-          <div className="bar" style={{ height: 6, width: "82%", background: "rgba(40,20,30,.14)", marginBottom: 7 }} />
-          <div className="bar" style={{ height: 6, width: "88%", background: "rgba(40,20,30,.14)", marginBottom: 18 }} />
-          <div className="bar" style={{ height: 8, width: "30%", background: "var(--ink)", marginBottom: 9 }} />
-          <div className="bar" style={{ height: 6, width: "85%", background: "rgba(40,20,30,.12)", marginBottom: 7 }} />
-          <div className="bar" style={{ height: 6, width: "78%", background: "rgba(40,20,30,.12)" }} />
+        <div className="paper">
+          <div className="classic">
+            <div className="head">
+              <div className="r-name">Jordan Avery</div>
+              <div className="r-role">Senior Product Designer</div>
+              <div className="contact">
+                jordan.avery@email.com · (415) 555-0182 · San Francisco, CA ·
+                linkedin.com/in/javery
+              </div>
+            </div>
+
+            <div className="sec">
+              <div className="r-h">Summary</div>
+              <div className="r-p">
+                Product designer with 8+ years shaping B2B SaaS platforms
+                end-to-end. Led design systems, research, and 0→1 launches
+                across fintech and developer tools.
+              </div>
+            </div>
+
+            <div className="sec">
+              <div className="r-h">Experience</div>
+              <div className="row">
+                <span className="r-job">Senior Product Designer</span>
+                <span className="r-date">2021 — Present</span>
+              </div>
+              <div className="r-co">Northwind Labs</div>
+              <div className="r-li">
+                Owned the core dashboard redesign, lifting weekly active use by
+                34%.
+              </div>
+              <div className="r-li">
+                Built and maintained a 60-component design system adopted
+                org-wide.
+              </div>
+              <div className="row" style={{ marginTop: 9 }}>
+                <span className="r-job">Product Designer</span>
+                <span className="r-date">2018 — 2021</span>
+              </div>
+              <div className="r-co">Cobalt Software</div>
+              <div className="r-li">
+                Shipped onboarding flow that cut time-to-value from 9 days to 2.
+              </div>
+            </div>
+
+            <div className="sec">
+              <div className="r-h">Education</div>
+              <div className="row">
+                <span className="r-job">B.F.A. Interaction Design</span>
+                <span className="r-date">2014 — 2018</span>
+              </div>
+              <div className="r-co">Rhode Island School of Design</div>
+            </div>
+
+            <div className="sec">
+              <div className="r-h">Skills</div>
+              <div className="skills">
+                <span className="chip">Figma</span>
+                <span className="chip">Prototyping</span>
+                <span className="chip">Design Systems</span>
+                <span className="chip">User Research</span>
+                <span className="chip">HTML/CSS</span>
+                <span className="chip">Accessibility</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="tname">Classic</div>
+        <div className="tname">
+          Classic <span className="pill">Single column</span>
+        </div>
       </div>
+
       <div className="tcard">
-        <div className="tpaper" style={{ padding: 0, display: "grid", gridTemplateColumns: "34% 1fr" }}>
-          <div style={{ background: "var(--ink)", padding: "18px 14px" }}>
-            <div style={{ height: 40, width: 40, borderRadius: "50%", background: "rgba(255,255,255,.2)", marginBottom: 14 }} />
-            <div className="bar" style={{ height: 6, width: "80%", background: "rgba(255,255,255,.3)", marginBottom: 7 }} />
-            <div className="bar" style={{ height: 6, width: "65%", background: "rgba(255,255,255,.2)", marginBottom: 7 }} />
-            <div className="bar" style={{ height: 6, width: "72%", background: "rgba(255,255,255,.2)" }} />
-          </div>
-          <div style={{ padding: "20px 16px" }}>
-            <div className="bar" style={{ height: 11, width: "60%", background: "var(--ink)" }} />
-            <div className="bar" style={{ height: 6, width: "40%", background: "var(--coral)", marginTop: 7, marginBottom: 16 }} />
-            <div className="bar" style={{ height: 6, width: "92%", background: "rgba(40,20,30,.13)", marginBottom: 7 }} />
-            <div className="bar" style={{ height: 6, width: "84%", background: "rgba(40,20,30,.13)", marginBottom: 7 }} />
-            <div className="bar" style={{ height: 6, width: "88%", background: "rgba(40,20,30,.13)" }} />
+        <div className="paper">
+          <div className="twocol">
+            <div className="side">
+              <div className="avatar">JA</div>
+              <div className="r-h">Contact</div>
+              <div className="txt">
+                jordan.avery@email.com
+                <br />
+                (415) 555-0182
+                <br />
+                San Francisco, CA
+                <br />
+                linkedin.com/in/javery
+              </div>
+
+              <div className="r-h">Skills</div>
+              <div className="sk">
+                <span>Figma</span>
+                <span className="meter">
+                  <span style={{ width: "92%" }} />
+                </span>
+              </div>
+              <div className="sk">
+                <span>Prototyping</span>
+                <span className="meter">
+                  <span style={{ width: "85%" }} />
+                </span>
+              </div>
+              <div className="sk">
+                <span>Research</span>
+                <span className="meter">
+                  <span style={{ width: "78%" }} />
+                </span>
+              </div>
+              <div className="sk">
+                <span>Front-end</span>
+                <span className="meter">
+                  <span style={{ width: "70%" }} />
+                </span>
+              </div>
+
+              <div className="r-h">Education</div>
+              <div className="txt">
+                <b style={{ color: "#fff" }}>RISD</b>
+                <br />
+                B.F.A. Interaction Design
+                <br />
+                2014 — 2018
+              </div>
+            </div>
+            <div className="main">
+              <div className="r-name">Jordan Avery</div>
+              <div className="r-role">Senior Product Designer</div>
+
+              <div className="r-h">Profile</div>
+              <div className="r-p">
+                Product designer with 8+ years building B2B SaaS from research
+                through launch, with a focus on design systems and developer
+                tooling.
+              </div>
+
+              <div className="r-h">Experience</div>
+              <div className="row">
+                <span className="r-job">Senior Product Designer</span>
+                <span className="r-date">2021—Now</span>
+              </div>
+              <div className="r-co">Northwind Labs</div>
+              <div className="r-li">
+                Led dashboard redesign — +34% weekly active use.
+              </div>
+              <div className="r-li">
+                Scaled a 60-component design system org-wide.
+              </div>
+
+              <div className="row" style={{ marginTop: 8 }}>
+                <span className="r-job">Product Designer</span>
+                <span className="r-date">2018—21</span>
+              </div>
+              <div className="r-co">Cobalt Software</div>
+              <div className="r-li">Rebuilt onboarding; time-to-value 9d → 2d.</div>
+              <div className="r-li">Ran the research program across 4 squads.</div>
+            </div>
           </div>
         </div>
-        <div className="tname">Two-Column</div>
+        <div className="tname">
+          Two-Column <span className="pill">Sidebar</span>
+        </div>
       </div>
+
       <div className="tcard">
-        <div className="tpaper">
-          <div className="bar" style={{ height: 26, width: "70%", background: "var(--coral)" }} />
-          <div className="bar" style={{ height: 7, width: "45%", background: "rgba(40,20,30,.3)", marginTop: 10, marginBottom: 20 }} />
-          <div style={{ display: "flex", gap: 7, marginBottom: 18 }}>
-            <div style={{ height: 18, width: 46, background: "rgba(255,92,56,.16)", borderRadius: 5 }} />
-            <div style={{ height: 18, width: 46, background: "rgba(255,92,56,.16)", borderRadius: 5 }} />
-            <div style={{ height: 18, width: 46, background: "rgba(255,92,56,.16)", borderRadius: 5 }} />
+        <div className="paper">
+          <div className="editorial">
+            <div className="topbar">
+              <div className="r-name">
+                Jordan<b>Avery</b>
+              </div>
+              <div className="badge">JA</div>
+            </div>
+            <div className="r-role">Senior Product Designer</div>
+            <div className="rule" />
+
+            <div className="chips">
+              <span className="chip">Design Systems</span>
+              <span className="chip alt">Research</span>
+              <span className="chip alt">Prototyping</span>
+              <span className="chip">0→1</span>
+            </div>
+
+            <div className="cols">
+              <div className="lead">
+                <div className="ed-blk">
+                  <div className="r-h">Experience</div>
+                  <div className="row">
+                    <span className="r-job">Senior Product Designer</span>
+                    <span className="r-date">&apos;21—Now</span>
+                  </div>
+                  <div className="r-co">Northwind Labs</div>
+                  <div className="r-li">Core dashboard redesign — +34% WAU.</div>
+                  <div className="r-li">Built 60-component design system.</div>
+                </div>
+                <div className="ed-blk">
+                  <div className="row">
+                    <span className="r-job">Product Designer</span>
+                    <span className="r-date">&apos;18—&apos;21</span>
+                  </div>
+                  <div className="r-co">Cobalt Software</div>
+                  <div className="r-li">Onboarding redesign, 9d → 2d to value.</div>
+                </div>
+              </div>
+              <div className="side">
+                <div className="r-h">Profile</div>
+                <div className="r-p">
+                  8+ years designing B2B SaaS end-to-end across fintech &amp; dev
+                  tools.
+                </div>
+                <div className="r-h">Top Skills</div>
+                <div className="skill-row">
+                  <span>Figma</span>
+                  <span>Expert</span>
+                </div>
+                <div className="skill-row">
+                  <span>Design Systems</span>
+                  <span>Expert</span>
+                </div>
+                <div className="skill-row">
+                  <span>User Research</span>
+                  <span>Advanced</span>
+                </div>
+                <div className="skill-row" style={{ border: "none" }}>
+                  <span>HTML / CSS</span>
+                  <span>Advanced</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="bar" style={{ height: 6, width: "90%", background: "rgba(40,20,30,.13)", marginBottom: 7 }} />
-          <div className="bar" style={{ height: 6, width: "84%", background: "rgba(40,20,30,.13)", marginBottom: 7 }} />
-          <div className="bar" style={{ height: 6, width: "78%", background: "rgba(40,20,30,.13)" }} />
         </div>
-        <div className="tname">Editorial</div>
+        <div className="tname">
+          Editorial <span className="pill">Statement</span>
+        </div>
       </div>
     </Reveal>
   );

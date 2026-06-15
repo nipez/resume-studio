@@ -1,0 +1,473 @@
+@import url("https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap");
+
+.marketing-home .tgrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 48px;
+}
+
+.marketing-home .tcard {
+  background: #fff;
+  border: 1px solid rgba(40, 20, 30, 0.07);
+  border-radius: 20px;
+  padding: 20px;
+  transition: transform 0.25s;
+}
+
+.marketing-home .tcard:hover {
+  transform: translateY(-4px);
+}
+
+.marketing-home .tname {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 16px;
+  color: var(--ink);
+}
+
+.marketing-home .tname .pill {
+  font-family: "Instrument Sans", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted2);
+  background: var(--cream);
+  border: 1px solid var(--line);
+  padding: 3px 9px;
+  border-radius: 100px;
+}
+
+.marketing-home .paper {
+  aspect-ratio: 8.5 / 11;
+  background: #fff;
+  border-radius: 9px;
+  box-shadow:
+    0 14px 34px -16px rgba(40, 20, 30, 0.4),
+    0 0 0 1px rgba(40, 20, 30, 0.05);
+  overflow: hidden;
+  position: relative;
+}
+
+.marketing-home .r-name {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #1a1420;
+  line-height: 1;
+}
+
+.marketing-home .r-role {
+  color: var(--coral);
+  font-weight: 600;
+}
+
+.marketing-home .r-h {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #1a1420;
+}
+
+.marketing-home .r-job {
+  font-weight: 700;
+  color: #1a1420;
+  white-space: nowrap;
+}
+
+.marketing-home .r-co {
+  color: var(--coral);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.marketing-home .r-date {
+  color: #9a93a3;
+  font-weight: 500;
+}
+
+.marketing-home .r-li {
+  position: relative;
+  color: #48414f;
+}
+
+.marketing-home .r-li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.42em;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--coral);
+}
+
+.marketing-home .r-p {
+  color: #48414f;
+}
+
+.marketing-home .row {
+  min-height: 1.2em;
+}
+
+/* Classic */
+.marketing-home .classic {
+  font-family: "Newsreader", Georgia, serif;
+  padding: 26px 26px 0;
+}
+
+.marketing-home .classic .head {
+  text-align: center;
+  border-bottom: 1.5px solid #1a1420;
+  padding-bottom: 11px;
+}
+
+.marketing-home .classic .r-name {
+  font-size: 22px;
+  letter-spacing: 0.02em;
+}
+
+.marketing-home .classic .r-role {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  margin-top: 5px;
+  font-family: "Instrument Sans", sans-serif;
+}
+
+.marketing-home .classic .contact {
+  font-size: 7.5px;
+  color: #6c6675;
+  margin-top: 7px;
+  letter-spacing: 0.02em;
+}
+
+.marketing-home .classic .sec {
+  margin-top: 13px;
+}
+
+.marketing-home .classic .r-h {
+  font-size: 8.5px;
+  font-family: "Instrument Sans", sans-serif;
+  border-bottom: 1px solid rgba(40, 20, 30, 0.18);
+  padding-bottom: 3px;
+  margin-bottom: 7px;
+}
+
+.marketing-home .classic .row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.marketing-home .classic .r-job {
+  font-size: 9.5px;
+}
+
+.marketing-home .classic .r-co {
+  font-size: 8.5px;
+  font-family: "Instrument Sans", sans-serif;
+}
+
+.marketing-home .classic .r-date {
+  font-size: 7.5px;
+  font-family: "Instrument Sans", sans-serif;
+}
+
+.marketing-home .classic .r-li {
+  font-size: 8px;
+  line-height: 1.5;
+  padding-left: 9px;
+  margin-top: 3px;
+  font-family: "Instrument Sans", sans-serif;
+}
+
+.marketing-home .classic .r-p {
+  font-size: 8px;
+  line-height: 1.55;
+  font-family: "Instrument Sans", sans-serif;
+}
+
+.marketing-home .classic .skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.marketing-home .classic .chip {
+  font-size: 7px;
+  font-family: "Instrument Sans", sans-serif;
+  color: #48414f;
+  background: #f4eee9;
+  border-radius: 4px;
+  padding: 2.5px 6px;
+  white-space: nowrap;
+}
+
+/* Two-column */
+.marketing-home .twocol {
+  display: grid;
+  grid-template-columns: 38% 1fr;
+  height: 100%;
+  font-family: "Instrument Sans", sans-serif;
+}
+
+.marketing-home .twocol .side {
+  background: #231a2e;
+  color: #fff;
+  padding: 20px 15px;
+}
+
+.marketing-home .twocol .avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--coral), var(--coral-l));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  color: #fff;
+  margin: 0 auto;
+}
+
+.marketing-home .twocol .side .r-h {
+  color: #ff9a72;
+  font-size: 7.5px;
+  margin: 14px 0 6px;
+}
+
+.marketing-home .twocol .side .txt {
+  font-size: 7.5px;
+  line-height: 1.7;
+  color: #d9d2e0;
+}
+
+.marketing-home .twocol .side .sk {
+  font-size: 7.5px;
+  color: #e8e3ee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.marketing-home .twocol .meter {
+  width: 46px;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.18);
+  overflow: hidden;
+}
+
+.marketing-home .twocol .meter span {
+  display: block;
+  height: 100%;
+  background: var(--coral);
+}
+
+.marketing-home .twocol .main {
+  padding: 20px 18px;
+}
+
+.marketing-home .twocol .r-name {
+  font-size: 19px;
+  font-family: "Space Grotesk", sans-serif;
+}
+
+.marketing-home .twocol .r-role {
+  font-size: 8.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+.marketing-home .twocol .main .r-h {
+  font-size: 8px;
+  color: #1a1420;
+  margin: 14px 0 6px;
+}
+
+.marketing-home .twocol .main .r-h:first-of-type {
+  margin-top: 13px;
+}
+
+.marketing-home .twocol .r-p {
+  font-size: 8px;
+  line-height: 1.6;
+}
+
+.marketing-home .twocol .row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.marketing-home .twocol .r-job {
+  font-size: 9px;
+}
+
+.marketing-home .twocol .r-co {
+  font-size: 8px;
+}
+
+.marketing-home .twocol .r-date {
+  font-size: 7px;
+}
+
+.marketing-home .twocol .r-li {
+  font-size: 7.5px;
+  line-height: 1.5;
+  padding-left: 9px;
+  margin-top: 3px;
+}
+
+/* Editorial */
+.marketing-home .editorial {
+  padding: 24px 24px 0;
+  font-family: "Instrument Sans", sans-serif;
+}
+
+.marketing-home .editorial .topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.marketing-home .editorial .r-name {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 25px;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  color: var(--coral);
+}
+
+.marketing-home .editorial .r-name b {
+  display: block;
+  color: #1a1420;
+  font-weight: 700;
+}
+
+.marketing-home .editorial .badge {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: #231a2e;
+  color: #fff;
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.marketing-home .editorial .r-role {
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #6c6675;
+  margin-top: 7px;
+  font-weight: 600;
+}
+
+.marketing-home .editorial .rule {
+  height: 2px;
+  background: #1a1420;
+  margin: 11px 0;
+}
+
+.marketing-home .editorial .chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 13px;
+}
+
+.marketing-home .editorial .chip {
+  font-size: 7px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--coral);
+  border-radius: 100px;
+  padding: 3px 8px;
+  white-space: nowrap;
+}
+
+.marketing-home .editorial .chip.alt {
+  background: #231a2e;
+}
+
+.marketing-home .editorial .cols {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 13px;
+}
+
+.marketing-home .editorial .r-h {
+  font-size: 8px;
+  color: var(--coral);
+  margin-bottom: 6px;
+}
+
+.marketing-home .editorial .r-job {
+  font-size: 9px;
+}
+
+.marketing-home .editorial .r-co {
+  font-size: 7.5px;
+  color: #6c6675;
+  font-weight: 500;
+}
+
+.marketing-home .editorial .r-date {
+  font-size: 6.5px;
+}
+
+.marketing-home .editorial .r-p {
+  font-size: 7.5px;
+  line-height: 1.55;
+}
+
+.marketing-home .editorial .r-li {
+  font-size: 7.5px;
+  line-height: 1.5;
+  padding-left: 9px;
+  margin-top: 3px;
+}
+
+.marketing-home .editorial .ed-blk {
+  margin-bottom: 11px;
+}
+
+.marketing-home .editorial .side .r-p {
+  margin-bottom: 9px;
+}
+
+.marketing-home .editorial .skill-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 7.5px;
+  color: #48414f;
+  padding: 3px 0;
+  border-bottom: 1px solid rgba(40, 20, 30, 0.08);
+  white-space: nowrap;
+  gap: 8px;
+}
+
+@media (max-width: 860px) {
+  .marketing-home .tgrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .marketing-home .tgrid {
+    grid-template-columns: 1fr;
+  }
+}
