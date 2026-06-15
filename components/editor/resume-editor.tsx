@@ -87,13 +87,21 @@ export function ResumeEditor({ version }: ResumeEditorProps) {
     setActiveSection(section);
   }, []);
 
-  function exportPdf() {
-    const html = buildResumeHTML({ templateStyle, data }, { forPrint: true });
+  function openResumeWindow(forPrint: boolean) {
+    const html = buildResumeHTML({ templateStyle, data }, { forPrint });
     const win = window.open("", "_blank");
     if (!win) return;
     win.document.open();
     win.document.write(html);
     win.document.close();
+  }
+
+  function exportPdf() {
+    openResumeWindow(true);
+  }
+
+  function previewPdf() {
+    openResumeWindow(false);
   }
 
   function addExperienceRole() {
@@ -162,6 +170,13 @@ export function ResumeEditor({ version }: ResumeEditorProps) {
                 ? "Save failed"
                 : "Live preview"}
         </span>
+        <button
+          type="button"
+          onClick={previewPdf}
+          className="inline-flex items-center gap-1.5 rounded-[10px] border border-[#DFE3E8] bg-white px-3.5 py-2.5 text-[13.5px] font-semibold text-[#5A6573] transition-colors hover:border-[#C8CED6] hover:text-ink"
+        >
+          ⤢ Preview PDF
+        </button>
         <button
           type="button"
           onClick={exportPdf}
