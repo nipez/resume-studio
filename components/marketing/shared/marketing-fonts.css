@@ -1,22 +1,22 @@
-/* Marketing site typography — modern straight sans (Inter) throughout */
+/* Marketing site typography — DM Sans throughout (straight, modern geometric sans) */
 
 .marketing-site {
-  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-marketing), system-ui, -apple-system, sans-serif;
 }
 
 .marketing-site .font-display {
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-marketing), system-ui, sans-serif;
 }
 
 .marketing-home {
-  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-marketing), system-ui, -apple-system, sans-serif;
 }
 
 .marketing-home h1,
 .marketing-home h2,
 .marketing-home h3,
 .marketing-home .display {
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-marketing), system-ui, sans-serif;
 }
 
 /* Hero accent words — straight weight emphasis, no serif italic */
@@ -34,7 +34,7 @@
 }
 
 .marketing-home .quote .qmark {
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-marketing), system-ui, sans-serif;
   font-style: normal;
   font-weight: 700;
 }

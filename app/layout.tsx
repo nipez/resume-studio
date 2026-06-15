@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Instrument_Sans, Instrument_Serif, Inter, Space_Grotesk } from "next/font/google";
+import { DM_Sans, Instrument_Sans, Instrument_Serif, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { SITE_DESCRIPTION, SITE_TITLE, SITE_URL } from "@/lib/marketing/content";
 
@@ -22,10 +22,10 @@ const instrumentSerif = Instrument_Serif({
   variable: "--font-instrument-serif",
 });
 
-const inter = Inter({
+const dmSans = DM_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
-  variable: "--font-inter",
+  variable: "--font-marketing",
 });
 
 export const metadata: Metadata = {
@@ -42,7 +42,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${spaceGrotesk.variable} ${instrumentSans.variable} ${instrumentSerif.variable} ${inter.variable} min-h-screen font-sans antialiased`}
+        className={`${spaceGrotesk.variable} ${instrumentSans.variable} ${instrumentSerif.variable} ${dmSans.variable} min-h-screen font-sans antialiased`}
       >
         {children}
       </body>

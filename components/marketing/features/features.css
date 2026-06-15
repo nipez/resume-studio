@@ -115,7 +115,7 @@
 }
 
 .marketing-home .features-bento-tile .bt-num {
-  font-family: var(--font-inter), sans-serif;
+  font-family: var(--font-marketing), sans-serif;
   font-size: 11px;
   font-weight: 600;
   color: #b3aab8;
@@ -139,7 +139,7 @@
 }
 
 .marketing-home .features-bento-tile .bt-label {
-  font-family: var(--font-inter), sans-serif;
+  font-family: var(--font-marketing), sans-serif;
   font-size: 14px;
   font-weight: 600;
   letter-spacing: -0.01em;
