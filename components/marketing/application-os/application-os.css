@@ -257,6 +257,89 @@
   box-shadow: 0 12px 28px -8px rgba(255, 92, 56, 0.7);
 }
 
+.marketing-home .aos-flow-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 6px;
+  margin-top: 40px;
+  padding: 28px 24px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  box-shadow: 0 12px 32px -18px rgba(40, 20, 30, 0.2);
+}
+
+.marketing-home .aos-flow-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.marketing-home .aos-flow-num {
+  font-family: var(--font-space-grotesk), sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: #b3aab8;
+}
+
+.marketing-home .aos-flow-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--cream);
+  border: 1px solid rgba(40, 20, 30, 0.08);
+  border-radius: 100px;
+  padding: 8px 14px;
+}
+
+.marketing-home .aos-flow-arrow {
+  color: var(--teal);
+  font-weight: 700;
+  font-size: 16px;
+  margin: 0 2px;
+}
+
+.marketing-home .aos-flow-loop {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--coral);
+  background: rgba(255, 92, 56, 0.1);
+  border-radius: 100px;
+  padding: 6px 12px;
+  margin-left: 4px;
+}
+
+.marketing-home .aos-concept-note {
+  margin-top: 32px;
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.marketing-home .aos-concept-note p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.marketing-home .aos-concept-note .link-underline {
+  display: inline-block;
+  margin-top: 16px;
+  font-size: 15px;
+}
+
+.marketing-home .aos-cta-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
 @media (max-width: 860px) {
   .marketing-home .aos-hero-grid {
     grid-template-columns: 1fr;

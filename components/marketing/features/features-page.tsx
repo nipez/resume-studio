@@ -4,7 +4,6 @@ import { Reveal } from "@/components/marketing/home/reveal-on-scroll";
 import {
   APPLICATION_OS_LOOP,
   FEATURE_CAPABILITIES,
-  GENERATOR_VS_OS,
   HOW_IT_WORKS,
   SITE_NAME,
 } from "@/lib/marketing/content";
@@ -39,35 +38,27 @@ export function FeaturesPage() {
       <section className="features-hero">
         <div className="wrap features-hero-grid">
           <div>
-            <span className="eyebrow">Features</span>
+            <span className="eyebrow">Product tour</span>
             <h1>
-              Six modules.
-              <br />
-              One <span className="serif-i">connected</span> workspace.
+              Everything in the{" "}
+              <span className="serif-i">workspace.</span>
             </h1>
             <p className="features-hero-sub">
-              {SITE_NAME} isn&apos;t a PDF generator — it&apos;s an application OS
-              with resume library, tailoring, cover letters, Q&amp;A, tracking,
-              and insights. Same job context, same login, immutable snapshots.
+              Resume library and canvas editor. Tailor per job with AI. Cover
+              letters, application Q&amp;A, tracking, and insights — plus job
+              URL import, section-level AI, and PDF export.
             </p>
             <div className="features-hero-cta">
               <Link href="/login" className="btn btn-coral">
                 Get started free
               </Link>
               <Link href="/application-os" className="link-underline">
-                What is an application OS? →
+                Why an application OS? →
               </Link>
-            </div>
-            <div className="features-chips">
-              {LOOP_LABELS.map((label) => (
-                <span key={label} className="features-chip">
-                  {label}
-                </span>
-              ))}
             </div>
           </div>
           <div className="features-bento-wrap">
-            <span className="features-bento-flow">1 workspace</span>
+            <span className="features-bento-flow">6 modules</span>
             <div className="features-bento">
               {APPLICATION_OS_LOOP.map((module, index) => (
                 <div
@@ -89,11 +80,11 @@ export function FeaturesPage() {
         </div>
         <div className="snap-strip">
           <div className="wrap inner">
-            <span className="snap-saved">One login</span>
+            <span className="snap-saved">Shared context</span>
             <span className="sep">·</span>
             <span>
-              Six modules share resume data, job context, and application
-              history — import once, use everywhere.
+              Import a job once — tailor, cover letter, and Q&amp;A all use the
+              same role, company, and description.
             </span>
           </div>
         </div>
@@ -102,11 +93,11 @@ export function FeaturesPage() {
       <section id="modules">
         <div className="wrap">
           <Reveal className="sec-head center">
-            <span className="eyebrow">Application OS modules</span>
-            <h2>Every tool in the loop.</h2>
+            <span className="eyebrow">Modules</span>
+            <h2>What each part of {SITE_NAME} does.</h2>
             <p>
-              Each module hands off to the next. Build a master resume, tailor
-              per job, generate materials, log the send, and learn what works.
+              Six integrated tools — not six subscriptions. Each module passes
+              context to the next.
             </p>
           </Reveal>
           <Reveal className="mgrid">
@@ -122,20 +113,6 @@ export function FeaturesPage() {
               </div>
             ))}
           </Reveal>
-          <Reveal className="moat">
-            <div className="badge">
-              <span className="b1">↻</span>
-              <span className="b2">feeds back</span>
-            </div>
-            <div>
-              <span className="label">The moat</span>
-              <p>
-                When you log an application, {SITE_NAME} freezes the exact
-                resume, cover letter, and Q&amp;A you sent. Insights stay tied
-                to reality — even as your master resume keeps evolving.
-              </p>
-            </div>
-          </Reveal>
         </div>
       </section>
 
@@ -147,8 +124,8 @@ export function FeaturesPage() {
             </span>
             <h2>Capabilities across the workspace.</h2>
             <p>
-              Beyond the six modules — editor, AI, imports, and snapshots
-              designed for serious job searches over months, not one-off PDFs.
+              Editor, AI, imports, and snapshots — the details that matter when
+              you&apos;re applying to dozens of roles over months.
             </p>
           </Reveal>
           <Reveal className="features-cap-grid">
@@ -185,7 +162,7 @@ export function FeaturesPage() {
         </div>
       </section>
 
-      <section className="templates">
+      <section className="templates" id="templates">
         <div className="wrap">
           <Reveal className="sec-head" style={{ maxWidth: 560 }}>
             <span className="eyebrow" style={{ background: "var(--cream)" }}>
@@ -201,40 +178,6 @@ export function FeaturesPage() {
         </div>
       </section>
 
-      <section className="dark">
-        <div className="wrap" style={{ maxWidth: 1060 }}>
-          <Reveal className="sec-head center">
-            <span className="eyebrow dark">Generators vs. application OS</span>
-            <h2>
-              Fast PDFs are fine for five jobs.
-              <br />
-              Serious searches need a system.
-            </h2>
-            <p>
-              Credit-based generators optimize a single moment. {SITE_NAME}{" "}
-              optimizes the entire search — versions, tracking, snapshots, and
-              insights that compound over months.
-            </p>
-          </Reveal>
-          <Reveal className="table-scroll">
-            <div className="ctable">
-              <div className="crow head">
-                <div className="c1">Dimension</div>
-                <div className="c2">AI resume generators</div>
-                <div className="c3">{SITE_NAME} · Application OS</div>
-              </div>
-              {GENERATOR_VS_OS.map((row) => (
-                <div key={row.dimension} className="crow">
-                  <div className="c1">{row.dimension}</div>
-                  <div className="c2">{row.generator}</div>
-                  <div className="c3">{row.applicationOs}</div>
-                </div>
-              ))}
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
       <section className="cta-sec">
         <div className="wrap">
           <Reveal className="cta">
@@ -243,12 +186,15 @@ export function FeaturesPage() {
             <div className="cta-inner">
               <h2>Try every module free during beta.</h2>
               <p>
-                Library, tailor, cover letters, Q&amp;A, tracking, and insights —
-                one login, one workspace.
+                Library, tailor, cover letters, Q&amp;A, tracking, and insights
+                — one login, one workspace.
               </p>
               <Link href="/login" className="btn btn-dark">
                 Open {SITE_NAME}
               </Link>
+              <div className="features-compare-link">
+                <Link href="/#compare">Compare to resume generators →</Link>
+              </div>
               <div className="fine">No credit card · Magic link sign-in</div>
             </div>
           </Reveal>

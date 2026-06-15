@@ -138,11 +138,12 @@ export function MarketingHomePage() {
             <span className="eyebrow">The application OS</span>
             <h2>Six modules. One closed loop.</h2>
             <p>
-              Generators stop at the download. An application OS runs the full cycle — build, tailor, send, snapshot, and learn — so every application makes the next one smarter.
+              Generators stop at the download. An application OS runs the full
+              cycle — build, tailor, send, snapshot, and learn.
             </p>
           </Reveal>
-          <Reveal className="mgrid">
-            {APPLICATION_OS_LOOP.map((module, index) => (
+          <Reveal className="mgrid home-module-teaser">
+            {APPLICATION_OS_LOOP.slice(0, 3).map((module, index) => (
               <div key={module.step} className="mcard">
                 <div className="top">
                   <span className="micon">{MODULE_ICONS[index]}</span>
@@ -153,17 +154,13 @@ export function MarketingHomePage() {
               </div>
             ))}
           </Reveal>
-          <Reveal className="moat">
-            <div className="badge">
-              <span className="b1">↻</span>
-              <span className="b2">feeds back</span>
-            </div>
-            <div>
-              <span className="label">The moat</span>
-              <p>
-                When you log an application, {SITE_NAME} freezes the exact resume, cover letter, and Q&amp;A you sent. Insights stay tied to reality — even as your master resume evolves.
-              </p>
-            </div>
+          <Reveal className="home-module-links">
+            <Link href="/features" className="btn btn-coral">
+              Explore all features
+            </Link>
+            <Link href="/application-os" className="link-underline">
+              Why an application OS? →
+            </Link>
           </Reveal>
         </div>
       </section>
@@ -191,7 +188,7 @@ export function MarketingHomePage() {
         </div>
       </section>
 
-      <section className="dark">
+      <section className="dark" id="compare">
         <div className="wrap" style={{ maxWidth: 1060 }}>
           <Reveal className="sec-head center">
             <span className="eyebrow dark">Generators vs. application OS</span>
@@ -226,8 +223,15 @@ export function MarketingHomePage() {
       <section>
         <div className="wrap">
           <Reveal className="sec-head center" style={{ maxWidth: 600 }}>
-            <span className="eyebrow">How it works</span>
+            <span className="eyebrow">Workflow</span>
             <h2>From blank page to tracked applications.</h2>
+            <p>
+              A quick overview — see the{" "}
+              <Link href="/features" className="features-inline-link">
+                full feature tour
+              </Link>{" "}
+              for module-by-module detail.
+            </p>
           </Reveal>
           <Reveal className="steps">
             <div className="steps-line" />
@@ -248,7 +252,10 @@ export function MarketingHomePage() {
             <span className="eyebrow" style={{ background: "var(--cream)" }}>Templates</span>
             <h2>Three templates, print-ready.</h2>
             <p>
-              Classic, Two-Column, and Editorial — ported pixel-for-pixel from the prototype with full PDF export support.
+              Classic, Two-Column, and Editorial — with full PDF export.{" "}
+              <Link href="/features#templates" className="features-inline-link">
+                See templates →
+              </Link>
             </p>
           </Reveal>
           <MarketingHomeTemplates />

@@ -1,10 +1,5 @@
 import Link from "next/link";
-import {
-  APPLICATION_OS_LOOP,
-  GENERATOR_VS_OS,
-  POSITIONING_PILLARS,
-  SITE_NAME,
-} from "@/lib/marketing/content";
+import { SITE_NAME } from "@/lib/marketing/content";
 import { Reveal } from "@/components/marketing/home/reveal-on-scroll";
 import "@/components/marketing/home/marketing-home.css";
 import "./application-os.css";
@@ -47,8 +42,6 @@ const PHASES = [
   },
 ];
 
-const PILLAR_COLORS = ["var(--coral)", "var(--teal)", "var(--coral)", "var(--teal)"];
-
 export function ApplicationOsPage() {
   return (
     <div className="marketing-home">
@@ -71,7 +64,7 @@ export function ApplicationOsPage() {
                 Start free during beta
               </Link>
               <Link href="/features" className="aos-ghost">
-                Explore features →
+                See what&apos;s included →
               </Link>
             </div>
             <div className="aos-stats">
@@ -155,103 +148,45 @@ export function ApplicationOsPage() {
         </div>
       </section>
 
-      <section id="modules">
-        <div className="wrap">
-          <Reveal className="sec-head center">
-            <span className="eyebrow">Six modules</span>
-            <h2>One closed loop, not six browser tabs.</h2>
-            <p>
-              Each module hands off to the next and feeds back into the first.
-              Build, tailor, send, snapshot, and learn — without leaving the
-              workspace.
-            </p>
-          </Reveal>
-          <Reveal className="mgrid">
-            {APPLICATION_OS_LOOP.map((module, index) => (
-              <div key={module.step} className="mcard">
-                <div className="top">
-                  <span className="micon">{MODULE_ICONS[index]}</span>
-                  <span className="mnum">{module.step}</span>
-                </div>
-                <h3>{module.title}</h3>
-                <p>{module.description}</p>
-              </div>
-            ))}
-          </Reveal>
-          <Reveal className="moat">
-            <div className="badge">
-              <span className="b1">↻</span>
-              <span className="b2">feeds back</span>
-            </div>
-            <div>
-              <span className="label">The moat</span>
-              <p>
-                When you log an application, {SITE_NAME} freezes the exact resume,
-                cover letter, and Q&amp;A you sent. Insights stay tied to reality —
-                even as your master resume keeps evolving.
-              </p>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      <section className="dark">
-        <div className="wrap" style={{ maxWidth: 1060 }}>
-          <Reveal className="sec-head center">
-            <span className="eyebrow dark">Generators vs. application OS</span>
-            <h2>
-              Fast PDFs are fine for five jobs.
-              <br />
-              Serious searches need a system.
-            </h2>
-            <p>
-              Credit-based generators optimize a single moment. {SITE_NAME}{" "}
-              optimizes the entire search — versions, tracking, snapshots, and
-              insights that compound over months.
-            </p>
-          </Reveal>
-          <Reveal className="table-scroll">
-            <div className="ctable">
-              <div className="crow head">
-                <div className="c1">Dimension</div>
-                <div className="c2">AI resume generators</div>
-                <div className="c3">{SITE_NAME} · Application OS</div>
-              </div>
-              {GENERATOR_VS_OS.slice(0, 6).map((row) => (
-                <div key={row.dimension} className="crow">
-                  <div className="c1">{row.dimension}</div>
-                  <div className="c2">{row.generator}</div>
-                  <div className="c3">{row.applicationOs}</div>
-                </div>
-              ))}
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
       <section className="why">
         <div className="wrap">
-          <Reveal className="sec-head" style={{ maxWidth: 680 }}>
+          <Reveal className="sec-head center" style={{ maxWidth: 620 }}>
             <span className="eyebrow" style={{ background: "var(--cream)" }}>
-              Why an application OS
+              The closed loop
             </span>
-            <h2>Why an OS beats another resume generator.</h2>
+            <h2>Six steps. One workspace. Insights feed back.</h2>
             <p>
-              The market is split between expensive ATS scanners, tracker-first
-              tools with weekly pricing, and builders with trial traps. {SITE_NAME}{" "}
-              is the honest middle: one workspace from first draft to interview prep.
+              Each stage hands off to the next — and logging an application
+              snapshots what you sent so learning stays tied to reality.
             </p>
           </Reveal>
-          <Reveal className="why-grid">
-            {POSITIONING_PILLARS.map((pillar, index) => (
-              <div key={pillar.accent} className="why-card">
-                <div className="tag" style={{ color: PILLAR_COLORS[index] }}>
-                  {pillar.accent}
-                </div>
-                <h3>{pillar.title}</h3>
-                <p>{pillar.description}</p>
+          <Reveal className="aos-flow-strip">
+            {LOOP_LABELS.map((label, index) => (
+              <div key={label} className="aos-flow-step">
+                <span className="aos-flow-num">{String(index + 1).padStart(2, "0")}</span>
+                <span className="aos-flow-label">{label}</span>
+                {index < LOOP_LABELS.length - 1 ? (
+                  <span className="aos-flow-arrow" aria-hidden>
+                    →
+                  </span>
+                ) : (
+                  <span className="aos-flow-loop" aria-hidden>
+                    ↻ Library
+                  </span>
+                )}
               </div>
             ))}
+          </Reveal>
+          <Reveal className="aos-concept-note">
+            <p>
+              <b>Why snapshots matter.</b> When your master resume evolves, past
+              applications stay frozen — resume, cover letter, and Q&amp;A exactly
+              as submitted. Insights compare what actually got interviews, not
+              what you wish you&apos;d sent.
+            </p>
+            <Link href="/features" className="link-underline">
+              See each module in detail →
+            </Link>
           </Reveal>
         </div>
       </section>
@@ -264,12 +199,17 @@ export function ApplicationOsPage() {
             <div className="cta-inner">
               <h2>Run your job search like a system.</h2>
               <p>
-                Free during beta. The application OS — not another credit-based PDF
-                generator.
+                Free during beta. Understand the OS here — explore the full
+                product on the features page.
               </p>
-              <Link href="/login" className="btn btn-dark">
-                Open {SITE_NAME}
-              </Link>
+              <div className="aos-cta-row">
+                <Link href="/login" className="btn btn-dark">
+                  Open {SITE_NAME}
+                </Link>
+                <Link href="/features" className="link-underline" style={{ color: "#fff", borderColor: "rgba(255,255,255,0.35)" }}>
+                  Feature tour →
+                </Link>
+              </div>
               <div className="fine">No credit card · Magic link sign-in</div>
             </div>
           </Reveal>

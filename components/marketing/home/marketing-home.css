@@ -195,6 +195,11 @@
 .marketing-home .pricing-more{text-align:center;margin-top:28px;}
 .marketing-home .pricing-more a{font-size:14.5px;font-weight:600;color:var(--coral);cursor:pointer;border-bottom:2px solid rgba(255,92,56,.3);padding-bottom:2px;}
 
+.marketing-home .home-module-teaser{margin-top:48px;}
+.marketing-home .home-module-links{display:flex;align-items:center;justify-content:center;gap:20px;margin-top:36px;flex-wrap:wrap;}
+.marketing-home .features-inline-link{font-weight:600;color:var(--coral);border-bottom:2px solid rgba(255,92,56,.35);padding-bottom:1px;}
+.marketing-home .features-inline-link:hover{border-color:var(--coral);}
+
 /* final cta */
 .marketing-home .cta-sec{padding:0 0 104px;}
 .marketing-home .cta{position:relative;overflow:hidden;border-radius:28px;background:linear-gradient(135deg,var(--coral),var(--coral-l));padding:72px 48px;text-align:center;box-shadow:0 30px 70px -24px rgba(255,92,56,.6);}
