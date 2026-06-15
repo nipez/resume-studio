@@ -134,6 +134,8 @@ export function ResumeAiAssist({
     setAppliedSuggestion(null);
   }
 
+  const activeSectionKey = sectionKey(section);
+
   useEffect(() => {
     setError("");
     setAnswer("");
@@ -143,7 +145,7 @@ export function ResumeAiAssist({
     setActivePanel(null);
     setSuggestPass(0);
     setPendingUndo(null);
-  }, [sectionKey(section)]);
+  }, [activeSectionKey]);
 
   async function run(
     action: string,
