@@ -296,7 +296,6 @@ export async function updateApplicationMeta(
     applied_at?: string;
   }
 ) {
-  const supabase = createClient();
   const payload: Record<string, unknown> = {};
   if (patch.role !== undefined) payload.role = patch.role;
   if (patch.company !== undefined) payload.company = patch.company;
