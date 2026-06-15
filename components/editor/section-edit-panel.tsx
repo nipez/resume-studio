@@ -1,6 +1,6 @@
 "use client";
 
-import { ResumeAiAssist, type AiApplyPatch } from "@/components/editor/resume-ai-assist";
+import { ResumeAiAssist, type AiApplyPatch, type AiUndoSnapshot } from "@/components/editor/resume-ai-assist";
 import type {
   ResumeData,
   ResumeEducation,
@@ -95,6 +95,25 @@ export function SectionEditPanel({
           : {}),
         ...(patch.experience.bullets
           ? { bullets: patch.experience.bullets }
+          : {}),
+      });
+    }
+  }
+
+  function restoreUndo(snapshot: AiUndoSnapshot) {
+    const updates: Partial<ResumeData> = {};
+    if (snapshot.headline !== undefined) updates.headline = snapshot.headline;
+    if (snapshot.summary !== undefined) updates.summary = snapshot.summary;
+    if (snapshot.skills !== undefined) updates.skills = snapshot.skills;
+    if (Object.keys(updates).length) onUpdateData(updates);
+
+    if (snapshot.experience) {
+      onUpdateExperience(snapshot.experience.index, {
+        ...(snapshot.experience.blurb !== undefined
+          ? { blurb: snapshot.experience.blurb }
+          : {}),
+        ...(snapshot.experience.bullets
+          ? { bullets: snapshot.experience.bullets }
           : {}),
       });
     }
@@ -424,6 +443,7 @@ export function SectionEditPanel({
             onUpdateExperience(index, { blurb, bullets })
           }
           onApplyPatch={applyAiPatch}
+          onRestoreUndo={restoreUndo}
         />
       </div>
     </aside>

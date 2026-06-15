@@ -16,6 +16,22 @@ export type AiApplyPatch = {
   };
 };
 
+export type AiUndoSnapshot = {
+  headline?: string;
+  summary?: string;
+  skills?: string[];
+  experience?: {
+    index: number;
+    blurb?: string;
+    bullets?: string[];
+  };
+};
+
+type PendingUndo = {
+  label: string;
+  snapshot: AiUndoSnapshot;
+};
+
 type ResultPanel = "headline" | "suggestions" | "ask" | null;
 
 type ResumeAiAssistProps = {
@@ -26,6 +42,7 @@ type ResumeAiAssistProps = {
   onApplySkills: (skills: string[]) => void;
   onApplyBullets: (index: number, blurb: string, bullets: string[]) => void;
   onApplyPatch: (patch: AiApplyPatch) => void;
+  onRestoreUndo: (snapshot: AiUndoSnapshot) => void;
 };
 
 const SECTION_COPY: Record<
@@ -62,6 +79,7 @@ export function ResumeAiAssist({
   onApplySkills,
   onApplyBullets,
   onApplyPatch,
+  onRestoreUndo,
 }: ResumeAiAssistProps) {
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -74,6 +92,7 @@ export function ResumeAiAssist({
   );
   const [activePanel, setActivePanel] = useState<ResultPanel>(null);
   const [suggestPass, setSuggestPass] = useState(0);
+  const [pendingUndo, setPendingUndo] = useState<PendingUndo | null>(null);
   const detailsRef = useRef<HTMLDetailsElement>(null);
 
   const isWorking = loading !== null;
@@ -81,6 +100,38 @@ export function ResumeAiAssist({
 
   function openAiPanel() {
     if (detailsRef.current) detailsRef.current.open = true;
+  }
+
+  function registerUndo(label: string, snapshot: AiUndoSnapshot) {
+    setPendingUndo({ label, snapshot });
+  }
+
+  function captureSnapshotForPatch(patch: AiApplyPatch): AiUndoSnapshot {
+    const snapshot: AiUndoSnapshot = {};
+    if (patch.headline !== undefined) snapshot.headline = data.headline;
+    if (patch.summary !== undefined) snapshot.summary = data.summary;
+    if (patch.skills !== undefined) snapshot.skills = [...data.skills];
+
+    const idx = patch.experience?.index;
+    if (idx !== undefined && data.experience[idx]) {
+      const role = data.experience[idx];
+      snapshot.experience = { index: idx };
+      if (patch.experience?.blurb !== undefined) {
+        snapshot.experience.blurb = role.blurb;
+      }
+      if (patch.experience?.bullets) {
+        snapshot.experience.bullets = [...role.bullets];
+      }
+    }
+
+    return snapshot;
+  }
+
+  function handleUndo() {
+    if (!pendingUndo) return;
+    onRestoreUndo(pendingUndo.snapshot);
+    setPendingUndo(null);
+    setAppliedSuggestion(null);
   }
 
   useEffect(() => {
@@ -91,6 +142,7 @@ export function ResumeAiAssist({
     setAppliedSuggestion(null);
     setActivePanel(null);
     setSuggestPass(0);
+    setPendingUndo(null);
   }, [sectionKey(section)]);
 
   async function run(
@@ -137,20 +189,30 @@ export function ResumeAiAssist({
       if (!res.ok) throw new Error(json.error || "Request failed");
 
       if (action === "polish-bullets" && opts?.experienceIndex !== undefined) {
-        onApplyBullets(
-          opts.experienceIndex,
-          json.blurb ?? "",
-          json.bullets ?? []
-        );
+        const index = opts.experienceIndex;
+        const role = data.experience[index];
+        const snapshot: AiUndoSnapshot = role
+          ? {
+              experience: {
+                index,
+                blurb: role.blurb,
+                bullets: [...role.bullets],
+              },
+            }
+          : {};
+        onApplyBullets(index, json.blurb ?? "", json.bullets ?? []);
+        registerUndo("Bullets polished", snapshot);
         setActivePanel(null);
         return true;
       }
       if (action === "suggest-skills") {
+        registerUndo("Skills updated", { skills: [...data.skills] });
         onApplySkills(json.skills ?? []);
         setActivePanel(null);
         return true;
       }
       if (action === "improve-summary") {
+        registerUndo("Summary updated", { summary: data.summary });
         onApplySummary(json.text ?? "");
         setActivePanel(null);
         return true;
@@ -180,7 +242,10 @@ export function ResumeAiAssist({
         return true;
       }
       if (action === "implement-suggestion") {
-        onApplyPatch(json.patch ?? {});
+        const patch = (json.patch ?? {}) as AiApplyPatch;
+        const snapshot = captureSnapshotForPatch(patch);
+        onApplyPatch(patch);
+        registerUndo("Suggestion applied", snapshot);
       }
       return true;
     } catch (err) {
@@ -262,6 +327,21 @@ export function ResumeAiAssist({
             </p>
           ) : null}
 
+          {pendingUndo ? (
+            <div className="flex items-center justify-between gap-3 rounded-[10px] border border-[#C8D8FF] bg-gradient-to-r from-[#F0F5FF] to-white px-3 py-2.5">
+              <span className="text-[12.5px] text-[#3a4250]">
+                {pendingUndo.label}
+              </span>
+              <button
+                type="button"
+                onClick={handleUndo}
+                className="cursor-pointer rounded-[8px] border border-[#C8D8FF] bg-white px-2.5 py-1 text-[12px] font-semibold text-[#2456D6] transition-colors hover:border-[#A8C0FF] hover:bg-[#F5F8FF]"
+              >
+                Undo
+              </button>
+            </div>
+          ) : null}
+
           {primaryAction ? (
             <button
               type="button"
@@ -315,6 +395,9 @@ export function ResumeAiAssist({
                   key={`${headline}-${i}`}
                   type="button"
                   onClick={() => {
+                    registerUndo("Headline updated", {
+                      headline: data.headline,
+                    });
                     onApplyHeadline(headline);
                     setHeadlineOptions([]);
                     setActivePanel(null);
