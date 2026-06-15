@@ -50,6 +50,62 @@ async function assertSafeHostname(hostname: string): Promise<void> {
   }
 }
 
+const BLOCKED_FETCH_HOSTS = ["indeed.com", "linkedin.com"];
+
+const BROWSER_HEADERS = {
+  Accept:
+    "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+  "Accept-Language": "en-US,en;q=0.9",
+  "Cache-Control": "no-cache",
+  "User-Agent":
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+};
+
+function hostMatches(hostname: string, pattern: string): boolean {
+  const host = hostname.toLowerCase().replace(/^www\./, "");
+  return host === pattern || host.endsWith(`.${pattern}`);
+}
+
+export function normalizeJobPostingUrl(urlString: string): string {
+  const url = new URL(urlString.trim());
+
+  if (hostMatches(url.hostname, "indeed.com")) {
+    const jk = url.searchParams.get("jk") || url.searchParams.get("vjk");
+    if (jk) {
+      return `https://www.indeed.com/viewjob?jk=${encodeURIComponent(jk)}`;
+    }
+    if (
+      url.pathname === "/" ||
+      url.pathname === "/jobs" ||
+      url.pathname.startsWith("/jobs/")
+    ) {
+      throw new Error(
+        "That looks like an Indeed search page. Open the job listing, then copy its URL (viewjob?jk=…) or paste the description using Paste text."
+      );
+    }
+  }
+
+  return url.toString();
+}
+
+function formatFetchError(url: URL, status: number): string {
+  if (
+    BLOCKED_FETCH_HOSTS.some((host) => hostMatches(url.hostname, host)) ||
+    status === 401 ||
+    status === 403
+  ) {
+    if (hostMatches(url.hostname, "indeed.com")) {
+      return "Indeed blocks automated imports. Open the job in your browser, select all on the page (or copy the description), then switch to Paste text and parse it.";
+    }
+    if (hostMatches(url.hostname, "linkedin.com")) {
+      return "LinkedIn blocks automated imports. Copy the job description from the page and use Paste text instead.";
+    }
+    return `That site blocked our import (${status}). Copy the job description from the page and use Paste text instead.`;
+  }
+
+  return `Could not fetch that page (${status}). Try Paste text with the job description copied from the page.`;
+}
+
 export async function assertSafeJobUrl(urlString: string): Promise<URL> {
   let url: URL;
   try {
@@ -102,15 +158,13 @@ export function htmlToPlainText(html: string): string {
 }
 
 export async function fetchJobPageText(urlString: string): Promise<string> {
-  let current = await assertSafeJobUrl(urlString);
+  const normalized = normalizeJobPostingUrl(urlString);
+  let current = await assertSafeJobUrl(normalized);
 
   for (let redirect = 0; redirect <= MAX_REDIRECTS; redirect++) {
     const res = await fetch(current.toString(), {
       method: "GET",
-      headers: {
-        Accept: "text/html,application/xhtml+xml,text/plain;q=0.9,*/*;q=0.8",
-        "User-Agent": "ResumeTrakr/1.0 JobImport",
-      },
+      headers: BROWSER_HEADERS,
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
       redirect: "manual",
     });
@@ -125,9 +179,7 @@ export async function fetchJobPageText(urlString: string): Promise<string> {
     }
 
     if (!res.ok) {
-      throw new Error(
-        `Could not fetch that page (${res.status}). Try pasting the description instead.`
-      );
+      throw new Error(formatFetchError(current, res.status));
     }
 
     const buffer = await res.arrayBuffer();

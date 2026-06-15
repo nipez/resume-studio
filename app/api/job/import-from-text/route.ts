@@ -1,5 +1,4 @@
 import { requireAIUser } from "@/lib/ai/auth";
-import { fetchJobPageText, normalizeJobPostingUrl } from "@/lib/job/fetch-job-url";
 import { parseJobPostingText } from "@/lib/job/parse-job-posting";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -8,7 +7,8 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 const bodySchema = z.object({
-  url: z.string().url().max(2048),
+  text: z.string().min(80).max(50_000),
+  sourceUrl: z.string().url().max(2048).optional(),
 });
 
 export async function POST(request: Request) {
@@ -21,13 +21,17 @@ export async function POST(request: Request) {
   try {
     body = bodySchema.parse(await request.json());
   } catch {
-    return NextResponse.json({ error: "Enter a valid URL." }, { status: 400 });
+    return NextResponse.json(
+      {
+        error:
+          "Paste the full job description (at least a few sentences) to parse.",
+      },
+      { status: 400 }
+    );
   }
 
   try {
-    const normalizedUrl = normalizeJobPostingUrl(body.url);
-    const pageText = await fetchJobPageText(normalizedUrl);
-    const result = await parseJobPostingText(pageText, normalizedUrl);
+    const result = await parseJobPostingText(body.text, body.sourceUrl);
     return NextResponse.json(result);
   } catch (err) {
     const message =

@@ -109,7 +109,7 @@ export function CoverPanel({ versions, defaultVersionId }: CoverPanelProps) {
                 jobDesc: fields.jobDesc,
               })
             }
-            hint="Paste a public job posting link. We'll fill the fields below — review before generating your letter."
+            hint="Career pages work via URL. For Indeed or LinkedIn, use Paste text."
             successMessage="Imported — review the fields below, then generate."
           />
           <div className="mt-3.5 grid grid-cols-2 gap-3">

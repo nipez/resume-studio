@@ -143,7 +143,7 @@ export function QAPanel({ versions, defaultVersionId }: QAPanelProps) {
               jobDesc: fields.jobDesc,
             })
           }
-          hint="Paste a public job posting link for better, role-specific answers."
+          hint="Career pages work via URL. For Indeed or LinkedIn, use Paste text."
           successMessage="Imported — job context updated below."
         />
         <div className="grid grid-cols-2 gap-3">
