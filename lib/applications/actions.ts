@@ -10,7 +10,7 @@ import type {
   LogApplicationInput,
   StatusHistoryEntry,
 } from "@/lib/applications/types";
-import { normalizeResumeSnapshot } from "@/lib/applications/utils";
+import { normalizeResumeSnapshot, parseJobFromVersionName } from "@/lib/applications/utils";
 import { getResumeVersion } from "@/lib/resume/actions";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
@@ -146,8 +146,9 @@ export async function logApplication(input: LogApplicationInput) {
   if (!version) throw new Error("Resume version not found");
 
   const tf = version.tailored_for;
-  const role = input.role?.trim() || tf?.role || "";
-  const company = input.company?.trim() || tf?.company || "";
+  const fromName = parseJobFromVersionName(version.name);
+  const role = input.role?.trim() || tf?.role || fromName.role || "";
+  const company = input.company?.trim() || tf?.company || fromName.company || "";
   const now = new Date().toISOString();
   const status: ApplicationStatus = "applied";
 

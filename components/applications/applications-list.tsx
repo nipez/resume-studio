@@ -10,6 +10,7 @@ import {
   APPLICATION_STATUSES,
   appEventLabel,
   appStatusMeta,
+  applicationListHeading,
   applicationTags,
   computeApplicationStats,
   formatAppDate,
@@ -23,6 +24,9 @@ import { useTransition } from "react";
 type ApplicationsListProps = {
   applications: Application[];
   defaultVersionId: string | null;
+  defaultVersionName?: string | null;
+  defaultVersionRole?: string;
+  defaultVersionCompany?: string;
 };
 
 function StatCard({
@@ -105,6 +109,9 @@ function StatusSelect({
 export function ApplicationsList({
   applications,
   defaultVersionId,
+  defaultVersionName,
+  defaultVersionRole = "",
+  defaultVersionCompany = "",
 }: ApplicationsListProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -134,7 +141,12 @@ export function ApplicationsList({
             </p>
           </div>
           {defaultVersionId ? (
-            <LogApplicationButton versionId={defaultVersionId} />
+            <LogApplicationButton
+              versionId={defaultVersionId}
+              resumeVersionName={defaultVersionName ?? "Resume"}
+              initialRole={defaultVersionRole}
+              initialCompany={defaultVersionCompany}
+            />
           ) : (
             <Link
               href="/library"
@@ -180,7 +192,7 @@ export function ApplicationsList({
             {applications.map((app) => {
               const tags = applicationTags(app);
               const nextEv = nextOpenEvent(app.events ?? []);
-              const title = app.role || app.resume_version_name || "Application";
+              const { primary, secondary } = applicationListHeading(app);
 
               return (
                 <div
@@ -192,11 +204,11 @@ export function ApplicationsList({
                     className="min-w-0 cursor-pointer no-underline"
                   >
                     <div className="truncate text-[14.5px] font-bold text-[#141821]">
-                      {title}
-                      {app.company && (
+                      {primary}
+                      {secondary && (
                         <span className="font-semibold text-[#8A92A0]">
                           {" "}
-                          · {app.company}
+                          · {secondary}
                         </span>
                       )}
                     </div>
@@ -248,9 +260,8 @@ export function ApplicationsList({
               No applications tracked yet
             </div>
             <div className="mt-1.5 text-[13px]">
-              Hit &ldquo;Log application&rdquo; here, or &ldquo;Log
-              application&rdquo; on any resume in your Library — it captures a
-              snapshot and shows up here.
+              Hit &ldquo;Log application&rdquo; and enter the role and company —
+              we&apos;ll snapshot the resume, cover letter, and Q&amp;A you used.
             </div>
           </div>
         )}

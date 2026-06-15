@@ -1,5 +1,5 @@
 import type { Application, ApplicationStatus } from "@/lib/applications/types";
-import { computeApplicationStats, todayISO } from "@/lib/applications/utils";
+import { computeApplicationStats, applicationInsightsTitle, todayISO } from "@/lib/applications/utils";
 
 // How far an application progressed. Later stages imply earlier ones.
 const STAGE_RANK: Record<ApplicationStatus, number> = {
@@ -148,7 +148,7 @@ export function computeInsights(apps: Application[]): InsightsData {
         type: event.type,
         title: event.title,
         appId: app.id,
-        appTitle: app.role || app.resume_version_name || "Application",
+        appTitle: applicationInsightsTitle(app),
         company: app.company,
         overdue: event.date < today,
       });

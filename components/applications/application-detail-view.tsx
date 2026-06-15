@@ -15,6 +15,7 @@ import {
   APPLICATION_STATUSES,
   appEventLabel,
   appStatusMeta,
+  applicationDetailTitle,
   eventDotColor,
   fitScoreStyle,
   formatAppDate,
@@ -49,9 +50,7 @@ export function ApplicationDetailView({
   const [mockMode, setMockMode] = useState(false);
 
   const statusMeta = appStatusMeta(app.status);
-  const title =
-    (app.role || app.resume_version_name || "Application") +
-    (app.company ? ` · ${app.company}` : "");
+  const title = applicationDetailTitle(app);
 
   const snapHtml = useMemo(
     () =>
@@ -204,6 +203,12 @@ export function ApplicationDetailView({
             </div>
             <div className="mt-0.5 text-[12.5px] text-[#8A92A0]">
               Applied {formatAppDate(app.applied_at)}
+              {app.resume_version_name ? (
+                <>
+                  {" "}
+                  · Resume: {app.resume_version_name}
+                </>
+              ) : null}
             </div>
           </div>
           <span

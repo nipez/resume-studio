@@ -93,6 +93,47 @@ export function applicationTags(app: Application): string[] {
   return tags;
 }
 
+/** Parse tailored version names like "VP of Growth · Acme Health". */
+export function parseJobFromVersionName(name: string): {
+  role: string;
+  company: string;
+} {
+  const trimmed = name.trim();
+  const sep = trimmed.indexOf(" · ");
+  if (sep === -1) return { role: "", company: "" };
+  return {
+    role: trimmed.slice(0, sep).trim(),
+    company: trimmed.slice(sep + 3).trim(),
+  };
+}
+
+export function applicationListHeading(app: Application): {
+  primary: string;
+  secondary: string | null;
+} {
+  const role = app.role?.trim() ?? "";
+  const company = app.company?.trim() ?? "";
+
+  if (role && company) return { primary: role, secondary: company };
+  if (role) return { primary: role, secondary: null };
+  if (company) return { primary: company, secondary: null };
+  return { primary: "Untitled application", secondary: null };
+}
+
+export function applicationDetailTitle(app: Application): string {
+  const role = app.role?.trim() ?? "";
+  const company = app.company?.trim() ?? "";
+
+  if (role && company) return `${role} · ${company}`;
+  if (role) return role;
+  if (company) return company;
+  return "Untitled application";
+}
+
+export function applicationInsightsTitle(app: Application): string {
+  return applicationDetailTitle(app);
+}
+
 export function nextOpenEvent(events: ApplicationEvent[]): ApplicationEvent | null {
   return (
     events
