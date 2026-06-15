@@ -7,6 +7,7 @@ import {
   saveGuidedDraft,
   type GuidedDraft,
 } from "@/lib/guided/actions";
+import { setStudentSegment, type StudentLevel } from "@/lib/profile/actions";
 import { buildResumeHTML } from "@/lib/resume/build-resume-html";
 import { createEmptyResumeData } from "@/lib/resume/defaults";
 import type {
@@ -61,16 +62,27 @@ type GuidedBuilderProps = {
   userName: string;
   userEmail: string;
   initialMode?: GuidedMode;
+  initialStudentLevel?: StudentLevel | null;
 };
+
+const STUDENT_LEVELS: { id: StudentLevel; label: string }[] = [
+  { id: "high_school", label: "High school" },
+  { id: "college", label: "College" },
+  { id: "other", label: "Other" },
+];
 
 export function GuidedBuilder({
   initialDraft,
   userName,
   userEmail,
   initialMode = "standard",
+  initialStudentLevel = null,
 }: GuidedBuilderProps) {
   const router = useRouter();
   const [mode, setMode] = useState<GuidedMode>(initialMode);
+  const [studentLevel, setStudentLevel] = useState<StudentLevel | null>(
+    initialStudentLevel
+  );
   const isStudent = mode === "student";
   const steps = stepsForMode(mode);
   const [step, setStep] = useState(initialDraft?.step ?? 0);
@@ -153,11 +165,28 @@ export function GuidedBuilder({
     if (next === "student" && data.education.length === 0) {
       updateData({ education: [{ school: "", degree: "", year: "" }] });
     }
+    // Remember the segment so /build opens in the right mode next time.
+    void setStudentSegment({
+      isStudent: next === "student",
+      studentLevel: next === "student" ? studentLevel : null,
+    }).catch(() => {});
+  }
+
+  function chooseLevel(level: StudentLevel) {
+    setStudentLevel(level);
+    void setStudentSegment({ isStudent: true, studentLevel: level }).catch(
+      () => {}
+    );
   }
 
   async function handleCreate() {
     setCreating(true);
     try {
+      if (isStudent) {
+        await setStudentSegment({ isStudent: true, studentLevel }).catch(
+          () => {}
+        );
+      }
       const { id } = await finishGuidedDraft({
         name: resumeName,
         templateStyle,
@@ -245,6 +274,29 @@ export function GuidedBuilder({
             <div className="mt-6">
               {current.id === "basics" ? (
                 <div className="space-y-3">
+                  {isStudent ? (
+                    <div>
+                      <div className="mb-1.5 text-xs font-semibold text-[#5A6573]">
+                        I&apos;m in
+                      </div>
+                      <div className="flex gap-2">
+                        {STUDENT_LEVELS.map((lvl) => (
+                          <button
+                            key={lvl.id}
+                            type="button"
+                            onClick={() => chooseLevel(lvl.id)}
+                            className={`flex-1 cursor-pointer rounded-[10px] border px-3 py-2 text-[13px] font-semibold transition-colors ${
+                              studentLevel === lvl.id
+                                ? "border-accent bg-[#EEF3FF] text-[#1E54E6]"
+                                : "border-[#DFE3E8] bg-white text-[#5A6573] hover:border-[#C8CED6]"
+                            }`}
+                          >
+                            {lvl.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
                   <Field label="Full name">
                     <input
                       className={inputClass}
