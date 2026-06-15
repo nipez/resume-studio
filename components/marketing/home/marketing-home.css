@@ -140,7 +140,10 @@
 .marketing-home .why-card p{font-size:15.5px;line-height:1.55;color:var(--muted);margin-top:12px;}
 
 /* comparison */
-.marketing-home .table-scroll{margin-top:48px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.marketing-home .table-scroll{margin-top:48px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;}
+@media (max-width:860px){
+.marketing-home .table-scroll-wrap .table-scroll{margin-top:16px;}
+}
 .marketing-home .ctable{min-width:760px;border:1px solid rgba(255,255,255,.1);border-radius:20px;overflow:hidden;}
 .marketing-home .crow{display:grid;grid-template-columns:1.1fr 1fr 1.2fr;border-top:1px solid rgba(255,255,255,.08);}
 .marketing-home .crow:first-child{border-top:none;}

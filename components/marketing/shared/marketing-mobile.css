@@ -1,0 +1,458 @@
+/* Shared mobile refinements for all marketing pages */
+
+/* ---- Hero CTAs & trust ---- */
+@media (max-width: 640px) {
+  .marketing-home .hero-cta,
+  .marketing-home .features-hero-cta,
+  .marketing-home .sub-hero-cta,
+  .marketing-home .aos-cta,
+  .marketing-home.students-page .students-hero-cta {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .marketing-home .hero-cta .btn-coral,
+  .marketing-home .features-hero-cta .btn-coral,
+  .marketing-home .sub-hero-cta .btn-coral,
+  .marketing-home .aos-cta .btn-coral,
+  .marketing-home.students-page .students-hero-cta .btn-coral {
+    width: 100%;
+    text-align: center;
+  }
+
+  .marketing-home .hero-cta .link-underline,
+  .marketing-home .features-hero-cta .link-underline,
+  .marketing-home .sub-hero-cta .link-underline,
+  .marketing-home .aos-cta .aos-ghost {
+    width: 100%;
+    text-align: center;
+    white-space: normal;
+  }
+
+  .marketing-home .aos-cta .aos-ghost {
+    justify-content: center;
+  }
+
+  .marketing-home .trust {
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  .marketing-home .snap-strip .inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 14px 0;
+    font-size: 13px;
+  }
+
+  .marketing-home .snap-strip .sep {
+    display: none;
+  }
+}
+
+/* ---- Compact loop fallback (replaces spinning diagram on very small screens) ---- */
+.marketing-home .loop-compact {
+  display: none;
+}
+
+@media (max-width: 520px) {
+  .marketing-home .loop-wrap {
+    display: none;
+  }
+
+  .marketing-home .loop-compact {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 8px;
+  }
+
+  .marketing-home .loop-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-height: 72px;
+    padding: 10px 8px;
+    border-radius: 14px;
+    border: 1px solid rgba(40, 20, 30, 0.08);
+    background: #fff;
+    box-shadow: 0 8px 22px -14px rgba(40, 20, 30, 0.22);
+    text-align: center;
+  }
+
+  .marketing-home .loop-chip .num {
+    font-family: var(--font-space-grotesk), sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    color: #b3aab8;
+  }
+
+  .marketing-home .loop-chip .lbl {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+
+  .marketing-home .loop-compact-core {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 4px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--coral), var(--coral-l));
+    color: #fff;
+    box-shadow: 0 14px 32px -12px rgba(255, 92, 56, 0.65);
+  }
+
+  .marketing-home .loop-compact-core .big {
+    font-family: var(--font-space-grotesk), sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .marketing-home .loop-compact-core .small {
+    font-size: 12px;
+    font-weight: 500;
+    opacity: 0.92;
+  }
+}
+
+/* ---- Comparison table scroll hint ---- */
+.marketing-home .table-scroll-wrap {
+  position: relative;
+}
+
+.marketing-home .table-scroll-hint {
+  display: none;
+}
+
+@media (max-width: 860px) {
+  .marketing-home .table-scroll-hint {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+    margin-bottom: -8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #b8aec2;
+  }
+
+  .marketing-home .table-scroll-hint::before {
+    content: "↔";
+    font-size: 16px;
+    color: var(--coral-l);
+  }
+}
+
+/* ---- Application OS page ---- */
+.marketing-home .aos-phases-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+@media (max-width: 860px) {
+  .marketing-home .aos-phases-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .marketing-home .aos-flow-strip {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 20px 18px;
+  }
+
+  .marketing-home .aos-flow-step {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .marketing-home .aos-flow-arrow {
+    display: none;
+  }
+
+  .marketing-home .aos-flow-loop {
+    margin-left: 0;
+    margin-top: 4px;
+    align-self: flex-start;
+  }
+
+  .marketing-home .aos-window-body {
+    grid-template-columns: 1fr;
+  }
+
+  .marketing-home .aos-side {
+    flex-direction: row;
+    flex-wrap: wrap;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    padding: 10px;
+    gap: 4px;
+  }
+
+  .marketing-home .aos-side .item {
+    flex: 1 1 calc(33.333% - 4px);
+    min-width: 0;
+    justify-content: center;
+    padding: 6px 4px;
+    font-size: 10px;
+    text-align: center;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .marketing-home .aos-side .item .ic {
+    margin: 0 auto;
+  }
+
+  .marketing-home .aos-loopback {
+    position: static;
+    margin-top: 12px;
+    align-self: flex-start;
+  }
+
+  .marketing-home .aos-mock-wrap {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .marketing-home .aos-stats {
+    gap: 20px 28px;
+  }
+
+  .marketing-home .aos-cta-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .marketing-home .aos-cta-row .btn-dark,
+  .marketing-home .aos-cta-row .link-underline {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .marketing-home .aos-hero h1 {
+    font-size: clamp(32px, 9vw, 44px);
+    line-height: 1.05;
+  }
+
+  .marketing-home .aos-sub {
+    font-size: 16px;
+  }
+}
+
+/* ---- Features page ---- */
+@media (max-width: 640px) {
+  .marketing-home .features-bento {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto;
+  }
+
+  .marketing-home .features-bento-tile {
+    min-height: 96px;
+  }
+
+  .marketing-home .features-chips {
+    gap: 6px;
+  }
+
+  .marketing-home .features-chip {
+    font-size: 11.5px;
+    padding: 6px 12px;
+  }
+}
+
+@media (max-width: 400px) {
+  .marketing-home .features-bento {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- Subpages (pricing, FAQ, blog, legal) ---- */
+@media (max-width: 640px) {
+  .marketing-home .sub-hero-inner {
+    padding: 20px 0 40px;
+  }
+
+  .marketing-home .sub-hero h1 {
+    font-size: clamp(34px, 9vw, 48px);
+  }
+
+  .marketing-home .sub-hero-sub {
+    font-size: 17px;
+    max-width: none;
+  }
+
+  .marketing-home .faq-item summary {
+    padding: 18px 20px;
+    font-size: 15px;
+    align-items: flex-start;
+  }
+
+  .marketing-home .faq-item .faq-a {
+    padding: 0 20px 18px 20px;
+    font-size: 14.5px;
+  }
+
+  .marketing-home .faq-item .faq-q {
+    gap: 10px;
+  }
+
+  .marketing-home .faq-item .faq-num {
+    width: 28px;
+    height: 28px;
+    font-size: 11px;
+  }
+
+  .marketing-home .blog-card {
+    padding: 22px 20px;
+  }
+
+  .marketing-home .blog-card h2 {
+    font-size: 22px;
+  }
+
+  .marketing-home .blog-article-header {
+    padding: 32px 0 24px;
+  }
+
+  .marketing-home .legal-prose h2 {
+    font-size: 20px;
+  }
+
+  .marketing-home .tier-tags {
+    gap: 8px;
+  }
+
+  .marketing-home .tier-tag {
+    font-size: 12.5px;
+    padding: 8px 14px;
+  }
+
+  .marketing-home .beta-note {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    font-size: 13px;
+  }
+}
+
+/* ---- Home page extras ---- */
+@media (max-width: 640px) {
+  .marketing-home .home-module-links {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .marketing-home .replace {
+    padding: 20px;
+  }
+
+  .marketing-home .replace b {
+    font-size: 17px;
+  }
+
+  .marketing-home .replace span {
+    font-size: 15px;
+  }
+
+  .marketing-home .moat {
+    padding: 22px 20px;
+    gap: 16px;
+  }
+
+  .marketing-home .moat p {
+    font-size: 16px;
+  }
+
+  .marketing-home section:not(.hero):not(.aos-hero):not(.features-hero):not(.sub-hero):not(.students-hero) {
+    padding: 56px 0;
+  }
+
+  .marketing-home .cta-sec {
+    padding: 0 0 64px;
+  }
+
+  .marketing-home .cta h2 {
+    font-size: clamp(28px, 8vw, 38px);
+  }
+
+  .marketing-home .cta p {
+    font-size: 17px;
+  }
+
+  .marketing-home .cta .btn-dark {
+    width: 100%;
+  }
+
+  .marketing-home .sec-head h2 {
+    font-size: clamp(28px, 7.5vw, 36px);
+  }
+
+  .marketing-home .sec-head p {
+    font-size: 16px;
+  }
+
+  .marketing-home .plan {
+    padding: 26px 22px;
+  }
+
+  .marketing-home .priceline .amt {
+    font-size: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .marketing-home .wrap {
+    padding: 0 16px;
+  }
+
+  .marketing-home .hero h1 {
+    font-size: clamp(34px, 10vw, 44px);
+  }
+
+  .marketing-home .eyebrow {
+    font-size: 11.5px;
+    padding: 5px 12px;
+  }
+}
+
+/* ---- Students page ---- */
+@media (max-width: 640px) {
+  .marketing-home.students-page .students-hero-grid {
+    padding: 20px 0 40px;
+  }
+
+  .marketing-home.students-page .students-hero h1 {
+    font-size: clamp(34px, 9vw, 44px);
+  }
+
+  .marketing-home.students-page .students-hero-sub {
+    font-size: 16px;
+    max-width: none;
+  }
+
+  .marketing-home.students-page .students-hero-card {
+    padding: 22px 20px;
+  }
+
+  .marketing-home.students-page .students-plan-price {
+    font-size: 36px;
+  }
+
+  .marketing-home.students-page .students-template-row {
+    gap: 24px;
+  }
+}
