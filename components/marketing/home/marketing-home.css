@@ -87,7 +87,7 @@
 .marketing-home .sep{color:#c8bfc8;}
 
 /* sections */
-.marketing-home section:not(.hero):not(.aos-hero):not(.features-hero){padding:104px 0;}
+.marketing-home section:not(.hero):not(.aos-hero):not(.features-hero):not(.sub-hero):not(.students-hero){padding:104px 0;}
 .marketing-home .sec-head{max-width:660px;}
 .marketing-home .sec-head.center{text-align:center;margin:0 auto;}
 .marketing-home .sec-head h2{font-size:clamp(32px,4.6vw,48px);line-height:1.04;margin-top:20px;color:var(--ink);}

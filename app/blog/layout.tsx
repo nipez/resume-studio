@@ -8,7 +8,7 @@ export default function BlogLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-page font-sans text-ink">
+    <div className="min-h-screen overflow-x-hidden bg-[#fbf6f2] font-sans text-[#231a2e] antialiased">
       <BetaBanner />
       <MarketingHeader />
       {children}
