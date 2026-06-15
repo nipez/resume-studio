@@ -1,9 +1,10 @@
 import { getAllBlogPosts } from "@/lib/marketing/blog";
+import { SITE_NAME } from "@/lib/marketing/content";
 import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Blog — Resume Studio",
+  title: `Blog — ${SITE_NAME}`,
   description:
     "Product updates, job search strategy, and why we're building a different kind of resume tool.",
 };

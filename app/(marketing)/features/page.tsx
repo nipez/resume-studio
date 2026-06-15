@@ -5,11 +5,11 @@ import { HowItWorks } from "@/components/marketing/how-it-works";
 import { MarketingCta } from "@/components/marketing/marketing-cta";
 import { MeshBackground } from "@/components/marketing/primitives";
 import { TemplateGallery } from "@/components/marketing/template-gallery";
-import { SITE_DESCRIPTION } from "@/lib/marketing/content";
+import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/marketing/content";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Features — Resume Studio",
+  title: `Features — ${SITE_NAME}`,
   description: SITE_DESCRIPTION,
 };
 

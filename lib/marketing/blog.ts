@@ -9,18 +9,18 @@ export type BlogPost = {
 
 export const BLOG_POSTS: BlogPost[] = [
   {
-    slug: "welcome-to-resume-studio",
-    title: "Welcome to Resume Studio",
+    slug: "welcome-to-resumetrakr",
+    title: "Welcome to ResumeTrakr",
     excerpt:
       "We're building the application OS job seekers actually need — not another one-off resume generator.",
     publishedAt: "2025-06-14",
-    author: "Resume Studio Team",
+    author: "ResumeTrakr Team",
     content: `
 ## Why we exist
 
 Job search is fragmented. Most people bounce between a resume builder, a keyword scanner, a spreadsheet for applications, and a doc folder for cover letters — then lose track of what they actually sent where.
 
-**Resume Studio** is one calm workspace for the full loop: resume library, tailor per job, cover letters, application Q&A, tracking, and insights — with immutable snapshots of exactly what you submitted.
+**ResumeTrakr** is one calm workspace for the full loop: resume library, tailor per job, cover letters, application Q&A, tracking, and insights — with immutable snapshots of exactly what you submitted.
 
 We're in beta now. Everything is free while we build. [Sign in](/login) and start with your resume library.
 
@@ -36,7 +36,7 @@ Here's how we're different — and why we think it matters:
 
 resumestudio.ai is built around credits: paste a job, upload a resume, get an optimized PDF. Useful for a single application. But there's no library of versions, no application tracker, no record of what you sent, and no way to learn across applications.
 
-Resume Studio is an **application OS** — built for people running a multi-month search across dozens of roles.
+ResumeTrakr is an **application OS** — built for people running a multi-month search across dozens of roles.
 
 ### Honest AI vs. keyword stuffing
 
@@ -44,7 +44,7 @@ Many resume tools optimize for ATS match scores and invented metrics. Our AI is 
 
 ### Snapshots change everything
 
-When you log an application in Resume Studio, we freeze the exact resume, cover letter, and Q&A you sent. Later, when you want insights — what worked, what didn't, which bullets correlated with interviews — that data is still tied to what you actually submitted. Competitors break this the moment your master resume changes.
+When you log an application in ResumeTrakr, we freeze the exact resume, cover letter, and Q&A you sent. Later, when you want insights — what worked, what didn't, which bullets correlated with interviews — that data is still tied to what you actually submitted. Competitors break this the moment your master resume changes.
 
 ### Pricing that respects unemployment
 

@@ -6,6 +6,9 @@ import {
   HOW_IT_WORKS,
   POSITIONING_PILLARS,
   PRICING_PLANS,
+  SITE_NAME,
+  SITE_TAGLINE_PRIMARY,
+  SITE_TAGLINE_SECONDARY,
   TESTIMONIALS,
 } from "@/lib/marketing/content";
 import { MarketingHomeTemplates } from "./marketing-home-templates";
@@ -43,7 +46,7 @@ export function MarketingHomePage() {
               One system for your <span className="serif-i">entire</span> job search.
             </h1>
             <p className="hero-sub">
-              Library, tailor, cover letters, Q&amp;A, tracking, and insights — connected in one workspace. Every send is snapshotted so you know what&apos;s actually working.
+              {SITE_TAGLINE_PRIMARY} {SITE_TAGLINE_SECONDARY} Library, tailor, cover letters, Q&amp;A, tracking, and insights — connected in one workspace.
             </p>
             <div className="hero-cta">
               <Link href="/login" className="btn btn-coral">
@@ -128,7 +131,7 @@ export function MarketingHomePage() {
           <Reveal className="replace">
             <span className="rlogo">R</span>
             <div>
-              <b>Resume Studio replaces the stack.</b>
+              <b>{SITE_NAME} replaces the stack.</b>
               <span>
                 {" "}
                 One application OS with six integrated modules, pricing from $2.99/mo, and snapshots that keep your history honest.
@@ -170,7 +173,7 @@ export function MarketingHomePage() {
             <div>
               <span className="label">The moat</span>
               <p>
-                When you log an application, Resume Studio freezes the exact resume, cover letter, and Q&amp;A you sent. Insights stay tied to reality — even as your master resume evolves.
+                When you log an application, {SITE_NAME} freezes the exact resume, cover letter, and Q&amp;A you sent. Insights stay tied to reality — even as your master resume evolves.
               </p>
             </div>
           </Reveal>
@@ -182,11 +185,11 @@ export function MarketingHomePage() {
           <Reveal className="sec-head" style={{ maxWidth: 680 }}>
             <span className="eyebrow" style={{ background: "var(--cream)" }}>
               <span className="dot" />
-              Why Resume Studio
+              Why {SITE_NAME}
             </span>
             <h2>Why an application OS beats another resume builder.</h2>
             <p>
-              The market is split between expensive ATS scanners, tracker-first tools with weekly AI pricing, and builders with trial traps. Resume Studio is the honest, affordable middle: one workspace from first draft to interview prep.
+              The market is split between expensive ATS scanners, tracker-first tools with weekly AI pricing, and builders with trial traps. {SITE_NAME} is the honest, affordable middle: one workspace from first draft to interview prep.
             </p>
           </Reveal>
           <Reveal className="why-grid">
@@ -216,7 +219,7 @@ export function MarketingHomePage() {
               Serious searches need a system.
             </h2>
             <p>
-              Credit-based generators optimize a moment. Resume Studio optimizes the entire search — with versions, tracking, snapshots, and insights that compound over months.
+              Credit-based generators optimize a moment. {SITE_NAME} optimizes the entire search — with versions, tracking, snapshots, and insights that compound over months.
             </p>
           </Reveal>
           <Reveal className="table-scroll">
@@ -226,7 +229,7 @@ export function MarketingHomePage() {
                 <div className="c2">AI resume generators</div>
                 <div className="c3">
                   <span className="sq" />
-                  Resume Studio · Application OS
+                  {SITE_NAME} · Application OS
                 </div>
               </div>
               {GENERATOR_VS_OS.slice(0, 6).map((row) => (
@@ -361,7 +364,7 @@ export function MarketingHomePage() {
                 Free during beta. The application OS — not another credit-based PDF generator.
               </p>
               <Link href="/login" className="btn btn-dark">
-                Open Resume Studio
+                Open {SITE_NAME}
               </Link>
               <div className="fine">No credit card · Magic link sign-in</div>
             </div>

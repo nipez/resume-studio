@@ -1,4 +1,5 @@
 import { getAllBlogPosts, getBlogPost } from "@/lib/marketing/blog";
+import { SITE_NAME } from "@/lib/marketing/content";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -19,7 +20,7 @@ export async function generateMetadata({
   if (!post) return { title: "Post not found" };
 
   return {
-    title: `${post.title} — Resume Studio`,
+    title: `${post.title} — ${SITE_NAME}`,
     description: post.excerpt,
   };
 }

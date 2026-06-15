@@ -1,5 +1,5 @@
 import { GlowCard } from "@/components/marketing/primitives";
-import { FRAGMENTED_STACK } from "@/lib/marketing/content";
+import { FRAGMENTED_STACK, SITE_NAME } from "@/lib/marketing/content";
 
 export function FragmentedStack() {
   return (
@@ -25,7 +25,7 @@ export function FragmentedStack() {
               hover={false}
             >
               <p className="font-display text-lg font-semibold text-ink">
-                Resume Studio replaces the stack.
+                {SITE_NAME} replaces the stack.
               </p>
               <p className="mt-2 text-[14px] leading-relaxed text-muted">
                 One application OS with six integrated modules, subscription

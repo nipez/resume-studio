@@ -9,6 +9,7 @@ import { StudentTestimonials } from "@/components/marketing/student-testimonials
 import { StudentUseCases } from "@/components/marketing/student-use-cases";
 import {
   BETA_BANNER,
+  SITE_NAME,
   STUDENT_HIGHLIGHTS,
   STUDENT_PERSONAS,
   STUDENT_RESUME_SECTIONS,
@@ -17,11 +18,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Students — First Resume & Cover Letter Builder | Resume Studio",
+  title: `Students — First Resume & Cover Letter Builder | ${SITE_NAME}`,
   description:
     "High school and college students: build your first resume from clubs, sports, volunteering, and honors. Three templates, guided builder, cover letters for part-time jobs and internships. $2.99/mo — free during beta.",
   openGraph: {
-    title: "Students — Resume Studio",
+    title: `Students — ${SITE_NAME}`,
     description:
       "Your first resume shouldn't start with a blank page. Guided builder, student templates, and cover letters for part-time jobs and internships.",
   },
@@ -44,7 +45,7 @@ export default function StudentsPage() {
           </h1>
           <p className="mt-5 max-w-2xl text-[16px] leading-relaxed text-muted">
             Honor society. Varsity captain. Food bank shifts. Debate team.
-            Resume Studio turns what you&apos;ve actually done into a real
+            {SITE_NAME} turns what you&apos;ve actually done into a real
             resume — plus cover letters for part-time jobs, camp counselor
             gigs, and summer internships.
           </p>

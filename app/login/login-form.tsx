@@ -1,6 +1,7 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
+import { SITE_NAME } from "@/lib/marketing/content";
 import { useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
 
@@ -49,7 +50,7 @@ export default function LoginForm() {
           </div>
           <div>
             <h1 className="font-display text-xl font-semibold tracking-tight text-ink">
-              Resume Studio
+              {SITE_NAME}
             </h1>
             <p className="text-[12px] text-muted">Sign in to your account</p>
           </div>

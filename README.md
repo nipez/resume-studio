@@ -1,4 +1,4 @@
-# Resume Studio
+# ResumeTrakr
 
 AI-assisted resume and job-application platform. Production rebuild of the
 `Resume Builder/Resume Studio.dc.html` prototype on **Next.js 14 + Supabase + Railway**.

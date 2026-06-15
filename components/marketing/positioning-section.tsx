@@ -1,5 +1,5 @@
 import { GlowCard, SectionHeader } from "@/components/marketing/primitives";
-import { POSITIONING_PILLARS } from "@/lib/marketing/content";
+import { POSITIONING_PILLARS, SITE_NAME } from "@/lib/marketing/content";
 
 export function PositioningSection() {
   return (
@@ -7,9 +7,9 @@ export function PositioningSection() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_0%_50%,rgba(47,107,255,0.04),transparent_50%)]" />
       <div className="relative mx-auto max-w-6xl px-6">
         <SectionHeader
-          eyebrow="Why Resume Studio"
+          eyebrow={`Why ${SITE_NAME}`}
           title="Why an application OS beats another resume builder"
-          description="The market is split between expensive ATS scanners ($50/mo), tracker-first tools with weekly AI pricing ($13/week), and builders with trial traps. Resume Studio is the honest, affordable middle: one workspace from first draft to interview prep."
+          description={`The market is split between expensive ATS scanners ($50/mo), tracker-first tools with weekly AI pricing ($13/week), and builders with trial traps. ${SITE_NAME} is the honest, affordable middle: one workspace from first draft to interview prep.`}
         />
 
         <div className="mt-14 grid gap-5 md:grid-cols-2">

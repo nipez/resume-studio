@@ -1,10 +1,11 @@
 import { MarketingCta } from "@/components/marketing/marketing-cta";
 import { MeshBackground } from "@/components/marketing/primitives";
 import { PricingCards } from "@/components/marketing/pricing-cards";
+import { SITE_NAME } from "@/lib/marketing/content";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Pricing — Resume Studio",
+  title: `Pricing — ${SITE_NAME}`,
   description:
     "Subscription pricing for the application OS — not credit packs. Student $2.99/mo. Essentials $4.99/mo. Pro $12/mo. Free during beta.",
 };
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
 const COMPARISON_SNIPPETS = [
   { tool: "AI generators", cost: "$9–29/mo", note: "Credit packs, no tracking" },
   { tool: "ATS scanners", cost: "$50/mo", note: "Score only, no workspace" },
-  { tool: "Resume Studio", cost: "From $2.99", note: "Full application OS" },
+  { tool: SITE_NAME, cost: "From $2.99", note: "Full application OS" },
 ];
 
 export default function PricingPage() {
@@ -29,8 +30,7 @@ export default function PricingPage() {
             Honest pricing for a tough job market
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-[16px] leading-relaxed text-[#AEB6C2]">
-            AI generators charge per credit. Scanners charge $50/mo. Resume
-            Studio is subscription pricing for the full application OS — from
+            AI generators charge per credit. Scanners charge $50/mo. {SITE_NAME} is subscription pricing for the full application OS — from
             $2.99 for students and $4.99 for the workspace without AI.
           </p>
           <div className="mx-auto mt-8 grid max-w-2xl gap-3 sm:grid-cols-3">
@@ -38,13 +38,13 @@ export default function PricingPage() {
               <div
                 key={item.tool}
                 className={`rounded-xl border px-4 py-3 ${
-                  item.tool === "Resume Studio"
+                  item.tool === SITE_NAME
                     ? "border-accent/40 bg-accent/10"
                     : "border-white/10 bg-white/5"
                 }`}
               >
                 <div
-                  className={`text-[12px] font-bold uppercase tracking-wider ${item.tool === "Resume Studio" ? "text-[#7FA6FF]" : "text-[#6E7686]"}`}
+                  className={`text-[12px] font-bold uppercase tracking-wider ${item.tool === SITE_NAME ? "text-[#7FA6FF]" : "text-[#6E7686]"}`}
                 >
                   {item.tool}
                 </div>

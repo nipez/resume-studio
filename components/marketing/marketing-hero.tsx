@@ -2,7 +2,7 @@ import { MeshBackground } from "@/components/marketing/primitives";
 import { ScaledResumePreview } from "@/components/resume/resume-preview";
 import { buildResumeHTML } from "@/lib/resume/build-resume-html";
 import { SAMPLE_RESUME_DATA } from "@/lib/resume/sample-data";
-import { SITE_TAGLINE } from "@/lib/marketing/content";
+import { SITE_NAME, SITE_TAGLINE, SITE_TAGLINE_PRIMARY, SITE_TAGLINE_SECONDARY } from "@/lib/marketing/content";
 import Link from "next/link";
 
 const previewHtml = buildResumeHTML({
@@ -37,10 +37,8 @@ export function MarketingHero() {
               </span>
             </h1>
             <p className="mt-6 max-w-xl text-[16px] leading-relaxed text-[#AEB6C2] sm:text-[17px]">
-              Resume Studio is the application OS — library, tailor, cover
-              letters, Q&A, tracking, and insights connected in one workspace.
-              Every send is snapshotted so you know what&apos;s actually
-              working.
+              {SITE_TAGLINE_PRIMARY} {SITE_TAGLINE_SECONDARY} Library, tailor, cover
+              letters, Q&amp;A, tracking, and insights — connected in one workspace.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
@@ -111,12 +109,12 @@ export function MarketingHero() {
                 <span className="h-2.5 w-2.5 rounded-full bg-[#FEBC2E]" />
                 <span className="h-2.5 w-2.5 rounded-full bg-[#28C840]" />
                 <span className="ml-2 text-[10px] font-medium text-[#6E7686]">
-                  Resume Studio
+                  {SITE_NAME}
                 </span>
               </div>
               <ScaledResumePreview
                 html={previewHtml}
-                title="Resume Studio preview"
+                title={`${SITE_NAME} preview`}
               />
             </div>
           </div>

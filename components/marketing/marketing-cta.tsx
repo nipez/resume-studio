@@ -1,3 +1,4 @@
+import { SITE_NAME } from "@/lib/marketing/content";
 import { MeshBackground } from "@/components/marketing/primitives";
 import Link from "next/link";
 
@@ -29,7 +30,7 @@ export function MarketingCta({
           href="/login"
           className="mt-10 inline-flex rounded-[11px] bg-accent px-8 py-3.5 text-[14px] font-semibold text-white shadow-[0_4px_20px_rgba(47,107,255,0.45)] transition hover:bg-accent-dark hover:shadow-[0_6px_28px_rgba(47,107,255,0.55)]"
         >
-          Open Resume Studio
+          Open {SITE_NAME}
         </Link>
         <p className="mt-5 text-[12.5px] text-[#6E7686]">
           No credit card · Magic link sign-in

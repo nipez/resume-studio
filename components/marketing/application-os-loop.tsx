@@ -5,7 +5,7 @@ import {
   MeshBackground,
   SectionHeader,
 } from "@/components/marketing/primitives";
-import { APPLICATION_OS_LOOP } from "@/lib/marketing/content";
+import { APPLICATION_OS_LOOP, SITE_NAME } from "@/lib/marketing/content";
 
 export function ApplicationOsLoop() {
   return (
@@ -63,7 +63,7 @@ export function ApplicationOsLoop() {
             </div>
             <p className="text-[14px] leading-relaxed text-[#D4F0E3]">
               <span className="font-semibold text-white">The moat:</span> when
-              you log an application, Resume Studio freezes the exact resume,
+              you log an application, {SITE_NAME} freezes the exact resume,
               cover letter, and Q&A you sent. Insights stay tied to reality —
               even as your master resume evolves.
             </p>

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { MarketingBrand } from "@/components/marketing/marketing-brand";
-import { NAV_LINKS, SITE_DESCRIPTION } from "@/lib/marketing/content";
+import { NAV_LINKS, SITE_DESCRIPTION, SITE_NAME } from "@/lib/marketing/content";
 
 export function MarketingFooter() {
   return (
@@ -46,7 +46,7 @@ export function MarketingFooter() {
         </div>
 
         <div className="flex flex-col items-start justify-between gap-2.5 pt-7 text-[13.5px] text-[#7a7184] sm:flex-row sm:items-center">
-          <span>© {new Date().getFullYear()} Resume Studio. All rights reserved.</span>
+          <span>© {new Date().getFullYear()} {SITE_NAME}. All rights reserved.</span>
           <span>Built for serious job searches.</span>
         </div>
       </div>

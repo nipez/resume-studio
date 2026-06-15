@@ -1,5 +1,5 @@
 import { SectionHeader } from "@/components/marketing/primitives";
-import { COMPETITOR_COMPARISON } from "@/lib/marketing/content";
+import { COMPETITOR_COMPARISON, SITE_NAME } from "@/lib/marketing/content";
 
 function CellValue({ value }: { value: boolean | string }) {
   if (value === true) {
@@ -35,7 +35,7 @@ export function ComparisonTable() {
               <tr className="bg-page text-[12px] font-bold uppercase tracking-wider text-muted">
                 <th className="px-5 py-4">Feature</th>
                 <th className="bg-accent/10 px-5 py-4 text-accent">
-                  Resume Studio · Application OS
+                  {SITE_NAME} · Application OS
                 </th>
                 <th className="px-5 py-4">Teal</th>
                 <th className="px-5 py-4">Jobscan</th>

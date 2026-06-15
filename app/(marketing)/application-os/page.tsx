@@ -4,12 +4,12 @@ import { GeneratorVsOs } from "@/components/marketing/generator-vs-os";
 import { MarketingCta } from "@/components/marketing/marketing-cta";
 import { MeshBackground } from "@/components/marketing/primitives";
 import { PositioningSection } from "@/components/marketing/positioning-section";
-import { SITE_DESCRIPTION } from "@/lib/marketing/content";
+import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/marketing/content";
 import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Application OS — Resume Studio",
+  title: `Application OS — ${SITE_NAME}`,
   description: SITE_DESCRIPTION,
 };
 
@@ -50,7 +50,7 @@ export default function ApplicationOsPage() {
             </span>
           </h1>
           <p className="mt-6 max-w-2xl text-[16px] leading-relaxed text-[#AEB6C2]">
-            Resume Studio connects resume versions, job-specific tailoring,
+            {SITE_NAME} connects resume versions, job-specific tailoring,
             cover letters, application Q&A, tracking, and insights in one
             closed loop — with immutable snapshots of every send.
           </p>

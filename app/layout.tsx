@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Instrument_Sans, Instrument_Serif, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+import { SITE_DESCRIPTION, SITE_TITLE, SITE_URL } from "@/lib/marketing/content";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -22,9 +23,9 @@ const instrumentSerif = Instrument_Serif({
 });
 
 export const metadata: Metadata = {
-  title: "Resume Studio — The application OS for job search",
-  description:
-    "The application OS for serious job searches — resume library, tailor, cover letters, Q&A, tracking, and insights with immutable snapshots. From $2.99/mo.",
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
+  metadataBase: new URL(SITE_URL),
 };
 
 export default function RootLayout({

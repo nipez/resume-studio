@@ -1,6 +1,6 @@
 import { NavIcon, type NavIconName } from "@/components/icons/nav-icons";
 import { GlowCard, SectionHeader } from "@/components/marketing/primitives";
-import { FEATURES } from "@/lib/marketing/content";
+import { FEATURES, SITE_NAME } from "@/lib/marketing/content";
 
 type FeatureGridProps = {
   title?: string;
@@ -10,7 +10,7 @@ type FeatureGridProps = {
 
 export function FeatureGrid({
   title = "Everything in one calm workspace",
-  description = "No more scattered docs and half-finished drafts. Resume Studio keeps your resumes, letters, and applications organized.",
+  description = `No more scattered docs and half-finished drafts. ${SITE_NAME} keeps your resumes, letters, and applications organized.`,
   limit,
 }: FeatureGridProps) {
   const items = limit ? FEATURES.slice(0, limit) : FEATURES;

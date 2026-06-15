@@ -1,9 +1,17 @@
-export const SITE_NAME = "Resume Studio";
+export const SITE_NAME = "ResumeTrakr";
+export const SITE_URL = "https://resumetrakr.com";
 
-export const SITE_TAGLINE = "The application OS";
+export const SITE_TAGLINE = "Application OS";
 
-export const SITE_DESCRIPTION =
-  "The application OS for serious job searches — resume library, tailor, cover letters, Q&A, tracking, and insights in one workspace with immutable snapshots.";
+export const SITE_TAGLINE_PRIMARY =
+  "Track every application, resume to offer.";
+
+export const SITE_TAGLINE_SECONDARY =
+  "The application OS that tracks what you actually sent.";
+
+export const SITE_TITLE = `${SITE_NAME} — track every application, resume to offer`;
+
+export const SITE_DESCRIPTION = `${SITE_TAGLINE_PRIMARY} ${SITE_TAGLINE_SECONDARY} Resume library, tailor, cover letters, Q&A, tracking, and insights in one workspace with immutable snapshots.`;
 
 export const BETA_BANNER =
   "Free during beta — all plans unlocked while we build. Pricing below is what launches at GA.";
@@ -145,7 +153,7 @@ export const POSITIONING_PILLARS = [
   {
     title: "An operating system — not a one-shot generator",
     description:
-      "Credit-based tools give you a PDF and move on. Resume Studio is the application OS: six connected modules from first draft to interview prep, with one login and one source of truth.",
+      "Credit-based tools give you a PDF and move on. ResumeTrakr is the application OS: six connected modules from first draft to interview prep, with one login and one source of truth.",
     accent: "Application OS",
   },
   {
@@ -157,7 +165,7 @@ export const POSITIONING_PILLARS = [
   {
     title: "AI that reframes — never invents",
     description:
-      "Competitors optimize for ATS match scores and keyword stuffing. Resume Studio is prompt-engineered to reposition your real experience, not fabricate roles or metrics.",
+      "Competitors optimize for ATS match scores and keyword stuffing. ResumeTrakr is prompt-engineered to reposition your real experience, not fabricate roles or metrics.",
     accent: "Honest AI",
   },
   {
@@ -480,7 +488,7 @@ export const STUDENT_FAQ_ITEMS = [
 export const TESTIMONIALS = [
   {
     quote:
-      "I was juggling Teal for tracking, Jobscan for keywords, and a Google Doc for cover letters. Resume Studio is the first application OS that felt like one system — not five tabs.",
+      "I was juggling Teal for tracking, Jobscan for keywords, and a Google Doc for cover letters. ResumeTrakr is the first application OS that felt like one system — not five tabs.",
     name: "Jordan M.",
     role: "Product marketing · 47 applications tracked",
   },
@@ -502,20 +510,20 @@ export const FAQ_ITEMS = [
   {
     question: "What is an 'application OS'?",
     answer:
-      "An application OS is a single system for your entire job search — not just resume generation. Resume Studio connects library, tailoring, cover letters, Q&A, application tracking, and insights in one workspace. Every send is snapshotted so you can learn what actually works over a multi-month search.",
+      "An application OS is a single system for your entire job search — not just resume generation. ResumeTrakr connects library, tailoring, cover letters, Q&A, application tracking, and insights in one workspace. Every send is snapshotted so you can learn what actually works over a multi-month search.",
   },
   {
     question: "How is this different from resumestudio.ai or other AI generators?",
     answer:
-      "AI generators optimize one PDF per job and charge per credit. They're fast for a handful of applications. Resume Studio is built for serious searches: multiple resume versions, application tracking, immutable snapshots, and cross-app insights — with subscription pricing that doesn't punish volume.",
+      "AI generators optimize one PDF per job and charge per credit. They're fast for a handful of applications. ResumeTrakr is built for serious searches: multiple resume versions, application tracking, immutable snapshots, and cross-app insights — with subscription pricing that doesn't punish volume.",
   },
   {
-    question: "How is Resume Studio different from Teal or Jobscan?",
+    question: "How is ResumeTrakr different from Teal or Jobscan?",
     answer:
-      "Teal is a strong tracker + resume matcher ($9–13/week for AI). Jobscan is an ATS scanner ($50/mo). Resume Studio is the application OS that covers the full loop — tailor, cover letter, Q&A, tracking, and insights — with immutable snapshots of what you actually sent. Plus honest AI that won't invent experience.",
+      "Teal is a strong tracker + resume matcher ($9–13/week for AI). Jobscan is an ATS scanner ($50/mo). ResumeTrakr is the application OS that covers the full loop — tailor, cover letter, Q&A, tracking, and insights — with immutable snapshots of what you actually sent. Plus honest AI that won't invent experience.",
   },
   {
-    question: "Does Resume Studio invent experience I don't have?",
+    question: "Does ResumeTrakr invent experience I don't have?",
     answer:
       "No. Tailoring and AI drafts only reframe your real input. The prompts explicitly forbid fabricating credentials, roles, or metrics.",
   },

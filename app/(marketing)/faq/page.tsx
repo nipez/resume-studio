@@ -1,12 +1,13 @@
 import { FaqList } from "@/components/marketing/faq-list";
 import { MarketingCta } from "@/components/marketing/marketing-cta";
 import { MeshBackground } from "@/components/marketing/primitives";
+import { SITE_NAME } from "@/lib/marketing/content";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "FAQ — Resume Studio",
+  title: `FAQ — ${SITE_NAME}`,
   description:
-    "What is an application OS? How Resume Studio differs from AI generators, Teal, and Jobscan. Snapshots, pricing, and honest AI.",
+    `What is an application OS? How ${SITE_NAME} differs from AI generators, Teal, and Jobscan. Snapshots, pricing, and honest AI.`,
 };
 
 export default function FaqPage() {

@@ -3,6 +3,7 @@
 import { Logo } from "@/components/brand/logo";
 import { NavIcon, type NavIconName } from "@/components/icons/nav-icons";
 import { SignOutButton } from "@/components/sign-out-button";
+import { SITE_NAME } from "@/lib/marketing/content";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -54,7 +55,7 @@ export function AppShell({
           />
           <div>
             <div className="font-display text-[15.5px] font-semibold tracking-[-0.01em] text-white">
-              Resume Studio
+              {SITE_NAME}
             </div>
             <div className="mt-px text-[11.5px] text-sidebar-subtle">
               {userName}

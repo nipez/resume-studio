@@ -1,5 +1,5 @@
 import { SectionHeader } from "@/components/marketing/primitives";
-import { GENERATOR_VS_OS } from "@/lib/marketing/content";
+import { GENERATOR_VS_OS, SITE_NAME } from "@/lib/marketing/content";
 
 export function GeneratorVsOs() {
   return (
@@ -14,7 +14,7 @@ export function GeneratorVsOs() {
               Serious searches need a system.
             </>
           }
-          description="Credit-based AI generators (like resumestudio.ai) optimize a moment. Resume Studio optimizes the entire search — with versions, tracking, snapshots, and insights that compound over months."
+          description={`Credit-based AI generators (like resumestudio.ai) optimize a moment. ${SITE_NAME} optimizes the entire search — with versions, tracking, snapshots, and insights that compound over months.`}
         />
 
         <div className="mt-12 overflow-hidden rounded-2xl border border-border shadow-[0_12px_40px_rgba(15,17,22,0.06)]">
@@ -24,7 +24,7 @@ export function GeneratorVsOs() {
                 <th className="px-5 py-4">Dimension</th>
                 <th className="px-5 py-4">AI resume generators</th>
                 <th className="bg-accent/15 px-5 py-4 text-accent">
-                  Resume Studio · Application OS
+                  {SITE_NAME} · Application OS
                 </th>
               </tr>
             </thead>
