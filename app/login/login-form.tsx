@@ -27,9 +27,16 @@ export default function LoginForm() {
     setError(null);
 
     const supabase = createClient();
-    const redirectTo = safeNext
-      ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(safeNext)}`
-      : `${window.location.origin}/auth/callback`;
+    // Keep the magic-link redirect on the plain (allow-listed) callback URL.
+    // Stash the post-login destination locally so it survives the round-trip
+    // without relying on Supabase preserving query params on redirect_to.
+    const redirectTo = `${window.location.origin}/auth/callback`;
+    try {
+      if (safeNext) window.localStorage.setItem("postLoginNext", safeNext);
+      else window.localStorage.removeItem("postLoginNext");
+    } catch {
+      // ignore storage errors
+    }
 
     const { error: signInError } = await supabase.auth.signInWithOtp({
       email,

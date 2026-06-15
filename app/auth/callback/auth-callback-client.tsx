@@ -12,11 +12,16 @@ export default function AuthCallbackClient() {
   useEffect(() => {
     const supabase = createClient();
 
-    const nextParam = searchParams.get("next");
-    const dest =
-      nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//")
-        ? nextParam
-        : "/library";
+    let dest = "/library";
+    try {
+      const stored = window.localStorage.getItem("postLoginNext");
+      if (stored && stored.startsWith("/") && !stored.startsWith("//")) {
+        dest = stored;
+      }
+      window.localStorage.removeItem("postLoginNext");
+    } catch {
+      // ignore storage errors
+    }
 
     async function finishSignIn() {
       const code = searchParams.get("code");
