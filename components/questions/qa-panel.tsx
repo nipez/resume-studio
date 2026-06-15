@@ -10,15 +10,11 @@ import {
 import { JobUrlImport } from "@/components/shared/job-url-import";
 import { Spinner } from "@/components/ui/spinner";
 import { Toast } from "@/components/ui/toast";
-import {
-  readQADraft,
-  uid,
-  writeQADraft,
-  type QAItem,
-} from "@/lib/job-draft/storage";
+import { uid, type QAItem } from "@/lib/job-draft/storage";
 import { useJobDraft } from "@/lib/job-draft/use-job-draft";
+import { useQADraft } from "@/lib/job-draft/use-qa-draft";
 import type { ResumeVersion } from "@/lib/resume/db-types";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 
 type QAPanelProps = {
   versions: ResumeVersion[];
@@ -27,21 +23,16 @@ type QAPanelProps = {
 
 export function QAPanel({ versions, defaultVersionId }: QAPanelProps) {
   const { draft, update } = useJobDraft();
+  const { items, persist: persistItems } = useQADraft();
   const [baseId, setBaseId] = useState(
     defaultVersionId ?? versions[0]?.id ?? ""
   );
-  const [items, setItems] = useState<QAItem[]>(() => readQADraft());
   const [mockMode, setMockMode] = useState(false);
   const [busyIds, setBusyIds] = useState<Set<string>>(new Set());
   const [toast, setToast] = useState<string | null>(null);
 
   const base = versions.find((v) => v.id === baseId) ?? versions[0];
   const anyBusy = busyIds.size > 0;
-
-  const persistItems = useCallback((next: QAItem[]) => {
-    setItems(next);
-    writeQADraft(next);
-  }, []);
 
   function updateItem(id: string, patch: Partial<QAItem>) {
     persistItems(items.map((q) => (q.id === id ? { ...q, ...patch } : q)));
