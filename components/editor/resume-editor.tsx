@@ -32,9 +32,9 @@ export function ResumeEditor({ version }: ResumeEditorProps) {
   const [name, setName] = useState(version.name);
   const [templateStyle, setTemplateStyle] = useState(version.template_style);
   const [data, setData] = useState<ResumeData>(version.data);
-  const [activeSection, setActiveSection] = useState<ResumeEditSection | null>(
-    null
-  );
+  const [activeSection, setActiveSection] = useState<ResumeEditSection | null>({
+    id: "header",
+  });
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">(
     "idle"
   );
@@ -163,7 +163,7 @@ export function ResumeEditor({ version }: ResumeEditorProps) {
               ? "Saved"
               : saveState === "error"
                 ? "Save failed"
-                : "Click any section to edit"}
+                : "Click a section to switch"}
         </span>
         <button
           type="button"

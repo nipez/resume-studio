@@ -87,7 +87,25 @@ export function SectionEditPanel({
         </button>
       </div>
 
-      <div className="flex-1 overflow-auto px-5 py-4">
+      <div className="flex flex-1 flex-col overflow-hidden">
+        <div className="scroll flex-1 overflow-auto px-5 py-4">
+          <div className="sticky top-0 z-10 -mx-1 mb-4 bg-white/95 pb-1 pt-0 backdrop-blur-sm">
+            <ResumeAiAssist
+              section={section}
+              data={data}
+              onApplySummary={(summary) => onUpdateData({ summary })}
+              onApplyHeadline={(headline) => onUpdateData({ headline })}
+              onApplySkills={(skills) => onUpdateData({ skills })}
+              onApplyBullets={(index, blurb, bullets) =>
+                onUpdateExperience(index, { blurb, bullets })
+              }
+            />
+          </div>
+
+          <div className="mb-3 font-display text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8A92A0]">
+            Edit fields
+          </div>
+
         {section.id === "header" ? (
           <div className="space-y-3">
             <Field label="Full name">
@@ -331,17 +349,7 @@ export function SectionEditPanel({
             </button>
           </div>
         ) : null}
-
-        <ResumeAiAssist
-          section={section}
-          data={data}
-          onApplySummary={(summary) => onUpdateData({ summary })}
-          onApplyHeadline={(headline) => onUpdateData({ headline })}
-          onApplySkills={(skills) => onUpdateData({ skills })}
-          onApplyBullets={(index, blurb, bullets) =>
-            onUpdateExperience(index, { blurb, bullets })
-          }
-        />
+        </div>
       </div>
     </div>
   );

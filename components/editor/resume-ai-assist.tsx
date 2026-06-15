@@ -81,52 +81,63 @@ export function ResumeAiAssist({
     }
   }
 
+  const primaryAction =
+    section.id === "summary"
+      ? { label: "Improve this summary", action: "improve-summary" as const }
+      : section.id === "header"
+        ? { label: "Improve headline", action: "improve-headline" as const }
+        : section.id === "skills"
+          ? { label: "Suggest skills", action: "suggest-skills" as const }
+          : section.id === "experience" && section.index !== undefined
+            ? {
+                label: "Polish bullets",
+                action: "polish-bullets" as const,
+                experienceIndex: section.index,
+              }
+            : null;
+
   return (
-    <div className="mt-5 border-t border-[#E8EBEF] pt-4">
-      <div className="mb-2 font-display text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8A92A0]">
-        AI assist
+    <div className="rounded-xl border border-[#C8D8FF] bg-gradient-to-br from-[#EEF3FF] to-[#F7FAFF] p-4 shadow-[0_4px_16px_rgba(47,107,255,0.08)]">
+      <div className="mb-3 flex items-start gap-2.5">
+        <span className="flex h-8 w-8 flex-none items-center justify-center rounded-lg bg-accent text-[15px] text-white shadow-[0_4px_12px_rgba(47,107,255,0.35)]">
+          ✦
+        </span>
+        <div>
+          <div className="font-display text-[14px] font-semibold text-ink">
+            AI suggestions
+          </div>
+          <div className="mt-0.5 text-[12px] leading-snug text-[#5A6573]">
+            Improve this section or ask for feedback — updates apply live.
+          </div>
+        </div>
       </div>
-      <div className="flex flex-wrap gap-2">
-        {section.id === "summary" ? (
-          <AssistButton
-            loading={loading === "improve-summary"}
-            onClick={() => run("improve-summary")}
-          >
-            Improve summary
-          </AssistButton>
-        ) : null}
-        {section.id === "header" ? (
-          <AssistButton
-            loading={loading === "improve-headline"}
-            onClick={() => run("improve-headline")}
-          >
-            Improve headline
-          </AssistButton>
-        ) : null}
-        {section.id === "skills" ? (
-          <AssistButton
-            loading={loading === "suggest-skills"}
-            onClick={() => run("suggest-skills")}
-          >
-            Suggest skills
-          </AssistButton>
-        ) : null}
-        {section.id === "experience" && section.index !== undefined ? (
-          <AssistButton
-            loading={loading === "polish-bullets"}
+
+      <div className="flex flex-col gap-2">
+        {primaryAction ? (
+          <button
+            type="button"
+            disabled={loading === primaryAction.action}
             onClick={() =>
-              run("polish-bullets", { experienceIndex: section.index })
+              run(primaryAction.action, {
+                experienceIndex: primaryAction.experienceIndex,
+              })
             }
+            className="cursor-pointer rounded-[10px] border-none bg-accent px-4 py-2.5 text-[13px] font-semibold text-white shadow-[0_4px_14px_rgba(47,107,255,0.32)] transition-colors hover:bg-[#1E54E6] disabled:opacity-50"
           >
-            Polish bullets
-          </AssistButton>
+            {loading === primaryAction.action
+              ? "Working…"
+              : primaryAction.label}
+          </button>
         ) : null}
-        <AssistButton
-          loading={loading === "suggest"}
+
+        <button
+          type="button"
+          disabled={loading === "suggest"}
           onClick={() => run("suggest")}
+          className="cursor-pointer rounded-[10px] border border-[#C8D8FF] bg-white px-4 py-2.5 text-[13px] font-semibold text-[#2456D6] transition-colors hover:bg-[#F5F8FF] disabled:opacity-50"
         >
-          Get suggestions
-        </AssistButton>
+          {loading === "suggest" ? "Working…" : "Get 3 improvement ideas"}
+        </button>
       </div>
 
       <div className="mt-3 flex gap-2">
@@ -134,7 +145,7 @@ export function ResumeAiAssist({
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
           placeholder="Ask AI anything about this section…"
-          className="min-w-0 flex-1 rounded-lg border border-[#DFE3E8] px-3 py-2 text-[13px] focus:border-accent focus:outline-none"
+          className="min-w-0 flex-1 rounded-[10px] border border-[#C8D8FF] bg-white px-3 py-2.5 text-[13px] focus:border-accent focus:outline-none"
           onKeyDown={(e) => {
             if (e.key !== "Enter" || !question.trim()) return;
             e.preventDefault();
@@ -145,9 +156,9 @@ export function ResumeAiAssist({
           type="button"
           disabled={!question.trim() || loading === "ask"}
           onClick={() => run("ask", { question: question.trim() })}
-          className="cursor-pointer rounded-lg border-none bg-[#EAF1FF] px-3 py-2 text-[12.5px] font-semibold text-[#2456D6] disabled:opacity-50"
+          className="cursor-pointer rounded-[10px] border-none bg-[#2456D6] px-4 py-2.5 text-[12.5px] font-semibold text-white disabled:opacity-50"
         >
-          Ask
+          {loading === "ask" ? "…" : "Ask"}
         </button>
       </div>
 
@@ -155,40 +166,22 @@ export function ResumeAiAssist({
         <p className="mt-2 text-[12px] text-[#B23B3B]">{error}</p>
       ) : null}
       {answer ? (
-        <p className="mt-2 rounded-lg bg-[#F7F9FC] px-3 py-2 text-[12.5px] leading-relaxed text-[#3a4250]">
+        <p className="mt-3 rounded-lg border border-[#DFE8FF] bg-white px-3 py-2.5 text-[12.5px] leading-relaxed text-[#3a4250]">
           {answer}
         </p>
       ) : null}
       {suggestions.length ? (
-        <ul className="mt-2 space-y-1.5 text-[12.5px] leading-relaxed text-[#3a4250]">
+        <ul className="mt-3 space-y-1.5">
           {suggestions.map((item) => (
-            <li key={item} className="rounded-lg bg-[#F7F9FC] px-3 py-2">
+            <li
+              key={item}
+              className="rounded-lg border border-[#DFE8FF] bg-white px-3 py-2 text-[12.5px] leading-relaxed text-[#3a4250]"
+            >
               {item}
             </li>
           ))}
         </ul>
       ) : null}
     </div>
-  );
-}
-
-function AssistButton({
-  children,
-  onClick,
-  loading,
-}: {
-  children: React.ReactNode;
-  onClick: () => void;
-  loading: boolean;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={loading}
-      className="cursor-pointer rounded-lg border border-[#DFE3E8] bg-white px-2.5 py-1.5 text-[12px] font-semibold text-[#2456D6] transition-colors hover:border-[#C8D8FF] hover:bg-[#F5F8FF] disabled:opacity-50"
-    >
-      {loading ? "Working…" : children}
-    </button>
   );
 }

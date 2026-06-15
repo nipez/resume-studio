@@ -52,12 +52,6 @@ function skillMeterWidth(index: number): number {
   return [92, 85, 78, 70, 88, 74, 82][index % 7];
 }
 
-function skillLevel(index: number): string {
-  return ["Expert", "Expert", "Advanced", "Advanced", "Proficient"][
-    index % 5
-  ];
-}
-
 function bullets(items: string[] | undefined): string {
   return (items || [])
     .filter(Boolean)
@@ -362,7 +356,7 @@ function buildEditorialHTML(
     `.r-li::before{content:'';position:absolute;left:0;top:.45em;width:3px;height:3px;border-radius:50%;background:${accent}}` +
     `.ed-blk{margin-bottom:12px}` +
     `.side .r-p{margin-bottom:10px}` +
-    `.skill-row{display:flex;justify-content:space-between;font-size:9pt;color:#48414f;padding:4px 0;border-bottom:1px solid rgba(40,20,30,.08);white-space:nowrap;gap:10px}` +
+    `.skill-row{font-size:9pt;color:#48414f;padding:4px 0;border-bottom:1px solid rgba(40,20,30,.08);white-space:nowrap}` +
     `.skill-row:last-child{border:none}` +
     (interactive ? INTERACTIVE_CSS : "") +
     PRINT_BASE;
@@ -395,10 +389,7 @@ function buildEditorialHTML(
     .join("");
 
   const skillsH = skills
-    .map(
-      (s, i) =>
-        `<div class="skill-row"><span>${esc(s)}</span><span>${skillLevel(i)}</span></div>`
-    )
+    .map((s) => `<div class="skill-row"><span>${esc(s)}</span></div>`)
     .join("");
 
   const chipsH = chips
