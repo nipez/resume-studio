@@ -229,6 +229,39 @@ export const FEATURES = [
   },
 ];
 
+export const FEATURE_CAPABILITIES = [
+  {
+    title: "Canvas editor",
+    description:
+      "Click any section on the live preview to edit. Docked sidebar, section tabs, and a full-width resume canvas — not nested panels.",
+  },
+  {
+    title: "Resume AI",
+    description:
+      "Per-section AI: headline options, bullet polish, improvement ideas, and one-click undo. Reframes your real experience — never invents credentials.",
+  },
+  {
+    title: "Job import",
+    description:
+      "Import postings from career-page URLs or paste text for Indeed and LinkedIn. Role, company, and description fill automatically.",
+  },
+  {
+    title: "Immutable snapshots",
+    description:
+      "Log an application and freeze the exact resume, cover letter, and Q&A you sent — so insights stay honest as your master evolves.",
+  },
+  {
+    title: "Three print-ready templates",
+    description:
+      "Classic, Two-Column, and Editorial — custom accent color, PDF export, and page-aware preview.",
+  },
+  {
+    title: "Shared job context",
+    description:
+      "Tailor, Cover Letter, and Q&A share the same job draft. Import once, use everywhere in the loop.",
+  },
+] as const;
+
 export const HOW_IT_WORKS = [
   {
     step: "01",

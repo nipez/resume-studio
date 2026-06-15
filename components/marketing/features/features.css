@@ -1,0 +1,138 @@
+.marketing-home .features-hero {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(75% 65% at 90% 12%, rgba(255, 92, 56, 0.1), transparent 58%),
+    radial-gradient(55% 55% at 6% 88%, rgba(15, 181, 166, 0.08), transparent 58%),
+    var(--cream);
+  padding: 0;
+}
+
+.marketing-home .features-hero-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 44px;
+  align-items: center;
+  padding: 36px 0 52px;
+}
+
+.marketing-home .features-hero h1 {
+  font-size: clamp(42px, 5.8vw, 68px);
+  line-height: 0.98;
+  letter-spacing: -0.038em;
+  margin-top: 18px;
+}
+
+.marketing-home .features-hero h1 .serif-i {
+  color: var(--coral);
+}
+
+.marketing-home .features-hero-sub {
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--muted);
+  max-width: 520px;
+  margin-top: 20px;
+}
+
+.marketing-home .features-hero-cta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 28px;
+  flex-wrap: wrap;
+}
+
+.marketing-home .features-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 28px;
+}
+
+.marketing-home .features-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 100px;
+  border: 1px solid rgba(40, 20, 30, 0.1);
+  background: rgba(255, 255, 255, 0.72);
+  padding: 7px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+  backdrop-filter: blur(8px);
+}
+
+.marketing-home .features-module-card {
+  position: relative;
+}
+
+.marketing-home .features-module-card .connects {
+  display: inline-flex;
+  margin-top: 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--teal);
+}
+
+.marketing-home .features-cap-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.marketing-home .features-cap-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 24px 22px;
+  box-shadow: 0 8px 26px -14px rgba(40, 20, 30, 0.18);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.marketing-home .features-cap-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 36px -16px rgba(40, 20, 30, 0.22);
+}
+
+.marketing-home .features-cap-card h3 {
+  font-size: 17px;
+  margin-top: 0;
+}
+
+.marketing-home .features-cap-card p {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--muted);
+  margin-top: 10px;
+}
+
+.marketing-home .features-cap-icon {
+  display: flex;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(255, 92, 56, 0.12), rgba(15, 181, 166, 0.1));
+  color: var(--coral);
+  font-size: 18px;
+  margin-bottom: 14px;
+}
+
+@media (max-width: 960px) {
+  .marketing-home .features-hero-grid {
+    grid-template-columns: 1fr;
+    padding-bottom: 40px;
+  }
+
+  .marketing-home .features-cap-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .marketing-home .wrap {
+    padding: 0 24px;
+  }
+}
