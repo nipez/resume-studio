@@ -30,7 +30,7 @@ export default async function LibraryPage() {
 
         {!hasVersions ? (
           <Link
-            href="/build"
+            href="/build?mode=student"
             className="mb-[22px] flex items-center gap-[18px] rounded-2xl bg-gradient-to-br from-sidebar to-[#1b2740] px-[22px] py-[19px] text-white transition-shadow hover:shadow-[0_14px_36px_rgba(15,17,22,0.22)]"
           >
             <div className="flex h-12 w-12 flex-none items-center justify-center rounded-[14px] bg-gradient-to-br from-accent to-[#7A53FF] text-[23px] shadow-[0_6px_18px_rgba(47,107,255,0.4)]">

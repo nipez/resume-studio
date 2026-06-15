@@ -18,14 +18,33 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-const STEPS = [
+export type GuidedMode = "standard" | "student";
+
+type Step = { id: string; title: string; subtitle: string };
+
+const STANDARD_STEPS: Step[] = [
   { id: "basics", title: "The basics", subtitle: "Who you are and how to reach you." },
   { id: "summary", title: "Your summary", subtitle: "Two or three sentences. Don't overthink it." },
   { id: "experience", title: "Experience", subtitle: "Add the roles you want to feature." },
   { id: "skills", title: "Skills", subtitle: "List the skills you want to highlight." },
   { id: "education", title: "Education", subtitle: "Where you studied (optional)." },
   { id: "finish", title: "Review & create", subtitle: "Pick a look, then create your resume." },
-] as const;
+];
+
+// Student flow: lead with school, and frame "experience" as activities, clubs,
+// sports, volunteering, jobs, and honors — what first resumes are built from.
+const STUDENT_STEPS: Step[] = [
+  { id: "basics", title: "About you", subtitle: "Your name, contact, and a one-line headline." },
+  { id: "summary", title: "Quick intro", subtitle: "A couple of sentences about you — grade, interests, what you're after." },
+  { id: "education", title: "School", subtitle: "Your school, graduation year, GPA, and standout coursework." },
+  { id: "experience", title: "Activities & experience", subtitle: "Clubs, sports, leadership, volunteering, jobs, and honors all count — add each as an entry." },
+  { id: "skills", title: "Skills & languages", subtitle: "Software, languages, and soft skills you want to show off." },
+  { id: "finish", title: "Review & create", subtitle: "Pick a look, then create your resume." },
+];
+
+function stepsForMode(mode: GuidedMode): Step[] {
+  return mode === "student" ? STUDENT_STEPS : STANDARD_STEPS;
+}
 
 const TEMPLATES: { id: TemplateStyle; label: string }[] = [
   { id: "classic", label: "Classic" },
@@ -40,14 +59,19 @@ type GuidedBuilderProps = {
   initialDraft: GuidedDraft | null;
   userName: string;
   userEmail: string;
+  initialMode?: GuidedMode;
 };
 
 export function GuidedBuilder({
   initialDraft,
   userName,
   userEmail,
+  initialMode = "standard",
 }: GuidedBuilderProps) {
   const router = useRouter();
+  const [mode, setMode] = useState<GuidedMode>(initialMode);
+  const isStudent = mode === "student";
+  const steps = stepsForMode(mode);
   const [step, setStep] = useState(initialDraft?.step ?? 0);
   const [templateStyle, setTemplateStyle] = useState<TemplateStyle>(
     initialDraft?.templateStyle ?? "twocol"
@@ -82,6 +106,18 @@ export function GuidedBuilder({
     };
   }, [step, templateStyle, makeDefault, data]);
 
+  // Students lead with education — make sure there's a row to fill in.
+  useEffect(() => {
+    if (isStudent && data.education.length === 0) {
+      setData((prev) =>
+        prev.education.length === 0
+          ? { ...prev, education: [{ school: "", degree: "", year: "" }] }
+          : prev
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isStudent]);
+
   const previewHtml = useMemo(
     () => buildResumeHTML({ templateStyle, data }),
     [templateStyle, data]
@@ -103,10 +139,19 @@ export function GuidedBuilder({
   );
 
   function goNext() {
-    setStep((s) => Math.min(s + 1, STEPS.length - 1));
+    setStep((s) => Math.min(s + 1, steps.length - 1));
   }
   function goBack() {
     setStep((s) => Math.max(s - 1, 0));
+  }
+
+  function switchMode(next: GuidedMode) {
+    if (next === mode) return;
+    setMode(next);
+    setStep((s) => Math.min(s, stepsForMode(next).length - 1));
+    if (next === "student" && data.education.length === 0) {
+      updateData({ education: [{ school: "", degree: "", year: "" }] });
+    }
   }
 
   async function handleCreate() {
@@ -130,7 +175,7 @@ export function GuidedBuilder({
     router.push("/library");
   }
 
-  const current = STEPS[step];
+  const current = steps[step];
 
   return (
     <div className="scroll flex-1 overflow-auto">
@@ -152,8 +197,29 @@ export function GuidedBuilder({
             </span>
           </div>
 
+          <div className="mb-4 inline-flex rounded-[10px] border border-[#E4E7EC] bg-[#F7F8FA] p-1 text-[12.5px] font-semibold">
+            <button
+              type="button"
+              onClick={() => switchMode("student")}
+              className={`cursor-pointer rounded-[7px] px-3 py-1.5 transition-colors ${
+                isStudent ? "bg-white text-ink shadow-[0_1px_3px_rgba(0,0,0,0.12)]" : "text-[#7A828F]"
+              }`}
+            >
+              Student / first resume
+            </button>
+            <button
+              type="button"
+              onClick={() => switchMode("standard")}
+              className={`cursor-pointer rounded-[7px] px-3 py-1.5 transition-colors ${
+                !isStudent ? "bg-white text-ink shadow-[0_1px_3px_rgba(0,0,0,0.12)]" : "text-[#7A828F]"
+              }`}
+            >
+              I have work experience
+            </button>
+          </div>
+
           <div className="mb-5 flex flex-wrap gap-1.5">
-            {STEPS.map((s, i) => (
+            {steps.map((s, i) => (
               <button
                 key={s.id}
                 type="button"
@@ -168,7 +234,7 @@ export function GuidedBuilder({
 
           <div className="rounded-2xl border border-border bg-white p-7">
             <div className="mb-1 text-[12px] font-semibold uppercase tracking-[0.07em] text-accent">
-              Step {step + 1} of {STEPS.length}
+              Step {step + 1} of {steps.length}
             </div>
             <h1 className="font-display text-[24px] font-semibold tracking-[-0.02em] text-ink">
               {current.title}
@@ -190,7 +256,11 @@ export function GuidedBuilder({
                     <input
                       className={inputClass}
                       value={data.headline}
-                      placeholder="Marketing Manager · Growth & Brand"
+                      placeholder={
+                        isStudent
+                          ? "High School Senior · Honor Roll · Varsity Soccer Captain"
+                          : "Marketing Manager · Growth & Brand"
+                      }
                       onChange={(e) => updateData({ headline: e.target.value })}
                     />
                   </Field>
@@ -235,7 +305,11 @@ export function GuidedBuilder({
                     rows={6}
                     className={`${inputClass} resize-y leading-[1.55]`}
                     value={data.summary}
-                    placeholder="What do you do, who for, and what are you known for? A couple of sentences is plenty."
+                    placeholder={
+                      isStudent
+                        ? "What grade or year are you in, what are you into, and what are you looking for? e.g. 'Motivated high school senior with leadership in athletics and community service, seeking a part-time role…'"
+                        : "What do you do, who for, and what are you known for? A couple of sentences is plenty."
+                    }
                     onChange={(e) => updateData({ summary: e.target.value })}
                   />
                 </Field>
@@ -245,7 +319,9 @@ export function GuidedBuilder({
                 <div className="space-y-4">
                   {data.experience.length === 0 ? (
                     <p className="rounded-xl border border-dashed border-[#D2D7DE] bg-[#FBFBFC] px-4 py-6 text-center text-[13px] text-muted">
-                      No roles yet. Add your most recent job to start.
+                      {isStudent
+                        ? "Nothing yet. Add a club, team, volunteer role, or part-time job to start — they all count."
+                        : "No roles yet. Add your most recent job to start."}
                     </p>
                   ) : null}
                   {data.experience.map((exp, i) => (
@@ -255,7 +331,7 @@ export function GuidedBuilder({
                     >
                       <div className="mb-2 flex items-center justify-between">
                         <span className="text-[12px] font-semibold text-muted">
-                          Role {i + 1}
+                          {isStudent ? "Entry" : "Role"} {i + 1}
                         </span>
                         <button
                           type="button"
@@ -275,7 +351,9 @@ export function GuidedBuilder({
                         <input
                           className={inputClass}
                           value={exp.company}
-                          placeholder="Company"
+                          placeholder={
+                            isStudent ? "Club, team, employer, or org" : "Company"
+                          }
                           onChange={(e) =>
                             updateExperience(i, { company: e.target.value })
                           }
@@ -283,7 +361,9 @@ export function GuidedBuilder({
                         <input
                           className={inputClass}
                           value={exp.title}
-                          placeholder="Title"
+                          placeholder={
+                            isStudent ? "Your role (Captain, Volunteer…)" : "Title"
+                          }
                           onChange={(e) =>
                             updateExperience(i, { title: e.target.value })
                           }
@@ -351,7 +431,7 @@ export function GuidedBuilder({
                     }
                     className="cursor-pointer rounded-[10px] border border-dashed border-[#CFD5DD] bg-[#FAFBFC] px-4 py-2.5 text-[13px] font-semibold text-[#2456D6] hover:border-accent"
                   >
-                    + Add a role
+                    {isStudent ? "+ Add an activity or job" : "+ Add a role"}
                   </button>
                 </div>
               ) : null}
@@ -411,7 +491,11 @@ export function GuidedBuilder({
                       <input
                         className={inputClass}
                         value={ed.degree}
-                        placeholder="Degree"
+                        placeholder={
+                          isStudent
+                            ? "Diploma · GPA 3.8 · AP Bio, AP English"
+                            : "Degree"
+                        }
                         onChange={(e) => {
                           const education = [...data.education];
                           education[i] = { ...education[i], degree: e.target.value };
@@ -421,7 +505,7 @@ export function GuidedBuilder({
                       <input
                         className={inputClass}
                         value={ed.year}
-                        placeholder="Year"
+                        placeholder={isStudent ? "Grad yr" : "Year"}
                         onChange={(e) => {
                           const education = [...data.education];
                           education[i] = { ...education[i], year: e.target.value };
@@ -521,7 +605,7 @@ export function GuidedBuilder({
                   </button>
                 )}
               </div>
-              {step < STEPS.length - 1 ? (
+              {step < steps.length - 1 ? (
                 <button
                   type="button"
                   onClick={goNext}
