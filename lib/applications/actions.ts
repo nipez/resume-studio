@@ -7,7 +7,9 @@ import type {
   ApplicationEvent,
   ApplicationStatus,
   EventType,
+  HiringContact,
   LogApplicationInput,
+  ResumeSnapshot,
   StatusHistoryEntry,
 } from "@/lib/applications/types";
 import { normalizeResumeSnapshot, parseJobFromVersionName } from "@/lib/applications/utils";
@@ -40,6 +42,7 @@ function mapApplication(
     role: String(row.role ?? ""),
     company: String(row.company ?? ""),
     job_desc: String(row.job_desc ?? ""),
+    job_url: String(row.job_url ?? ""),
     applied_at: row.applied_at as string,
     resume_version_id: (row.resume_version_id as string | null) ?? null,
     resume_version_name: (row.resume_version_name as string | null) ?? null,
@@ -54,6 +57,9 @@ function mapApplication(
       : [],
     insight: (row.insight as AppInsight | null) ?? null,
     prep: (row.prep as AppPrep | null) ?? null,
+    hiring_contacts: Array.isArray(row.hiring_contacts)
+      ? (row.hiring_contacts as HiringContact[])
+      : null,
     notes: String(row.notes ?? ""),
     created_at: row.created_at as string,
     events,
@@ -163,6 +169,7 @@ export async function logApplication(input: LogApplicationInput) {
       role,
       company,
       job_desc: input.jobDesc?.trim() ?? "",
+      job_url: input.jobUrl?.trim() ?? "",
       applied_at: now,
       resume_version_id: version.id,
       resume_version_name: version.name,
@@ -218,7 +225,9 @@ export async function updateApplicationMeta(
     role?: string;
     company?: string;
     job_desc?: string;
+    job_url?: string;
     notes?: string;
+    applied_at?: string;
   }
 ) {
   const supabase = createClient();
@@ -226,7 +235,9 @@ export async function updateApplicationMeta(
   if (patch.role !== undefined) payload.role = patch.role;
   if (patch.company !== undefined) payload.company = patch.company;
   if (patch.job_desc !== undefined) payload.job_desc = patch.job_desc;
+  if (patch.job_url !== undefined) payload.job_url = patch.job_url;
   if (patch.notes !== undefined) payload.notes = patch.notes;
+  if (patch.applied_at !== undefined) payload.applied_at = patch.applied_at;
 
   const { error } = await supabase
     .from("applications")
@@ -237,6 +248,94 @@ export async function updateApplicationMeta(
 
   revalidatePath("/applications");
   revalidatePath(`/applications/${id}`);
+}
+
+export async function replaceApplicationResumeSnapshot(
+  applicationId: string,
+  input: { versionId: string } | { snapshot: ResumeSnapshot; resumeVersionName: string }
+) {
+  const supabase = createClient();
+  const app = await getApplication(applicationId);
+  if (!app) throw new Error("Application not found");
+
+  let resumeVersionId: string | null = null;
+  let resumeVersionName: string;
+  let resumeSnapshot: ResumeSnapshot;
+
+  if ("versionId" in input) {
+    const version = await getResumeVersion(input.versionId);
+    if (!version) throw new Error("Resume version not found");
+    resumeVersionId = version.id;
+    resumeVersionName = version.name;
+    resumeSnapshot = {
+      name: version.name,
+      template_style: version.template_style,
+      data: version.data,
+    };
+  } else {
+    resumeVersionId = null;
+    resumeVersionName = input.resumeVersionName;
+    resumeSnapshot = input.snapshot;
+  }
+
+  const { error } = await supabase
+    .from("applications")
+    .update({
+      resume_version_id: resumeVersionId,
+      resume_version_name: resumeVersionName,
+      resume_snapshot: resumeSnapshot,
+    })
+    .eq("id", applicationId);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/applications");
+  revalidatePath(`/applications/${applicationId}`);
+}
+
+export async function updateApplicationHiringContacts(
+  id: string,
+  contacts: HiringContact[]
+) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("applications")
+    .update({ hiring_contacts: contacts })
+    .eq("id", id);
+
+  if (error) throw new Error(error.message);
+  revalidatePath(`/applications/${id}`);
+}
+
+export async function getCompanyApplicationHistory(
+  company: string,
+  excludeId?: string
+): Promise<Pick<Application, "id" | "role" | "company" | "applied_at" | "status">[]> {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user || !company.trim()) return [];
+
+  const { data: rows } = await supabase
+    .from("applications")
+    .select("id, role, company, applied_at, status")
+    .eq("user_id", user.id)
+    .order("applied_at", { ascending: false });
+
+  const key = company.trim().toLowerCase();
+  return (rows ?? [])
+    .filter((row) => {
+      if (excludeId && row.id === excludeId) return false;
+      return String(row.company ?? "").trim().toLowerCase() === key;
+    })
+    .map((row) => ({
+      id: row.id as string,
+      role: String(row.role ?? ""),
+      company: String(row.company ?? ""),
+      applied_at: row.applied_at as string,
+      status: row.status as ApplicationStatus,
+    }));
 }
 
 export async function updateApplicationInsight(id: string, insight: AppInsight) {

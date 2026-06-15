@@ -63,6 +63,7 @@ export function LogApplicationModal({
   const [role, setRole] = useState("");
   const [company, setCompany] = useState("");
   const [jobDesc, setJobDesc] = useState("");
+  const [jobUrl, setJobUrl] = useState("");
   const [error, setError] = useState("");
   const [toast, setToast] = useState<string | null>(null);
 
@@ -73,6 +74,7 @@ export function LogApplicationModal({
     setRole(ctx.jobRole || initialRole || fromName.role);
     setCompany(ctx.jobCompany || initialCompany || fromName.company);
     setJobDesc(ctx.jobDesc);
+    setJobUrl("");
     setError("");
   }, [open, initialRole, initialCompany, resumeVersionName]);
 
@@ -106,6 +108,7 @@ export function LogApplicationModal({
           role: trimmedRole,
           company: trimmedCompany,
           jobDesc: jobDesc.trim() || ctx.jobDesc,
+          jobUrl: jobUrl.trim(),
           coverLetter: ctx.coverLetter,
           answers: ctx.answers,
         });
@@ -177,6 +180,16 @@ export function LogApplicationModal({
             rows={5}
             label="Job description (optional)"
           />
+
+          <label className="mt-3 flex flex-col gap-1.5 text-[12.5px] font-semibold text-[#5A6573]">
+            Job posting URL (optional)
+            <input
+              value={jobUrl}
+              onChange={(e) => setJobUrl(e.target.value)}
+              placeholder="https://www.indeed.com/viewjob?jk=…"
+              className="rounded-[9px] border border-[#DFE3E8] px-[11px] py-2.5 text-sm text-ink focus:border-accent focus:outline-none"
+            />
+          </label>
 
           {error ? <div className={errorBoxClass}>{error}</div> : null}
 

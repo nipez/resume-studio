@@ -1,5 +1,9 @@
 import { ApplicationDetailView } from "@/components/applications/application-detail-view";
-import { getApplication } from "@/lib/applications/actions";
+import {
+  getApplication,
+  getCompanyApplicationHistory,
+} from "@/lib/applications/actions";
+import { getLibraryData } from "@/lib/resume/actions";
 import { notFound } from "next/navigation";
 
 type PageProps = {
@@ -14,5 +18,16 @@ export default async function ApplicationDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  return <ApplicationDetailView application={application} />;
+  const [{ versions }, companyHistory] = await Promise.all([
+    getLibraryData(),
+    getCompanyApplicationHistory(application.company, application.id),
+  ]);
+
+  return (
+    <ApplicationDetailView
+      application={application}
+      resumeVersions={versions}
+      companyHistory={companyHistory}
+    />
+  );
 }

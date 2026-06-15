@@ -134,6 +134,26 @@ export function applicationInsightsTitle(app: Application): string {
   return applicationDetailTitle(app);
 }
 
+export function normalizeCompanyKey(company: string): string {
+  return company.trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+export function appliedDateInputValue(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+export function appliedDateFromInput(value: string): string | null {
+  if (!value.trim()) return null;
+  const d = new Date(`${value}T12:00:00`);
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toISOString();
+}
+
 export function nextOpenEvent(events: ApplicationEvent[]): ApplicationEvent | null {
   return (
     events

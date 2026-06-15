@@ -36,6 +36,13 @@ export type AppPrep = {
   ask: string[];
 };
 
+export type HiringContact = {
+  name: string;
+  title: string;
+  rationale: string;
+  confidence: "high" | "medium" | "low";
+};
+
 export type ApplicationEvent = {
   id: string;
   application_id: string;
@@ -55,6 +62,7 @@ export type Application = {
   role: string;
   company: string;
   job_desc: string;
+  job_url: string;
   applied_at: string;
   resume_version_id: string | null;
   resume_version_name: string | null;
@@ -65,6 +73,7 @@ export type Application = {
   status_history: StatusHistoryEntry[];
   insight: AppInsight | null;
   prep: AppPrep | null;
+  hiring_contacts: HiringContact[] | null;
   notes: string;
   created_at: string;
   events?: ApplicationEvent[];
@@ -75,6 +84,7 @@ export type LogApplicationInput = {
   role?: string;
   company?: string;
   jobDesc?: string;
+  jobUrl?: string;
   coverLetter?: string;
   answers?: ApplicationAnswer[];
 };

@@ -388,3 +388,24 @@ export function resumeAssistPrompt(
     '{"suggestions":["suggestion 1","suggestion 2","suggestion 3"]}'
   );
 }
+
+export function hiringContactsPrompt(
+  jobRole: string,
+  jobCompany: string,
+  jobDesc: string
+): string {
+  return (
+    "You help job seekers identify LIKELY hiring contacts for outreach research — not verified contact info.\n\n" +
+    "ROLE: " +
+    (jobRole.trim() || "Unknown role") +
+    "\nCOMPANY: " +
+    (jobCompany.trim() || "Unknown company") +
+    "\nJOB DESCRIPTION:\n" +
+    (jobDesc.trim() || "(not provided)") +
+    "\n\n" +
+    "Suggest 2-4 plausible people or roles who might own hiring for this opening — e.g. hiring manager, department head, recruiter, talent acquisition.\n" +
+    "Do NOT invent personal email addresses or phone numbers. Names may be illustrative if unknown; say so in rationale.\n" +
+    "confidence is high only when the JD names a person or team; medium for standard role titles; low for guesses.\n\n" +
+    'Return ONLY valid minified JSON: {"contacts":[{"name":"...","title":"...","rationale":"...","confidence":"high"|"medium"|"low"}]}'
+  );
+}
