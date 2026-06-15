@@ -21,37 +21,18 @@ import "./students.css";
 
 const TESTIMONIAL_AVATARS = ["var(--coral)", "var(--teal)", "var(--ink)"];
 
-const PARENT_REASONS = [
-  {
-    icon: "🚀",
-    title: "A head start that compounds",
-    body: "The first job, internship, or college app is often the first time a kid has to put themselves on paper. Learning to do it well now pays off for years — every future application gets easier.",
-  },
-  {
-    icon: "📄",
-    title: "A first resume that actually lands",
-    body: "Clubs, sports, volunteering, and part-time jobs become real, employer-ready bullet points — not a blank page or a copied template.",
-  },
-  {
-    icon: "✉",
-    title: "Cover letters, written for them",
-    body: "Short, genuine cover letters for part-time jobs, camp counselor gigs, and internships — in their own voice, not stiff corporate filler.",
-  },
-  {
-    icon: "🎤",
-    title: "Interview-ready",
-    body: "Built-in interview prep turns each application into likely questions and talking points, so they walk in confident instead of winging it.",
-  },
-  {
-    icon: "📋",
-    title: "One place to stay organized",
-    body: "Every application, status, and follow-up lives in one workspace — so nothing slips through the cracks during a busy senior year.",
-  },
-  {
-    icon: "💬",
-    title: "Confidence putting themselves forward",
-    body: "Writing about your own strengths is a life skill. The guided steps coach them through it — a win well beyond the first job.",
-  },
+const STUDENT_POINTS = [
+  "Guided, plain-language steps — no blank page",
+  "Turns clubs, sports, jobs & volunteering into real bullets",
+  "Cover letters that sound like you",
+  "Interview prep before you walk in",
+];
+
+const PARENT_POINTS = [
+  "Set your kid up — or let them run with it",
+  "More than a resume: cover letters, interviews & tracking",
+  "Builds skills that pay off for years",
+  "Stay organized through a busy senior year",
 ];
 
 export function StudentsPage() {
@@ -62,7 +43,7 @@ export function StudentsPage() {
       <section className="students-hero">
         <div className="wrap students-hero-grid">
           <div>
-            <span className="eyebrow">Free for students · In beta</span>
+            <span className="eyebrow">For students &amp; parents · Free in beta</span>
             <h1>
               Your first resume shouldn&apos;t start with a{" "}
               <span className="serif-i">blank page</span>
@@ -114,42 +95,59 @@ export function StudentsPage() {
 
       <section className="why">
         <div className="wrap">
-          <Reveal className="sec-head center" style={{ maxWidth: 760 }}>
+          <Reveal className="sec-head center" style={{ maxWidth: 720 }}>
             <span className="eyebrow" style={{ background: "var(--cream)" }}>
-              For parents
+              For students &amp; parents
             </span>
-            <h2>Why getting this right early matters.</h2>
+            <h2>Whoever&apos;s driving — we&apos;ve got you.</h2>
             <p>
-              Helping your kid land that first job or internship isn&apos;t just
-              about one application — it&apos;s where they learn to describe what
-              they&apos;ve done, write a cover letter, and prep for an interview.
-              {SITE_NAME} makes it approachable and walks them through it, and
-              it&apos;s far more than a resume.
+              Students can do it themselves with guided, plain-language steps.
+              Parents can set their kid up and follow along. Either way it&apos;s
+              more than a resume — cover letters, interview prep, and tracking
+              what works.
             </p>
           </Reveal>
-          <Reveal className="mgrid">
-            {PARENT_REASONS.map((item) => (
-              <div key={item.title} className="mcard">
-                <div className="top">
-                  <span className="micon students-spark" aria-hidden>
-                    {item.icon}
-                  </span>
-                </div>
-                <h3>{item.title}</h3>
-                <p>{item.body}</p>
-              </div>
-            ))}
-          </Reveal>
-          <Reveal className="students-band-cta" style={{ marginTop: 32 }}>
-            <Link
-              href="/login?next=%2Fbuild%3Fmode%3Dstudent"
-              className="btn btn-coral"
-            >
-              Get your kid started →
-            </Link>
-            <Link href="/pricing" className="link-underline">
-              See what&apos;s included
-            </Link>
+          <Reveal className="students-audience">
+            <div className="students-audience-card">
+              <span className="students-audience-tag">For students</span>
+              <h3>You&apos;ve done more than you think.</h3>
+              <p>
+                Clubs, sports, volunteering, a part-time job — we turn it into a
+                real resume, one small step at a time. No blank page, no
+                pretending you have ten years of experience.
+              </p>
+              <ul className="plan-features">
+                {STUDENT_POINTS.map((point) => (
+                  <li key={point}>{point}</li>
+                ))}
+              </ul>
+              <Link
+                href="/login?next=%2Fbuild%3Fmode%3Dstudent"
+                className="btn btn-coral"
+              >
+                Build my resume →
+              </Link>
+            </div>
+            <div className="students-audience-card">
+              <span className="students-audience-tag alt">For parents</span>
+              <h3>Give your kid a head start.</h3>
+              <p>
+                Help them put their best foot forward for that first job,
+                internship, or college app — and pick up skills that pay off for
+                years, not just one application.
+              </p>
+              <ul className="plan-features">
+                {PARENT_POINTS.map((point) => (
+                  <li key={point}>{point}</li>
+                ))}
+              </ul>
+              <Link
+                href="/login?next=%2Fbuild%3Fmode%3Dstudent"
+                className="btn btn-coral"
+              >
+                Set my kid up →
+              </Link>
+            </div>
           </Reveal>
         </div>
       </section>
@@ -346,8 +344,8 @@ export function StudentsPage() {
       </section>
 
       <MarketingPageCta
-        title="Counselors & parents: share this link"
-        description="Free for students — currently in beta. Hurry, it's a limited-time offer."
+        title="Students, parents & counselors — start here"
+        description="Free for students while we're in beta. Hurry, it's a limited-time offer."
         secondaryHref="/pricing"
         secondaryLabel="Compare all plans →"
       />
