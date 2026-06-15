@@ -83,31 +83,39 @@ export const APPLICATION_OS_LOOP = [
   },
 ] as const;
 
+// `monthlyLow` is a conservative low-end USD/month estimate used to tally the
+// cost of the fragmented stack (0 for non-monetary items). The application
+// tracker is billed weekly (~$9/wk → ~$39/mo).
 export const FRAGMENTED_STACK = [
   {
     tool: "Resume builder",
     problem: "Great PDF, zero memory of what you sent where.",
     cost: "$10–25/mo",
+    monthlyLow: 10,
   },
   {
     tool: "ATS scanner",
     problem: "Keyword score, no cover letter, no tracking, no versions.",
     cost: "$50/mo",
+    monthlyLow: 50,
   },
   {
     tool: "Application tracker",
     problem: "Spreadsheet of companies — not what you actually submitted.",
     cost: "$9–13/wk",
+    monthlyLow: 39,
   },
   {
     tool: "Cover letter doc",
     problem: "Lost in Google Drive. Wrong version attached. Again.",
     cost: "Your sanity",
+    monthlyLow: 0,
   },
   {
     tool: "AI resume generator",
     problem: "One PDF per credit. No library. No history. No learning.",
     cost: "$5 per 10 runs",
+    monthlyLow: 5,
   },
 ] as const;
 

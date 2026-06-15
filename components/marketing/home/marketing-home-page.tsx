@@ -33,6 +33,13 @@ const TESTIMONIAL_AVATARS = ["var(--ink)", "var(--teal)", "var(--coral)"];
 const TESTIMONIAL_INITIALS = ["JM", "PK", "AR"];
 
 export function MarketingHomePage() {
+  // Conservative low-end monthly total of the fragmented stack, rounded down
+  // to the nearest $10 for an honest "from $X/mo" contrast against our pricing.
+  const stackMonthlyLow =
+    Math.floor(
+      FRAGMENTED_STACK.reduce((sum, item) => sum + (item.monthlyLow ?? 0), 0) / 10
+    ) * 10;
+
   return (
     <div className="marketing-home">
       <section className="hero">
@@ -116,7 +123,10 @@ export function MarketingHomePage() {
               <b>{SITE_NAME} replaces the stack.</b>
               <span>
                 {" "}
-                One application OS with six integrated modules, pricing from $2.99/mo, and snapshots that keep your history honest.
+                One application OS with six integrated modules and snapshots
+                that keep your history honest — from{" "}
+                <strong className="replace-price">$2.99/mo</strong>, replacing a
+                stack that can run <strong>${stackMonthlyLow}+/mo</strong>.
               </span>
             </div>
           </Reveal>

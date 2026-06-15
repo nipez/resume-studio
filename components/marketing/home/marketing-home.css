@@ -109,7 +109,8 @@
 .marketing-home .stack-card p{font-size:13.5px;line-height:1.5;color:#9b91a6;margin-bottom:16px;}
 .marketing-home .cost-row{display:flex;flex-direction:column;gap:2px;}
 .marketing-home .cost-label{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#7a7184;}
-.marketing-home .price-tag{font-size:13.5px;font-weight:600;color:#9b91a6;text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:var(--coral);}
+.marketing-home .price-tag{font-size:13.5px;font-weight:600;color:#c4bacd;text-decoration:line-through;text-decoration-thickness:1px;text-decoration-color:rgba(255,92,56,.85);}
+.marketing-home .replace-price{color:var(--coral-l);}
 .marketing-home .replace{display:flex;align-items:center;gap:20px;margin-top:40px;background:linear-gradient(100deg,rgba(255,92,56,.16),rgba(255,92,56,.04));border:1px solid rgba(255,92,56,.3);border-radius:16px;padding:24px 28px;position:relative;}
 .marketing-home .replace .rlogo{width:44px;height:44px;border-radius:12px;background:var(--coral);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:20px;color:#fff;flex-shrink:0;}
 .marketing-home .replace b{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:19px;}
