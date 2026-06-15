@@ -24,6 +24,15 @@ const MODULE_ICONS = [
 
 const CAPABILITY_ICONS = ["✎", "✦", "↗", "📸", "◫", "↻"];
 
+const BENTO_SHORT = [
+  "Master + role cuts",
+  "JD → matched version",
+  "Voice, not filler",
+  "Batch or one-by-one",
+  "Snapshot every send",
+  "Funnel + learnings",
+] as const;
+
 export function FeaturesPage() {
   return (
     <div className="marketing-home">
@@ -57,34 +66,34 @@ export function FeaturesPage() {
               ))}
             </div>
           </div>
-          <div className="loop-wrap">
-            <div className="loop">
-              <div className="loop-ring" />
-              <div className="loop-blob" />
-              <div className="loop-spin">
-                {APPLICATION_OS_LOOP.map((node, index) => (
-                  <div key={node.step} className={`node n${index + 1}`}>
-                    <div>
-                      <span className="num">{node.step}</span>
-                      <span className="lbl">{LOOP_LABELS[index]}</span>
-                    </div>
+          <div className="features-bento-wrap">
+            <span className="features-bento-flow">1 workspace</span>
+            <div className="features-bento">
+              {APPLICATION_OS_LOOP.map((module, index) => (
+                <div
+                  key={module.step}
+                  className={`features-bento-tile${index === 1 ? " accent" : ""}`}
+                >
+                  <div className="bt-top">
+                    <span className="bt-num">{module.step}</span>
+                    <span className="bt-icon">{MODULE_ICONS[index]}</span>
                   </div>
-                ))}
-              </div>
-              <div className="loop-core">
-                <span className="big">6→1</span>
-                <span className="small">closed loop</span>
-              </div>
+                  <div>
+                    <span className="bt-label">{LOOP_LABELS[index]}</span>
+                    <p className="bt-desc">{BENTO_SHORT[index]}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
         <div className="snap-strip">
           <div className="wrap inner">
-            <span className="snap-saved">Snapshot saved</span>
+            <span className="snap-saved">One login</span>
             <span className="sep">·</span>
             <span>
-              Every module shares resume data, job context, and application
-              history — no re-pasting between tools.
+              Six modules share resume data, job context, and application
+              history — import once, use everywhere.
             </span>
           </div>
         </div>
