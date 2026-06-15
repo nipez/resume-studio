@@ -28,6 +28,32 @@ type ResumeAiAssistProps = {
   onApplyPatch: (patch: AiApplyPatch) => void;
 };
 
+const SECTION_COPY: Record<
+  ResumeEditSection["id"],
+  { tagline: string; hint: string }
+> = {
+  header: {
+    tagline: "Sharpen your headline",
+    hint: "Get positioning that reads like a VP, not a job description.",
+  },
+  summary: {
+    tagline: "Rewrite your opener",
+    hint: "Turn the summary into a tight, role-ready narrative.",
+  },
+  skills: {
+    tagline: "Curate your skills",
+    hint: "Surface the keywords recruiters actually scan for.",
+  },
+  experience: {
+    tagline: "Polish this role",
+    hint: "Quantify impact and tighten every bullet.",
+  },
+  education: {
+    tagline: "Improve this section",
+    hint: "Spot gaps and ways to strengthen your credentials.",
+  },
+};
+
 export function ResumeAiAssist({
   section,
   data,
@@ -49,6 +75,9 @@ export function ResumeAiAssist({
   const [activePanel, setActivePanel] = useState<ResultPanel>(null);
   const [suggestPass, setSuggestPass] = useState(0);
   const detailsRef = useRef<HTMLDetailsElement>(null);
+
+  const isWorking = loading !== null;
+  const copy = SECTION_COPY[section.id];
 
   function openAiPanel() {
     if (detailsRef.current) detailsRef.current.open = true;
@@ -166,7 +195,7 @@ export function ResumeAiAssist({
     section.id === "summary"
       ? { label: "Improve summary", action: "improve-summary" as const }
       : section.id === "header"
-        ? { label: "Headline options", action: "improve-headline" as const }
+        ? { label: "Generate headline options", action: "improve-headline" as const }
         : section.id === "skills"
           ? { label: "Suggest skills", action: "suggest-skills" as const }
           : section.id === "experience" && section.index !== undefined
@@ -180,160 +209,228 @@ export function ResumeAiAssist({
   return (
     <details
       ref={detailsRef}
-      className="group mt-8 border-t border-[#EEF1F4] pt-5"
+      className="group/ai resume-ai-assist mt-8"
     >
-      <summary className="cursor-pointer list-none font-display text-[13px] font-semibold text-[#5A6573] marker:content-none [&::-webkit-details-marker]:hidden">
-        <span className="inline-flex items-center gap-2">
-          <span className="text-accent">✦</span>
-          AI help
-          <span className="text-[11px] font-normal text-[#9AA3AF]">
-            (optional)
-          </span>
-        </span>
+      <summary className="cursor-pointer list-none marker:content-none [&::-webkit-details-marker]:hidden">
+        <div
+          className={`relative overflow-hidden rounded-[14px] p-[1px] transition-shadow duration-300 group-open/ai:rounded-b-none ${
+            isWorking
+              ? "resume-ai-glow-active shadow-[0_0_28px_-4px_rgba(47,107,255,0.55)]"
+              : "shadow-[0_0_0_1px_rgba(47,107,255,0.12),0_10px_28px_-14px_rgba(47,107,255,0.35)]"
+          }`}
+        >
+          <div className="resume-ai-border absolute inset-0 rounded-[14px] opacity-90" />
+          <div className="relative flex items-center gap-3 rounded-[13px] bg-gradient-to-br from-[#F5F8FF] via-white to-[#F8F5FF] px-3.5 py-3 group-open/ai:rounded-b-none">
+            <div className="relative flex h-9 w-9 flex-none items-center justify-center">
+              <span className="absolute inset-0 rounded-[10px] bg-gradient-to-br from-[#2F6BFF] to-[#7C5CFF] opacity-15" />
+              <span className="resume-ai-sparkle relative text-[17px] leading-none text-[#2F6BFF]">
+                ✦
+              </span>
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <span className="font-display text-[13.5px] font-semibold text-ink">
+                  Resume AI
+                </span>
+                <span className="rounded-full bg-gradient-to-r from-[#2F6BFF]/10 to-[#7C5CFF]/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#2456D6]">
+                  Beta
+                </span>
+              </div>
+              <p className="mt-0.5 truncate text-[12px] text-[#7A828F]">
+                {copy.tagline}
+              </p>
+            </div>
+            <span className="flex-none text-[#9AA3AF] transition-transform duration-200 group-open/ai:rotate-180">
+              ▾
+            </span>
+          </div>
+        </div>
       </summary>
 
-      <div className="mt-4 space-y-3">
-        {error ? (
-          <p className="rounded-lg bg-[#FFF4F4] px-3 py-2 text-[12px] text-[#B23B3B]">
-            {error}
-          </p>
-        ) : null}
+      <div className="relative -mt-1 overflow-hidden rounded-b-[14px] border border-t-0 border-[#E4EAFF] bg-gradient-to-b from-[#FAFBFF] to-white px-3.5 pb-4 pt-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]">
+        <div className="pointer-events-none absolute -right-8 -top-10 h-32 w-32 rounded-full bg-[#7C5CFF]/8 blur-2xl" />
+        <div className="pointer-events-none absolute -bottom-6 -left-6 h-24 w-24 rounded-full bg-[#2F6BFF]/8 blur-2xl" />
 
-        <div className="flex flex-wrap gap-2">
+        <div className="relative space-y-3.5">
+          <p className="text-[12.5px] leading-relaxed text-[#5A6573]">
+            {copy.hint}
+          </p>
+
+          {error ? (
+            <p className="rounded-[10px] border border-[#F5C4C4] bg-[#FFF4F4] px-3 py-2 text-[12px] text-[#B23B3B]">
+              {error}
+            </p>
+          ) : null}
+
           {primaryAction ? (
-            <ActionChip
+            <button
+              type="button"
               disabled={loading === primaryAction.action}
               onClick={() =>
                 run(primaryAction.action, {
                   experienceIndex: primaryAction.experienceIndex,
                 })
               }
+              className="group/btn relative w-full cursor-pointer overflow-hidden rounded-[11px] border-none bg-gradient-to-r from-[#2F6BFF] via-[#4B5FFF] to-[#6B4FFF] px-4 py-3 text-[13px] font-semibold text-white shadow-[0_6px_20px_-6px_rgba(47,107,255,0.65)] transition-[transform,box-shadow] hover:shadow-[0_8px_24px_-6px_rgba(47,107,255,0.75)] active:scale-[0.99] disabled:opacity-70"
             >
-              {loading === primaryAction.action
-                ? "Working…"
-                : primaryAction.label}
-            </ActionChip>
+              <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 opacity-0 transition-opacity group-hover/btn:opacity-100" />
+              <span className="relative inline-flex items-center justify-center gap-2">
+                {loading === primaryAction.action ? (
+                  <>
+                    <LoadingDots />
+                    Working magic…
+                  </>
+                ) : (
+                  <>
+                    <span className="text-[15px] leading-none">✦</span>
+                    {primaryAction.label}
+                  </>
+                )}
+              </span>
+            </button>
           ) : null}
-          <ActionChip
-            disabled={loading === "suggest"}
-            onClick={() => run("suggest")}
-          >
-            {loading === "suggest"
-              ? "Working…"
-              : suggestions.length
-                ? "Refresh ideas"
-                : "3 ideas"}
-          </ActionChip>
-        </div>
 
-        {activePanel === "headline" && headlineOptions.length ? (
-          <div className="space-y-2">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-[#8A92A0]">
-              Pick a headline
-            </p>
-            {headlineOptions.map((headline, i) => (
-              <button
-                key={`${headline}-${i}`}
-                type="button"
-                onClick={() => {
-                  onApplyHeadline(headline);
-                  setHeadlineOptions([]);
-                  setActivePanel(null);
-                }}
-                className="w-full cursor-pointer rounded-lg border border-[#E2E6EB] bg-[#FAFBFC] px-3 py-2 text-left text-[12.5px] leading-snug text-ink hover:border-accent"
-              >
-                {headline}
-              </button>
-            ))}
-          </div>
-        ) : null}
-
-        {activePanel === "suggestions" && suggestions.length ? (
-          <div key={suggestPass} className="space-y-2">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-[#8A92A0]">
-              Ideas
-            </p>
-            {suggestions.map((item, i) => (
-              <div
-                key={`${suggestPass}-${i}`}
-                className="rounded-lg border border-[#E2E6EB] bg-[#FAFBFC] px-3 py-2.5"
-              >
-                <p className="text-[12.5px] leading-relaxed text-[#3a4250]">
-                  {item}
-                </p>
-                <button
-                  type="button"
-                  disabled={
-                    loading === `implement-${i}` || appliedSuggestion === i
-                  }
-                  onClick={async () => {
-                    setAppliedSuggestion(null);
-                    const ok = await run("implement-suggestion", {
-                      suggestion: item,
-                      loadingKey: `implement-${i}`,
-                    });
-                    if (ok) setAppliedSuggestion(i);
-                  }}
-                  className="mt-2 cursor-pointer text-[12px] font-semibold text-accent hover:underline disabled:opacity-50"
-                >
-                  {loading === `implement-${i}`
-                    ? "Applying…"
-                    : appliedSuggestion === i
-                      ? "Applied"
-                      : "Apply"}
-                </button>
-              </div>
-            ))}
-          </div>
-        ) : null}
-
-        <div className="flex gap-2">
-          <input
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            placeholder="Ask about this section…"
-            className="min-w-0 flex-1 rounded-lg border border-[#DFE3E8] px-3 py-2 text-[13px] focus:border-accent focus:outline-none"
-            onKeyDown={(e) => {
-              if (e.key !== "Enter" || !question.trim()) return;
-              e.preventDefault();
-              run("ask", { question: question.trim() });
-            }}
-          />
           <button
             type="button"
-            disabled={!question.trim() || loading === "ask"}
-            onClick={() => run("ask", { question: question.trim() })}
-            className="cursor-pointer rounded-lg border border-[#DFE3E8] bg-white px-3 py-2 text-[12px] font-semibold text-[#2456D6] disabled:opacity-50"
+            disabled={loading === "suggest"}
+            onClick={() => run("suggest")}
+            className="w-full cursor-pointer rounded-[11px] border border-[#C8D8FF] bg-white/80 px-4 py-2.5 text-[12.5px] font-semibold text-[#2456D6] backdrop-blur-sm transition-colors hover:border-[#A8C0FF] hover:bg-[#F5F8FF] disabled:opacity-60"
           >
-            Ask
+            {loading === "suggest" ? (
+              <span className="inline-flex items-center justify-center gap-2">
+                <LoadingDots />
+                Finding ideas…
+              </span>
+            ) : suggestions.length ? (
+              "Refresh improvement ideas"
+            ) : (
+              "Get 3 improvement ideas"
+            )}
           </button>
-        </div>
 
-        {activePanel === "ask" && answer ? (
-          <p className="text-[12.5px] leading-relaxed text-[#5A6573]">{answer}</p>
-        ) : null}
+          {activePanel === "headline" && headlineOptions.length ? (
+            <ResultBlock title="Pick a headline">
+              {headlineOptions.map((headline, i) => (
+                <button
+                  key={`${headline}-${i}`}
+                  type="button"
+                  onClick={() => {
+                    onApplyHeadline(headline);
+                    setHeadlineOptions([]);
+                    setActivePanel(null);
+                  }}
+                  className="w-full cursor-pointer rounded-[10px] border border-[#E2E8FF] bg-white px-3 py-2.5 text-left text-[12.5px] leading-snug text-ink shadow-[0_1px_2px_rgba(15,17,22,0.04)] transition-all hover:border-[#2F6BFF] hover:shadow-[0_4px_14px_-6px_rgba(47,107,255,0.35)]"
+                >
+                  {headline}
+                </button>
+              ))}
+            </ResultBlock>
+          ) : null}
+
+          {activePanel === "suggestions" && suggestions.length ? (
+            <ResultBlock title="Improvement ideas">
+              {suggestions.map((item, i) => (
+                <div
+                  key={`${suggestPass}-${i}`}
+                  className="relative overflow-hidden rounded-[10px] border border-[#E2E8FF] bg-white px-3 py-2.5 shadow-[0_1px_2px_rgba(15,17,22,0.04)]"
+                >
+                  <div className="absolute inset-y-0 left-0 w-[3px] bg-gradient-to-b from-[#2F6BFF] to-[#7C5CFF]" />
+                  <p className="pl-2 text-[12.5px] leading-relaxed text-[#3a4250]">
+                    {item}
+                  </p>
+                  <button
+                    type="button"
+                    disabled={
+                      loading === `implement-${i}` || appliedSuggestion === i
+                    }
+                    onClick={async () => {
+                      setAppliedSuggestion(null);
+                      const ok = await run("implement-suggestion", {
+                        suggestion: item,
+                        loadingKey: `implement-${i}`,
+                      });
+                      if (ok) setAppliedSuggestion(i);
+                    }}
+                    className="mt-2.5 pl-2 text-[12px] font-semibold text-[#2456D6] hover:underline disabled:opacity-50"
+                  >
+                    {loading === `implement-${i}`
+                      ? "Applying…"
+                      : appliedSuggestion === i
+                        ? "Applied to resume ✓"
+                        : "Apply this idea →"}
+                  </button>
+                </div>
+              ))}
+            </ResultBlock>
+          ) : null}
+
+          <div className="rounded-[11px] border border-[#E2E8FF] bg-white/90 p-1 shadow-[inset_0_1px_2px_rgba(15,17,22,0.03)]">
+            <div className="flex gap-1.5">
+              <input
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                placeholder="Ask anything about this section…"
+                className="min-w-0 flex-1 rounded-[8px] border-none bg-transparent px-2.5 py-2 text-[13px] text-ink placeholder:text-[#9AA3AF] focus:outline-none"
+                onKeyDown={(e) => {
+                  if (e.key !== "Enter" || !question.trim()) return;
+                  e.preventDefault();
+                  run("ask", { question: question.trim() });
+                }}
+              />
+              <button
+                type="button"
+                disabled={!question.trim() || loading === "ask"}
+                onClick={() => run("ask", { question: question.trim() })}
+                className="cursor-pointer rounded-[8px] bg-[#EAF1FF] px-3 py-2 text-[12px] font-semibold text-[#2456D6] transition-colors hover:bg-[#DCE8FF] disabled:opacity-50"
+              >
+                {loading === "ask" ? "…" : "Ask"}
+              </button>
+            </div>
+          </div>
+
+          {activePanel === "ask" && answer ? (
+            <div className="rounded-[10px] border border-[#E2E8FF] bg-white px-3 py-2.5">
+              <p className="mb-1 text-[10px] font-bold uppercase tracking-wide text-[#8A92A0]">
+                Answer
+              </p>
+              <p className="text-[12.5px] leading-relaxed text-[#5A6573]">
+                {answer}
+              </p>
+            </div>
+          ) : null}
+        </div>
       </div>
     </details>
   );
 }
 
-function ActionChip({
+function ResultBlock({
+  title,
   children,
-  onClick,
-  disabled,
 }: {
+  title: string;
   children: React.ReactNode;
-  onClick: () => void;
-  disabled?: boolean;
 }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className="cursor-pointer rounded-lg border border-[#DFE3E8] bg-white px-3 py-1.5 text-[12px] font-semibold text-[#2456D6] hover:border-[#C8D8FF] hover:bg-[#F5F8FF] disabled:opacity-50"
-    >
-      {children}
-    </button>
+    <div className="space-y-2">
+      <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-[#8A92A0]">
+        {title}
+      </p>
+      <div className="space-y-2">{children}</div>
+    </div>
+  );
+}
+
+function LoadingDots() {
+  return (
+    <span className="inline-flex gap-0.5" aria-hidden>
+      {[0, 1, 2].map((i) => (
+        <span
+          key={i}
+          className="resume-ai-dot h-1 w-1 rounded-full bg-current"
+          style={{ animationDelay: `${i * 0.15}s` }}
+        />
+      ))}
+    </span>
   );
 }
