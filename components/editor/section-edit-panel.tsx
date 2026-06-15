@@ -6,12 +6,22 @@ import type {
   ResumeEducation,
   ResumeExperience,
 } from "@/lib/types/resume";
-import type { ResumeEditSection } from "@/lib/types/resume-editor";
+import type {
+  ResumeEditSection,
+  ResumeEditSectionId,
+} from "@/lib/types/resume-editor";
 import { sectionLabel } from "@/lib/types/resume-editor";
 import { useCallback, useEffect, useRef } from "react";
 
 const inputClass =
   "rounded-[9px] border border-[#DFE3E8] px-[11px] py-[9px] text-sm text-ink focus:border-accent focus:outline-none";
+
+const SECTION_TABS: { id: ResumeEditSectionId; label: string }[] = [
+  { id: "header", label: "Header" },
+  { id: "summary", label: "Summary" },
+  { id: "skills", label: "Skills" },
+  { id: "education", label: "Education" },
+];
 
 function AutoTextarea({
   value,
@@ -52,17 +62,17 @@ function AutoTextarea({
 type SectionEditPanelProps = {
   section: ResumeEditSection;
   data: ResumeData;
+  onSectionChange: (section: ResumeEditSection) => void;
   onUpdateData: (patch: Partial<ResumeData>) => void;
   onUpdateExperience: (index: number, patch: Partial<ResumeExperience>) => void;
-  onClose: () => void;
 };
 
 export function SectionEditPanel({
   section,
   data,
+  onSectionChange,
   onUpdateData,
   onUpdateExperience,
-  onClose,
 }: SectionEditPanelProps) {
   const expIndex = section.index ?? 0;
   const exp = data.experience[expIndex];
@@ -90,45 +100,67 @@ export function SectionEditPanel({
     }
   }
 
+  function selectTab(id: ResumeEditSectionId) {
+    if (id === "experience") {
+      onSectionChange({ id: "experience", index: 0 });
+      return;
+    }
+    onSectionChange({ id });
+  }
+
+  const isExperience = section.id === "experience";
+
   return (
-    <div className="absolute bottom-4 right-4 top-4 z-20 flex w-[min(400px,calc(100%-2rem))] flex-col overflow-hidden rounded-2xl border border-white/70 bg-white/96 shadow-[0_22px_56px_rgba(15,17,22,0.22)] backdrop-blur-md">
-      <div className="flex items-center justify-between border-b border-[#EEF1F4] px-5 py-4">
-        <div>
-          <div className="font-display text-[15px] font-semibold text-ink">
-            {sectionLabel(section)}
-          </div>
-          <div className="mt-0.5 text-[12px] text-[#8A92A0]">
-            Changes update live on your resume
-          </div>
+    <aside className="flex h-full w-[400px] flex-none flex-col border-l border-border bg-white">
+      <div className="flex-none border-b border-[#EEF1F4] px-4 py-3">
+        <div className="font-display text-[15px] font-semibold text-ink">
+          Edit resume
         </div>
-        <button
-          type="button"
-          onClick={onClose}
-          className="cursor-pointer rounded-lg border-none bg-[#F2F3F5] px-2.5 py-1 text-[11.5px] font-semibold text-[#5A6573] hover:bg-[#E8EBEF]"
-        >
-          Close
-        </button>
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {SECTION_TABS.map((tab) => (
+            <TabButton
+              key={tab.id}
+              active={section.id === tab.id}
+              onClick={() => selectTab(tab.id)}
+            >
+              {tab.label}
+            </TabButton>
+          ))}
+          <TabButton
+            active={isExperience}
+            onClick={() => selectTab("experience")}
+          >
+            Experience
+          </TabButton>
+        </div>
       </div>
 
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <div className="scroll max-h-[min(480px,52vh)] flex-none overflow-y-auto border-b border-[#EEF1F4] px-5 py-4">
-          <ResumeAiAssist
-            section={section}
-            data={data}
-            onApplySummary={(summary) => onUpdateData({ summary })}
-            onApplyHeadline={(headline) => onUpdateData({ headline })}
-            onApplySkills={(skills) => onUpdateData({ skills })}
-            onApplyBullets={(index, blurb, bullets) =>
-              onUpdateExperience(index, { blurb, bullets })
-            }
-            onApplyPatch={applyAiPatch}
-          />
-        </div>
+      <div className="scroll min-h-0 flex-1 overflow-y-auto px-4 py-4">
+        <h2 className="mb-4 font-display text-[14px] font-semibold text-ink">
+          {sectionLabel(section)}
+        </h2>
 
-        <div className="scroll min-h-0 flex-1 overflow-auto px-5 py-4">
-          <div className="mb-3 font-display text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8A92A0]">
-            Edit fields
-          </div>
+        {isExperience && data.experience.length > 1 ? (
+          <label className="mb-4 flex flex-col gap-1.5 text-xs font-semibold text-[#5A6573]">
+            Role
+            <select
+              value={expIndex}
+              onChange={(e) =>
+                onSectionChange({
+                  id: "experience",
+                  index: Number(e.target.value),
+                })
+              }
+              className={inputClass}
+            >
+              {data.experience.map((role, i) => (
+                <option key={i} value={i}>
+                  {role.title || role.company || `Role ${i + 1}`}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : null}
 
         {section.id === "header" ? (
           <div className="space-y-3">
@@ -182,7 +214,7 @@ export function SectionEditPanel({
         {section.id === "summary" ? (
           <Field label="Summary / profile">
             <textarea
-              rows={6}
+              rows={8}
               className={`${inputClass} w-full resize-y leading-[1.55]`}
               value={data.summary}
               onChange={(e) => onUpdateData({ summary: e.target.value })}
@@ -226,6 +258,14 @@ export function SectionEditPanel({
               }}
             />
           </div>
+        ) : null}
+
+        {section.id === "experience" && !exp ? (
+          <p className="text-[13px] leading-relaxed text-[#7A828F]">
+            No roles yet. Use{" "}
+            <span className="font-semibold text-ink">+ Role</span> in the toolbar,
+            or click a job on the preview.
+          </p>
         ) : null}
 
         {section.id === "experience" && exp ? (
@@ -373,9 +413,44 @@ export function SectionEditPanel({
             </button>
           </div>
         ) : null}
-        </div>
+
+        <ResumeAiAssist
+          section={section}
+          data={data}
+          onApplySummary={(summary) => onUpdateData({ summary })}
+          onApplyHeadline={(headline) => onUpdateData({ headline })}
+          onApplySkills={(skills) => onUpdateData({ skills })}
+          onApplyBullets={(index, blurb, bullets) =>
+            onUpdateExperience(index, { blurb, bullets })
+          }
+          onApplyPatch={applyAiPatch}
+        />
       </div>
-    </div>
+    </aside>
+  );
+}
+
+function TabButton({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`cursor-pointer rounded-lg px-2.5 py-1 text-[12px] font-semibold transition-colors ${
+        active
+          ? "bg-[#EAF1FF] text-[#2456D6]"
+          : "bg-[#F2F3F5] text-[#5A6573] hover:bg-[#E8EBEF]"
+      }`}
+    >
+      {children}
+    </button>
   );
 }
 

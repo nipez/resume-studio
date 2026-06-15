@@ -21,9 +21,6 @@ const TEMPLATES: { id: TemplateStyle; label: string }[] = [
   { id: "editorial", label: "Editorial" },
 ];
 
-const PANEL_WIDTH = 400;
-const PANEL_GUTTER = 32;
-
 type ResumeEditorProps = {
   version: ResumeVersion;
 };
@@ -32,7 +29,7 @@ export function ResumeEditor({ version }: ResumeEditorProps) {
   const [name, setName] = useState(version.name);
   const [templateStyle, setTemplateStyle] = useState(version.template_style);
   const [data, setData] = useState<ResumeData>(version.data);
-  const [activeSection, setActiveSection] = useState<ResumeEditSection | null>({
+  const [activeSection, setActiveSection] = useState<ResumeEditSection>({
     id: "header",
   });
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">(
@@ -163,7 +160,7 @@ export function ResumeEditor({ version }: ResumeEditorProps) {
               ? "Saved"
               : saveState === "error"
                 ? "Save failed"
-                : "Click a section to switch"}
+                : "Live preview"}
         </span>
         <button
           type="button"
@@ -174,31 +171,23 @@ export function ResumeEditor({ version }: ResumeEditorProps) {
         </button>
       </div>
 
-      <div className="relative min-h-0 flex-1">
-        <InteractiveResumePreview
-          html={previewHtml}
-          activeSection={activeSection}
-          onSectionSelect={handleSectionSelect}
-          reservedRight={activeSection ? PANEL_WIDTH + PANEL_GUTTER : 0}
-          className="absolute inset-0"
-        />
-
-        {!activeSection ? (
-          <div className="pointer-events-none absolute bottom-5 left-1/2 z-10 -translate-x-1/2 rounded-full border border-white/70 bg-white/92 px-4 py-2 text-[12.5px] font-medium text-[#5A6573] shadow-[0_8px_24px_rgba(15,17,22,0.12)] backdrop-blur-md">
-            Click any highlighted section on your resume to edit · AI assist in
-            each panel
-          </div>
-        ) : null}
-
-        {activeSection ? (
-          <SectionEditPanel
-            section={activeSection}
-            data={data}
-            onUpdateData={updateData}
-            onUpdateExperience={updateExperience}
-            onClose={() => setActiveSection(null)}
+      <div className="flex min-h-0 flex-1">
+        <div className="min-h-0 min-w-0 flex-1">
+          <InteractiveResumePreview
+            html={previewHtml}
+            activeSection={activeSection}
+            onSectionSelect={handleSectionSelect}
+            className="h-full"
           />
-        ) : null}
+        </div>
+
+        <SectionEditPanel
+          section={activeSection}
+          data={data}
+          onSectionChange={setActiveSection}
+          onUpdateData={updateData}
+          onUpdateExperience={updateExperience}
+        />
       </div>
     </div>
   );
