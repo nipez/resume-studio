@@ -88,6 +88,18 @@ export function MarketingHomePage() {
               </div>
             </div>
           </div>
+          <div className="loop-compact" aria-label="Application OS modules">
+            {APPLICATION_OS_LOOP.map((node, index) => (
+              <div key={node.step} className="loop-chip">
+                <span className="num">{node.step}</span>
+                <span className="lbl">{LOOP_LABELS[index]}</span>
+              </div>
+            ))}
+            <div className="loop-compact-core">
+              <span className="big">6→1</span>
+              <span className="small">closed loop</span>
+            </div>
+          </div>
         </div>
         <div className="snap-strip">
           <div className="wrap inner">
@@ -209,20 +221,23 @@ export function MarketingHomePage() {
               Credit-based generators optimize a moment. {SITE_NAME} optimizes the entire search — with versions, tracking, snapshots, and insights that compound over months.
             </p>
           </Reveal>
-          <Reveal className="table-scroll">
-            <div className="ctable">
-              <div className="crow head">
-                <div className="c1">Dimension</div>
-                <div className="c2">AI resume generators</div>
-                <div className="c3">{SITE_NAME} · Application OS</div>
-              </div>
-              {GENERATOR_VS_OS.slice(0, 6).map((row) => (
-                <div key={row.dimension} className="crow">
-                  <div className="c1">{row.dimension}</div>
-                  <div className="c2">{row.generator}</div>
-                  <div className="c3">{row.applicationOs}</div>
+          <Reveal className="table-scroll-wrap">
+            <p className="table-scroll-hint">Swipe to compare</p>
+            <div className="table-scroll">
+              <div className="ctable">
+                <div className="crow head">
+                  <div className="c1">Dimension</div>
+                  <div className="c2">AI resume generators</div>
+                  <div className="c3">{SITE_NAME} · Application OS</div>
                 </div>
-              ))}
+                {GENERATOR_VS_OS.slice(0, 6).map((row) => (
+                  <div key={row.dimension} className="crow">
+                    <div className="c1">{row.dimension}</div>
+                    <div className="c2">{row.generator}</div>
+                    <div className="c3">{row.applicationOs}</div>
+                  </div>
+                ))}
+              </div>
             </div>
           </Reveal>
         </div>

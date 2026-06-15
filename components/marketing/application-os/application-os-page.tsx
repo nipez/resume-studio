@@ -133,7 +133,7 @@ export function ApplicationOsPage() {
               cycle — so every application you send makes the next one sharper.
             </p>
           </Reveal>
-          <Reveal className="mgrid" style={{ gridTemplateColumns: "repeat(3,1fr)" }}>
+          <Reveal className="mgrid aos-phases-grid">
             {PHASES.map((phase) => (
               <div key={phase.title} className="mcard">
                 <div className="top">

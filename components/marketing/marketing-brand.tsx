@@ -5,12 +5,14 @@ type MarketingBrandProps = {
   light?: boolean;
   href?: string;
   hideTagline?: boolean;
+  hideTaglineOnMobile?: boolean;
 };
 
 export function MarketingBrand({
   light = false,
   href = "/",
   hideTagline = false,
+  hideTaglineOnMobile = false,
 }: MarketingBrandProps) {
   const content = (
     <>
@@ -25,7 +27,7 @@ export function MarketingBrand({
         </span>
         {!hideTagline && (
           <span
-            className={`mt-[3px] block text-[10px] font-semibold uppercase tracking-[0.14em] ${light ? "text-[#ff8a5c]" : "text-[#ff5c38]"}`}
+            className={`mt-[3px] block text-[10px] font-semibold uppercase tracking-[0.14em] ${hideTaglineOnMobile ? "hidden min-[480px]:block" : ""} ${light ? "text-[#ff8a5c]" : "text-[#ff5c38]"}`}
           >
             {SITE_TAGLINE}
           </span>
