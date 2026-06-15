@@ -16,7 +16,7 @@ export default async function MarketingLayout({
   } = await supabase.auth.getUser();
 
   if (user) {
-    redirect("/library");
+    redirect("/dashboard");
   }
 
   return (
