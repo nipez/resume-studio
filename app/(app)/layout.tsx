@@ -2,6 +2,8 @@ import { AppShell } from "@/components/shell/app-shell";
 import { getSessionProfile } from "@/lib/auth/get-session-profile";
 import { redirect } from "next/navigation";
 
+export const dynamic = "force-dynamic";
+
 export default async function AppLayout({
   children,
 }: {

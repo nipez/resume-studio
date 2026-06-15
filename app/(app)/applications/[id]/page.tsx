@@ -12,22 +12,28 @@ type PageProps = {
 
 export default async function ApplicationDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const application = await getApplication(id);
 
-  if (!application) {
-    notFound();
+  try {
+    const application = await getApplication(id);
+
+    if (!application) {
+      notFound();
+    }
+
+    const [{ versions }, companyHistory] = await Promise.all([
+      getLibraryData(),
+      getCompanyApplicationHistory(application.company, application.id),
+    ]);
+
+    return (
+      <ApplicationDetailView
+        application={application}
+        resumeVersions={versions}
+        companyHistory={companyHistory}
+      />
+    );
+  } catch (error) {
+    console.error("ApplicationDetailPage:", error);
+    throw error;
   }
-
-  const [{ versions }, companyHistory] = await Promise.all([
-    getLibraryData(),
-    getCompanyApplicationHistory(application.company, application.id),
-  ]);
-
-  return (
-    <ApplicationDetailView
-      application={application}
-      resumeVersions={versions}
-      companyHistory={companyHistory}
-    />
-  );
 }

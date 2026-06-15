@@ -13,6 +13,12 @@ import type {
   StatusHistoryEntry,
 } from "@/lib/applications/types";
 import { normalizeResumeSnapshot, parseJobFromVersionName } from "@/lib/applications/utils";
+import {
+  isMissingApplicationColumnError,
+  isOptionalApplicationColumnError,
+  stripApplicationColumn,
+  stripOptionalApplicationColumns,
+} from "@/lib/applications/db-write";
 import { getResumeVersion } from "@/lib/resume/actions";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
@@ -66,6 +72,58 @@ function mapApplication(
   };
 }
 
+async function insertApplicationRow(
+  payload: Record<string, unknown>
+): Promise<{ data: Record<string, unknown> | null; error: Error | null }> {
+  const supabase = createClient();
+  let { data, error } = await supabase
+    .from("applications")
+    .insert(payload)
+    .select("*")
+    .single();
+
+  if (error && isOptionalApplicationColumnError(error.message)) {
+    ({ data, error } = await supabase
+      .from("applications")
+      .insert(stripOptionalApplicationColumns(payload))
+      .select("*")
+      .single());
+  }
+
+  return {
+    data: (data as Record<string, unknown> | null) ?? null,
+    error: error ? new Error(error.message) : null,
+  };
+}
+
+async function updateApplicationRow(
+  id: string,
+  payload: Record<string, unknown>
+): Promise<{ error: Error | null }> {
+  const supabase = createClient();
+  let { error } = await supabase.from("applications").update(payload).eq("id", id);
+
+  if (error && isOptionalApplicationColumnError(error.message)) {
+    ({ error } = await supabase
+      .from("applications")
+      .update(stripOptionalApplicationColumns(payload))
+      .eq("id", id));
+  }
+
+  if (
+    error &&
+    payload.job_url !== undefined &&
+    isMissingApplicationColumnError(error.message, "job_url")
+  ) {
+    ({ error } = await supabase
+      .from("applications")
+      .update(stripApplicationColumn(payload, "job_url"))
+      .eq("id", id));
+  }
+
+  return { error: error ? new Error(error.message) : null };
+}
+
 export async function getApplicationsList(): Promise<{
   applications: Application[];
   versionCounts: Record<string, number>;
@@ -79,7 +137,7 @@ export async function getApplicationsList(): Promise<{
     return { applications: [], versionCounts: {} };
   }
 
-  const [{ data: rows }, { data: events }] = await Promise.all([
+  const [{ data: rows, error: appsError }, { data: events }] = await Promise.all([
     supabase
       .from("applications")
       .select("*")
@@ -92,6 +150,11 @@ export async function getApplicationsList(): Promise<{
       .order("date", { ascending: true }),
   ]);
 
+  if (appsError) {
+    console.error("getApplicationsList:", appsError.message);
+    return { applications: [], versionCounts: {} };
+  }
+
   const eventsByApp = new Map<string, ApplicationEvent[]>();
   for (const row of events ?? []) {
     const ev = mapEvent(row);
@@ -100,9 +163,14 @@ export async function getApplicationsList(): Promise<{
     eventsByApp.set(ev.application_id, list);
   }
 
-  const applications = (rows ?? []).map((row) =>
-    mapApplication(row, eventsByApp.get(row.id as string) ?? [])
-  );
+  const applications = (rows ?? []).flatMap((row) => {
+    try {
+      return [mapApplication(row, eventsByApp.get(row.id as string) ?? [])];
+    } catch (error) {
+      console.error("mapApplication:", error);
+      return [];
+    }
+  });
 
   const versionCounts: Record<string, number> = {};
   for (const app of applications) {
@@ -162,29 +230,27 @@ export async function logApplication(input: LogApplicationInput) {
     (a) => a.q?.trim() && a.a?.trim()
   );
 
-  const { data: created, error } = await supabase
-    .from("applications")
-    .insert({
-      user_id: user.id,
-      role,
-      company,
-      job_desc: input.jobDesc?.trim() ?? "",
-      job_url: input.jobUrl?.trim() ?? "",
-      applied_at: now,
-      resume_version_id: version.id,
-      resume_version_name: version.name,
-      resume_snapshot: {
-        name: version.name,
-        template_style: version.template_style,
-        data: version.data,
-      },
-      cover_letter: input.coverLetter?.trim() ?? "",
-      answers,
-      status,
-      status_history: [{ status, at: now }],
-    })
-    .select("*")
-    .single();
+  const insertPayload = {
+    user_id: user.id,
+    role,
+    company,
+    job_desc: input.jobDesc?.trim() ?? "",
+    job_url: input.jobUrl?.trim() ?? "",
+    applied_at: now,
+    resume_version_id: version.id,
+    resume_version_name: version.name,
+    resume_snapshot: {
+      name: version.name,
+      template_style: version.template_style,
+      data: version.data,
+    },
+    cover_letter: input.coverLetter?.trim() ?? "",
+    answers,
+    status,
+    status_history: [{ status, at: now }],
+  };
+
+  const { data: created, error } = await insertApplicationRow(insertPayload);
 
   if (error || !created) {
     throw new Error(error?.message ?? "Failed to log application");
@@ -239,10 +305,7 @@ export async function updateApplicationMeta(
   if (patch.notes !== undefined) payload.notes = patch.notes;
   if (patch.applied_at !== undefined) payload.applied_at = patch.applied_at;
 
-  const { error } = await supabase
-    .from("applications")
-    .update(payload)
-    .eq("id", id);
+  const { error } = await updateApplicationRow(id, payload);
 
   if (error) throw new Error(error.message);
 
@@ -297,13 +360,14 @@ export async function updateApplicationHiringContacts(
   id: string,
   contacts: HiringContact[]
 ) {
-  const supabase = createClient();
-  const { error } = await supabase
-    .from("applications")
-    .update({ hiring_contacts: contacts })
-    .eq("id", id);
+  const { error } = await updateApplicationRow(id, { hiring_contacts: contacts });
 
-  if (error) throw new Error(error.message);
+  if (error) {
+    if (isMissingApplicationColumnError(error.message, "hiring_contacts")) {
+      return;
+    }
+    throw error;
+  }
   revalidatePath(`/applications/${id}`);
 }
 

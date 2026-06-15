@@ -8,7 +8,7 @@ export async function getSessionProfile() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { user: null, profile: null };
+    return { user: null, profile: null, displayName: null, avatarLetter: null };
   }
 
   const { data: profile } = await supabase
