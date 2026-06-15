@@ -1,5 +1,7 @@
 "use client";
 
+import { AccentColorPicker } from "@/components/editor/accent-color-picker";
+import { FitResumePreview } from "@/components/resume/fit-resume-preview";
 import { buildResumeHTML } from "@/lib/resume/build-resume-html";
 import { updateResumeVersion } from "@/lib/resume/actions";
 import type { ResumeVersion } from "@/lib/resume/db-types";
@@ -100,6 +102,7 @@ export function ResumeEditor({ version }: ResumeEditorProps) {
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">(
     "idle"
   );
+  const [editorOpen, setEditorOpen] = useState(true);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const latestRef = useRef({ name, templateStyle, data });
 
@@ -197,6 +200,21 @@ export function ResumeEditor({ version }: ResumeEditorProps) {
             </button>
           ))}
         </div>
+        <AccentColorPicker
+          value={data.accentColor}
+          onChange={(accentColor) => updateData({ accentColor })}
+        />
+        <button
+          type="button"
+          onClick={() => setEditorOpen((open) => !open)}
+          className={`cursor-pointer rounded-[10px] border px-3 py-2 text-[12.5px] font-semibold transition-colors ${
+            editorOpen
+              ? "border-[#DFE3E8] bg-white text-[#5A6573] hover:border-[#C8CED6]"
+              : "border-accent bg-[#EAF1FF] text-[#2456D6]"
+          }`}
+        >
+          {editorOpen ? "Preview only" : "Show editor"}
+        </button>
         <span className="text-xs text-[#9AA3AF]">
           {saveState === "saving"
             ? "Saving…"
@@ -215,8 +233,29 @@ export function ResumeEditor({ version }: ResumeEditorProps) {
         </button>
       </div>
 
-      <div className="flex min-h-0 flex-1">
-        <div className="scroll w-[47%] max-w-[640px] flex-none overflow-auto border-r border-border bg-white px-7 pb-16 pt-[26px]">
+      <div className="relative min-h-0 flex-1">
+        <FitResumePreview html={previewHtml} className="absolute inset-0" />
+
+        <div
+          className={`absolute bottom-4 left-4 top-4 z-10 flex w-[min(440px,calc(100%-2rem))] flex-col transition-all duration-300 ease-out ${
+            editorOpen
+              ? "translate-x-0 opacity-100"
+              : "pointer-events-none -translate-x-[108%] opacity-0"
+          }`}
+        >
+          <div className="scroll flex flex-1 flex-col overflow-auto rounded-2xl border border-white/70 bg-white/94 px-6 pb-14 pt-5 shadow-[0_22px_56px_rgba(15,17,22,0.2)] backdrop-blur-md">
+            <div className="mb-4 flex items-center justify-between">
+              <span className="font-display text-[13px] font-semibold uppercase tracking-[0.08em] text-[#8A92A0]">
+                Edit resume
+              </span>
+              <button
+                type="button"
+                onClick={() => setEditorOpen(false)}
+                className="cursor-pointer rounded-lg border-none bg-[#F2F3F5] px-2.5 py-1 text-[11.5px] font-semibold text-[#5A6573] hover:bg-[#E8EBEF]"
+              >
+                Hide
+              </button>
+            </div>
           <SectionTitle>Header</SectionTitle>
           <div className="grid grid-cols-2 gap-3">
             <FieldLabel label="Full name">
@@ -506,17 +545,18 @@ export function ResumeEditor({ version }: ResumeEditorProps) {
               </div>
             ))}
           </div>
-        </div>
-
-        <div className="scroll flex flex-1 justify-center overflow-auto bg-[#EAECEF] p-7">
-          <div className="h-[1060px] w-[820px] max-w-full flex-none overflow-hidden rounded-[5px] bg-white shadow-[0_6px_30px_rgba(15,17,22,0.13)]">
-            <iframe
-              title="Resume preview"
-              srcDoc={previewHtml}
-              className="block h-full w-full border-none bg-white"
-            />
           </div>
         </div>
+
+        {!editorOpen ? (
+          <button
+            type="button"
+            onClick={() => setEditorOpen(true)}
+            className="absolute left-4 top-4 z-10 inline-flex cursor-pointer items-center gap-2 rounded-xl border border-white/70 bg-white/94 px-4 py-2.5 text-[13px] font-semibold text-ink shadow-[0_10px_28px_rgba(15,17,22,0.16)] backdrop-blur-md transition-colors hover:bg-white"
+          >
+            ✎ Edit resume
+          </button>
+        ) : null}
       </div>
     </div>
   );

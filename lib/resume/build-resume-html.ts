@@ -1,3 +1,4 @@
+import { resolveAccentPalette } from "@/lib/resume/accent-color";
 import type {
   ResumeData,
   ResumeEducation,
@@ -6,9 +7,8 @@ import type {
   TemplateStyle,
 } from "@/lib/types/resume";
 
-const CORAL = "#ff5c38";
-const CORAL_L = "#ff8a5c";
 const INK = "#231a2e";
+const PAGE_WIDTH_PX = 816;
 
 const PRINT_BASE =
   "@page{size:letter;margin:0}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}";
@@ -69,6 +69,7 @@ function buildClassicHTML(d: ResumeData): { css: string; body: string } {
   const skills = d.skills || [];
   const exp = d.experience || [];
   const edu = d.education || [];
+  const { accent, accentTint } = resolveAccentPalette(d.accentColor);
 
   const css =
     "*{box-sizing:border-box}body{margin:0;font-family:'Instrument Sans',Arial,sans-serif;color:#48414f;font-size:9.5pt;line-height:1.45}" +
@@ -76,19 +77,19 @@ function buildClassicHTML(d: ResumeData): { css: string; body: string } {
     `.classic{font-family:'Newsreader',Georgia,serif}` +
     `.head{text-align:center;border-bottom:1.5px solid #1a1420;padding-bottom:12px}` +
     `.r-name{font-size:26pt;font-weight:700;letter-spacing:.02em;color:#1a1420;line-height:1}` +
-    `.r-role{color:${CORAL};font-size:10.5pt;font-weight:600;letter-spacing:.22em;text-transform:uppercase;margin-top:6px;font-family:'Instrument Sans',sans-serif}` +
+    `.r-role{color:${accent};font-size:10.5pt;font-weight:600;letter-spacing:.22em;text-transform:uppercase;margin-top:6px;font-family:'Instrument Sans',sans-serif}` +
     `.contact{font-size:9pt;color:#6c6675;margin-top:8px;letter-spacing:.02em;font-family:'Instrument Sans',sans-serif}` +
     `.sec{margin-top:16px}` +
     `.r-h{font-size:10pt;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:#1a1420;font-family:'Instrument Sans',sans-serif;border-bottom:1px solid rgba(40,20,30,.18);padding-bottom:4px;margin-bottom:8px}` +
     `.row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;min-height:1.2em}` +
     `.r-job{font-weight:700;color:#1a1420;font-size:10.5pt;white-space:nowrap}` +
-    `.r-co{color:${CORAL};font-weight:600;font-size:9.5pt;font-family:'Instrument Sans',sans-serif;white-space:nowrap}` +
+    `.r-co{color:${accent};font-weight:600;font-size:9.5pt;font-family:'Instrument Sans',sans-serif;white-space:nowrap}` +
     `.r-date{color:#9a93a3;font-weight:500;font-size:9pt;font-family:'Instrument Sans',sans-serif;white-space:nowrap}` +
     `.r-li{position:relative;color:#48414f;font-size:9.5pt;line-height:1.5;padding-left:11px;margin-top:4px;font-family:'Instrument Sans',sans-serif}` +
-    `.r-li::before{content:'';position:absolute;left:0;top:.45em;width:3px;height:3px;border-radius:50%;background:${CORAL}}` +
+    `.r-li::before{content:'';position:absolute;left:0;top:.45em;width:3px;height:3px;border-radius:50%;background:${accent}}` +
     `.r-p{color:#48414f;font-size:9.5pt;line-height:1.55;font-family:'Instrument Sans',sans-serif}` +
     `.skills{display:flex;flex-wrap:wrap;gap:5px}` +
-    `.chip{font-size:8.5pt;font-family:'Instrument Sans',sans-serif;color:#48414f;background:#f4eee9;border-radius:4px;padding:3px 7px;white-space:nowrap}` +
+    `.chip{font-size:8.5pt;font-family:'Instrument Sans',sans-serif;color:#48414f;background:${accentTint};border-radius:4px;padding:3px 7px;white-space:nowrap}` +
     `.exp{margin-bottom:12px}` +
     `.exp+.exp{margin-top:10px}` +
     PRINT_BASE;
@@ -147,29 +148,30 @@ function buildTwocolHTML(d: ResumeData): { css: string; body: string } {
   const exp = d.experience || [];
   const edu = d.education || [];
   const ini = initials(d.name);
+  const { accent, accentLight, accentMuted } = resolveAccentPalette(d.accentColor);
 
   const css =
     "*{box-sizing:border-box}body{margin:0;font-family:'Instrument Sans',Arial,sans-serif;color:#48414f;font-size:9.5pt;line-height:1.45}" +
     `.wrap{max-width:8.5in;margin:0 auto;min-height:11in;display:grid;grid-template-columns:38% 1fr}` +
     `.side{background:${INK};color:#fff;padding:.52in .36in}` +
-    `.avatar{width:.68in;height:.68in;border-radius:50%;background:linear-gradient(135deg,${CORAL},${CORAL_L});display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17pt;color:#fff;margin:0 auto}` +
-    `.side .r-h{color:#ff9a72;font-size:8.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.14em;margin:18px 0 7px}` +
+    `.avatar{width:.68in;height:.68in;border-radius:50%;background:linear-gradient(135deg,${accent},${accentLight});display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17pt;color:#fff;margin:0 auto}` +
+    `.side .r-h{color:${accentMuted};font-size:8.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.14em;margin:18px 0 7px}` +
     `.side .txt{font-size:9pt;line-height:1.7;color:#d9d2e0}` +
     `.side .sk{font-size:9pt;color:#e8e3ee;display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}` +
     `.meter{width:52px;height:3px;border-radius:2px;background:rgba(255,255,255,.18);overflow:hidden;flex-shrink:0}` +
-    `.meter span{display:block;height:100%;background:${CORAL}}` +
+    `.meter span{display:block;height:100%;background:${accent}}` +
     `.main{padding:.52in .44in}` +
     `.r-name{font-size:21pt;font-weight:700;font-family:'Space Grotesk',sans-serif;color:#1a1420;line-height:1;letter-spacing:-.01em}` +
-    `.r-role{color:${CORAL};font-size:9.5pt;font-weight:600;letter-spacing:.16em;text-transform:uppercase;margin-top:5px}` +
+    `.r-role{color:${accent};font-size:9.5pt;font-weight:600;letter-spacing:.16em;text-transform:uppercase;margin-top:5px}` +
     `.main .r-h{font-size:9pt;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:#1a1420;margin:16px 0 7px}` +
     `.main .r-h:first-of-type{margin-top:14px}` +
     `.r-p{color:#48414f;font-size:9.5pt;line-height:1.6}` +
     `.row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;min-height:1.2em}` +
     `.r-job{font-weight:700;color:#1a1420;font-size:10pt;white-space:nowrap}` +
-    `.r-co{color:${CORAL};font-weight:600;font-size:9pt;white-space:nowrap}` +
+    `.r-co{color:${accent};font-weight:600;font-size:9pt;white-space:nowrap}` +
     `.r-date{color:#9a93a3;font-weight:500;font-size:8.5pt;white-space:nowrap}` +
     `.r-li{position:relative;color:#48414f;font-size:9pt;line-height:1.5;padding-left:11px;margin-top:4px}` +
-    `.r-li::before{content:'';position:absolute;left:0;top:.45em;width:3px;height:3px;border-radius:50%;background:${CORAL}}` +
+    `.r-li::before{content:'';position:absolute;left:0;top:.45em;width:3px;height:3px;border-radius:50%;background:${accent}}` +
     `.exp{margin-bottom:11px}` +
     PRINT_BASE;
 
@@ -232,28 +234,29 @@ function buildEditorialHTML(d: ResumeData): { css: string; body: string } {
   const { first, last } = splitName(d.name);
   const ini = initials(d.name);
   const chips = skills.slice(0, 4);
+  const { accent } = resolveAccentPalette(d.accentColor);
 
   const css =
     "*{box-sizing:border-box}body{margin:0;font-family:'Instrument Sans',Arial,sans-serif;color:#48414f;font-size:9.5pt;line-height:1.45}" +
     `.page{max-width:8.5in;margin:0 auto;min-height:11in;padding:.55in .58in 0}` +
     `.topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}` +
-    `.r-name{font-family:'Space Grotesk',sans-serif;font-size:28pt;line-height:.95;letter-spacing:-.02em;color:${CORAL};font-weight:700}` +
+    `.r-name{font-family:'Space Grotesk',sans-serif;font-size:28pt;line-height:.95;letter-spacing:-.02em;color:${accent};font-weight:700}` +
     `.r-name b{display:block;color:#1a1420;font-weight:700}` +
     `.badge{width:34px;height:34px;border-radius:8px;background:${INK};color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:11pt;display:flex;align-items:center;justify-content:center;flex-shrink:0}` +
     `.r-role{font-size:9pt;letter-spacing:.2em;text-transform:uppercase;color:#6c6675;margin-top:8px;font-weight:600}` +
     `.rule{height:2px;background:#1a1420;margin:12px 0}` +
     `.chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px}` +
-    `.chip{font-size:8pt;font-weight:600;color:#fff;background:${CORAL};border-radius:100px;padding:4px 10px;white-space:nowrap}` +
+    `.chip{font-size:8pt;font-weight:600;color:#fff;background:${accent};border-radius:100px;padding:4px 10px;white-space:nowrap}` +
     `.chip.alt{background:${INK}}` +
     `.cols{display:grid;grid-template-columns:1.35fr 1fr;gap:16px}` +
-    `.r-h{font-size:9pt;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:${CORAL};margin-bottom:7px}` +
+    `.r-h{font-size:9pt;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:${accent};margin-bottom:7px}` +
     `.row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;min-height:1.2em}` +
     `.r-job{font-weight:700;color:#1a1420;font-size:10pt;white-space:nowrap}` +
     `.r-co{font-size:9pt;color:#6c6675;font-weight:500;white-space:nowrap}` +
     `.r-date{font-size:8.5pt;color:#9a93a3;font-weight:500;white-space:nowrap}` +
     `.r-p{color:#48414f;font-size:9.5pt;line-height:1.55}` +
     `.r-li{position:relative;color:#48414f;font-size:9.5pt;line-height:1.5;padding-left:11px;margin-top:4px}` +
-    `.r-li::before{content:'';position:absolute;left:0;top:.45em;width:3px;height:3px;border-radius:50%;background:${CORAL}}` +
+    `.r-li::before{content:'';position:absolute;left:0;top:.45em;width:3px;height:3px;border-radius:50%;background:${accent}}` +
     `.ed-blk{margin-bottom:12px}` +
     `.side .r-p{margin-bottom:10px}` +
     `.skill-row{display:flex;justify-content:space-between;font-size:9pt;color:#48414f;padding:4px 0;border-bottom:1px solid rgba(40,20,30,.08);white-space:nowrap;gap:10px}` +
@@ -349,3 +352,5 @@ export function templateLabel(style: TemplateStyle): string {
   if (style === "editorial") return "Editorial";
   return "Classic";
 }
+
+export { PAGE_WIDTH_PX };
