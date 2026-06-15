@@ -25,6 +25,8 @@ export type ResumeData = {
   skills: string[];
   experience: ResumeExperience[];
   education: ResumeEducation[];
+  /** Honors & awards — short standalone lines (e.g. "National Honor Society, 2024"). */
+  awards?: string[];
   /** Template accent color (hex). Defaults to coral when omitted. */
   accentColor?: string;
 };

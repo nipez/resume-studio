@@ -37,7 +37,8 @@ const STUDENT_STEPS: Step[] = [
   { id: "basics", title: "About you", subtitle: "Your name, contact, and a one-line headline." },
   { id: "summary", title: "Quick intro", subtitle: "A couple of sentences about you — grade, interests, what you're after." },
   { id: "education", title: "School", subtitle: "Your school, graduation year, GPA, and standout coursework." },
-  { id: "experience", title: "Activities & experience", subtitle: "Clubs, sports, leadership, volunteering, jobs, and honors all count — add each as an entry." },
+  { id: "experience", title: "Activities & experience", subtitle: "Clubs, sports, leadership, volunteering, and jobs all count — add each as an entry." },
+  { id: "awards", title: "Honors & awards", subtitle: "Honor Roll, Dean's List, scholarships, competitions — list anything you're proud of." },
   { id: "skills", title: "Skills & languages", subtitle: "Software, languages, and soft skills you want to show off." },
   { id: "finish", title: "Review & create", subtitle: "Pick a look, then create your resume." },
 ];
@@ -471,6 +472,48 @@ export function GuidedBuilder({
                       e.currentTarget.value = "";
                     }}
                   />
+                </div>
+              ) : null}
+
+              {current.id === "awards" ? (
+                <div className="space-y-1.5">
+                  {(data.awards ?? []).map((award, i) => (
+                    <div key={i} className="flex items-start gap-1.5">
+                      <span className="pt-[10px] text-accent">•</span>
+                      <input
+                        className={inputClass}
+                        value={award}
+                        placeholder="e.g. National Honor Society · 2024"
+                        onChange={(e) => {
+                          const awards = [...(data.awards ?? [])];
+                          awards[i] = e.target.value;
+                          updateData({ awards });
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updateData({
+                            awards: (data.awards ?? []).filter(
+                              (_, idx) => idx !== i
+                            ),
+                          })
+                        }
+                        className="cursor-pointer border-none bg-transparent pt-[8px] text-[#b9bfc8] hover:text-[#B23B3B]"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      updateData({ awards: [...(data.awards ?? []), ""] })
+                    }
+                    className="cursor-pointer rounded-[10px] border border-dashed border-[#CFD5DD] bg-[#FAFBFC] px-4 py-2.5 text-[13px] font-semibold text-[#2456D6] hover:border-accent"
+                  >
+                    + Add an honor or award
+                  </button>
                 </div>
               ) : null}
 

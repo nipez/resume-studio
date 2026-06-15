@@ -15,6 +15,7 @@ export function createEmptyResumeData(
     skills: [],
     experience: [],
     education: [],
+    awards: [],
   };
 }
 
@@ -48,5 +49,8 @@ export function normalizeResumeData(raw: unknown): ResumeData {
           year: ed?.year ?? "",
         }))
       : base.education,
+    awards: Array.isArray(d.awards)
+      ? d.awards.filter(Boolean).map(String)
+      : base.awards,
   };
 }
