@@ -145,6 +145,9 @@ function buildClassicHTML(
     )
     .join("");
 
+  const awards = (d.awards || []).filter(Boolean);
+  const awardsH = awards.map((a) => `<div class="r-li">${esc(a)}</div>`).join("");
+
   const body =
     `<div class="page"><div class="classic">` +
     editZone(
@@ -177,6 +180,13 @@ function buildClassicHTML(
           interactive,
           "education",
           `<div class="sec"><div class="r-h">Education</div>${eduH}</div>`
+        )
+      : "") +
+    (awardsH
+      ? editZone(
+          interactive,
+          "awards",
+          `<div class="sec"><div class="r-h">Honors &amp; Awards</div>${awardsH}</div>`
         )
       : "") +
     (skills.length
@@ -250,6 +260,11 @@ function buildTwocolHTML(
     )
     .join("");
 
+  const awards = (d.awards || []).filter(Boolean);
+  const awardsH = awards
+    .map((a) => `<div class="txt" style="margin-bottom:5px">${esc(a)}</div>`)
+    .join("");
+
   const expH = exp
     .map(
       (e: ResumeExperience, i: number) =>
@@ -294,6 +309,13 @@ function buildTwocolHTML(
           interactive,
           "education",
           `<div class="r-h">Education</div>${eduH}`
+        )
+      : "") +
+    (awardsH
+      ? editZone(
+          interactive,
+          "awards",
+          `<div class="r-h">Honors &amp; Awards</div>${awardsH}`
         )
       : "") +
     `</div>` +
@@ -392,6 +414,11 @@ function buildEditorialHTML(
     .map((s) => `<div class="skill-row"><span>${esc(s)}</span></div>`)
     .join("");
 
+  const awards = (d.awards || []).filter(Boolean);
+  const awardsH = awards
+    .map((a) => `<div class="skill-row"><span>${esc(a)}</span></div>`)
+    .join("");
+
   const chipsH = chips
     .map((_, i) => {
       const alt = i === 1 || i === 2 ? " alt" : "";
@@ -448,6 +475,13 @@ function buildEditorialHTML(
           "skills",
           `<div class="r-h">Top Skills</div><div class="skill-row"><span style="opacity:.45">Click to add skills…</span></div>`
         )) +
+    (awardsH
+      ? editZone(
+          interactive,
+          "awards",
+          `<div class="r-h" style="margin-top:14px">Honors &amp; Awards</div>${awardsH}`
+        )
+      : "") +
     `</div>` +
     `</div></div>`;
 

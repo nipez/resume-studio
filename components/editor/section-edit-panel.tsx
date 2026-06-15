@@ -21,6 +21,7 @@ const SECTION_TABS: { id: ResumeEditSectionId; label: string }[] = [
   { id: "summary", label: "Summary" },
   { id: "skills", label: "Skills" },
   { id: "education", label: "Education" },
+  { id: "awards", label: "Honors" },
 ];
 
 function AutoTextarea({
@@ -429,6 +430,54 @@ export function SectionEditPanel({
               className="cursor-pointer rounded-lg border-none bg-[#EAF1FF] px-[11px] py-1.5 text-[12.5px] font-semibold text-[#2456D6]"
             >
               + Add education
+            </button>
+          </div>
+        ) : null}
+
+        {section.id === "awards" ? (
+          <div>
+            <div className="mb-2 space-y-1.5">
+              {(data.awards ?? []).map((award, i) => (
+                <div key={i} className="flex items-start gap-1.5">
+                  <span className="flex-none pt-[7px] text-accent">•</span>
+                  <AutoTextarea
+                    value={award}
+                    placeholder="e.g. National Honor Society · 2024"
+                    onChange={(value) => {
+                      const awards = [...(data.awards ?? [])];
+                      awards[i] = value;
+                      onUpdateData({ awards });
+                    }}
+                    className={`${inputClass} min-h-[34px] flex-1 text-[12.8px]`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() =>
+                      onUpdateData({
+                        awards: (data.awards ?? []).filter((_, idx) => idx !== i),
+                      })
+                    }
+                    className="cursor-pointer border-none bg-transparent text-[#b9bfc8] hover:text-[#B23B3B]"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+              {(data.awards ?? []).length === 0 ? (
+                <p className="text-[13px] leading-relaxed text-[#7A828F]">
+                  Add honors, awards, or recognitions — like Honor Roll, Dean&apos;s
+                  List, or a scholarship.
+                </p>
+              ) : null}
+            </div>
+            <button
+              type="button"
+              onClick={() =>
+                onUpdateData({ awards: [...(data.awards ?? []), ""] })
+              }
+              className="cursor-pointer rounded-lg border-none bg-[#EAF1FF] px-[11px] py-1.5 text-[12.5px] font-semibold text-[#2456D6]"
+            >
+              + Add honor or award
             </button>
           </div>
         ) : null}

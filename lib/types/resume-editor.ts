@@ -3,7 +3,8 @@ export type ResumeEditSectionId =
   | "summary"
   | "skills"
   | "experience"
-  | "education";
+  | "education"
+  | "awards";
 
 export type ResumeEditSection = {
   id: ResumeEditSectionId;
@@ -26,5 +27,6 @@ export function sectionLabel(section: ResumeEditSection): string {
       : "Experience";
   }
   if (section.id === "education") return "Education";
+  if (section.id === "awards") return "Honors & Awards";
   return "Section";
 }

@@ -69,6 +69,10 @@ const SECTION_COPY: Record<
     tagline: "Improve this section",
     hint: "Spot gaps and ways to strengthen your credentials.",
   },
+  awards: {
+    tagline: "Strengthen your honors",
+    hint: "Phrase awards and recognitions so they land.",
+  },
 };
 
 export function ResumeAiAssist({
