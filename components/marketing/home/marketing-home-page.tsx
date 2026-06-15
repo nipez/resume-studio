@@ -110,15 +110,6 @@ export function MarketingHomePage() {
               Most seekers stitch together a resume builder, ATS scanner, tracker, Google Doc, and an AI generator — then lose track of which version went where. That&apos;s not a workflow. That&apos;s duct tape.
             </p>
           </Reveal>
-          <Reveal className="stack">
-            {FRAGMENTED_STACK.map((item) => (
-              <div key={item.tool} className="stack-card">
-                <h4>{item.tool}</h4>
-                <p>{item.problem}</p>
-                <span className="price-tag">{item.cost}</span>
-              </div>
-            ))}
-          </Reveal>
           <Reveal className="replace">
             <span className="rlogo">R</span>
             <div>
@@ -127,6 +118,23 @@ export function MarketingHomePage() {
                 {" "}
                 One application OS with six integrated modules, pricing from $2.99/mo, and snapshots that keep your history honest.
               </span>
+            </div>
+          </Reveal>
+          <Reveal className="stack-frame">
+            <div className="stack-caption">
+              What you&apos;d otherwise pay for separately — not what you pay here
+            </div>
+            <div className="stack">
+              {FRAGMENTED_STACK.map((item) => (
+                <div key={item.tool} className="stack-card">
+                  <h4>{item.tool}</h4>
+                  <p>{item.problem}</p>
+                  <div className="cost-row">
+                    <span className="cost-label">Typical cost</span>
+                    <span className="price-tag">{item.cost}</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </Reveal>
         </div>
