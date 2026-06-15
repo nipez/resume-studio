@@ -8,7 +8,8 @@ import type {
 } from "@/lib/types/resume";
 
 const INK = "#231a2e";
-const PAGE_WIDTH_PX = 816;
+export const PAGE_WIDTH_PX = 816;
+export const PAGE_HEIGHT_PX = 1056;
 
 const PRINT_BASE =
   "@page{size:letter;margin:0}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}";
@@ -499,5 +500,3 @@ export function templateLabel(style: TemplateStyle): string {
   if (style === "editorial") return "Editorial";
   return "Classic";
 }
-
-export { PAGE_WIDTH_PX };

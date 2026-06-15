@@ -21,7 +21,8 @@ const TEMPLATES: { id: TemplateStyle; label: string }[] = [
   { id: "editorial", label: "Editorial" },
 ];
 
-const PANEL_WIDTH = 416;
+const PANEL_WIDTH = 400;
+const PANEL_GUTTER = 32;
 
 type ResumeEditorProps = {
   version: ResumeVersion;
@@ -178,7 +179,7 @@ export function ResumeEditor({ version }: ResumeEditorProps) {
           html={previewHtml}
           activeSection={activeSection}
           onSectionSelect={handleSectionSelect}
-          reservedRight={activeSection ? PANEL_WIDTH + 24 : 0}
+          reservedRight={activeSection ? PANEL_WIDTH + PANEL_GUTTER : 0}
           className="absolute inset-0"
         />
 

@@ -1,11 +1,14 @@
 "use client";
 
-import { PAGE_WIDTH_PX } from "@/lib/resume/build-resume-html";
+import {
+  PAGE_HEIGHT_PX,
+  PAGE_WIDTH_PX,
+} from "@/lib/resume/build-resume-html";
 import type { ResumeEditSection } from "@/lib/types/resume-editor";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const PAGE_MIN_HEIGHT_PX = 1056;
-const CANVAS_PADDING_PX = 20;
+const CANVAS_PADDING_PX = 16;
+const PAGE_GAP_PX = 20;
 
 type InteractiveResumePreviewProps = {
   html: string;
@@ -19,17 +22,21 @@ function measureDocumentHeight(doc: Document): number {
   const root = doc.querySelector(".page, .wrap") as HTMLElement | null;
   if (root) {
     return Math.max(
-      PAGE_MIN_HEIGHT_PX,
+      PAGE_HEIGHT_PX,
       root.scrollHeight,
       Math.ceil(root.getBoundingClientRect().height)
     );
   }
   const body = doc.body;
-  if (!body) return PAGE_MIN_HEIGHT_PX;
+  if (!body) return PAGE_HEIGHT_PX;
   return Math.max(
-    PAGE_MIN_HEIGHT_PX,
+    PAGE_HEIGHT_PX,
     Math.ceil(body.getBoundingClientRect().height)
   );
+}
+
+export function pageCountForHeight(contentHeight: number): number {
+  return Math.max(1, Math.ceil(contentHeight / PAGE_HEIGHT_PX));
 }
 
 export function InteractiveResumePreview({
@@ -41,28 +48,31 @@ export function InteractiveResumePreview({
 }: InteractiveResumePreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [pageHeight, setPageHeight] = useState(PAGE_MIN_HEIGHT_PX);
+  const [contentHeight, setContentHeight] = useState(PAGE_HEIGHT_PX);
   const [scale, setScale] = useState(0.75);
+
+  const pageCount = pageCountForHeight(contentHeight);
+  const scaledPageWidth = PAGE_WIDTH_PX * scale;
+  const scaledPageHeight = PAGE_HEIGHT_PX * scale;
+  const stackHeight =
+    pageCount * scaledPageHeight + Math.max(0, pageCount - 1) * PAGE_GAP_PX;
 
   const measure = useCallback(() => {
     const iframe = iframeRef.current;
     const container = containerRef.current;
     if (!container) return;
 
-    let height = PAGE_MIN_HEIGHT_PX;
+    let height = PAGE_HEIGHT_PX;
     if (iframe?.contentDocument) {
       height = measureDocumentHeight(iframe.contentDocument);
     }
-    setPageHeight(height);
+    setContentHeight(height);
 
     const availW = Math.max(
       container.clientWidth - CANVAS_PADDING_PX * 2 - reservedRight,
       1
     );
-    const availH = Math.max(container.clientHeight - CANVAS_PADDING_PX * 2, 1);
-    const scaleByWidth = availW / PAGE_WIDTH_PX;
-    const scaleByHeight = availH / PAGE_MIN_HEIGHT_PX;
-    setScale(Math.min(scaleByWidth, scaleByHeight, 1));
+    setScale(Math.min(availW / PAGE_WIDTH_PX, 1));
   }, [reservedRight]);
 
   useEffect(() => {
@@ -103,9 +113,6 @@ export function InteractiveResumePreview({
     );
   }, [activeSection, html]);
 
-  const scaledWidth = PAGE_WIDTH_PX * scale;
-  const scaledHeight = pageHeight * scale;
-
   return (
     <div
       ref={containerRef}
@@ -117,26 +124,89 @@ export function InteractiveResumePreview({
       }}
     >
       <div
-        className="flex min-h-full items-start justify-start"
-        style={{ padding: CANVAS_PADDING_PX }}
+        style={{
+          padding: CANVAS_PADDING_PX,
+          paddingRight: CANVAS_PADDING_PX + reservedRight,
+        }}
       >
         <div
-          className="relative flex-none"
-          style={{ width: scaledWidth, height: scaledHeight }}
+          className="mb-3 flex items-center justify-between gap-3 rounded-xl border border-[#C8CDD4] bg-white/90 px-3.5 py-2 text-[12.5px] shadow-sm backdrop-blur-sm"
+          style={{ width: scaledPageWidth }}
         >
+          <span className="font-semibold text-ink">
+            {pageCount} {pageCount === 1 ? "page" : "pages"} · Letter (8.5×11)
+          </span>
+          <span className="text-[#7A828F]">Matches PDF export</span>
+        </div>
+
+        <div
+          className="relative"
+          style={{ width: scaledPageWidth, height: stackHeight }}
+        >
+          {Array.from({ length: pageCount }).map((_, pageIndex) => {
+            const top = pageIndex * (scaledPageHeight + PAGE_GAP_PX);
+            return (
+              <div
+                key={pageIndex}
+                className="pointer-events-none absolute left-0 rounded-[2px] shadow-[0_10px_40px_rgba(15,17,22,0.16)] ring-1 ring-black/[0.06]"
+                style={{
+                  top,
+                  width: scaledPageWidth,
+                  height: scaledPageHeight,
+                  zIndex: 0,
+                }}
+              />
+            );
+          })}
+
           <iframe
             ref={iframeRef}
             title="Resume preview"
             srcDoc={html}
             scrolling="no"
             onLoad={measure}
-            className="absolute left-0 top-0 block origin-top-left border-none bg-white shadow-[0_10px_40px_rgba(15,17,22,0.16)]"
+            className="absolute left-0 top-0 z-10 block origin-top-left border-none bg-transparent"
             style={{
               width: PAGE_WIDTH_PX,
-              height: pageHeight,
+              height: contentHeight,
               transform: `scale(${scale})`,
             }}
           />
+
+          {Array.from({ length: pageCount }).map((_, pageIndex) => {
+            const top = pageIndex * (scaledPageHeight + PAGE_GAP_PX);
+            return (
+              <div
+                key={`label-${pageIndex}`}
+                className="pointer-events-none absolute left-0 z-20"
+                style={{
+                  top,
+                  width: scaledPageWidth,
+                  height: scaledPageHeight,
+                }}
+              >
+                <div className="absolute bottom-2 right-3 rounded-md bg-white/95 px-2 py-0.5 text-[11px] font-semibold text-[#5A6573] shadow-sm ring-1 ring-black/[0.05]">
+                  Page {pageIndex + 1} of {pageCount}
+                </div>
+
+                {pageIndex < pageCount - 1 ? (
+                  <div
+                    className="absolute left-1/2 z-30 -translate-x-1/2 rounded-full border border-[#C8CDD4] bg-white px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-[#8A92A0] shadow-sm"
+                    style={{ bottom: -(PAGE_GAP_PX / 2 + 10) }}
+                  >
+                    Page break
+                  </div>
+                ) : null}
+
+                {pageIndex < pageCount - 1 ? (
+                  <div
+                    className="absolute inset-x-4 border-b-2 border-dashed border-[#CFCFD6]"
+                    style={{ bottom: 0 }}
+                  />
+                ) : null}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
