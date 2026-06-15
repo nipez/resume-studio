@@ -11,6 +11,7 @@ import type {
   LogApplicationInput,
   ResumeSnapshot,
   StatusHistoryEntry,
+  VersionLinkedApplication,
 } from "@/lib/applications/types";
 import { normalizeResumeSnapshot, parseJobFromVersionName } from "@/lib/applications/utils";
 import {
@@ -188,6 +189,36 @@ export async function getApplicationCountsByVersion(): Promise<
 > {
   const { versionCounts } = await getApplicationsList();
   return versionCounts;
+}
+
+export async function getApplicationsForVersion(
+  versionId: string
+): Promise<VersionLinkedApplication[]> {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return [];
+
+  const { data: rows, error } = await supabase
+    .from("applications")
+    .select("id, role, company, applied_at")
+    .eq("user_id", user.id)
+    .eq("resume_version_id", versionId)
+    .order("applied_at", { ascending: false });
+
+  if (error) {
+    console.error("getApplicationsForVersion:", error.message);
+    return [];
+  }
+
+  return (rows ?? []).map((row) => ({
+    id: row.id as string,
+    role: String(row.role ?? ""),
+    company: String(row.company ?? ""),
+    applied_at: String(row.applied_at ?? ""),
+  }));
 }
 
 export async function getApplication(id: string): Promise<Application | null> {

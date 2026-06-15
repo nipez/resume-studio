@@ -1,7 +1,12 @@
 import { TailorPanel } from "@/components/tailor/tailor-panel";
 import { getLibraryData } from "@/lib/resume/actions";
 
-export default async function TailorPage() {
+type TailorPageProps = {
+  searchParams: Promise<{ base?: string }>;
+};
+
+export default async function TailorPage({ searchParams }: TailorPageProps) {
+  const { base } = await searchParams;
   const { versions, defaultVersionId } = await getLibraryData();
 
   return (
@@ -16,7 +21,11 @@ export default async function TailorPage() {
           bullets — without changing your master copy.
         </p>
         <div className="mt-[26px]">
-          <TailorPanel versions={versions} defaultVersionId={defaultVersionId} />
+          <TailorPanel
+            versions={versions}
+            defaultVersionId={defaultVersionId}
+            initialBaseId={base ?? null}
+          />
         </div>
       </div>
     </div>
