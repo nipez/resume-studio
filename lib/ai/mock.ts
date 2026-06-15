@@ -129,6 +129,60 @@ export function mockComplete(prompt: string): string {
     });
   }
 
+  if (prompt.includes("Rewrite the summary/profile")) {
+    return (
+      "Results-driven professional with a track record of delivering measurable outcomes across cross-functional teams. " +
+      "Demo mode — configure ANTHROPIC_API_KEY for a summary tailored to your real experience."
+    );
+  }
+
+  if (prompt.includes("Write a concise professional headline")) {
+    return "Senior Professional · Strategy & Growth (demo mode)";
+  }
+
+  if (prompt.includes("Rewrite bullets for this role")) {
+    return JSON.stringify({
+      blurb: "Role summary emphasizing scope and impact (demo mode).",
+      bullets: [
+        "Led initiatives that improved key business metrics using existing experience (demo — add API key).",
+        "Partnered cross-functionally to deliver outcomes aligned to organizational priorities.",
+        "Drove process improvements that increased efficiency and stakeholder satisfaction.",
+      ],
+    });
+  }
+
+  if (prompt.includes("Suggest 8-12 relevant skills")) {
+    return JSON.stringify({
+      skills: [
+        "Strategic Planning",
+        "Cross-Functional Leadership",
+        "Data Analysis",
+        "Stakeholder Management",
+        "Project Management",
+        "Communication",
+        "Process Improvement",
+        "Budget Management",
+      ],
+    });
+  }
+
+  if (prompt.includes("Offer 3 specific, actionable suggestions")) {
+    return JSON.stringify({
+      suggestions: [
+        "Lead with a quantified outcome in your most recent role (demo mode).",
+        "Trim skills to the 10 most relevant for your target roles.",
+        "Add a one-line blurb under each role to frame scope before bullets.",
+      ],
+    });
+  }
+
+  if (prompt.includes("Answer this question about improving or positioning")) {
+    return (
+      "Demo mode: with AI configured, this would give specific advice grounded in your resume — " +
+      "what to emphasize, what to trim, and how to strengthen weak sections without inventing facts."
+    );
+  }
+
   return "Demo AI response — configure ANTHROPIC_API_KEY for real generation.";
 }
 

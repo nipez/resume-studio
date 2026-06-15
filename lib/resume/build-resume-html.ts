@@ -64,7 +64,35 @@ function bullets(items: string[] | undefined): string {
     .join("");
 }
 
-function buildClassicHTML(d: ResumeData): { css: string; body: string } {
+const INTERACTIVE_CSS =
+  ".edit-zone{cursor:pointer;border-radius:6px;transition:box-shadow .15s,background .15s}" +
+  ".edit-zone:hover{box-shadow:inset 0 0 0 2px rgba(47,107,255,.42);background:rgba(47,107,255,.03)}" +
+  ".edit-zone.is-active{box-shadow:inset 0 0 0 2px rgba(47,107,255,.82);background:rgba(47,107,255,.06)}";
+
+function editZone(
+  interactive: boolean,
+  section: string,
+  inner: string,
+  index?: number
+): string {
+  if (!interactive) return inner;
+  const idxAttr = index !== undefined ? ` data-index="${index}"` : "";
+  return `<div class="edit-zone" data-section="${section}"${idxAttr}>${inner}</div>`;
+}
+
+function interactiveScript(): string {
+  return (
+    "<script>" +
+    "(function(){document.querySelectorAll('[data-section]').forEach(function(el){el.addEventListener('click',function(e){e.stopPropagation();parent.postMessage({type:'resume-edit',section:el.dataset.section,index:el.dataset.index!=null?Number(el.dataset.index):undefined},'*');});});" +
+    "window.addEventListener('message',function(e){if(!e.data||e.data.type!=='resume-active')return;document.querySelectorAll('.edit-zone.is-active').forEach(function(n){n.classList.remove('is-active');});if(!e.data.section)return;var sel='[data-section=\"'+e.data.section+'\"]';if(e.data.index!=null)sel+='[data-index=\"'+e.data.index+'\"]';document.querySelectorAll(sel).forEach(function(n){n.classList.add('is-active');});});})();" +
+    "</script>"
+  );
+}
+
+function buildClassicHTML(
+  d: ResumeData,
+  interactive: boolean
+): { css: string; body: string } {
   const contact = contactParts(d);
   const skills = d.skills || [];
   const exp = d.experience || [];
@@ -92,17 +120,23 @@ function buildClassicHTML(d: ResumeData): { css: string; body: string } {
     `.chip{font-size:8.5pt;font-family:'Instrument Sans',sans-serif;color:#48414f;background:${accentTint};border-radius:4px;padding:3px 7px;white-space:nowrap}` +
     `.exp{margin-bottom:12px}` +
     `.exp+.exp{margin-top:10px}` +
+    (interactive ? INTERACTIVE_CSS : "") +
     PRINT_BASE;
 
   const expH = exp
     .map(
-      (e: ResumeExperience) =>
-        `<div class="exp">` +
-        `<div class="row">${e.title ? `<span class="r-job">${esc(e.title)}</span>` : ""}${e.dates ? `<span class="r-date">${esc(e.dates)}</span>` : ""}</div>` +
-        (e.company ? `<div class="r-co">${esc(e.company)}</div>` : "") +
-        (e.blurb ? `<div class="r-p" style="margin-top:4px;font-style:italic">${esc(e.blurb)}</div>` : "") +
-        bullets(e.bullets) +
-        `</div>`
+      (e: ResumeExperience, i: number) =>
+        editZone(
+          interactive,
+          "experience",
+          `<div class="exp">` +
+            `<div class="row">${e.title ? `<span class="r-job">${esc(e.title)}</span>` : ""}${e.dates ? `<span class="r-date">${esc(e.dates)}</span>` : ""}</div>` +
+            (e.company ? `<div class="r-co">${esc(e.company)}</div>` : "") +
+            (e.blurb ? `<div class="r-p" style="margin-top:4px;font-style:italic">${esc(e.blurb)}</div>` : "") +
+            bullets(e.bullets) +
+            `</div>`,
+          i
+        )
     )
     .join("");
 
@@ -118,31 +152,58 @@ function buildClassicHTML(d: ResumeData): { css: string; body: string } {
 
   const body =
     `<div class="page"><div class="classic">` +
-    `<div class="head">` +
-    `<div class="r-name">${esc(d.name)}</div>` +
-    (d.headline ? `<div class="r-role">${esc(d.headline)}</div>` : "") +
-    (contact.length
-      ? `<div class="contact">${contact.join(" · ")}</div>`
-      : "") +
-    `</div>` +
+    editZone(
+      interactive,
+      "header",
+      `<div class="head">` +
+        `<div class="r-name">${esc(d.name)}</div>` +
+        (d.headline ? `<div class="r-role">${esc(d.headline)}</div>` : "") +
+        (contact.length
+          ? `<div class="contact">${contact.join(" · ")}</div>`
+          : "") +
+        `</div>`
+    ) +
     (d.summary
-      ? `<div class="sec"><div class="r-h">Summary</div><div class="r-p">${esc(d.summary)}</div></div>`
-      : "") +
+      ? editZone(
+          interactive,
+          "summary",
+          `<div class="sec"><div class="r-h">Summary</div><div class="r-p">${esc(d.summary)}</div></div>`
+        )
+      : editZone(
+          interactive,
+          "summary",
+          `<div class="sec"><div class="r-h">Summary</div><div class="r-p" style="opacity:.45">Click to add a summary…</div></div>`
+        )) +
     (expH
       ? `<div class="sec"><div class="r-h">Experience</div>${expH}</div>`
       : "") +
     (eduH
-      ? `<div class="sec"><div class="r-h">Education</div>${eduH}</div>`
+      ? editZone(
+          interactive,
+          "education",
+          `<div class="sec"><div class="r-h">Education</div>${eduH}</div>`
+        )
       : "") +
     (skills.length
-      ? `<div class="sec"><div class="r-h">Skills</div><div class="skills">${skills.map((s) => `<span class="chip">${esc(s)}</span>`).join("")}</div></div>`
-      : "") +
+      ? editZone(
+          interactive,
+          "skills",
+          `<div class="sec"><div class="r-h">Skills</div><div class="skills">${skills.map((s) => `<span class="chip">${esc(s)}</span>`).join("")}</div></div>`
+        )
+      : editZone(
+          interactive,
+          "skills",
+          `<div class="sec"><div class="r-h">Skills</div><div class="skills"><span class="chip" style="opacity:.45">Click to add skills…</span></div></div>`
+        )) +
     `</div></div>`;
 
   return { css, body };
 }
 
-function buildTwocolHTML(d: ResumeData): { css: string; body: string } {
+function buildTwocolHTML(
+  d: ResumeData,
+  interactive: boolean
+): { css: string; body: string } {
   const contact = contactParts(d);
   const skills = d.skills || [];
   const exp = d.experience || [];
@@ -173,6 +234,7 @@ function buildTwocolHTML(d: ResumeData): { css: string; body: string } {
     `.r-li{position:relative;color:#48414f;font-size:9pt;line-height:1.5;padding-left:11px;margin-top:4px}` +
     `.r-li::before{content:'';position:absolute;left:0;top:.45em;width:3px;height:3px;border-radius:50%;background:${accent}}` +
     `.exp{margin-bottom:11px}` +
+    (interactive ? INTERACTIVE_CSS : "") +
     PRINT_BASE;
 
   const skillsH = skills
@@ -195,13 +257,18 @@ function buildTwocolHTML(d: ResumeData): { css: string; body: string } {
 
   const expH = exp
     .map(
-      (e: ResumeExperience) =>
-        `<div class="exp">` +
-        `<div class="row">${e.title ? `<span class="r-job">${esc(e.title)}</span>` : ""}${e.dates ? `<span class="r-date">${esc(e.dates)}</span>` : ""}</div>` +
-        (e.company ? `<div class="r-co">${esc(e.company)}</div>` : "") +
-        (e.blurb ? `<div class="r-p" style="margin-top:4px;font-style:italic">${esc(e.blurb)}</div>` : "") +
-        bullets(e.bullets) +
-        `</div>`
+      (e: ResumeExperience, i: number) =>
+        editZone(
+          interactive,
+          "experience",
+          `<div class="exp">` +
+            `<div class="row">${e.title ? `<span class="r-job">${esc(e.title)}</span>` : ""}${e.dates ? `<span class="r-date">${esc(e.dates)}</span>` : ""}</div>` +
+            (e.company ? `<div class="r-co">${esc(e.company)}</div>` : "") +
+            (e.blurb ? `<div class="r-p" style="margin-top:4px;font-style:italic">${esc(e.blurb)}</div>` : "") +
+            bullets(e.bullets) +
+            `</div>`,
+          i
+        )
     )
     .join("");
 
@@ -209,25 +276,60 @@ function buildTwocolHTML(d: ResumeData): { css: string; body: string } {
     `<div class="wrap">` +
     `<div class="side">` +
     `<div class="avatar">${esc(ini)}</div>` +
-    (contact.length
-      ? `<div class="r-h">Contact</div><div class="txt">${contact.join("<br>")}</div>`
+    editZone(
+      interactive,
+      "header",
+      contact.length
+        ? `<div class="r-h">Contact</div><div class="txt">${contact.join("<br>")}</div>`
+        : `<div class="r-h">Contact</div><div class="txt" style="opacity:.55">Click to add contact info…</div>`
+    ) +
+    (skillsH
+      ? editZone(
+          interactive,
+          "skills",
+          `<div class="r-h">Skills</div>${skillsH}`
+        )
+      : editZone(
+          interactive,
+          "skills",
+          `<div class="r-h">Skills</div><div class="txt" style="opacity:.55">Click to add skills…</div>`
+        )) +
+    (eduH
+      ? editZone(
+          interactive,
+          "education",
+          `<div class="r-h">Education</div>${eduH}`
+        )
       : "") +
-    (skillsH ? `<div class="r-h">Skills</div>${skillsH}` : "") +
-    (eduH ? `<div class="r-h">Education</div>${eduH}` : "") +
     `</div>` +
     `<div class="main">` +
-    `<div class="r-name">${esc(d.name)}</div>` +
-    (d.headline ? `<div class="r-role">${esc(d.headline)}</div>` : "") +
+    editZone(
+      interactive,
+      "header",
+      `<div class="r-name">${esc(d.name)}</div>` +
+        (d.headline ? `<div class="r-role">${esc(d.headline)}</div>` : "")
+    ) +
     (d.summary
-      ? `<div class="r-h">Profile</div><div class="r-p">${esc(d.summary)}</div>`
-      : "") +
+      ? editZone(
+          interactive,
+          "summary",
+          `<div class="r-h">Profile</div><div class="r-p">${esc(d.summary)}</div>`
+        )
+      : editZone(
+          interactive,
+          "summary",
+          `<div class="r-h">Profile</div><div class="r-p" style="opacity:.45">Click to add a profile…</div>`
+        )) +
     (expH ? `<div class="r-h">Experience</div>${expH}` : "") +
     `</div></div>`;
 
   return { css, body };
 }
 
-function buildEditorialHTML(d: ResumeData): { css: string; body: string } {
+function buildEditorialHTML(
+  d: ResumeData,
+  interactive: boolean
+): { css: string; body: string } {
   const skills = d.skills || [];
   const exp = d.experience || [];
   const edu = d.education || [];
@@ -261,17 +363,23 @@ function buildEditorialHTML(d: ResumeData): { css: string; body: string } {
     `.side .r-p{margin-bottom:10px}` +
     `.skill-row{display:flex;justify-content:space-between;font-size:9pt;color:#48414f;padding:4px 0;border-bottom:1px solid rgba(40,20,30,.08);white-space:nowrap;gap:10px}` +
     `.skill-row:last-child{border:none}` +
+    (interactive ? INTERACTIVE_CSS : "") +
     PRINT_BASE;
 
   const expH = exp
     .map(
-      (e: ResumeExperience) =>
-        `<div class="ed-blk">` +
-        `<div class="row">${e.title ? `<span class="r-job">${esc(e.title)}</span>` : ""}${e.dates ? `<span class="r-date">${esc(e.dates)}</span>` : ""}</div>` +
-        (e.company ? `<div class="r-co">${esc(e.company)}</div>` : "") +
-        (e.blurb ? `<div class="r-p" style="margin-top:4px;font-style:italic">${esc(e.blurb)}</div>` : "") +
-        bullets(e.bullets) +
-        `</div>`
+      (e: ResumeExperience, i: number) =>
+        editZone(
+          interactive,
+          "experience",
+          `<div class="ed-blk">` +
+            `<div class="row">${e.title ? `<span class="r-job">${esc(e.title)}</span>` : ""}${e.dates ? `<span class="r-date">${esc(e.dates)}</span>` : ""}</div>` +
+            (e.company ? `<div class="r-co">${esc(e.company)}</div>` : "") +
+            (e.blurb ? `<div class="r-p" style="margin-top:4px;font-style:italic">${esc(e.blurb)}</div>` : "") +
+            bullets(e.bullets) +
+            `</div>`,
+          i
+        )
     )
     .join("");
 
@@ -301,27 +409,53 @@ function buildEditorialHTML(d: ResumeData): { css: string; body: string } {
 
   const body =
     `<div class="page">` +
-    `<div class="topbar">` +
-    `<div class="r-name">${esc(first)}${last ? `<b>${esc(last)}</b>` : ""}</div>` +
-    `<div class="badge">${esc(ini)}</div>` +
-    `</div>` +
-    (d.headline ? `<div class="r-role">${esc(d.headline)}</div>` : "") +
-    `<div class="rule"></div>` +
-    (chipsH ? `<div class="chips">${chipsH}</div>` : "") +
+    editZone(
+      interactive,
+      "header",
+      `<div class="topbar">` +
+        `<div class="r-name">${esc(first)}${last ? `<b>${esc(last)}</b>` : ""}</div>` +
+        `<div class="badge">${esc(ini)}</div>` +
+        `</div>` +
+        (d.headline ? `<div class="r-role">${esc(d.headline)}</div>` : "") +
+        `<div class="rule"></div>` +
+        (chipsH ? `<div class="chips">${chipsH}</div>` : "")
+    ) +
     `<div class="cols">` +
     `<div class="lead">` +
     (expH
       ? `<div class="ed-blk"><div class="r-h">Experience</div>${expH}</div>`
       : "") +
     (eduH
-      ? `<div class="ed-blk"><div class="r-h">Education</div>${eduH}</div>`
+      ? editZone(
+          interactive,
+          "education",
+          `<div class="ed-blk"><div class="r-h">Education</div>${eduH}</div>`
+        )
       : "") +
     `</div>` +
     `<div class="side">` +
     (d.summary
-      ? `<div class="r-h">Profile</div><div class="r-p">${esc(d.summary)}</div>`
-      : "") +
-    (skillsH ? `<div class="r-h">Top Skills</div>${skillsH}` : "") +
+      ? editZone(
+          interactive,
+          "summary",
+          `<div class="r-h">Profile</div><div class="r-p">${esc(d.summary)}</div>`
+        )
+      : editZone(
+          interactive,
+          "summary",
+          `<div class="r-h">Profile</div><div class="r-p" style="opacity:.45">Click to add a profile…</div>`
+        )) +
+    (skillsH
+      ? editZone(
+          interactive,
+          "skills",
+          `<div class="r-h">Top Skills</div>${skillsH}`
+        )
+      : editZone(
+          interactive,
+          "skills",
+          `<div class="r-h">Top Skills</div><div class="skill-row"><span style="opacity:.45">Click to add skills…</span></div>`
+        )) +
     `</div>` +
     `</div></div>`;
 
@@ -330,21 +464,34 @@ function buildEditorialHTML(d: ResumeData): { css: string; body: string } {
 
 export function buildResumeHTML(
   version: ResumeVersionInput,
-  forPrint = false
+  forPrintOrOptions: boolean | { forPrint?: boolean; interactive?: boolean } = false
 ): string {
+  const forPrint =
+    typeof forPrintOrOptions === "boolean"
+      ? forPrintOrOptions
+      : !!forPrintOrOptions.forPrint;
+  const interactive =
+    typeof forPrintOrOptions === "object" && !!forPrintOrOptions.interactive;
+
   const d = version.data;
   const style = version.templateStyle || "classic";
 
   let built: { css: string; body: string };
   if (style === "twocol") {
-    built = buildTwocolHTML(d);
+    built = buildTwocolHTML(d, interactive);
   } else if (style === "editorial") {
-    built = buildEditorialHTML(d);
+    built = buildEditorialHTML(d, interactive);
   } else {
-    built = buildClassicHTML(d);
+    built = buildClassicHTML(d, interactive);
   }
 
-  return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(d.name)} — Resume</title>${fontLink()}<style>html,body{background:#fff;color-scheme:light;}${built.css}</style></head><body>${built.body}${printScript(forPrint)}</body></html>`;
+  const script = forPrint
+    ? printScript(true)
+    : interactive
+      ? interactiveScript()
+      : "";
+
+  return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(d.name)} — Resume</title>${fontLink()}<style>html,body{background:#fff;color-scheme:light;}${built.css}</style></head><body>${built.body}${script}</body></html>`;
 }
 
 export function templateLabel(style: TemplateStyle): string {

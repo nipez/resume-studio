@@ -277,3 +277,70 @@ export function interviewPrepPrompt(
     summary
   );
 }
+
+export function resumeAssistPrompt(
+  positioning: string,
+  userName: string,
+  action: string,
+  data: ResumeData,
+  experienceIndex?: number,
+  question?: string
+): string {
+  const ctx =
+    buildPositioningContext(positioning, userName) +
+    "\n\nRESUME (JSON):\n" +
+    JSON.stringify(data) +
+    "\n\n";
+
+  if (action === "improve-summary") {
+    return (
+      ctx +
+      "TASK: Rewrite the summary/profile to be sharper and more outcome-focused. Use only facts from the resume. Return ONLY the new summary text — no markdown, no quotes."
+    );
+  }
+
+  if (action === "improve-headline") {
+    return (
+      ctx +
+      "TASK: Write a concise professional headline (under 12 words) aligned to this candidate's experience. Return ONLY the headline text."
+    );
+  }
+
+  if (action === "polish-bullets" && experienceIndex !== undefined) {
+    const role = data.experience[experienceIndex];
+    return (
+      ctx +
+      "TASK: Rewrite bullets for this role to be concise, quantified where possible, and outcome-led. Do NOT invent companies, titles, dates, or metrics.\n\n" +
+      "ROLE: " +
+      (role?.company || "") +
+      " — " +
+      (role?.title || "") +
+      "\nCURRENT BULLETS:\n" +
+      (role?.bullets || []).map((b) => "- " + b).join("\n") +
+      '\n\nReturn ONLY valid minified JSON: {"blurb":"optional one-line role summary","bullets":["3-5 improved bullets"]}'
+    );
+  }
+
+  if (action === "suggest-skills") {
+    return (
+      ctx +
+      'TASK: Suggest 8-12 relevant skills based on this resume. Return ONLY valid minified JSON: {"skills":["skill1","skill2"]}'
+    );
+  }
+
+  if (action === "ask" && question?.trim()) {
+    return (
+      ctx +
+      "TASK: Answer this question about improving or positioning this resume. Be specific and actionable. Do not invent facts.\n\n" +
+      "QUESTION: " +
+      question.trim() +
+      "\n\nReturn only your answer (2-5 sentences unless they ask for more)."
+    );
+  }
+
+  return (
+    ctx +
+    "TASK: Offer 3 specific, actionable suggestions to improve this resume. Return ONLY valid minified JSON: " +
+    '{"suggestions":["suggestion 1","suggestion 2","suggestion 3"]}'
+  );
+}
