@@ -40,6 +40,8 @@ PORT=3000
 - **Auth is passwordless magic link.** After clicking "Send magic link", open the email
   in **Mailpit** at `http://127.0.0.1:54324`, then click the link **once** (links are
   single-use). It signs you in and redirects to `/library`.
+- **Production branded auth email** uses the Send Email hook + Resend — see
+  `docs/auth-email-setup.md`. Without that setup, Supabase sends default auth mail.
 - **`supabase/seed.sql` grants table privileges** to `anon`/`authenticated`/`service_role`.
   A bare local Postgres lacks the default privileges hosted Supabase ships with, so
   without this seed every authenticated query fails with "permission denied". RLS still

@@ -60,8 +60,8 @@ export default function LoginForm() {
           <div className="rounded-[11px] border border-[#CDEBD9] bg-[#EAF7F0] px-4 py-4 text-[14px] leading-relaxed text-[#0E7C4B]">
             <p className="font-semibold">Check your email</p>
             <p className="mt-1">
-              We sent a magic link to <strong>{email}</strong>. Click it to sign
-              in.
+              We sent a sign-in link from <strong>{SITE_NAME}</strong> to{" "}
+              <strong>{email}</strong>. Click it to sign in.
             </p>
           </div>
         ) : (
