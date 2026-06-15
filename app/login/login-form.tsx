@@ -8,6 +8,11 @@ import { FormEvent, useState } from "react";
 export default function LoginForm() {
   const searchParams = useSearchParams();
   const authError = searchParams.get("error") === "auth";
+  const nextParam = searchParams.get("next");
+  const safeNext =
+    nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//")
+      ? nextParam
+      : null;
 
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -22,7 +27,9 @@ export default function LoginForm() {
     setError(null);
 
     const supabase = createClient();
-    const redirectTo = `${window.location.origin}/auth/callback`;
+    const redirectTo = safeNext
+      ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(safeNext)}`
+      : `${window.location.origin}/auth/callback`;
 
     const { error: signInError } = await supabase.auth.signInWithOtp({
       email,

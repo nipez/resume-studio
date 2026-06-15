@@ -2,6 +2,7 @@
 
 import { LibraryToolbar } from "@/components/library/library-toolbar";
 import { ImportModal } from "@/components/import/import-modal";
+import Link from "next/link";
 import { useState } from "react";
 
 export function LibraryActions() {
@@ -10,6 +11,12 @@ export function LibraryActions() {
   return (
     <>
       <div className="flex gap-2.5">
+        <Link
+          href="/build"
+          className="inline-flex items-center gap-1.5 rounded-[11px] border border-[#DCE0E6] bg-white px-[17px] py-[11px] text-[13.5px] font-semibold text-[#3a4350] transition-colors hover:bg-[#F4F5F7]"
+        >
+          ✎ Build step by step
+        </Link>
         <button
           type="button"
           onClick={() => setImportOpen(true)}

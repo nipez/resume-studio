@@ -507,7 +507,7 @@ export const STUDENT_FAQ_ITEMS = [
   {
     question: "How is the guided builder different from a template?",
     answer:
-      "Templates give you layout. The guided builder (coming soon) asks simple questions — what school, what clubs, any jobs — and writes the bullets for you. Pick a template first; the builder fills it in.",
+      "Templates give you layout. The guided builder asks simple questions — what school, what clubs, any jobs — and helps turn them into a real resume. Pick a template first; the builder fills it in.",
   },
   {
     question: "Do I need a cover letter for a part-time job?",

@@ -12,6 +12,12 @@ export default function AuthCallbackClient() {
   useEffect(() => {
     const supabase = createClient();
 
+    const nextParam = searchParams.get("next");
+    const dest =
+      nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//")
+        ? nextParam
+        : "/library";
+
     async function finishSignIn() {
       const code = searchParams.get("code");
       const tokenHash = searchParams.get("token_hash");
@@ -20,7 +26,7 @@ export default function AuthCallbackClient() {
       if (code) {
         const { error } = await supabase.auth.exchangeCodeForSession(code);
         if (!error) {
-          router.replace("/library");
+          router.replace(dest);
           router.refresh();
           return;
         }
@@ -32,7 +38,7 @@ export default function AuthCallbackClient() {
           type: type as EmailOtpType,
         });
         if (!error) {
-          router.replace("/library");
+          router.replace(dest);
           router.refresh();
           return;
         }
