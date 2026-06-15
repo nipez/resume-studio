@@ -27,24 +27,26 @@ export default async function LibraryPage() {
           <LibraryActions />
         </div>
 
-        <div className="mb-[22px] flex cursor-default items-center gap-[18px] rounded-2xl bg-gradient-to-br from-sidebar to-[#1b2740] px-[22px] py-[19px] text-white">
-          <div className="flex h-12 w-12 flex-none items-center justify-center rounded-[14px] bg-gradient-to-br from-accent to-[#7A53FF] text-[23px] shadow-[0_6px_18px_rgba(47,107,255,0.4)]">
-            ✎
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="font-display text-[16.5px] font-semibold">
-              No resume yet — or want a fresh start?
+        {!hasVersions ? (
+          <div className="mb-[22px] flex cursor-default items-center gap-[18px] rounded-2xl bg-gradient-to-br from-sidebar to-[#1b2740] px-[22px] py-[19px] text-white">
+            <div className="flex h-12 w-12 flex-none items-center justify-center rounded-[14px] bg-gradient-to-br from-accent to-[#7A53FF] text-[23px] shadow-[0_6px_18px_rgba(47,107,255,0.4)]">
+              ✎
             </div>
-            <div className="mt-[3px] text-[13.3px] leading-[1.5] text-[#AEB6C2]">
-              Don&apos;t love the one you have, or starting from a blank page?
-              I&apos;ll guide you through it one small step at a time. It&apos;s
-              easier than it feels.
+            <div className="min-w-0 flex-1">
+              <div className="font-display text-[16.5px] font-semibold">
+                No resume yet — or want a fresh start?
+              </div>
+              <div className="mt-[3px] text-[13.3px] leading-[1.5] text-[#AEB6C2]">
+                Don&apos;t love the one you have, or starting from a blank page?
+                I&apos;ll guide you through it one small step at a time. It&apos;s
+                easier than it feels.
+              </div>
+            </div>
+            <div className="flex-none whitespace-nowrap rounded-[11px] bg-white px-[18px] py-[11px] text-[13.5px] font-semibold text-ink">
+              Build step by step →
             </div>
           </div>
-          <div className="flex-none whitespace-nowrap rounded-[11px] bg-white px-[18px] py-[11px] text-[13.5px] font-semibold text-ink">
-            Build step by step →
-          </div>
-        </div>
+        ) : null}
 
         {hasVersions ? (
           <div className="grid grid-cols-[repeat(auto-fill,minmax(330px,1fr))] gap-[18px]">
