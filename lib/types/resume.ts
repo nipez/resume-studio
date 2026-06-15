@@ -25,6 +25,8 @@ export type ResumeData = {
   skills: string[];
   experience: ResumeExperience[];
   education: ResumeEducation[];
+  /** Template accent color (hex). Defaults to coral when omitted. */
+  accentColor?: string;
 };
 
 export type ResumeVersionInput = {
