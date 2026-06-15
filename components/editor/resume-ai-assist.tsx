@@ -3,7 +3,7 @@
 import type { ResumeData } from "@/lib/types/resume";
 import type { ResumeEditSection } from "@/lib/types/resume-editor";
 import { sectionKey } from "@/lib/types/resume-editor";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export type AiApplyPatch = {
   headline?: string;
@@ -48,6 +48,11 @@ export function ResumeAiAssist({
   );
   const [activePanel, setActivePanel] = useState<ResultPanel>(null);
   const [suggestPass, setSuggestPass] = useState(0);
+  const detailsRef = useRef<HTMLDetailsElement>(null);
+
+  function openAiPanel() {
+    if (detailsRef.current) detailsRef.current.open = true;
+  }
 
   useEffect(() => {
     setError("");
@@ -69,6 +74,7 @@ export function ResumeAiAssist({
     }
   ): Promise<boolean> {
     const loadingKey = opts?.loadingKey ?? action;
+    openAiPanel();
     setLoading(loadingKey);
     setError("");
 
@@ -82,9 +88,7 @@ export function ResumeAiAssist({
       setActivePanel("suggestions");
       setSuggestions([]);
     }
-    if (action === "ask") {
-      setActivePanel("ask");
-    }
+    if (action === "ask") setActivePanel("ask");
 
     try {
       const res = await fetch("/api/ai/resume-assist", {
@@ -160,9 +164,9 @@ export function ResumeAiAssist({
 
   const primaryAction =
     section.id === "summary"
-      ? { label: "Improve this summary", action: "improve-summary" as const }
+      ? { label: "Improve summary", action: "improve-summary" as const }
       : section.id === "header"
-        ? { label: "Improve headline", action: "improve-headline" as const }
+        ? { label: "Headline options", action: "improve-headline" as const }
         : section.id === "skills"
           ? { label: "Suggest skills", action: "suggest-skills" as const }
           : section.id === "experience" && section.index !== undefined
@@ -174,157 +178,162 @@ export function ResumeAiAssist({
             : null;
 
   return (
-    <div className="rounded-xl border border-[#C8D8FF] bg-gradient-to-br from-[#EEF3FF] to-[#F7FAFF] p-4 shadow-[0_4px_16px_rgba(47,107,255,0.08)]">
-      <div className="mb-3 flex items-start gap-2.5">
-        <span className="flex h-8 w-8 flex-none items-center justify-center rounded-lg bg-accent text-[15px] text-white shadow-[0_4px_12px_rgba(47,107,255,0.35)]">
-          ✦
+    <details
+      ref={detailsRef}
+      className="group mt-8 border-t border-[#EEF1F4] pt-5"
+    >
+      <summary className="cursor-pointer list-none font-display text-[13px] font-semibold text-[#5A6573] marker:content-none [&::-webkit-details-marker]:hidden">
+        <span className="inline-flex items-center gap-2">
+          <span className="text-accent">✦</span>
+          AI help
+          <span className="text-[11px] font-normal text-[#9AA3AF]">
+            (optional)
+          </span>
         </span>
-        <div>
-          <div className="font-display text-[14px] font-semibold text-ink">
-            AI suggestions
-          </div>
-          <div className="mt-0.5 text-[12px] leading-snug text-[#5A6573]">
-            Results appear right below the action you choose.
-          </div>
+      </summary>
+
+      <div className="mt-4 space-y-3">
+        {error ? (
+          <p className="rounded-lg bg-[#FFF4F4] px-3 py-2 text-[12px] text-[#B23B3B]">
+            {error}
+          </p>
+        ) : null}
+
+        <div className="flex flex-wrap gap-2">
+          {primaryAction ? (
+            <ActionChip
+              disabled={loading === primaryAction.action}
+              onClick={() =>
+                run(primaryAction.action, {
+                  experienceIndex: primaryAction.experienceIndex,
+                })
+              }
+            >
+              {loading === primaryAction.action
+                ? "Working…"
+                : primaryAction.label}
+            </ActionChip>
+          ) : null}
+          <ActionChip
+            disabled={loading === "suggest"}
+            onClick={() => run("suggest")}
+          >
+            {loading === "suggest"
+              ? "Working…"
+              : suggestions.length
+                ? "Refresh ideas"
+                : "3 ideas"}
+          </ActionChip>
         </div>
-      </div>
 
-      {error ? (
-        <p className="mb-3 rounded-lg border border-[#F5D0D0] bg-[#FFF4F4] px-3 py-2 text-[12px] text-[#B23B3B]">
-          {error}
-        </p>
-      ) : null}
+        {activePanel === "headline" && headlineOptions.length ? (
+          <div className="space-y-2">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-[#8A92A0]">
+              Pick a headline
+            </p>
+            {headlineOptions.map((headline, i) => (
+              <button
+                key={`${headline}-${i}`}
+                type="button"
+                onClick={() => {
+                  onApplyHeadline(headline);
+                  setHeadlineOptions([]);
+                  setActivePanel(null);
+                }}
+                className="w-full cursor-pointer rounded-lg border border-[#E2E6EB] bg-[#FAFBFC] px-3 py-2 text-left text-[12.5px] leading-snug text-ink hover:border-accent"
+              >
+                {headline}
+              </button>
+            ))}
+          </div>
+        ) : null}
 
-      {primaryAction ? (
-        <>
+        {activePanel === "suggestions" && suggestions.length ? (
+          <div key={suggestPass} className="space-y-2">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-[#8A92A0]">
+              Ideas
+            </p>
+            {suggestions.map((item, i) => (
+              <div
+                key={`${suggestPass}-${i}`}
+                className="rounded-lg border border-[#E2E6EB] bg-[#FAFBFC] px-3 py-2.5"
+              >
+                <p className="text-[12.5px] leading-relaxed text-[#3a4250]">
+                  {item}
+                </p>
+                <button
+                  type="button"
+                  disabled={
+                    loading === `implement-${i}` || appliedSuggestion === i
+                  }
+                  onClick={async () => {
+                    setAppliedSuggestion(null);
+                    const ok = await run("implement-suggestion", {
+                      suggestion: item,
+                      loadingKey: `implement-${i}`,
+                    });
+                    if (ok) setAppliedSuggestion(i);
+                  }}
+                  className="mt-2 cursor-pointer text-[12px] font-semibold text-accent hover:underline disabled:opacity-50"
+                >
+                  {loading === `implement-${i}`
+                    ? "Applying…"
+                    : appliedSuggestion === i
+                      ? "Applied"
+                      : "Apply"}
+                </button>
+              </div>
+            ))}
+          </div>
+        ) : null}
+
+        <div className="flex gap-2">
+          <input
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            placeholder="Ask about this section…"
+            className="min-w-0 flex-1 rounded-lg border border-[#DFE3E8] px-3 py-2 text-[13px] focus:border-accent focus:outline-none"
+            onKeyDown={(e) => {
+              if (e.key !== "Enter" || !question.trim()) return;
+              e.preventDefault();
+              run("ask", { question: question.trim() });
+            }}
+          />
           <button
             type="button"
-            disabled={loading === primaryAction.action}
-            onClick={() =>
-              run(primaryAction.action, {
-                experienceIndex: primaryAction.experienceIndex,
-              })
-            }
-            className="w-full cursor-pointer rounded-[10px] border-none bg-accent px-4 py-2.5 text-[13px] font-semibold text-white shadow-[0_4px_14px_rgba(47,107,255,0.32)] transition-colors hover:bg-[#1E54E6] disabled:opacity-50"
+            disabled={!question.trim() || loading === "ask"}
+            onClick={() => run("ask", { question: question.trim() })}
+            className="cursor-pointer rounded-lg border border-[#DFE3E8] bg-white px-3 py-2 text-[12px] font-semibold text-[#2456D6] disabled:opacity-50"
           >
-            {loading === primaryAction.action
-              ? "Working…"
-              : primaryAction.label}
+            Ask
           </button>
-
-          {activePanel === "headline" && headlineOptions.length ? (
-            <div className="scroll mt-3 max-h-[280px] space-y-2 overflow-y-auto rounded-lg border border-[#DFE8FF] bg-white/80 p-3 pr-2">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[#5A6573]">
-                Choose a headline
-              </p>
-              {headlineOptions.map((headline, i) => (
-                <button
-                  key={`${headline}-${i}`}
-                  type="button"
-                  onClick={() => {
-                    onApplyHeadline(headline);
-                    setHeadlineOptions([]);
-                    setActivePanel(null);
-                  }}
-                  className="flex w-full cursor-pointer flex-col gap-1.5 rounded-lg border border-[#E8EBEF] bg-white px-3 py-2.5 text-left transition-colors hover:border-accent hover:bg-[#F5F8FF]"
-                >
-                  <span className="text-[12.5px] leading-snug text-[#3a4250]">
-                    {headline}
-                  </span>
-                  <span className="text-[11px] font-semibold text-[#2456D6]">
-                    Use this headline →
-                  </span>
-                </button>
-              ))}
-            </div>
-          ) : null}
-        </>
-      ) : null}
-
-      <button
-        type="button"
-        disabled={loading === "suggest"}
-        onClick={() => run("suggest")}
-        className={`w-full cursor-pointer rounded-[10px] border border-[#C8D8FF] bg-white px-4 py-2.5 text-[13px] font-semibold text-[#2456D6] transition-colors hover:bg-[#F5F8FF] disabled:opacity-50 ${
-          primaryAction ? "mt-2" : ""
-        }`}
-      >
-        {loading === "suggest"
-          ? "Working…"
-          : suggestions.length
-            ? "Refresh improvement ideas"
-            : "Get 3 improvement ideas"}
-      </button>
-
-      {activePanel === "suggestions" && suggestions.length ? (
-        <div
-          key={suggestPass}
-          className="scroll mt-3 max-h-[280px] space-y-2 overflow-y-auto rounded-lg border border-[#DFE8FF] bg-white/80 p-3 pr-2"
-        >
-          <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[#5A6573]">
-            Improvement ideas
-          </p>
-          {suggestions.map((item, i) => (
-            <div
-              key={`${suggestPass}-${item}-${i}`}
-              className="rounded-lg border border-[#E8EBEF] bg-white px-3 py-2.5"
-            >
-              <p className="text-[12.5px] leading-relaxed text-[#3a4250]">
-                {item}
-              </p>
-              <button
-                type="button"
-                disabled={
-                  loading === `implement-${i}` || appliedSuggestion === i
-                }
-                onClick={async () => {
-                  setAppliedSuggestion(null);
-                  const ok = await run("implement-suggestion", {
-                    suggestion: item,
-                    loadingKey: `implement-${i}`,
-                  });
-                  if (ok) setAppliedSuggestion(i);
-                }}
-                className="mt-2 cursor-pointer rounded-lg border-none bg-[#EAF1FF] px-3 py-1.5 text-[12px] font-semibold text-[#2456D6] hover:bg-[#dbe7ff] disabled:opacity-50"
-              >
-                {loading === `implement-${i}`
-                  ? "Applying…"
-                  : appliedSuggestion === i
-                    ? "Applied ✓"
-                    : "Apply this idea"}
-              </button>
-            </div>
-          ))}
         </div>
-      ) : null}
 
-      <div className="mt-3 flex gap-2 border-t border-[#DFE8FF] pt-3">
-        <input
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          placeholder="Ask AI anything about this section…"
-          className="min-w-0 flex-1 rounded-[10px] border border-[#C8D8FF] bg-white px-3 py-2.5 text-[13px] focus:border-accent focus:outline-none"
-          onKeyDown={(e) => {
-            if (e.key !== "Enter" || !question.trim()) return;
-            e.preventDefault();
-            run("ask", { question: question.trim() });
-          }}
-        />
-        <button
-          type="button"
-          disabled={!question.trim() || loading === "ask"}
-          onClick={() => run("ask", { question: question.trim() })}
-          className="cursor-pointer rounded-[10px] border-none bg-[#2456D6] px-4 py-2.5 text-[12.5px] font-semibold text-white disabled:opacity-50"
-        >
-          {loading === "ask" ? "…" : "Ask"}
-        </button>
+        {activePanel === "ask" && answer ? (
+          <p className="text-[12.5px] leading-relaxed text-[#5A6573]">{answer}</p>
+        ) : null}
       </div>
+    </details>
+  );
+}
 
-      {activePanel === "ask" && answer ? (
-        <p className="mt-3 rounded-lg border border-[#DFE8FF] bg-white px-3 py-2.5 text-[12.5px] leading-relaxed text-[#3a4250]">
-          {answer}
-        </p>
-      ) : null}
-    </div>
+function ActionChip({
+  children,
+  onClick,
+  disabled,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className="cursor-pointer rounded-lg border border-[#DFE3E8] bg-white px-3 py-1.5 text-[12px] font-semibold text-[#2456D6] hover:border-[#C8D8FF] hover:bg-[#F5F8FF] disabled:opacity-50"
+    >
+      {children}
+    </button>
   );
 }
