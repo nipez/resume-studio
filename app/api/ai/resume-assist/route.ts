@@ -14,10 +14,13 @@ const bodySchema = z.object({
     "suggest-skills",
     "suggest",
     "ask",
+    "apply-suggestion",
   ]),
   data: z.custom<ResumeData>(),
   experienceIndex: z.number().int().min(0).optional(),
   question: z.string().optional(),
+  section: z.string().optional(),
+  suggestion: z.string().optional(),
 });
 
 export async function POST(request: Request) {
@@ -34,17 +37,27 @@ export async function POST(request: Request) {
   }
 
   try {
-    const prompt = resumeAssistPrompt(
-      auth.positioning,
-      auth.userName,
-      body.action,
-      body.data,
-      body.experienceIndex,
-      body.question
-    );
+    const prompt = resumeAssistPrompt({
+      positioning: auth.positioning,
+      userName: auth.userName,
+      action: body.action,
+      data: body.data,
+      experienceIndex: body.experienceIndex,
+      question: body.question,
+      sectionId: body.section,
+      suggestion: body.suggestion,
+    });
     const { text, mock } = await completeWithFallback(prompt);
 
-    if (body.action === "polish-bullets") {
+    // apply-suggestion returns the shape matching the active section.
+    const wantsBullets =
+      body.action === "polish-bullets" ||
+      (body.action === "apply-suggestion" && body.section === "experience");
+    const wantsSkills =
+      body.action === "suggest-skills" ||
+      (body.action === "apply-suggestion" && body.section === "skills");
+
+    if (wantsBullets) {
       const parsed = extractJSON(text) as {
         blurb?: string;
         bullets?: string[];
@@ -56,12 +69,23 @@ export async function POST(request: Request) {
       });
     }
 
-    if (body.action === "suggest-skills") {
+    if (wantsSkills) {
       const parsed = extractJSON(text) as { skills?: string[] } | null;
       return NextResponse.json({
         skills: Array.isArray(parsed?.skills) ? parsed.skills : [],
         mock,
       });
+    }
+
+    if (body.action === "improve-headline") {
+      const parsed = extractJSON(text) as { options?: string[] } | null;
+      const options = Array.isArray(parsed?.options)
+        ? parsed.options.map((o) => String(o).trim()).filter(Boolean)
+        : (text || "")
+            .split("\n")
+            .map((line) => line.replace(/^[-*\d.)\s]+/, "").trim())
+            .filter(Boolean);
+      return NextResponse.json({ options: options.slice(0, 3), mock });
     }
 
     if (body.action === "suggest") {
@@ -70,6 +94,11 @@ export async function POST(request: Request) {
         suggestions: Array.isArray(parsed?.suggestions) ? parsed.suggestions : [],
         mock,
       });
+    }
+
+    // header apply-suggestion + summary text actions
+    if (body.action === "apply-suggestion" && body.section === "header") {
+      return NextResponse.json({ headline: (text || "").trim(), mock });
     }
 
     return NextResponse.json({ text: (text || "").trim(), mock });

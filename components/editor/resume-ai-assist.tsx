@@ -2,7 +2,7 @@
 
 import type { ResumeData } from "@/lib/types/resume";
 import type { ResumeEditSection } from "@/lib/types/resume-editor";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type ResumeAiAssistProps = {
   section: ResumeEditSection;
@@ -26,12 +26,53 @@ export function ResumeAiAssist({
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [headlineOptions, setHeadlineOptions] = useState<string[]>([]);
+  const [applyingIndex, setApplyingIndex] = useState<number | null>(null);
+  const [appliedIndex, setAppliedIndex] = useState<number | null>(null);
+
+  // Reset transient AI output when the active section changes.
+  useEffect(() => {
+    setError("");
+    setAnswer("");
+    setSuggestions([]);
+    setHeadlineOptions([]);
+    setApplyingIndex(null);
+    setAppliedIndex(null);
+  }, [section.id, section.index]);
+
+  const canApplySuggestion =
+    section.id === "header" ||
+    section.id === "summary" ||
+    section.id === "skills" ||
+    (section.id === "experience" && section.index !== undefined);
+
+  function applyForSection(json: {
+    text?: string;
+    headline?: string;
+    skills?: string[];
+    blurb?: string;
+    bullets?: string[];
+  }) {
+    if (section.id === "summary") {
+      onApplySummary(json.text ?? "");
+    } else if (section.id === "header") {
+      onApplyHeadline(json.headline ?? json.text ?? "");
+    } else if (section.id === "skills") {
+      onApplySkills(json.skills ?? []);
+    } else if (section.id === "experience" && section.index !== undefined) {
+      onApplyBullets(section.index, json.blurb ?? "", json.bullets ?? []);
+    }
+  }
 
   async function run(
     action: string,
-    opts?: { question?: string; experienceIndex?: number }
+    opts?: { question?: string; suggestion?: string; suggestionIndex?: number }
   ) {
-    setLoading(action);
+    if (action === "apply-suggestion" && opts?.suggestionIndex !== undefined) {
+      setApplyingIndex(opts.suggestionIndex);
+    } else {
+      setLoading(action);
+    }
     setError("");
     try {
       const res = await fetch("/api/ai/resume-assist", {
@@ -40,19 +81,24 @@ export function ResumeAiAssist({
         body: JSON.stringify({
           action,
           data,
-          experienceIndex: opts?.experienceIndex,
+          section: section.id,
+          experienceIndex: section.index,
           question: opts?.question,
+          suggestion: opts?.suggestion,
         }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Request failed");
 
-      if (action === "polish-bullets" && opts?.experienceIndex !== undefined) {
-        onApplyBullets(
-          opts.experienceIndex,
-          json.blurb ?? "",
-          json.bullets ?? []
-        );
+      if (action === "apply-suggestion") {
+        applyForSection(json);
+        if (opts?.suggestionIndex !== undefined) {
+          setAppliedIndex(opts.suggestionIndex);
+        }
+        return;
+      }
+      if (action === "polish-bullets" && section.index !== undefined) {
+        onApplyBullets(section.index, json.blurb ?? "", json.bullets ?? []);
         return;
       }
       if (action === "suggest-skills") {
@@ -64,7 +110,12 @@ export function ResumeAiAssist({
         return;
       }
       if (action === "improve-headline") {
-        onApplyHeadline(json.text ?? "");
+        const options: string[] = Array.isArray(json.options)
+          ? json.options
+          : json.text
+            ? [json.text]
+            : [];
+        setHeadlineOptions(options);
         return;
       }
       if (action === "ask") {
@@ -72,12 +123,14 @@ export function ResumeAiAssist({
         return;
       }
       if (action === "suggest") {
+        setAppliedIndex(null);
         setSuggestions(json.suggestions ?? []);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setLoading(null);
+      setApplyingIndex(null);
     }
   }
 
@@ -89,11 +142,7 @@ export function ResumeAiAssist({
         : section.id === "skills"
           ? { label: "Suggest skills", action: "suggest-skills" as const }
           : section.id === "experience" && section.index !== undefined
-            ? {
-                label: "Polish bullets",
-                action: "polish-bullets" as const,
-                experienceIndex: section.index,
-              }
+            ? { label: "Polish bullets", action: "polish-bullets" as const }
             : null;
 
   return (
@@ -117,11 +166,7 @@ export function ResumeAiAssist({
           <button
             type="button"
             disabled={loading === primaryAction.action}
-            onClick={() =>
-              run(primaryAction.action, {
-                experienceIndex: primaryAction.experienceIndex,
-              })
-            }
+            onClick={() => run(primaryAction.action)}
             className="cursor-pointer rounded-[10px] border-none bg-accent px-4 py-2.5 text-[13px] font-semibold text-white shadow-[0_4px_14px_rgba(47,107,255,0.32)] transition-colors hover:bg-[#1E54E6] disabled:opacity-50"
           >
             {loading === primaryAction.action
@@ -139,6 +184,37 @@ export function ResumeAiAssist({
           {loading === "suggest" ? "Working…" : "Get 3 improvement ideas"}
         </button>
       </div>
+
+      {/* Headline options — pick one to insert */}
+      {section.id === "header" && headlineOptions.length ? (
+        <div className="mt-3">
+          <div className="mb-1.5 text-[11.5px] font-semibold uppercase tracking-[0.06em] text-[#5A6573]">
+            Pick a headline
+          </div>
+          <ul className="space-y-1.5">
+            {headlineOptions.map((option, i) => (
+              <li
+                key={`${option}-${i}`}
+                className="flex items-center gap-2 rounded-lg border border-[#DFE8FF] bg-white px-3 py-2"
+              >
+                <span className="flex-1 text-[12.5px] leading-snug text-[#3a4250]">
+                  {option}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onApplyHeadline(option);
+                    setHeadlineOptions([]);
+                  }}
+                  className="flex-none cursor-pointer rounded-md border-none bg-accent px-2.5 py-1 text-[11.5px] font-semibold text-white hover:bg-[#1E54E6]"
+                >
+                  Use
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
 
       <div className="mt-3 flex gap-2">
         <input
@@ -172,12 +248,38 @@ export function ResumeAiAssist({
       ) : null}
       {suggestions.length ? (
         <ul className="mt-3 space-y-1.5">
-          {suggestions.map((item) => (
+          {suggestions.map((item, i) => (
             <li
               key={item}
-              className="rounded-lg border border-[#DFE8FF] bg-white px-3 py-2 text-[12.5px] leading-relaxed text-[#3a4250]"
+              className="rounded-lg border border-[#DFE8FF] bg-white px-3 py-2.5 text-[12.5px] leading-relaxed text-[#3a4250]"
             >
-              {item}
+              <p>{item}</p>
+              {canApplySuggestion ? (
+                <div className="mt-2 flex items-center gap-2">
+                  <button
+                    type="button"
+                    disabled={applyingIndex !== null}
+                    onClick={() =>
+                      run("apply-suggestion", {
+                        suggestion: item,
+                        suggestionIndex: i,
+                      })
+                    }
+                    className="cursor-pointer rounded-md border border-[#C8D8FF] bg-[#F5F8FF] px-2.5 py-1 text-[11.5px] font-semibold text-[#2456D6] transition-colors hover:bg-[#EAF1FF] disabled:opacity-50"
+                  >
+                    {applyingIndex === i
+                      ? "Applying…"
+                      : appliedIndex === i
+                        ? "Apply again"
+                        : "Apply this"}
+                  </button>
+                  {appliedIndex === i ? (
+                    <span className="text-[11.5px] font-semibold text-[#0E7C4B]">
+                      ✓ Applied
+                    </span>
+                  ) : null}
+                </div>
+              ) : null}
             </li>
           ))}
         </ul>

@@ -278,19 +278,52 @@ export function interviewPrepPrompt(
   );
 }
 
-export function resumeAssistPrompt(
-  positioning: string,
-  userName: string,
-  action: string,
-  data: ResumeData,
-  experienceIndex?: number,
-  question?: string
-): string {
+const SECTION_LABELS: Record<string, string> = {
+  header: "header (name & professional headline)",
+  summary: "summary / profile",
+  skills: "skills",
+  experience: "work experience",
+  education: "education",
+};
+
+export function resumeAssistPrompt(opts: {
+  positioning: string;
+  userName: string;
+  action: string;
+  data: ResumeData;
+  experienceIndex?: number;
+  question?: string;
+  sectionId?: string;
+  suggestion?: string;
+}): string {
+  const {
+    positioning,
+    userName,
+    action,
+    data,
+    experienceIndex,
+    question,
+    sectionId,
+    suggestion,
+  } = opts;
+
   const ctx =
     buildPositioningContext(positioning, userName) +
     "\n\nRESUME (JSON):\n" +
     JSON.stringify(data) +
     "\n\n";
+
+  const roleContext = (index: number) => {
+    const role = data.experience[index];
+    return (
+      "ROLE: " +
+      (role?.company || "") +
+      " — " +
+      (role?.title || "") +
+      "\nCURRENT BULLETS:\n" +
+      (role?.bullets || []).map((b) => "- " + b).join("\n")
+    );
+  };
 
   if (action === "improve-summary") {
     return (
@@ -302,21 +335,16 @@ export function resumeAssistPrompt(
   if (action === "improve-headline") {
     return (
       ctx +
-      "TASK: Write a concise professional headline (under 12 words) aligned to this candidate's experience. Return ONLY the headline text."
+      "TASK: Write 3 distinct professional headline options (each under 12 words) aligned to this candidate's experience. Vary the angle across the options. Do not invent facts. " +
+      'Return ONLY valid minified JSON: {"options":["headline 1","headline 2","headline 3"]}'
     );
   }
 
   if (action === "polish-bullets" && experienceIndex !== undefined) {
-    const role = data.experience[experienceIndex];
     return (
       ctx +
       "TASK: Rewrite bullets for this role to be concise, quantified where possible, and outcome-led. Do NOT invent companies, titles, dates, or metrics.\n\n" +
-      "ROLE: " +
-      (role?.company || "") +
-      " — " +
-      (role?.title || "") +
-      "\nCURRENT BULLETS:\n" +
-      (role?.bullets || []).map((b) => "- " + b).join("\n") +
+      roleContext(experienceIndex) +
       '\n\nReturn ONLY valid minified JSON: {"blurb":"optional one-line role summary","bullets":["3-5 improved bullets"]}'
     );
   }
@@ -338,9 +366,56 @@ export function resumeAssistPrompt(
     );
   }
 
+  if (action === "apply-suggestion" && suggestion?.trim()) {
+    const s = suggestion.trim();
+    if (sectionId === "header") {
+      return (
+        ctx +
+        'TASK: Rewrite the professional headline to implement this suggestion: "' +
+        s +
+        '". Keep it under 12 words and truthful. Return ONLY the headline text — no markdown, no quotes.'
+      );
+    }
+    if (sectionId === "skills") {
+      return (
+        ctx +
+        'TASK: Revise the skills list to implement this suggestion: "' +
+        s +
+        '". Keep the strongest existing skills and only add ones supported by the resume. Return ONLY valid minified JSON: {"skills":["skill1","skill2"]}'
+      );
+    }
+    if (sectionId === "experience" && experienceIndex !== undefined) {
+      return (
+        ctx +
+        'TASK: Rewrite this role to implement this suggestion: "' +
+        s +
+        '". Do NOT invent companies, titles, dates, or metrics.\n\n' +
+        roleContext(experienceIndex) +
+        '\n\nReturn ONLY valid minified JSON: {"blurb":"optional one-line role summary","bullets":["3-5 improved bullets"]}'
+      );
+    }
+    // summary (and any other text section)
+    return (
+      ctx +
+      'TASK: Rewrite the summary/profile to implement this suggestion: "' +
+      s +
+      '". Use only facts from the resume. Return ONLY the new summary text — no markdown, no quotes.'
+    );
+  }
+
+  const focus = sectionId ? SECTION_LABELS[sectionId] : undefined;
+  const roleFocus =
+    sectionId === "experience" && experienceIndex !== undefined
+      ? "\n\n" + roleContext(experienceIndex)
+      : "";
+
   return (
     ctx +
-    "TASK: Offer 3 specific, actionable suggestions to improve this resume. Return ONLY valid minified JSON: " +
+    "TASK: Offer 3 specific, actionable suggestions to improve " +
+    (focus ? "the " + focus + " section of this resume" : "this resume") +
+    ". Each suggestion must be concrete enough to act on in one step. Do not invent facts." +
+    roleFocus +
+    "\n\nReturn ONLY valid minified JSON: " +
     '{"suggestions":["suggestion 1","suggestion 2","suggestion 3"]}'
   );
 }

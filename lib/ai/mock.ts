@@ -136,8 +136,42 @@ export function mockComplete(prompt: string): string {
     );
   }
 
-  if (prompt.includes("Write a concise professional headline")) {
-    return "Senior Professional · Strategy & Growth (demo mode)";
+  if (prompt.includes("professional headline options")) {
+    return JSON.stringify({
+      options: [
+        "Senior Professional · Strategy & Growth (demo mode)",
+        "Results-Driven Leader in Operations & Delivery (demo)",
+        "Cross-Functional Builder · Outcomes Over Output (demo)",
+      ],
+    });
+  }
+
+  if (prompt.includes("Rewrite the professional headline to implement")) {
+    return "Senior Leader · Implemented Suggestion (demo mode)";
+  }
+
+  if (prompt.includes("Revise the skills list to implement")) {
+    return JSON.stringify({
+      skills: [
+        "Strategic Planning",
+        "Cross-Functional Leadership",
+        "Data Analysis",
+        "Stakeholder Management",
+        "Process Improvement",
+        "Communication",
+      ],
+    });
+  }
+
+  if (prompt.includes("Rewrite this role to implement")) {
+    return JSON.stringify({
+      blurb: "Role summary updated to implement the suggestion (demo mode).",
+      bullets: [
+        "Reworked this bullet to reflect the suggested improvement (demo — add API key).",
+        "Emphasized quantified outcomes from your existing experience.",
+        "Tightened scope and impact to match the suggested change.",
+      ],
+    });
   }
 
   if (prompt.includes("Rewrite bullets for this role")) {
