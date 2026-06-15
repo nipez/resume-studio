@@ -14,7 +14,7 @@ export function MarketingHeader() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="font-semibold text-[#ff5c38] transition hover:text-[#e0421f]"
+                className="inline-flex items-center rounded-full border border-[#ff5c38]/40 bg-[#ff5c38]/10 px-3 py-1 font-semibold text-[#ff5c38] transition hover:border-[#ff5c38]/70 hover:bg-[#ff5c38]/15"
               >
                 {link.label} · Parents
               </Link>
