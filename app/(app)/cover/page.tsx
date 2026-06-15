@@ -1,8 +1,12 @@
 import { CoverPanel } from "@/components/cover/cover-panel";
+import { listCoverLetters } from "@/lib/cover/actions";
 import { getLibraryData } from "@/lib/resume/actions";
 
 export default async function CoverPage() {
-  const { versions, defaultVersionId } = await getLibraryData();
+  const [{ versions, defaultVersionId }, savedLetters] = await Promise.all([
+    getLibraryData(),
+    listCoverLetters(),
+  ]);
 
   return (
     <div className="scroll flex-1 overflow-auto">
@@ -15,7 +19,11 @@ export default async function CoverPage() {
           inline and export. Shares the job description with the Tailor tab.
         </p>
         <div className="mt-[26px]">
-          <CoverPanel versions={versions} defaultVersionId={defaultVersionId} />
+          <CoverPanel
+            versions={versions}
+            defaultVersionId={defaultVersionId}
+            savedLetters={savedLetters}
+          />
         </div>
       </div>
     </div>

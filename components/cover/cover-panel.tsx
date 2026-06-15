@@ -12,6 +12,11 @@ import {
 import { JobUrlImport } from "@/components/shared/job-url-import";
 import { Spinner } from "@/components/ui/spinner";
 import { Toast } from "@/components/ui/toast";
+import {
+  deleteCoverLetter,
+  saveCoverLetter,
+  type CoverLetter,
+} from "@/lib/cover/actions";
 import { useJobDraft } from "@/lib/job-draft/use-job-draft";
 import { buildCoverHTML, openPrintHtml } from "@/lib/resume/build-cover-html";
 import type { ResumeVersion } from "@/lib/resume/db-types";
@@ -20,9 +25,26 @@ import { useState } from "react";
 type CoverPanelProps = {
   versions: ResumeVersion[];
   defaultVersionId: string | null;
+  savedLetters?: CoverLetter[];
 };
 
-export function CoverPanel({ versions, defaultVersionId }: CoverPanelProps) {
+function formatWhen(iso: string) {
+  try {
+    return new Date(iso).toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  } catch {
+    return "";
+  }
+}
+
+export function CoverPanel({
+  versions,
+  defaultVersionId,
+  savedLetters = [],
+}: CoverPanelProps) {
   const { draft, update } = useJobDraft();
   const [baseId, setBaseId] = useState(
     defaultVersionId ?? versions[0]?.id ?? ""
@@ -31,6 +53,9 @@ export function CoverPanel({ versions, defaultVersionId }: CoverPanelProps) {
   const [error, setError] = useState("");
   const [mockMode, setMockMode] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [letters, setLetters] = useState<CoverLetter[]>(savedLetters);
+  const [currentLetterId, setCurrentLetterId] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   const base = versions.find((v) => v.id === baseId) ?? versions[0];
 
@@ -81,6 +106,68 @@ export function CoverPanel({ versions, defaultVersionId }: CoverPanelProps) {
         location: base.data.location,
       })
     );
+  }
+
+  async function handleSave() {
+    if (!draft.coverText.trim()) {
+      setError("Generate or write a letter before saving.");
+      return;
+    }
+    setSaving(true);
+    setError("");
+    try {
+      const saved = await saveCoverLetter({
+        id: currentLetterId ?? undefined,
+        role: draft.jobRole,
+        company: draft.jobCompany,
+        body: draft.coverText,
+        resumeVersionId: baseId || null,
+      });
+      setLetters((prev) => {
+        const without = prev.filter((l) => l.id !== saved.id);
+        return [saved, ...without];
+      });
+      setCurrentLetterId(saved.id);
+      setToast("Saved to your account");
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Couldn't save. Try again."
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function loadLetter(letter: CoverLetter) {
+    update({
+      coverText: letter.body,
+      jobRole: letter.role,
+      jobCompany: letter.company,
+    });
+    setCurrentLetterId(letter.id);
+    if (letter.resume_version_id && versions.some((v) => v.id === letter.resume_version_id)) {
+      setBaseId(letter.resume_version_id);
+    }
+    setError("");
+  }
+
+  function startNewLetter() {
+    setCurrentLetterId(null);
+    update({ coverText: "" });
+    setError("");
+  }
+
+  async function removeLetter(id: string) {
+    const prev = letters;
+    setLetters((curr) => curr.filter((l) => l.id !== id));
+    if (currentLetterId === id) setCurrentLetterId(null);
+    try {
+      await deleteCoverLetter(id);
+      setToast("Deleted");
+    } catch {
+      setLetters(prev);
+      setError("Couldn't delete. Try again.");
+    }
   }
 
   if (!versions.length) {
@@ -147,6 +234,69 @@ export function CoverPanel({ versions, defaultVersionId }: CoverPanelProps) {
             {busy ? <Spinner /> : null}
             {busy ? "Writing…" : "Generate cover letter"}
           </button>
+
+          <div className="mt-5 border-t border-[#EEF0F3] pt-4">
+            <div className="flex items-center justify-between">
+              <span className="text-[12.5px] font-semibold text-[#5A6573]">
+                Saved cover letters
+              </span>
+              {currentLetterId ? (
+                <button
+                  type="button"
+                  onClick={startNewLetter}
+                  className="text-[12px] font-semibold text-accent hover:underline"
+                >
+                  + New
+                </button>
+              ) : null}
+            </div>
+            {letters.length === 0 ? (
+              <p className="mt-2 text-[12.5px] leading-relaxed text-muted">
+                Nothing saved yet. Generate a letter and click{" "}
+                <span className="font-semibold text-[#3a4350]">
+                  Save to account
+                </span>{" "}
+                to sync it to every device you sign in on.
+              </p>
+            ) : (
+              <ul className="mt-2.5 flex max-h-[260px] flex-col gap-1.5 overflow-auto">
+                {letters.map((letter) => {
+                  const active = letter.id === currentLetterId;
+                  return (
+                    <li
+                      key={letter.id}
+                      className={`group flex items-center gap-1 rounded-[9px] border px-2.5 py-2 ${
+                        active
+                          ? "border-accent bg-[#F4F7FF]"
+                          : "border-[#EAECEF] bg-white hover:border-[#D6DAE0]"
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => loadLetter(letter)}
+                        className="min-w-0 flex-1 text-left"
+                      >
+                        <div className="truncate text-[13px] font-semibold text-[#1a1f29]">
+                          {letter.title}
+                        </div>
+                        <div className="text-[11.5px] text-muted">
+                          {formatWhen(letter.updated_at)}
+                        </div>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeLetter(letter.id)}
+                        aria-label="Delete cover letter"
+                        className="shrink-0 rounded-md px-1.5 py-1 text-[13px] text-[#9aa3af] hover:bg-[#F2F3F5] hover:text-[#e5484d]"
+                      >
+                        ✕
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
         </div>
 
         <div className="flex min-h-[560px] flex-col rounded-2xl border border-[#E6E8EC] bg-white p-2">
@@ -155,6 +305,19 @@ export function CoverPanel({ versions, defaultVersionId }: CoverPanelProps) {
               Letter
             </div>
             <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={handleSave}
+                disabled={!draft.coverText || saving}
+                className="flex items-center gap-1.5 rounded-lg bg-[#F2F3F5] px-[13px] py-[7px] text-[12.5px] font-semibold text-[#3a4350] hover:bg-[#E6E8EC] disabled:opacity-50"
+              >
+                {saving ? <Spinner /> : null}
+                {saving
+                  ? "Saving…"
+                  : currentLetterId
+                  ? "Save changes"
+                  : "Save to account"}
+              </button>
               <button
                 type="button"
                 onClick={handleCopy}
