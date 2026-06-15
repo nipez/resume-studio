@@ -32,6 +32,27 @@ export function parseResumePrompt(raw: string): string {
   );
 }
 
+export function parseJobPostingPrompt(raw: string, sourceUrl?: string): string {
+  const source = sourceUrl?.trim()
+    ? `\nSOURCE URL: ${sourceUrl.trim()}\n`
+    : "\n";
+
+  return (
+    "You are extracting structured job posting fields from web page text. Return ONLY valid minified JSON — no markdown, no commentary.\n\n" +
+    source +
+    "PAGE TEXT:\n" +
+    raw +
+    "\n\n" +
+    'Return JSON with this exact shape: {"jobRole":"","jobCompany":"","jobDesc":""}\n' +
+    "Rules:\n" +
+    "- jobRole: the primary job title (e.g. VP of Growth, Senior Product Manager).\n" +
+    "- jobCompany: the hiring company name only — no taglines.\n" +
+    "- jobDesc: the full job description as clean plain text. Include responsibilities, requirements, and qualifications. Preserve bullet-like lines with newlines. Do NOT invent content.\n" +
+    "- If a field is missing, use an empty string.\n" +
+    "- jobDesc must be at least a few sentences when the posting content is present."
+  );
+}
+
 export function tailorMetaPrompt(
   positioning: string,
   userName: string,

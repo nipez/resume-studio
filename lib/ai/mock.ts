@@ -33,6 +33,33 @@ export function mockComplete(prompt: string): string {
     });
   }
 
+  if (prompt.includes("extracting structured job posting fields")) {
+    const pageMatch = prompt.match(/PAGE TEXT:\n([\s\S]+?)\n\nReturn JSON/);
+    const urlMatch = prompt.match(/SOURCE URL: (.+)\n/);
+    const raw = pageMatch?.[1]?.trim() ?? "";
+    const url = urlMatch?.[1]?.trim() ?? "";
+    let jobCompany = "Demo Company";
+    if (url) {
+      try {
+        const host = new URL(url).hostname.replace(/^www\./, "");
+        jobCompany = host.split(".")[0] ?? jobCompany;
+        jobCompany =
+          jobCompany.charAt(0).toUpperCase() + jobCompany.slice(1);
+      } catch {
+        /* keep default */
+      }
+    }
+    const excerpt = raw.slice(0, 1200).trim();
+    return JSON.stringify({
+      jobRole: "VP of Growth",
+      jobCompany,
+      jobDesc:
+        (excerpt ||
+          "Demo job description — configure ANTHROPIC_API_KEY for real URL parsing.") +
+        "\n\n[Demo mode] Review these fields before tailoring.",
+    });
+  }
+
   if (prompt.includes("Tailor the META")) {
     return JSON.stringify({
       headline: "Role-Aligned Professional · Demo Tailoring",
@@ -263,4 +290,23 @@ export function parseResumeFromAI(text: string): ResumeData | null {
   const j = extractJSON<Record<string, unknown>>(text);
   if (!j) return null;
   return normalizeParsedResume(j);
+}
+
+export type ParsedJobPosting = {
+  jobRole: string;
+  jobCompany: string;
+  jobDesc: string;
+};
+
+export function parseJobPostingFromAI(text: string): ParsedJobPosting | null {
+  const j = extractJSON<Record<string, unknown>>(text);
+  if (!j) return null;
+
+  const jobRole = String(j.jobRole || "").trim();
+  const jobCompany = String(j.jobCompany || "").trim();
+  const jobDesc = String(j.jobDesc || "").trim();
+
+  if (!jobDesc) return null;
+
+  return { jobRole, jobCompany, jobDesc };
 }
