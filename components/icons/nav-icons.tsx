@@ -71,7 +71,18 @@ export function ChartIcon(props: IconProps) {
   );
 }
 
+export function HomeIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M3 10.5 12 3l9 7.5" />
+      <path d="M5 9.5V21h14V9.5" />
+      <path d="M9.5 21v-6h5v6" />
+    </svg>
+  );
+}
+
 export type NavIconName =
+  | "home"
   | "library"
   | "target"
   | "mail"
@@ -84,6 +95,8 @@ export function NavIcon({
   ...props
 }: { name: NavIconName } & IconProps) {
   switch (name) {
+    case "home":
+      return <HomeIcon {...props} />;
     case "library":
       return <LibraryIcon {...props} />;
     case "target":

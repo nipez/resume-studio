@@ -10,6 +10,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useTransition } from "react";
 
 const NAV_ITEMS: { href: string; label: string; icon: NavIconName }[] = [
+  { href: "/dashboard", label: "Home", icon: "home" },
   { href: "/library", label: "Resume Library", icon: "library" },
   { href: "/tailor", label: "Tailor to a Job", icon: "target" },
   { href: "/cover", label: "Cover Letter", icon: "mail" },
