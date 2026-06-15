@@ -33,6 +33,7 @@ function collectJobContext(): {
   jobRole: string;
   jobCompany: string;
   jobDesc: string;
+  jobUrl: string;
   coverLetter: string;
   answers: { q: string; a: string }[];
 } {
@@ -42,6 +43,7 @@ function collectJobContext(): {
     jobRole: draft.jobRole,
     jobCompany: draft.jobCompany,
     jobDesc: draft.jobDesc,
+    jobUrl: draft.jobUrl,
     coverLetter: draft.coverText,
     answers: qa
       .filter((q) => q.q?.trim() && q.a?.trim())
@@ -74,7 +76,7 @@ export function LogApplicationModal({
     setRole(ctx.jobRole || initialRole || fromName.role);
     setCompany(ctx.jobCompany || initialCompany || fromName.company);
     setJobDesc(ctx.jobDesc);
-    setJobUrl("");
+    setJobUrl(ctx.jobUrl);
     setError("");
   }, [open, initialRole, initialCompany, resumeVersionName]);
 
@@ -97,6 +99,7 @@ export function LogApplicationModal({
       jobRole: trimmedRole,
       jobCompany: trimmedCompany,
       jobDesc: jobDesc.trim(),
+      jobUrl: jobUrl.trim(),
     });
 
     const ctx = collectJobContext();

@@ -2,6 +2,7 @@ export type JobDraft = {
   jobRole: string;
   jobCompany: string;
   jobDesc: string;
+  jobUrl: string;
   coverText: string;
   coverHM: string;
 };
@@ -12,6 +13,7 @@ export const EMPTY_JOB_DRAFT: JobDraft = {
   jobRole: "",
   jobCompany: "",
   jobDesc: "",
+  jobUrl: "",
   coverText: "",
   coverHM: "",
 };

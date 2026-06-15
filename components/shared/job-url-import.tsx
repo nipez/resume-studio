@@ -8,6 +8,7 @@ export type ImportedJobFields = {
   jobRole: string;
   jobCompany: string;
   jobDesc: string;
+  jobUrl?: string;
 };
 
 type JobUrlImportProps = {
@@ -72,6 +73,7 @@ export function JobUrlImport({
         jobRole: json.jobRole ?? "",
         jobCompany: json.jobCompany ?? "",
         jobDesc: json.jobDesc ?? "",
+        jobUrl: trimmed,
       });
       setImported(true);
     } catch (err) {
@@ -110,6 +112,7 @@ export function JobUrlImport({
         jobRole: json.jobRole ?? "",
         jobCompany: json.jobCompany ?? "",
         jobDesc: json.jobDesc ?? "",
+        jobUrl: url.trim() ? normalizeJobUrl(url) : "",
       });
       setImported(true);
     } catch (err) {

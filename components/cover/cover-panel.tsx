@@ -107,6 +107,7 @@ export function CoverPanel({ versions, defaultVersionId }: CoverPanelProps) {
                 jobRole: fields.jobRole,
                 jobCompany: fields.jobCompany,
                 jobDesc: fields.jobDesc,
+                jobUrl: fields.jobUrl ?? draft.jobUrl,
               })
             }
             hint="Career pages work via URL. For Indeed or LinkedIn, use Paste text."

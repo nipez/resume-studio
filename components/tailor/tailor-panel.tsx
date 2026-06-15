@@ -148,6 +148,7 @@ export function TailorPanel({ versions, defaultVersionId }: TailorPanelProps) {
               jobRole: fields.jobRole,
               jobCompany: fields.jobCompany,
               jobDesc: fields.jobDesc,
+              jobUrl: fields.jobUrl ?? draft.jobUrl,
             })
           }
           hint="Career pages (Greenhouse, Lever) work via URL. For Indeed or LinkedIn, use Paste text."
