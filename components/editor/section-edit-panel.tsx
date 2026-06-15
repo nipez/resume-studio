@@ -68,7 +68,7 @@ export function SectionEditPanel({
   const exp = data.experience[expIndex];
 
   return (
-    <div className="scroll absolute bottom-4 right-4 top-4 z-20 flex w-[min(400px,calc(100%-2rem))] flex-col overflow-hidden rounded-2xl border border-white/70 bg-white/96 shadow-[0_22px_56px_rgba(15,17,22,0.22)] backdrop-blur-md">
+    <div className="absolute bottom-4 right-4 top-4 z-20 flex w-[min(400px,calc(100%-2rem))] flex-col overflow-hidden rounded-2xl border border-white/70 bg-white/96 shadow-[0_22px_56px_rgba(15,17,22,0.22)] backdrop-blur-md">
       <div className="flex items-center justify-between border-b border-[#EEF1F4] px-5 py-4">
         <div>
           <div className="font-display text-[15px] font-semibold text-ink">
@@ -88,20 +88,20 @@ export function SectionEditPanel({
       </div>
 
       <div className="flex flex-1 flex-col overflow-hidden">
-        <div className="scroll flex-1 overflow-auto px-5 py-4">
-          <div className="sticky top-0 z-10 -mx-1 mb-4 bg-white/95 pb-1 pt-0 backdrop-blur-sm">
-            <ResumeAiAssist
-              section={section}
-              data={data}
-              onApplySummary={(summary) => onUpdateData({ summary })}
-              onApplyHeadline={(headline) => onUpdateData({ headline })}
-              onApplySkills={(skills) => onUpdateData({ skills })}
-              onApplyBullets={(index, blurb, bullets) =>
-                onUpdateExperience(index, { blurb, bullets })
-              }
-            />
-          </div>
+        <div className="flex-none border-b border-[#EEF1F4] px-5 py-4">
+          <ResumeAiAssist
+            section={section}
+            data={data}
+            onApplySummary={(summary) => onUpdateData({ summary })}
+            onApplyHeadline={(headline) => onUpdateData({ headline })}
+            onApplySkills={(skills) => onUpdateData({ skills })}
+            onApplyBullets={(index, blurb, bullets) =>
+              onUpdateExperience(index, { blurb, bullets })
+            }
+          />
+        </div>
 
+        <div className="scroll min-h-0 flex-1 overflow-auto px-5 py-4">
           <div className="mb-3 font-display text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8A92A0]">
             Edit fields
           </div>
