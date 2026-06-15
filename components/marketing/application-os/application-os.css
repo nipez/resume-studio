@@ -30,7 +30,7 @@
   color: var(--coral-l);
 }
 .marketing-home .aos-hero h1 {
-  font-family: var(--font-space-grotesk), sans-serif;
+  font-family: var(--font-inter), sans-serif;
   font-weight: 600;
   letter-spacing: -0.035em;
   line-height: 1;
@@ -39,9 +39,8 @@
   color: #fff;
 }
 .marketing-home .aos-hero h1 .serif-i {
-  font-family: var(--font-instrument-serif), serif;
-  font-style: italic;
-  font-weight: 400;
+  font-style: normal;
+  font-weight: 700;
   color: var(--coral-l);
 }
 .marketing-home .aos-sub {
@@ -80,7 +79,7 @@
   border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
 .marketing-home .aos-stat .v {
-  font-family: var(--font-space-grotesk), sans-serif;
+  font-family: var(--font-inter), sans-serif;
   font-size: 26px;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -123,7 +122,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-space-grotesk), sans-serif;
+  font-family: var(--font-inter), sans-serif;
   font-weight: 700;
   font-size: 12px;
   color: #fff;
@@ -192,7 +191,7 @@
   padding: 14px;
 }
 .marketing-home .aos-doc .nm {
-  font-family: var(--font-space-grotesk), sans-serif;
+  font-family: var(--font-inter), sans-serif;
   font-weight: 700;
   font-size: 15px;
   color: var(--coral);
@@ -278,7 +277,7 @@
 }
 
 .marketing-home .aos-flow-num {
-  font-family: var(--font-space-grotesk), sans-serif;
+  font-family: var(--font-inter), sans-serif;
   font-size: 11px;
   font-weight: 700;
   color: #b3aab8;

@@ -97,7 +97,7 @@
 }
 
 .marketing-home .price-chip .amt {
-  font-family: var(--font-space-grotesk), sans-serif;
+  font-family: var(--font-inter), sans-serif;
   font-size: 22px;
   font-weight: 600;
   margin-top: 6px;
@@ -215,7 +215,7 @@
   cursor: pointer;
   list-style: none;
   padding: 22px 28px;
-  font-family: var(--font-space-grotesk), sans-serif;
+  font-family: var(--font-inter), sans-serif;
   font-size: 17px;
   font-weight: 600;
   color: var(--ink);

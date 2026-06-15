@@ -82,7 +82,7 @@
 }
 
 .marketing-home.students-page .students-plan-price {
-  font-family: var(--font-space-grotesk), sans-serif;
+  font-family: var(--font-inter), sans-serif;
   font-size: 44px;
   font-weight: 600;
   margin-top: 10px;
@@ -155,7 +155,7 @@
   border-radius: 50%;
   background: rgba(255, 92, 56, 0.1);
   color: var(--coral);
-  font-family: var(--font-space-grotesk), sans-serif;
+  font-family: var(--font-inter), sans-serif;
   font-size: 13px;
   font-weight: 700;
   align-items: center;

@@ -23,7 +23,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
   font-size: 16px;
   font-weight: 600;
   margin-top: 16px;
@@ -31,7 +31,7 @@
 }
 
 .marketing-home .tname .pill {
-  font-family: "Instrument Sans", sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
   font-size: 11px;
   font-weight: 600;
   color: var(--muted2);
@@ -134,7 +134,7 @@
   letter-spacing: 0.22em;
   text-transform: uppercase;
   margin-top: 5px;
-  font-family: "Instrument Sans", sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
 }
 
 .marketing-home .classic .contact {
@@ -150,7 +150,7 @@
 
 .marketing-home .classic .r-h {
   font-size: 8.5px;
-  font-family: "Instrument Sans", sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
   border-bottom: 1px solid rgba(40, 20, 30, 0.18);
   padding-bottom: 3px;
   margin-bottom: 7px;
@@ -168,12 +168,12 @@
 
 .marketing-home .classic .r-co {
   font-size: 8.5px;
-  font-family: "Instrument Sans", sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
 }
 
 .marketing-home .classic .r-date {
   font-size: 7.5px;
-  font-family: "Instrument Sans", sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
 }
 
 .marketing-home .classic .r-li {
@@ -181,13 +181,13 @@
   line-height: 1.5;
   padding-left: 9px;
   margin-top: 3px;
-  font-family: "Instrument Sans", sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
 }
 
 .marketing-home .classic .r-p {
   font-size: 8px;
   line-height: 1.55;
-  font-family: "Instrument Sans", sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
 }
 
 .marketing-home .classic .skills {
@@ -198,7 +198,7 @@
 
 .marketing-home .classic .chip {
   font-size: 7px;
-  font-family: "Instrument Sans", sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
   color: #48414f;
   background: #f4eee9;
   border-radius: 4px;
@@ -211,7 +211,7 @@
   display: grid;
   grid-template-columns: 38% 1fr;
   height: 100%;
-  font-family: "Instrument Sans", sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
 }
 
 .marketing-home .twocol .side {
@@ -228,7 +228,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
   font-weight: 700;
   font-size: 17px;
   color: #fff;
@@ -276,7 +276,7 @@
 
 .marketing-home .twocol .r-name {
   font-size: 19px;
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
 }
 
 .marketing-home .twocol .r-role {
@@ -329,7 +329,7 @@
 /* Editorial */
 .marketing-home .editorial {
   padding: 24px 24px 0;
-  font-family: "Instrument Sans", sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
 }
 
 .marketing-home .editorial .topbar {
@@ -339,7 +339,7 @@
 }
 
 .marketing-home .editorial .r-name {
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
   font-size: 25px;
   line-height: 0.95;
   letter-spacing: -0.02em;
@@ -358,7 +358,7 @@
   border-radius: 8px;
   background: #231a2e;
   color: #fff;
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
   font-weight: 700;
   font-size: 11px;
   display: flex;
