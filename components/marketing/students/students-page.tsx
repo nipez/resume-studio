@@ -4,7 +4,6 @@ import { StudentTemplateGallery } from "@/components/marketing/students/student-
 import { MarketingFaqAccordion } from "@/components/marketing/shared/marketing-faq-accordion";
 import { MarketingPageCta } from "@/components/marketing/shared/marketing-page-cta";
 import {
-  BETA_BANNER,
   PRICING_PLANS,
   SITE_NAME,
   STUDENT_COVER_LETTER_SCENARIOS,
@@ -22,6 +21,39 @@ import "./students.css";
 
 const TESTIMONIAL_AVATARS = ["var(--coral)", "var(--teal)", "var(--ink)"];
 
+const PARENT_REASONS = [
+  {
+    icon: "🚀",
+    title: "A head start that compounds",
+    body: "The first job, internship, or college app is often the first time a kid has to put themselves on paper. Learning to do it well now pays off for years — every future application gets easier.",
+  },
+  {
+    icon: "📄",
+    title: "A first resume that actually lands",
+    body: "Clubs, sports, volunteering, and part-time jobs become real, employer-ready bullet points — not a blank page or a copied template.",
+  },
+  {
+    icon: "✉",
+    title: "Cover letters, written for them",
+    body: "Short, genuine cover letters for part-time jobs, camp counselor gigs, and internships — in their own voice, not stiff corporate filler.",
+  },
+  {
+    icon: "🎤",
+    title: "Interview-ready",
+    body: "Built-in interview prep turns each application into likely questions and talking points, so they walk in confident instead of winging it.",
+  },
+  {
+    icon: "📋",
+    title: "One place to stay organized",
+    body: "Every application, status, and follow-up lives in one workspace — so nothing slips through the cracks during a busy senior year.",
+  },
+  {
+    icon: "💬",
+    title: "Confidence putting themselves forward",
+    body: "Writing about your own strengths is a life skill. The guided steps coach them through it — a win well beyond the first job.",
+  },
+];
+
 export function StudentsPage() {
   const studentPlan = PRICING_PLANS.find((plan) => plan.id === "student")!;
 
@@ -30,7 +62,7 @@ export function StudentsPage() {
       <section className="students-hero">
         <div className="wrap students-hero-grid">
           <div>
-            <span className="eyebrow">Student plan · $2.99/mo</span>
+            <span className="eyebrow">Free for students · In beta</span>
             <h1>
               Your first resume shouldn&apos;t start with a{" "}
               <span className="serif-i">blank page</span>
@@ -54,24 +86,71 @@ export function StudentsPage() {
                 Start guided builder →
               </Link>
               <Link href="/pricing" className="link-underline">
-                See student pricing
+                See what&apos;s included
               </Link>
             </div>
-            <p className="students-beta">{BETA_BANNER}</p>
+            <p className="students-beta">
+              🔥 Free for students while we&apos;re in beta — hurry, limited-time
+              offer.
+            </p>
           </div>
           <div className="students-hero-card">
-            <div className="students-plan-kicker">{studentPlan.badge}</div>
+            <div className="students-plan-kicker">Limited-time beta offer</div>
             <div className="students-plan-price">
-              {studentPlan.price}
-              <span>{studentPlan.period}</span>
+              Free<span> · in beta</span>
             </div>
-            <p>{studentPlan.description}</p>
+            <p>
+              Currently free for students while we&apos;re in beta — hurry, it
+              won&apos;t last. {studentPlan.description}
+            </p>
             <ul>
               {studentPlan.features.map((feature) => (
                 <li key={feature}>{feature}</li>
               ))}
             </ul>
           </div>
+        </div>
+      </section>
+
+      <section className="why">
+        <div className="wrap">
+          <Reveal className="sec-head center" style={{ maxWidth: 760 }}>
+            <span className="eyebrow" style={{ background: "var(--cream)" }}>
+              For parents
+            </span>
+            <h2>Why getting this right early matters.</h2>
+            <p>
+              Helping your kid land that first job or internship isn&apos;t just
+              about one application — it&apos;s where they learn to describe what
+              they&apos;ve done, write a cover letter, and prep for an interview.
+              {SITE_NAME} makes it approachable and walks them through it, and
+              it&apos;s far more than a resume.
+            </p>
+          </Reveal>
+          <Reveal className="mgrid">
+            {PARENT_REASONS.map((item) => (
+              <div key={item.title} className="mcard">
+                <div className="top">
+                  <span className="micon students-spark" aria-hidden>
+                    {item.icon}
+                  </span>
+                </div>
+                <h3>{item.title}</h3>
+                <p>{item.body}</p>
+              </div>
+            ))}
+          </Reveal>
+          <Reveal className="students-band-cta" style={{ marginTop: 32 }}>
+            <Link
+              href="/login?next=%2Fbuild%3Fmode%3Dstudent"
+              className="btn btn-coral"
+            >
+              Get your kid started →
+            </Link>
+            <Link href="/pricing" className="link-underline">
+              See what&apos;s included
+            </Link>
+          </Reveal>
         </div>
       </section>
 
@@ -268,7 +347,7 @@ export function StudentsPage() {
 
       <MarketingPageCta
         title="Counselors & parents: share this link"
-        description="$2.99/mo — less than a latte. Free during beta. Guided builder launching soon."
+        description="Free for students — currently in beta. Hurry, it's a limited-time offer."
         secondaryHref="/pricing"
         secondaryLabel="Compare all plans →"
       />

@@ -523,7 +523,7 @@ export const STUDENT_FAQ_ITEMS = [
   {
     question: "How much does the Student plan cost?",
     answer:
-      "$2.99/month at launch — less than a latte. Free during beta while we build. Includes guided builder, activities sections, 3 templates, PDF export, and 2 AI cover letters per month.",
+      "Right now it's completely free for students while we're in beta — a limited-time offer. You get the guided builder, activities sections, 3 templates, PDF export, and AI cover letters. Affordable student pricing comes later, after beta.",
   },
 ] as const;
 
