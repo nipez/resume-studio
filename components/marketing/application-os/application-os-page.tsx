@@ -7,6 +7,7 @@ import {
 } from "@/lib/marketing/content";
 import { Reveal } from "@/components/marketing/home/reveal-on-scroll";
 import "@/components/marketing/home/marketing-home.css";
+import "./application-os.css";
 
 const LOOP_LABELS = ["Library", "Tailor", "Cover", "Q&A", "Track", "Insights"] as const;
 
@@ -51,71 +52,80 @@ const PILLAR_COLORS = ["var(--coral)", "var(--teal)", "var(--coral)", "var(--tea
 export function ApplicationOsPage() {
   return (
     <div className="marketing-home">
-      <section className="hero">
-        <div className="wrap hero-grid">
+      <section className="aos-hero">
+        <div className="wrap aos-hero-grid">
           <div>
-            <span className="eyebrow">The application OS</span>
+            <span className="aos-eyebrow">The application OS</span>
             <h1>
-              Generators give you a PDF. An OS runs your{" "}
-              <span className="serif-i">entire</span> search.
+              A generator gives you a PDF.
+              <br />
+              An <span className="serif-i">OS</span> runs your whole search.
             </h1>
-            <p className="hero-sub">
-              {SITE_NAME} connects resume versions, job-specific tailoring, cover
-              letters, Q&amp;A, tracking, and insights in one closed loop — with an
+            <p className="aos-sub">
+              {SITE_NAME} connects resume versions, tailoring, cover letters,
+              Q&amp;A, tracking, and insights into one closed loop — with an
               immutable snapshot of every send.
             </p>
-            <div className="hero-cta">
+            <div className="aos-cta">
               <Link href="/login" className="btn btn-coral">
                 Start free during beta
               </Link>
-              <Link href="/features" className="link-underline">
+              <Link href="/features" className="aos-ghost">
                 Explore features →
               </Link>
             </div>
-            <div className="trust">
-              <span className="trust-item">
-                <span className="check">✓</span>
-                One login, six modules
-              </span>
-              <span className="trust-item">
-                <span className="check">✓</span>
-                Immutable snapshots
-              </span>
-              <span className="trust-item">
-                <span className="check">✓</span>
-                Subscription, not credits
-              </span>
+            <div className="aos-stats">
+              <div className="aos-stat">
+                <div className="v">6→1</div>
+                <div className="l">modules, one workspace</div>
+              </div>
+              <div className="aos-stat">
+                <div className="v">100%</div>
+                <div className="l">snapshot fidelity</div>
+              </div>
+              <div className="aos-stat">
+                <div className="v">1</div>
+                <div className="l">login, not five tools</div>
+              </div>
             </div>
           </div>
-          <div className="loop-wrap">
-            <div className="loop">
-              <div className="loop-ring" />
-              <div className="loop-blob" />
-              <div className="loop-spin">
-                {APPLICATION_OS_LOOP.map((node, index) => (
-                  <div key={node.step} className={`node n${index + 1}`}>
-                    <div>
-                      <span className="num">{node.step}</span>
-                      <span className="lbl">{LOOP_LABELS[index]}</span>
+          <div className="aos-mock-wrap">
+            <div className="aos-window">
+              <div className="aos-window-bar">
+                <span className="brand">R</span>
+                <span className="ttl">{SITE_NAME}</span>
+                <span className="tag">Application OS</span>
+              </div>
+              <div className="aos-window-body">
+                <div className="aos-side">
+                  {LOOP_LABELS.map((label, index) => (
+                    <div
+                      key={label}
+                      className={`item${index === 4 ? " active" : ""}`}
+                    >
+                      <span className="ic">{MODULE_ICONS[index]}</span>
+                      {label}
                     </div>
+                  ))}
+                </div>
+                <div className="aos-canvas">
+                  <div className="aos-doc">
+                    <div className="nm">Master Resume</div>
+                    <div className="ln m" />
+                    <div className="ln" />
+                    <div className="ln s" />
                   </div>
-                ))}
-              </div>
-              <div className="loop-core">
-                <span className="big">6→1</span>
-                <span className="small">closed loop</span>
+                  <div className="aos-snap">
+                    <span className="chk">✓</span>
+                    <span className="tx">
+                      <b>Snapshot saved.</b> Resume + cover + Q&amp;A frozen
+                      exactly as sent.
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-        <div className="snap-strip">
-          <div className="wrap inner">
-            <span className="snap-saved">Snapshot saved</span>
-            <span className="sep">·</span>
-            <span>
-              Resume + cover + Q&amp;A frozen the moment you hit send — so your
-              insights never lie to you.
-            </span>
+            <div className="aos-loopback">↻ feeds back to Library</div>
           </div>
         </div>
       </section>
