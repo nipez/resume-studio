@@ -14,7 +14,7 @@
   grid-template-columns: 1.02fr 0.98fr;
   gap: 52px;
   align-items: center;
-  padding: 76px 0 88px;
+  padding: 40px 0 72px;
 }
 .marketing-home .aos-eyebrow {
   display: inline-flex;
@@ -261,7 +261,7 @@
   .marketing-home .aos-hero-grid {
     grid-template-columns: 1fr;
     gap: 36px;
-    padding: 52px 0 64px;
+    padding: 32px 0 56px;
   }
   .marketing-home .aos-mock-wrap {
     justify-content: flex-start;
