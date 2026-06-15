@@ -150,6 +150,8 @@ export function TailorPanel({ versions, defaultVersionId }: TailorPanelProps) {
               jobDesc: fields.jobDesc,
             })
           }
+          hint="Paste a public job posting link. We'll fill role, company, and description below — review before tailoring."
+          successMessage="Imported — review the fields below, then tailor."
         />
         <div className="mt-3.5 grid grid-cols-2 gap-3">
           <JobRoleField

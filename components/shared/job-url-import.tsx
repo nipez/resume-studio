@@ -12,6 +12,9 @@ export type ImportedJobFields = {
 
 type JobUrlImportProps = {
   onImported: (fields: ImportedJobFields) => void;
+  className?: string;
+  hint?: string;
+  successMessage?: string;
 };
 
 function normalizeJobUrl(input: string): string {
@@ -21,7 +24,12 @@ function normalizeJobUrl(input: string): string {
   return trimmed;
 }
 
-export function JobUrlImport({ onImported }: JobUrlImportProps) {
+export function JobUrlImport({
+  onImported,
+  className = "",
+  hint = "Paste a public job posting link. We'll fill role, company, and description below.",
+  successMessage = "Imported — review the fields below.",
+}: JobUrlImportProps) {
   const [url, setUrl] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -65,17 +73,16 @@ export function JobUrlImport({ onImported }: JobUrlImportProps) {
   }
 
   return (
-    <div className="mt-3.5 rounded-[12px] border border-[#E4EAFF] bg-gradient-to-br from-[#F8FAFF] to-white p-3.5">
+    <div
+      className={`mt-3.5 rounded-[12px] border border-[#E4EAFF] bg-gradient-to-br from-[#F8FAFF] to-white p-3.5 ${className}`}
+    >
       <div className="mb-2 flex items-center gap-2">
         <span className="text-[13px] text-accent">✦</span>
         <span className="font-display text-[13px] font-semibold text-ink">
           Import from URL
         </span>
       </div>
-      <p className="mb-2.5 text-[12px] leading-relaxed text-[#7A828F]">
-        Paste a public job posting link. We&apos;ll fill role, company, and
-        description below — review before tailoring.
-      </p>
+      <p className="mb-2.5 text-[12px] leading-relaxed text-[#7A828F]">{hint}</p>
 
       {mockMode ? (
         <div className={`${mockBannerClass} mb-2.5`}>
@@ -114,7 +121,7 @@ export function JobUrlImport({ onImported }: JobUrlImportProps) {
 
       {imported && !error ? (
         <p className="mt-2 text-[12px] font-semibold text-[#2456D6]">
-          Imported — review the fields below, then tailor.
+          {successMessage}
         </p>
       ) : null}
     </div>

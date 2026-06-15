@@ -1,6 +1,13 @@
 "use client";
 
-import { VersionSelect, mockBannerClass } from "@/components/shared/job-fields";
+import {
+  JobCompanyField,
+  JobDescField,
+  JobRoleField,
+  VersionSelect,
+  mockBannerClass,
+} from "@/components/shared/job-fields";
+import { JobUrlImport } from "@/components/shared/job-url-import";
 import { Spinner } from "@/components/ui/spinner";
 import { Toast } from "@/components/ui/toast";
 import {
@@ -109,31 +116,52 @@ export function QAPanel({ versions, defaultVersionId }: QAPanelProps) {
           Demo mode — add ANTHROPIC_API_KEY for answers in your voice.
         </div>
       ) : null}
-      <div className="mb-[18px] flex flex-wrap items-end gap-3.5 rounded-[14px] border border-[#E6E8EC] bg-white px-[18px] py-4">
-        <VersionSelect
-          versions={versions}
-          value={baseId}
-          onChange={setBaseId}
-          label="Resume context"
-          id="qa-base"
-        />
-        <label className="flex min-w-[260px] flex-[2] flex-col gap-1.5 text-[12.5px] font-semibold text-[#5A6573]">
-          Job description (optional context)
-          <input
-            value={draft.jobDesc}
-            onChange={(e) => update({ jobDesc: e.target.value })}
-            placeholder="Paste or reuse from the Tailor tab"
-            className="rounded-[9px] border border-[#DFE3E8] px-[11px] py-[9px] text-[13.5px] focus:border-accent focus:outline-none"
+      <div className="mb-[18px] space-y-3.5 rounded-[14px] border border-[#E6E8EC] bg-white px-[18px] py-4">
+        <div className="flex flex-wrap items-end justify-between gap-3.5">
+          <VersionSelect
+            versions={versions}
+            value={baseId}
+            onChange={setBaseId}
+            label="Resume context"
+            id="qa-base"
           />
-        </label>
-        <button
-          type="button"
-          onClick={answerAll}
-          disabled={anyBusy}
-          className="rounded-[10px] bg-accent px-4 py-2.5 text-[13px] font-semibold text-white hover:bg-[#1E54E6] disabled:opacity-60"
-        >
-          {anyBusy ? "Answering…" : "Answer all"}
-        </button>
+          <button
+            type="button"
+            onClick={answerAll}
+            disabled={anyBusy}
+            className="rounded-[10px] bg-accent px-4 py-2.5 text-[13px] font-semibold text-white hover:bg-[#1E54E6] disabled:opacity-60"
+          >
+            {anyBusy ? "Answering…" : "Answer all"}
+          </button>
+        </div>
+        <JobUrlImport
+          className="mt-0"
+          onImported={(fields) =>
+            update({
+              jobRole: fields.jobRole,
+              jobCompany: fields.jobCompany,
+              jobDesc: fields.jobDesc,
+            })
+          }
+          hint="Paste a public job posting link for better, role-specific answers."
+          successMessage="Imported — job context updated below."
+        />
+        <div className="grid grid-cols-2 gap-3">
+          <JobRoleField
+            value={draft.jobRole}
+            onChange={(v) => update({ jobRole: v })}
+          />
+          <JobCompanyField
+            value={draft.jobCompany}
+            onChange={(v) => update({ jobCompany: v })}
+          />
+        </div>
+        <JobDescField
+          value={draft.jobDesc}
+          onChange={(v) => update({ jobDesc: v })}
+          rows={4}
+          label="Job description (optional context)"
+        />
       </div>
 
       <div className="flex flex-col gap-3.5">

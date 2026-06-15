@@ -9,6 +9,7 @@ import {
   mockBannerClass,
   primaryBtnClass,
 } from "@/components/shared/job-fields";
+import { JobUrlImport } from "@/components/shared/job-url-import";
 import { Spinner } from "@/components/ui/spinner";
 import { Toast } from "@/components/ui/toast";
 import { useJobDraft } from "@/lib/job-draft/use-job-draft";
@@ -100,6 +101,17 @@ export function CoverPanel({ versions, defaultVersionId }: CoverPanelProps) {
             </div>
           ) : null}
           <VersionSelect versions={versions} value={baseId} onChange={setBaseId} />
+          <JobUrlImport
+            onImported={(fields) =>
+              update({
+                jobRole: fields.jobRole,
+                jobCompany: fields.jobCompany,
+                jobDesc: fields.jobDesc,
+              })
+            }
+            hint="Paste a public job posting link. We'll fill the fields below — review before generating your letter."
+            successMessage="Imported — review the fields below, then generate."
+          />
           <div className="mt-3.5 grid grid-cols-2 gap-3">
             <JobRoleField
               value={draft.jobRole}
