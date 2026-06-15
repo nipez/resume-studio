@@ -19,6 +19,7 @@
     "pdf-parse": "^2.4.5",
     "react": "^18",
     "react-dom": "^18",
+    "standardwebhooks": "^1.0.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {

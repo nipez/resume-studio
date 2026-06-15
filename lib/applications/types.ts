@@ -88,3 +88,11 @@ export type LogApplicationInput = {
   coverLetter?: string;
   answers?: ApplicationAnswer[];
 };
+
+/** Minimal application row for resume editor usage banner. */
+export type VersionLinkedApplication = {
+  id: string;
+  role: string;
+  company: string;
+  applied_at: string;
+};

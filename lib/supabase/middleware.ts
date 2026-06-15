@@ -43,7 +43,8 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith("/blog") ||
     pathname.startsWith("/login") ||
     pathname.startsWith("/auth") ||
-    pathname === "/api/health";
+    pathname === "/api/health" ||
+    pathname === "/api/auth/send-email";
 
   if (!user && !isPublic) {
     const redirectUrl = request.nextUrl.clone();

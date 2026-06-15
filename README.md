@@ -37,6 +37,8 @@ supabase db push
 4. In the dashboard, enable **Email (magic link)** and **Google** auth.
 5. Create private Storage buckets: `resume-uploads`, `generated-pdfs` (RLS per-user prefix — PR #9).
 
+**Branded sign-in emails:** By default magic links come from Supabase Auth. To send from **ResumeTrakr** via Resend, follow [`docs/auth-email-setup.md`](./docs/auth-email-setup.md).
+
 ## Railway deploy
 
 1. Push this repo to GitHub.
