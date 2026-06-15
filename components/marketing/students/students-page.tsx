@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { ScaledResumePreview } from "@/components/resume/resume-preview";
 import { Reveal } from "@/components/marketing/home/reveal-on-scroll";
+import { StudentTemplateGallery } from "@/components/marketing/students/student-template-gallery";
 import { MarketingFaqAccordion } from "@/components/marketing/shared/marketing-faq-accordion";
 import { MarketingPageCta } from "@/components/marketing/shared/marketing-page-cta";
 import {
@@ -16,30 +16,9 @@ import {
   STUDENT_TESTIMONIALS,
   STUDENT_USE_CASES,
 } from "@/lib/marketing/content";
-import { buildResumeHTML } from "@/lib/resume/build-resume-html";
-import { STUDENT_SAMPLE_RESUME_DATA } from "@/lib/resume/student-sample-data";
-import type { TemplateStyle } from "@/lib/types/resume";
 import "@/components/marketing/home/marketing-home.css";
 import "@/components/marketing/shared/marketing-subpage.css";
 import "./students.css";
-
-const TEMPLATES: { style: TemplateStyle; label: string; note: string }[] = [
-  {
-    style: "classic",
-    label: "Classic",
-    note: "Clean and familiar — great for counselors and first applications.",
-  },
-  {
-    style: "twocol",
-    label: "Two-Column",
-    note: "Skills and school on the left — fits lots of activities on one page.",
-  },
-  {
-    style: "editorial",
-    label: "Editorial",
-    note: "Polished serif look — strong for college supplements and internships.",
-  },
-];
 
 const TESTIMONIAL_AVATARS = ["var(--coral)", "var(--teal)", "var(--ink)"];
 
@@ -160,25 +139,7 @@ export function StudentsPage() {
               real high-school sample data.
             </p>
           </Reveal>
-          <Reveal className="students-template-row">
-            {TEMPLATES.map((template) => {
-              const html = buildResumeHTML({
-                templateStyle: template.style,
-                data: STUDENT_SAMPLE_RESUME_DATA,
-              });
-
-              return (
-                <div key={template.style} className="students-template-card">
-                  <ScaledResumePreview
-                    html={html}
-                    title={`${template.label} student resume preview`}
-                  />
-                  <div className="students-template-label">{template.label}</div>
-                  <p>{template.note}</p>
-                </div>
-              );
-            })}
-          </Reveal>
+          <StudentTemplateGallery />
         </div>
       </section>
 
