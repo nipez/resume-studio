@@ -1,0 +1,280 @@
+/* Unique dark hero for the Application OS page — distinct from the light homepage hero. */
+.marketing-home .aos-hero {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(70% 60% at 88% 8%, rgba(255, 92, 56, 0.22), transparent 60%),
+    radial-gradient(55% 55% at 4% 92%, rgba(15, 181, 166, 0.18), transparent 60%),
+    var(--ink);
+  color: #fff;
+}
+.marketing-home .aos-hero-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.02fr 0.98fr;
+  gap: 52px;
+  align-items: center;
+  padding: 76px 0 88px;
+}
+.marketing-home .aos-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 100px;
+  padding: 6px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--coral-l);
+}
+.marketing-home .aos-hero h1 {
+  font-family: var(--font-space-grotesk), sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  font-size: clamp(40px, 5.4vw, 64px);
+  margin-top: 22px;
+  color: #fff;
+}
+.marketing-home .aos-hero h1 .serif-i {
+  font-family: var(--font-instrument-serif), serif;
+  font-style: italic;
+  font-weight: 400;
+  color: var(--coral-l);
+}
+.marketing-home .aos-sub {
+  font-size: 18px;
+  line-height: 1.55;
+  color: #c4bacd;
+  max-width: 500px;
+  margin-top: 22px;
+}
+.marketing-home .aos-cta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 32px;
+  flex-wrap: wrap;
+}
+.marketing-home .aos-ghost {
+  font-weight: 600;
+  font-size: 15px;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 12px;
+  padding: 14px 22px;
+  transition: background 0.2s, border-color 0.2s;
+}
+.marketing-home .aos-ghost:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+.marketing-home .aos-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px 40px;
+  margin-top: 44px;
+  padding-top: 28px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+.marketing-home .aos-stat .v {
+  font-family: var(--font-space-grotesk), sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+.marketing-home .aos-stat .l {
+  font-size: 12.5px;
+  color: #9b91a6;
+  margin-top: 2px;
+}
+
+/* Workspace "OS window" mockup */
+.marketing-home .aos-mock-wrap {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+.marketing-home .aos-window {
+  width: 100%;
+  max-width: 440px;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #15101f;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 30px 70px -24px rgba(0, 0, 0, 0.7);
+}
+.marketing-home .aos-window-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+}
+.marketing-home .aos-window-bar .brand {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: var(--coral);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-space-grotesk), sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  color: #fff;
+}
+.marketing-home .aos-window-bar .ttl {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #d7d0e0;
+}
+.marketing-home .aos-window-bar .tag {
+  margin-left: auto;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--coral-l);
+  background: rgba(255, 92, 56, 0.14);
+  padding: 3px 9px;
+  border-radius: 100px;
+}
+.marketing-home .aos-window-body {
+  display: grid;
+  grid-template-columns: 132px 1fr;
+}
+.marketing-home .aos-side {
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 12px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.marketing-home .aos-side .item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 9px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #9b91a6;
+}
+.marketing-home .aos-side .item .ic {
+  width: 14px;
+  height: 14px;
+  color: #6f6680;
+}
+.marketing-home .aos-side .item.active {
+  background: rgba(255, 92, 56, 0.16);
+  color: #fff;
+}
+.marketing-home .aos-side .item.active .ic {
+  color: var(--coral-l);
+}
+.marketing-home .aos-side .item .ic svg {
+  width: 14px;
+  height: 14px;
+  display: block;
+}
+.marketing-home .aos-canvas {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+.marketing-home .aos-doc {
+  background: #fff;
+  border-radius: 9px;
+  padding: 14px;
+}
+.marketing-home .aos-doc .nm {
+  font-family: var(--font-space-grotesk), sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--coral);
+  letter-spacing: -0.01em;
+}
+.marketing-home .aos-doc .ln {
+  height: 6px;
+  border-radius: 4px;
+  background: #e7e1ec;
+  margin-top: 8px;
+}
+.marketing-home .aos-doc .ln.s {
+  width: 60%;
+}
+.marketing-home .aos-doc .ln.m {
+  width: 82%;
+}
+.marketing-home .aos-snap {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: rgba(15, 181, 166, 0.12);
+  border: 1px solid rgba(15, 181, 166, 0.3);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.marketing-home .aos-snap .chk {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--teal);
+  color: #04261f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex: none;
+}
+.marketing-home .aos-snap .tx {
+  font-size: 11.5px;
+  line-height: 1.35;
+  color: #bfe7e1;
+}
+.marketing-home .aos-snap .tx b {
+  color: #fff;
+  font-weight: 600;
+}
+.marketing-home .aos-loopback {
+  position: absolute;
+  right: -14px;
+  bottom: 26px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--coral);
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 8px 13px;
+  border-radius: 100px;
+  box-shadow: 0 12px 28px -8px rgba(255, 92, 56, 0.7);
+}
+
+@media (max-width: 860px) {
+  .marketing-home .aos-hero-grid {
+    grid-template-columns: 1fr;
+    gap: 36px;
+    padding: 52px 0 64px;
+  }
+  .marketing-home .aos-mock-wrap {
+    justify-content: flex-start;
+  }
+  .marketing-home .aos-loopback {
+    right: 12px;
+  }
+}
+@media (max-width: 600px) {
+  .marketing-home .aos-sub {
+    max-width: none;
+  }
+  .marketing-home .aos-window {
+    max-width: none;
+  }
+}
