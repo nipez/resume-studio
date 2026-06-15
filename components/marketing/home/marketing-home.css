@@ -101,12 +101,16 @@
 .marketing-home .problem-glow{position:absolute;inset:0;background:radial-gradient(60% 50% at 85% 0%,rgba(255,92,56,.18),transparent 60%);pointer-events:none;}
 
 /* problem stack */
-.marketing-home .stack{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:48px;position:relative;}
+.marketing-home .stack-frame{margin-top:24px;}
+.marketing-home .stack-caption{font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#8a8094;margin-bottom:16px;}
+.marketing-home .stack{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;position:relative;}
 .marketing-home .stack-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:20px;}
 .marketing-home .stack-card h4{margin:0 0 10px;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;}
 .marketing-home .stack-card p{font-size:13.5px;line-height:1.5;color:#9b91a6;margin-bottom:16px;}
-.marketing-home .price-tag{font-size:12px;font-weight:600;color:var(--coral-l);background:rgba(255,92,56,.12);display:inline-block;padding:4px 9px;border-radius:6px;}
-.marketing-home .replace{display:flex;align-items:center;gap:20px;margin-top:36px;background:linear-gradient(100deg,rgba(255,92,56,.16),rgba(255,92,56,.04));border:1px solid rgba(255,92,56,.3);border-radius:16px;padding:24px 28px;position:relative;}
+.marketing-home .cost-row{display:flex;flex-direction:column;gap:2px;}
+.marketing-home .cost-label{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#7a7184;}
+.marketing-home .price-tag{font-size:13.5px;font-weight:600;color:#9b91a6;text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:var(--coral);}
+.marketing-home .replace{display:flex;align-items:center;gap:20px;margin-top:40px;background:linear-gradient(100deg,rgba(255,92,56,.16),rgba(255,92,56,.04));border:1px solid rgba(255,92,56,.3);border-radius:16px;padding:24px 28px;position:relative;}
 .marketing-home .replace .rlogo{width:44px;height:44px;border-radius:12px;background:var(--coral);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:20px;color:#fff;flex-shrink:0;}
 .marketing-home .replace b{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:19px;}
 .marketing-home .replace span{font-size:16px;color:#c4bacd;}
