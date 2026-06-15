@@ -9,15 +9,25 @@ export function MarketingHeader() {
         <MarketingBrand />
 
         <nav className="hidden items-center gap-[30px] text-[14.5px] font-medium text-[#5c5269] md:flex">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="transition hover:text-[#231a2e]"
-            >
-              {link.label}
-            </Link>
-          ))}
+          {NAV_LINKS.map((link) =>
+            link.href === "/students" ? (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="font-semibold text-[#ff5c38] transition hover:text-[#e0421f]"
+              >
+                {link.label} · Parents
+              </Link>
+            ) : (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="transition hover:text-[#231a2e]"
+              >
+                {link.label}
+              </Link>
+            )
+          )}
         </nav>
 
         <div className="flex items-center gap-[18px]">

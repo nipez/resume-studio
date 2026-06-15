@@ -46,13 +46,13 @@ export function StudentStartPath() {
 
         <div className="mt-10 flex flex-wrap items-center gap-4 rounded-2xl border border-[#F59E0B]/15 bg-white/80 p-6 backdrop-blur-sm">
           <Link
-            href="/login"
+            href="/login?next=%2Fbuild%3Fmode%3Dstudent"
             className="inline-flex rounded-[11px] bg-accent px-6 py-3 text-[14px] font-semibold text-white shadow-accent transition hover:bg-accent-dark"
           >
             Start guided builder →
           </Link>
           <p className="text-[13px] text-muted">
-            Guided builder launching soon · free during beta
+            Guided builder is live · free during beta
           </p>
         </div>
       </div>

@@ -32,6 +32,18 @@ const TESTIMONIAL_AVATARS = ["var(--ink)", "var(--teal)", "var(--coral)"];
 
 const TESTIMONIAL_INITIALS = ["JM", "PK", "AR"];
 
+// Deep-link straight into the student guided builder (after magic-link sign-in).
+const STUDENT_BUILD_HREF = `/login?next=${encodeURIComponent("/build?mode=student")}`;
+
+const STUDENT_SECTION_CHIPS = [
+  "Clubs & leadership",
+  "Sports & athletics",
+  "Volunteering",
+  "Honors & awards",
+  "GPA & coursework",
+  "Part-time jobs",
+];
+
 export function MarketingHomePage() {
   // Conservative low-end monthly total of the fragmented stack, rounded down
   // to the nearest $10 for an honest "from $X/mo" contrast against our pricing.
@@ -306,6 +318,36 @@ export function MarketingHomePage() {
                 </div>
               </div>
             ))}
+          </Reveal>
+        </div>
+      </section>
+
+      <section className="students-band">
+        <div className="wrap">
+          <Reveal className="sec-head center" style={{ maxWidth: 700 }}>
+            <span className="eyebrow">For students &amp; parents</span>
+            <h2>Get your kid going — their first resume, done right.</h2>
+            <p>
+              High school and college students turn clubs, sports, volunteering,
+              and honors into a real resume with a guided, step-by-step builder.
+              Parents: set them up in a single sitting — from $2.99/mo, free
+              during beta.
+            </p>
+          </Reveal>
+          <Reveal className="students-chips">
+            {STUDENT_SECTION_CHIPS.map((chip) => (
+              <span key={chip} className="students-chip">
+                {chip}
+              </span>
+            ))}
+          </Reveal>
+          <Reveal className="students-band-cta">
+            <Link href={STUDENT_BUILD_HREF} className="btn btn-coral">
+              Get your student started
+            </Link>
+            <Link href="/students" className="link-underline">
+              See the student guide →
+            </Link>
           </Reveal>
         </div>
       </section>

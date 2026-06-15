@@ -176,6 +176,12 @@
 .marketing-home .who .name{font-weight:600;font-size:14.5px;color:var(--ink);}
 .marketing-home .who .role{font-size:13px;color:var(--muted2);}
 
+/* students & parents band */
+.marketing-home .students-band{background:linear-gradient(180deg,#fff 0%,var(--cream) 100%);border-top:1px solid var(--line);}
+.marketing-home .students-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:30px;}
+.marketing-home .students-chip{font-size:13px;font-weight:600;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:100px;padding:8px 16px;box-shadow:0 6px 18px -12px rgba(40,20,30,.25);}
+.marketing-home .students-band-cta{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:16px;margin-top:34px;}
+
 /* pricing */
 .marketing-home .pricing{background:#fff;border-top:1px solid var(--line);}
 .marketing-home .pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:48px;align-items:stretch;}

@@ -68,7 +68,10 @@ export function StudentsPage() {
               ))}
             </ul>
             <div className="students-hero-cta">
-              <Link href="/login" className="btn btn-coral">
+              <Link
+                href="/login?next=%2Fbuild%3Fmode%3Dstudent"
+                className="btn btn-coral"
+              >
                 Start guided builder →
               </Link>
               <Link href="/pricing" className="link-underline">

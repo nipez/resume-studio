@@ -8,6 +8,11 @@ import { FormEvent, useState } from "react";
 export default function LoginForm() {
   const searchParams = useSearchParams();
   const authError = searchParams.get("error") === "auth";
+  const nextParam = searchParams.get("next");
+  const safeNext =
+    nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//")
+      ? nextParam
+      : null;
 
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -22,7 +27,16 @@ export default function LoginForm() {
     setError(null);
 
     const supabase = createClient();
+    // Keep the magic-link redirect on the plain (allow-listed) callback URL.
+    // Stash the post-login destination locally so it survives the round-trip
+    // without relying on Supabase preserving query params on redirect_to.
     const redirectTo = `${window.location.origin}/auth/callback`;
+    try {
+      if (safeNext) window.localStorage.setItem("postLoginNext", safeNext);
+      else window.localStorage.removeItem("postLoginNext");
+    } catch {
+      // ignore storage errors
+    }
 
     const { error: signInError } = await supabase.auth.signInWithOtp({
       email,
