@@ -1,10 +1,10 @@
-import { PlaceholderPage } from "@/components/shell/placeholder-page";
+import { InsightsDashboard } from "@/components/insights/insights-dashboard";
+import { getApplicationsList } from "@/lib/applications/actions";
+import { computeInsights } from "@/lib/applications/insights";
 
-export default function InsightsPage() {
-  return (
-    <PlaceholderPage
-      title="Insights"
-      description="See your pipeline funnel, upcoming events, and what’s working across applications — powered by immutable send snapshots."
-    />
-  );
+export default async function InsightsPage() {
+  const { applications } = await getApplicationsList();
+  const data = computeInsights(applications);
+
+  return <InsightsDashboard data={data} />;
 }
