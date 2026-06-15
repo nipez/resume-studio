@@ -2,6 +2,7 @@ import { LibraryActions } from "@/components/library/library-actions";
 import { VersionCard } from "@/components/library/version-card";
 import { getApplicationCountsByVersion } from "@/lib/applications/actions";
 import { getLibraryData } from "@/lib/resume/actions";
+import Link from "next/link";
 
 export default async function LibraryPage() {
   const [{ versions, defaultVersionId }, versionCounts] = await Promise.all([
@@ -28,7 +29,10 @@ export default async function LibraryPage() {
         </div>
 
         {!hasVersions ? (
-          <div className="mb-[22px] flex cursor-default items-center gap-[18px] rounded-2xl bg-gradient-to-br from-sidebar to-[#1b2740] px-[22px] py-[19px] text-white">
+          <Link
+            href="/build"
+            className="mb-[22px] flex items-center gap-[18px] rounded-2xl bg-gradient-to-br from-sidebar to-[#1b2740] px-[22px] py-[19px] text-white transition-shadow hover:shadow-[0_14px_36px_rgba(15,17,22,0.22)]"
+          >
             <div className="flex h-12 w-12 flex-none items-center justify-center rounded-[14px] bg-gradient-to-br from-accent to-[#7A53FF] text-[23px] shadow-[0_6px_18px_rgba(47,107,255,0.4)]">
               ✎
             </div>
@@ -45,7 +49,7 @@ export default async function LibraryPage() {
             <div className="flex-none whitespace-nowrap rounded-[11px] bg-white px-[18px] py-[11px] text-[13.5px] font-semibold text-ink">
               Build step by step →
             </div>
-          </div>
+          </Link>
         ) : null}
 
         {hasVersions ? (
