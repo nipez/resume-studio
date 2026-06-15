@@ -14,9 +14,22 @@ export function createEmptyResumeData(
     summary: "",
     skills: [],
     experience: [],
+    activities: [],
     education: [],
     awards: [],
   };
+}
+
+function normalizeExperienceList(raw: unknown): ResumeData["experience"] {
+  return Array.isArray(raw)
+    ? raw.map((e) => ({
+        company: e?.company ?? "",
+        title: e?.title ?? "",
+        dates: e?.dates ?? "",
+        blurb: e?.blurb ?? "",
+        bullets: Array.isArray(e?.bullets) ? e.bullets : [""],
+      }))
+    : [];
 }
 
 export function normalizeResumeData(raw: unknown): ResumeData {
@@ -34,14 +47,11 @@ export function normalizeResumeData(raw: unknown): ResumeData {
     summary: d.summary ?? base.summary,
     skills: Array.isArray(d.skills) ? d.skills : base.skills,
     experience: Array.isArray(d.experience)
-      ? d.experience.map((e) => ({
-          company: e?.company ?? "",
-          title: e?.title ?? "",
-          dates: e?.dates ?? "",
-          blurb: e?.blurb ?? "",
-          bullets: Array.isArray(e?.bullets) ? e.bullets : [""],
-        }))
+      ? normalizeExperienceList(d.experience)
       : base.experience,
+    activities: Array.isArray(d.activities)
+      ? normalizeExperienceList(d.activities)
+      : base.activities,
     education: Array.isArray(d.education)
       ? d.education.map((ed) => ({
           school: ed?.school ?? "",

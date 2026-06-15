@@ -66,6 +66,7 @@ type SectionEditPanelProps = {
   onSectionChange: (section: ResumeEditSection) => void;
   onUpdateData: (patch: Partial<ResumeData>) => void;
   onUpdateExperience: (index: number, patch: Partial<ResumeExperience>) => void;
+  onUpdateActivity: (index: number, patch: Partial<ResumeExperience>) => void;
 };
 
 export function SectionEditPanel({
@@ -74,9 +75,13 @@ export function SectionEditPanel({
   onSectionChange,
   onUpdateData,
   onUpdateExperience,
+  onUpdateActivity,
 }: SectionEditPanelProps) {
   const expIndex = section.index ?? 0;
   const exp = data.experience[expIndex];
+  const activities = data.activities ?? [];
+  const actIndex = section.index ?? 0;
+  const act = activities[actIndex];
 
   function applyAiPatch(patch: AiApplyPatch) {
     const updates: Partial<ResumeData> = {};
@@ -121,14 +126,15 @@ export function SectionEditPanel({
   }
 
   function selectTab(id: ResumeEditSectionId) {
-    if (id === "experience") {
-      onSectionChange({ id: "experience", index: 0 });
+    if (id === "experience" || id === "activities") {
+      onSectionChange({ id, index: 0 });
       return;
     }
     onSectionChange({ id });
   }
 
   const isExperience = section.id === "experience";
+  const isActivities = section.id === "activities";
 
   return (
     <aside className="flex h-full w-[400px] flex-none flex-col border-l border-border bg-white">
@@ -151,6 +157,12 @@ export function SectionEditPanel({
             onClick={() => selectTab("experience")}
           >
             Experience
+          </TabButton>
+          <TabButton
+            active={isActivities}
+            onClick={() => selectTab("activities")}
+          >
+            Activities
           </TabButton>
         </div>
       </div>
@@ -176,6 +188,28 @@ export function SectionEditPanel({
               {data.experience.map((role, i) => (
                 <option key={i} value={i}>
                   {role.title || role.company || `Role ${i + 1}`}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : null}
+
+        {isActivities && activities.length > 1 ? (
+          <label className="mb-4 flex flex-col gap-1.5 text-xs font-semibold text-[#5A6573]">
+            Activity
+            <select
+              value={actIndex}
+              onChange={(e) =>
+                onSectionChange({
+                  id: "activities",
+                  index: Number(e.target.value),
+                })
+              }
+              className={inputClass}
+            >
+              {activities.map((a, i) => (
+                <option key={i} value={i}>
+                  {a.title || a.company || `Entry ${i + 1}`}
                 </option>
               ))}
             </select>
@@ -358,6 +392,94 @@ export function SectionEditPanel({
                   onUpdateExperience(expIndex, {
                     bullets: [...exp.bullets, ""],
                   })
+                }
+                className="cursor-pointer border-none bg-transparent text-[12.3px] font-semibold text-[#2456D6]"
+              >
+                + Add bullet
+              </button>
+            </div>
+          </div>
+        ) : null}
+
+        {isActivities && !act ? (
+          <p className="text-[13px] leading-relaxed text-[#7A828F]">
+            No activities yet. Use{" "}
+            <span className="font-semibold text-ink">+ Activity</span> in the
+            toolbar, or click an activity on the preview. Great for clubs,
+            sports, leadership, and volunteering.
+          </p>
+        ) : null}
+
+        {isActivities && act ? (
+          <div className="space-y-3">
+            <Field label="Organization">
+              <input
+                className={`${inputClass} w-full`}
+                value={act.company}
+                placeholder="Club, team, or organization"
+                onChange={(e) =>
+                  onUpdateActivity(actIndex, { company: e.target.value })
+                }
+              />
+            </Field>
+            <div className="grid grid-cols-[1fr_120px] gap-2">
+              <Field label="Role">
+                <input
+                  className={inputClass}
+                  value={act.title}
+                  placeholder="Captain, Volunteer…"
+                  onChange={(e) =>
+                    onUpdateActivity(actIndex, { title: e.target.value })
+                  }
+                />
+              </Field>
+              <Field label="Dates">
+                <input
+                  className={inputClass}
+                  value={act.dates}
+                  onChange={(e) =>
+                    onUpdateActivity(actIndex, { dates: e.target.value })
+                  }
+                />
+              </Field>
+            </div>
+            <Field label="Summary">
+              <AutoTextarea
+                value={act.blurb ?? ""}
+                onChange={(value) => onUpdateActivity(actIndex, { blurb: value })}
+                className={`${inputClass} w-full text-[12.8px]`}
+              />
+            </Field>
+            <div className="space-y-1.5">
+              {act.bullets.map((bullet, j) => (
+                <div key={j} className="flex items-start gap-1.5">
+                  <span className="flex-none pt-[7px] text-accent">•</span>
+                  <AutoTextarea
+                    value={bullet}
+                    onChange={(value) => {
+                      const list = [...act.bullets];
+                      list[j] = value;
+                      onUpdateActivity(actIndex, { bullets: list });
+                    }}
+                    className={`${inputClass} min-h-[34px] flex-1 text-[12.8px]`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() =>
+                      onUpdateActivity(actIndex, {
+                        bullets: act.bullets.filter((_, idx) => idx !== j),
+                      })
+                    }
+                    className="cursor-pointer border-none bg-transparent text-[#b9bfc8] hover:text-[#B23B3B]"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() =>
+                  onUpdateActivity(actIndex, { bullets: [...act.bullets, ""] })
                 }
                 className="cursor-pointer border-none bg-transparent text-[12.3px] font-semibold text-[#2456D6]"
               >

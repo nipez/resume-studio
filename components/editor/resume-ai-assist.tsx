@@ -65,6 +65,10 @@ const SECTION_COPY: Record<
     tagline: "Polish this role",
     hint: "Quantify impact and tighten every bullet.",
   },
+  activities: {
+    tagline: "Polish this activity",
+    hint: "Show leadership and impact in clubs, sports, and volunteering.",
+  },
   education: {
     tagline: "Improve this section",
     hint: "Spot gaps and ways to strengthen your credentials.",

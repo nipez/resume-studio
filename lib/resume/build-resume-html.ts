@@ -91,6 +91,7 @@ function buildClassicHTML(
   const contact = contactParts(d);
   const skills = d.skills || [];
   const exp = d.experience || [];
+  const act = d.activities || [];
   const edu = d.education || [];
   const { accent, accentTint } = resolveAccentPalette(d.accentColor);
 
@@ -118,22 +119,21 @@ function buildClassicHTML(
     (interactive ? INTERACTIVE_CSS : "") +
     PRINT_BASE;
 
-  const expH = exp
-    .map(
-      (e: ResumeExperience, i: number) =>
-        editZone(
-          interactive,
-          "experience",
-          `<div class="exp">` +
-            `<div class="row">${e.title ? `<span class="r-job">${esc(e.title)}</span>` : ""}${e.dates ? `<span class="r-date">${esc(e.dates)}</span>` : ""}</div>` +
-            (e.company ? `<div class="r-co">${esc(e.company)}</div>` : "") +
-            (e.blurb ? `<div class="r-p" style="margin-top:4px;font-style:italic">${esc(e.blurb)}</div>` : "") +
-            bullets(e.bullets) +
-            `</div>`,
-          i
-        )
-    )
-    .join("");
+  const classicEntry = (section: string) => (e: ResumeExperience, i: number) =>
+    editZone(
+      interactive,
+      section,
+      `<div class="exp">` +
+        `<div class="row">${e.title ? `<span class="r-job">${esc(e.title)}</span>` : ""}${e.dates ? `<span class="r-date">${esc(e.dates)}</span>` : ""}</div>` +
+        (e.company ? `<div class="r-co">${esc(e.company)}</div>` : "") +
+        (e.blurb ? `<div class="r-p" style="margin-top:4px;font-style:italic">${esc(e.blurb)}</div>` : "") +
+        bullets(e.bullets) +
+        `</div>`,
+      i
+    );
+
+  const expH = exp.map(classicEntry("experience")).join("");
+  const actH = act.map(classicEntry("activities")).join("");
 
   const eduH = edu
     .map(
@@ -175,6 +175,9 @@ function buildClassicHTML(
     (expH
       ? `<div class="sec"><div class="r-h">Experience</div>${expH}</div>`
       : "") +
+    (actH
+      ? `<div class="sec"><div class="r-h">Activities &amp; Leadership</div>${actH}</div>`
+      : "") +
     (eduH
       ? editZone(
           interactive,
@@ -212,6 +215,7 @@ function buildTwocolHTML(
   const contact = contactParts(d);
   const skills = d.skills || [];
   const exp = d.experience || [];
+  const act = d.activities || [];
   const edu = d.education || [];
   const ini = initials(d.name);
   const { accent, accentLight, accentMuted } = resolveAccentPalette(d.accentColor);
@@ -265,22 +269,21 @@ function buildTwocolHTML(
     .map((a) => `<div class="txt" style="margin-bottom:5px">${esc(a)}</div>`)
     .join("");
 
-  const expH = exp
-    .map(
-      (e: ResumeExperience, i: number) =>
-        editZone(
-          interactive,
-          "experience",
-          `<div class="exp">` +
-            `<div class="row">${e.title ? `<span class="r-job">${esc(e.title)}</span>` : ""}${e.dates ? `<span class="r-date">${esc(e.dates)}</span>` : ""}</div>` +
-            (e.company ? `<div class="r-co">${esc(e.company)}</div>` : "") +
-            (e.blurb ? `<div class="r-p" style="margin-top:4px;font-style:italic">${esc(e.blurb)}</div>` : "") +
-            bullets(e.bullets) +
-            `</div>`,
-          i
-        )
-    )
-    .join("");
+  const twocolEntry = (section: string) => (e: ResumeExperience, i: number) =>
+    editZone(
+      interactive,
+      section,
+      `<div class="exp">` +
+        `<div class="row">${e.title ? `<span class="r-job">${esc(e.title)}</span>` : ""}${e.dates ? `<span class="r-date">${esc(e.dates)}</span>` : ""}</div>` +
+        (e.company ? `<div class="r-co">${esc(e.company)}</div>` : "") +
+        (e.blurb ? `<div class="r-p" style="margin-top:4px;font-style:italic">${esc(e.blurb)}</div>` : "") +
+        bullets(e.bullets) +
+        `</div>`,
+      i
+    );
+
+  const expH = exp.map(twocolEntry("experience")).join("");
+  const actH = act.map(twocolEntry("activities")).join("");
 
   const body =
     `<div class="wrap">` +
@@ -338,6 +341,7 @@ function buildTwocolHTML(
           `<div class="r-h">Profile</div><div class="r-p" style="opacity:.45">Click to add a profile…</div>`
         )) +
     (expH ? `<div class="r-h">Experience</div>${expH}` : "") +
+    (actH ? `<div class="r-h">Activities &amp; Leadership</div>${actH}` : "") +
     `</div></div>`;
 
   return { css, body };
@@ -349,6 +353,7 @@ function buildEditorialHTML(
 ): { css: string; body: string } {
   const skills = d.skills || [];
   const exp = d.experience || [];
+  const act = d.activities || [];
   const edu = d.education || [];
   const { first, last } = splitName(d.name);
   const ini = initials(d.name);
@@ -383,22 +388,21 @@ function buildEditorialHTML(
     (interactive ? INTERACTIVE_CSS : "") +
     PRINT_BASE;
 
-  const expH = exp
-    .map(
-      (e: ResumeExperience, i: number) =>
-        editZone(
-          interactive,
-          "experience",
-          `<div class="ed-blk">` +
-            `<div class="row">${e.title ? `<span class="r-job">${esc(e.title)}</span>` : ""}${e.dates ? `<span class="r-date">${esc(e.dates)}</span>` : ""}</div>` +
-            (e.company ? `<div class="r-co">${esc(e.company)}</div>` : "") +
-            (e.blurb ? `<div class="r-p" style="margin-top:4px;font-style:italic">${esc(e.blurb)}</div>` : "") +
-            bullets(e.bullets) +
-            `</div>`,
-          i
-        )
-    )
-    .join("");
+  const editorialEntry = (section: string) => (e: ResumeExperience, i: number) =>
+    editZone(
+      interactive,
+      section,
+      `<div class="ed-blk">` +
+        `<div class="row">${e.title ? `<span class="r-job">${esc(e.title)}</span>` : ""}${e.dates ? `<span class="r-date">${esc(e.dates)}</span>` : ""}</div>` +
+        (e.company ? `<div class="r-co">${esc(e.company)}</div>` : "") +
+        (e.blurb ? `<div class="r-p" style="margin-top:4px;font-style:italic">${esc(e.blurb)}</div>` : "") +
+        bullets(e.bullets) +
+        `</div>`,
+      i
+    );
+
+  const expH = exp.map(editorialEntry("experience")).join("");
+  const actH = act.map(editorialEntry("activities")).join("");
 
   const eduH = edu
     .map(
@@ -443,6 +447,9 @@ function buildEditorialHTML(
     `<div class="lead">` +
     (expH
       ? `<div class="ed-blk"><div class="r-h">Experience</div>${expH}</div>`
+      : "") +
+    (actH
+      ? `<div class="ed-blk"><div class="r-h">Activities &amp; Leadership</div>${actH}</div>`
       : "") +
     (eduH
       ? editZone(
