@@ -24,6 +24,7 @@ import { useMemo, useState } from "react";
 type TailorPanelProps = {
   versions: ResumeVersion[];
   defaultVersionId: string | null;
+  initialBaseId?: string | null;
 };
 
 const DEPTH_OPTIONS = [
@@ -39,11 +40,18 @@ const DEPTH_OPTIONS = [
   },
 ];
 
-export function TailorPanel({ versions, defaultVersionId }: TailorPanelProps) {
+export function TailorPanel({
+  versions,
+  defaultVersionId,
+  initialBaseId,
+}: TailorPanelProps) {
   const { draft, update } = useJobDraft();
-  const [baseId, setBaseId] = useState(
-    defaultVersionId ?? versions[0]?.id ?? ""
-  );
+  const [baseId, setBaseId] = useState(() => {
+    if (initialBaseId && versions.some((v) => v.id === initialBaseId)) {
+      return initialBaseId;
+    }
+    return defaultVersionId ?? versions[0]?.id ?? "";
+  });
   const [depth, setDepth] = useState<"light" | "deep">("light");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");

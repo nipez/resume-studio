@@ -1,8 +1,10 @@
 "use client";
 
 import { AccentColorPicker } from "@/components/editor/accent-color-picker";
+import { ResumeEditorUsageBanner } from "@/components/editor/resume-editor-usage-banner";
 import { SectionEditPanel } from "@/components/editor/section-edit-panel";
 import { InteractiveResumePreview } from "@/components/resume/interactive-resume-preview";
+import type { VersionLinkedApplication } from "@/lib/applications/types";
 import { buildResumeHTML } from "@/lib/resume/build-resume-html";
 import { updateResumeVersion } from "@/lib/resume/actions";
 import type { ResumeVersion } from "@/lib/resume/db-types";
@@ -23,9 +25,13 @@ const TEMPLATES: { id: TemplateStyle; label: string }[] = [
 
 type ResumeEditorProps = {
   version: ResumeVersion;
+  linkedApplications?: VersionLinkedApplication[];
 };
 
-export function ResumeEditor({ version }: ResumeEditorProps) {
+export function ResumeEditor({
+  version,
+  linkedApplications = [],
+}: ResumeEditorProps) {
   const [name, setName] = useState(version.name);
   const [templateStyle, setTemplateStyle] = useState(version.template_style);
   const [data, setData] = useState<ResumeData>(version.data);
@@ -213,6 +219,11 @@ export function ResumeEditor({ version }: ResumeEditorProps) {
           ↓ Export PDF
         </button>
       </div>
+
+      <ResumeEditorUsageBanner
+        versionId={version.id}
+        linkedApplications={linkedApplications}
+      />
 
       <div className="flex min-h-0 flex-1">
         <div className="min-h-0 min-w-0 flex-1">
