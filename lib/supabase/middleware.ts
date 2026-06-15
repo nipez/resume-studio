@@ -39,7 +39,10 @@ export async function updateSession(request: NextRequest) {
     pathname === "/pricing" ||
     pathname === "/students" ||
     pathname === "/application-os" ||
+    pathname === "/about" ||
     pathname === "/faq" ||
+    pathname === "/privacy" ||
+    pathname === "/terms" ||
     pathname.startsWith("/blog") ||
     pathname.startsWith("/login") ||
     pathname.startsWith("/auth") ||
