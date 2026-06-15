@@ -136,6 +136,16 @@ export function mockComplete(prompt: string): string {
     );
   }
 
+  if (prompt.includes("Write 3 distinct professional headline options")) {
+    return JSON.stringify({
+      headlines: [
+        "VP Growth Marketing · Patient Acquisition & ROI (demo)",
+        "Healthcare Marketing Leader · Demand Gen & MarTech (demo)",
+        "Growth Executive · Full-Funnel Strategy & Analytics (demo)",
+      ],
+    });
+  }
+
   if (prompt.includes("Write a concise professional headline")) {
     return "Senior Professional · Strategy & Growth (demo mode)";
   }
@@ -173,6 +183,21 @@ export function mockComplete(prompt: string): string {
         "Trim skills to the 10 most relevant for your target roles.",
         "Add a one-line blurb under each role to frame scope before bullets.",
       ],
+    });
+  }
+
+  if (prompt.includes("Implement this improvement suggestion")) {
+    return JSON.stringify({
+      summary:
+        "Marketing leader with measurable patient acquisition and ROI gains across healthcare growth programs. Demo mode — configure ANTHROPIC_API_KEY for a real rewrite.",
+      experience: {
+        index: 0,
+        blurb: "Led growth marketing with quantified acquisition outcomes (demo).",
+        bullets: [
+          "Increased qualified patient inquiries through integrated demand programs (demo).",
+          "Optimized marketing spend with analytics-led channel mix decisions.",
+        ],
+      },
     });
   }
 

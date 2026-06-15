@@ -284,7 +284,9 @@ export function resumeAssistPrompt(
   action: string,
   data: ResumeData,
   experienceIndex?: number,
-  question?: string
+  question?: string,
+  sectionId?: string,
+  sectionIndex?: number
 ): string {
   const ctx =
     buildPositioningContext(positioning, userName) +
@@ -302,7 +304,10 @@ export function resumeAssistPrompt(
   if (action === "improve-headline") {
     return (
       ctx +
-      "TASK: Write a concise professional headline (under 12 words) aligned to this candidate's experience. Return ONLY the headline text."
+      "CURRENT HEADLINE: " +
+      (data.headline || "(none)") +
+      "\n\n" +
+      'TASK: Write 3 distinct professional headline options (each under 14 words), aligned to this candidate\'s experience. Vary angle (leadership, specialty, outcomes). Do not invent facts. Return ONLY valid minified JSON: {"headlines":["option 1","option 2","option 3"]}'
     );
   }
 
@@ -335,6 +340,24 @@ export function resumeAssistPrompt(
       "QUESTION: " +
       question.trim() +
       "\n\nReturn only your answer (2-5 sentences unless they ask for more)."
+    );
+  }
+
+  if (action === "implement-suggestion" && question?.trim()) {
+    const focus =
+      sectionId === "experience" && sectionIndex !== undefined
+        ? `experience role index ${sectionIndex}`
+        : sectionId || "the active resume section";
+    return (
+      ctx +
+      "TASK: Implement this improvement suggestion on the resume. Use ONLY facts from the resume — do not invent companies, titles, dates, or metrics.\n\n" +
+      "FOCUS SECTION: " +
+      focus +
+      "\n" +
+      "SUGGESTION TO IMPLEMENT:\n" +
+      question.trim() +
+      "\n\n" +
+      'Return ONLY valid minified JSON with fields to update (omit fields that should not change): {"headline":"...","summary":"...","skills":["..."],"experience":{"index":0,"blurb":"...","bullets":["..."]}}'
     );
   }
 

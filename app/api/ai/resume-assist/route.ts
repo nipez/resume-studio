@@ -6,6 +6,14 @@ import type { ResumeData } from "@/lib/types/resume";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+const sectionIdSchema = z.enum([
+  "header",
+  "summary",
+  "skills",
+  "experience",
+  "education",
+]);
+
 const bodySchema = z.object({
   action: z.enum([
     "improve-summary",
@@ -14,10 +22,14 @@ const bodySchema = z.object({
     "suggest-skills",
     "suggest",
     "ask",
+    "implement-suggestion",
   ]),
   data: z.custom<ResumeData>(),
   experienceIndex: z.number().int().min(0).optional(),
   question: z.string().optional(),
+  suggestion: z.string().optional(),
+  sectionId: sectionIdSchema.optional(),
+  sectionIndex: z.number().int().min(0).optional(),
 });
 
 export async function POST(request: Request) {
@@ -33,6 +45,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
+  const promptText =
+    body.action === "implement-suggestion"
+      ? body.suggestion
+      : body.question;
+
   try {
     const prompt = resumeAssistPrompt(
       auth.positioning,
@@ -40,7 +57,9 @@ export async function POST(request: Request) {
       body.action,
       body.data,
       body.experienceIndex,
-      body.question
+      promptText,
+      body.sectionId,
+      body.sectionIndex
     );
     const { text, mock } = await completeWithFallback(prompt);
 
@@ -64,10 +83,42 @@ export async function POST(request: Request) {
       });
     }
 
+    if (body.action === "improve-headline") {
+      const parsed = extractJSON(text) as { headlines?: string[] } | null;
+      const headlines = Array.isArray(parsed?.headlines)
+        ? parsed.headlines.filter(Boolean).map(String)
+        : text.trim()
+          ? [text.trim()]
+          : [];
+      return NextResponse.json({ headlines, mock });
+    }
+
     if (body.action === "suggest") {
       const parsed = extractJSON(text) as { suggestions?: string[] } | null;
       return NextResponse.json({
         suggestions: Array.isArray(parsed?.suggestions) ? parsed.suggestions : [],
+        mock,
+      });
+    }
+
+    if (body.action === "implement-suggestion") {
+      const parsed = extractJSON(text) as {
+        headline?: string;
+        summary?: string;
+        skills?: string[];
+        experience?: {
+          index?: number;
+          blurb?: string;
+          bullets?: string[];
+        };
+      } | null;
+      return NextResponse.json({
+        patch: {
+          headline: parsed?.headline,
+          summary: parsed?.summary,
+          skills: Array.isArray(parsed?.skills) ? parsed.skills : undefined,
+          experience: parsed?.experience,
+        },
         mock,
       });
     }
