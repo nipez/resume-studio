@@ -4,7 +4,6 @@ import { Reveal } from "@/components/marketing/home/reveal-on-scroll";
 import { MarketingFaqAccordion } from "@/components/marketing/shared/marketing-faq-accordion";
 import { MarketingPageCta } from "@/components/marketing/shared/marketing-page-cta";
 import {
-  BETA_BANNER,
   PRICING_PLANS,
   SITE_NAME,
   STUDENT_COVER_LETTER_SCENARIOS,
@@ -84,7 +83,7 @@ export function StudentsPage() {
       <section className="students-hero">
         <div className="wrap students-hero-grid">
           <div>
-            <span className="eyebrow">Student plan · $2.99/mo</span>
+            <span className="eyebrow">Free for students · In beta</span>
             <h1>
               Your first resume shouldn&apos;t start with a{" "}
               <span className="serif-i">blank page</span>
@@ -108,18 +107,23 @@ export function StudentsPage() {
                 Start guided builder →
               </Link>
               <Link href="/pricing" className="link-underline">
-                See student pricing
+                See what&apos;s included
               </Link>
             </div>
-            <p className="students-beta">{BETA_BANNER}</p>
+            <p className="students-beta">
+              🔥 Free for students while we&apos;re in beta — hurry, limited-time
+              offer.
+            </p>
           </div>
           <div className="students-hero-card">
-            <div className="students-plan-kicker">{studentPlan.badge}</div>
+            <div className="students-plan-kicker">Limited-time beta offer</div>
             <div className="students-plan-price">
-              {studentPlan.price}
-              <span>{studentPlan.period}</span>
+              Free<span> · in beta</span>
             </div>
-            <p>{studentPlan.description}</p>
+            <p>
+              Currently free for students while we&apos;re in beta — hurry, it
+              won&apos;t last. {studentPlan.description}
+            </p>
             <ul>
               {studentPlan.features.map((feature) => (
                 <li key={feature}>{feature}</li>
@@ -165,7 +169,7 @@ export function StudentsPage() {
               Get your kid started →
             </Link>
             <Link href="/pricing" className="link-underline">
-              See student pricing
+              See what&apos;s included
             </Link>
           </Reveal>
         </div>
@@ -382,7 +386,7 @@ export function StudentsPage() {
 
       <MarketingPageCta
         title="Counselors & parents: share this link"
-        description="$2.99/mo — less than a latte. Free during beta, and the guided builder is live today."
+        description="Free for students — currently in beta. Hurry, it's a limited-time offer."
         secondaryHref="/pricing"
         secondaryLabel="Compare all plans →"
       />
