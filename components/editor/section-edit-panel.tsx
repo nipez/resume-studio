@@ -1,6 +1,6 @@
 "use client";
 
-import { ResumeAiAssist } from "@/components/editor/resume-ai-assist";
+import { ResumeAiAssist, type AiApplyPatch } from "@/components/editor/resume-ai-assist";
 import type {
   ResumeData,
   ResumeEducation,
@@ -67,6 +67,29 @@ export function SectionEditPanel({
   const expIndex = section.index ?? 0;
   const exp = data.experience[expIndex];
 
+  function applyAiPatch(patch: AiApplyPatch) {
+    const updates: Partial<ResumeData> = {};
+    if (patch.headline) updates.headline = patch.headline;
+    if (patch.summary) updates.summary = patch.summary;
+    if (patch.skills) updates.skills = patch.skills;
+    if (Object.keys(updates).length) onUpdateData(updates);
+
+    if (
+      patch.experience &&
+      patch.experience.index !== undefined &&
+      data.experience[patch.experience.index]
+    ) {
+      onUpdateExperience(patch.experience.index, {
+        ...(patch.experience.blurb !== undefined
+          ? { blurb: patch.experience.blurb }
+          : {}),
+        ...(patch.experience.bullets
+          ? { bullets: patch.experience.bullets }
+          : {}),
+      });
+    }
+  }
+
   return (
     <div className="absolute bottom-4 right-4 top-4 z-20 flex w-[min(400px,calc(100%-2rem))] flex-col overflow-hidden rounded-2xl border border-white/70 bg-white/96 shadow-[0_22px_56px_rgba(15,17,22,0.22)] backdrop-blur-md">
       <div className="flex items-center justify-between border-b border-[#EEF1F4] px-5 py-4">
@@ -88,7 +111,7 @@ export function SectionEditPanel({
       </div>
 
       <div className="flex flex-1 flex-col overflow-hidden">
-        <div className="flex-none border-b border-[#EEF1F4] px-5 py-4">
+        <div className="scroll max-h-[min(480px,52vh)] flex-none overflow-y-auto border-b border-[#EEF1F4] px-5 py-4">
           <ResumeAiAssist
             section={section}
             data={data}
@@ -98,6 +121,7 @@ export function SectionEditPanel({
             onApplyBullets={(index, blurb, bullets) =>
               onUpdateExperience(index, { blurb, bullets })
             }
+            onApplyPatch={applyAiPatch}
           />
         </div>
 

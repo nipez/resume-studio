@@ -2,7 +2,19 @@
 
 import type { ResumeData } from "@/lib/types/resume";
 import type { ResumeEditSection } from "@/lib/types/resume-editor";
-import { useState } from "react";
+import { sectionKey } from "@/lib/types/resume-editor";
+import { useEffect, useState } from "react";
+
+export type AiApplyPatch = {
+  headline?: string;
+  summary?: string;
+  skills?: string[];
+  experience?: {
+    index?: number;
+    blurb?: string;
+    bullets?: string[];
+  };
+};
 
 type ResumeAiAssistProps = {
   section: ResumeEditSection;
@@ -11,6 +23,7 @@ type ResumeAiAssistProps = {
   onApplyHeadline: (headline: string) => void;
   onApplySkills: (skills: string[]) => void;
   onApplyBullets: (index: number, blurb: string, bullets: string[]) => void;
+  onApplyPatch: (patch: AiApplyPatch) => void;
 };
 
 export function ResumeAiAssist({
@@ -20,18 +33,37 @@ export function ResumeAiAssist({
   onApplyHeadline,
   onApplySkills,
   onApplyBullets,
+  onApplyPatch,
 }: ResumeAiAssistProps) {
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [headlineOptions, setHeadlineOptions] = useState<string[]>([]);
+  const [appliedSuggestion, setAppliedSuggestion] = useState<number | null>(
+    null
+  );
+
+  useEffect(() => {
+    setError("");
+    setAnswer("");
+    setSuggestions([]);
+    setHeadlineOptions([]);
+    setAppliedSuggestion(null);
+  }, [sectionKey(section)]);
 
   async function run(
     action: string,
-    opts?: { question?: string; experienceIndex?: number }
-  ) {
-    setLoading(action);
+    opts?: {
+      question?: string;
+      suggestion?: string;
+      experienceIndex?: number;
+      loadingKey?: string;
+    }
+  ): Promise<boolean> {
+    const loadingKey = opts?.loadingKey ?? action;
+    setLoading(loadingKey);
     setError("");
     try {
       const res = await fetch("/api/ai/resume-assist", {
@@ -40,8 +72,11 @@ export function ResumeAiAssist({
         body: JSON.stringify({
           action,
           data,
-          experienceIndex: opts?.experienceIndex,
+          experienceIndex: opts?.experienceIndex ?? section.index,
           question: opts?.question,
+          suggestion: opts?.suggestion,
+          sectionId: section.id,
+          sectionIndex: section.index,
         }),
       });
       const json = await res.json();
@@ -53,29 +88,36 @@ export function ResumeAiAssist({
           json.blurb ?? "",
           json.bullets ?? []
         );
-        return;
+        return true;
       }
       if (action === "suggest-skills") {
         onApplySkills(json.skills ?? []);
-        return;
+        return true;
       }
       if (action === "improve-summary") {
         onApplySummary(json.text ?? "");
-        return;
+        return true;
       }
       if (action === "improve-headline") {
-        onApplyHeadline(json.text ?? "");
-        return;
+        setHeadlineOptions(json.headlines ?? []);
+        return true;
       }
       if (action === "ask") {
         setAnswer(json.text ?? "");
-        return;
+        return true;
       }
       if (action === "suggest") {
         setSuggestions(json.suggestions ?? []);
+        setAppliedSuggestion(null);
+        return true;
       }
+      if (action === "implement-suggestion") {
+        onApplyPatch(json.patch ?? {});
+      }
+      return true;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
+      return false;
     } finally {
       setLoading(null);
     }
@@ -96,6 +138,12 @@ export function ResumeAiAssist({
               }
             : null;
 
+  const hasResults =
+    headlineOptions.length > 0 ||
+    suggestions.length > 0 ||
+    !!answer ||
+    !!error;
+
   return (
     <div className="rounded-xl border border-[#C8D8FF] bg-gradient-to-br from-[#EEF3FF] to-[#F7FAFF] p-4 shadow-[0_4px_16px_rgba(47,107,255,0.08)]">
       <div className="mb-3 flex items-start gap-2.5">
@@ -107,7 +155,7 @@ export function ResumeAiAssist({
             AI suggestions
           </div>
           <div className="mt-0.5 text-[12px] leading-snug text-[#5A6573]">
-            Improve this section or ask for feedback — updates apply live.
+            Pick a headline option or apply an improvement with one click.
           </div>
         </div>
       </div>
@@ -162,25 +210,83 @@ export function ResumeAiAssist({
         </button>
       </div>
 
-      {error ? (
-        <p className="mt-2 text-[12px] text-[#B23B3B]">{error}</p>
-      ) : null}
-      {answer ? (
-        <p className="mt-3 rounded-lg border border-[#DFE8FF] bg-white px-3 py-2.5 text-[12.5px] leading-relaxed text-[#3a4250]">
-          {answer}
-        </p>
-      ) : null}
-      {suggestions.length ? (
-        <ul className="mt-3 space-y-1.5">
-          {suggestions.map((item) => (
-            <li
-              key={item}
-              className="rounded-lg border border-[#DFE8FF] bg-white px-3 py-2 text-[12.5px] leading-relaxed text-[#3a4250]"
-            >
-              {item}
-            </li>
-          ))}
-        </ul>
+      {hasResults ? (
+        <div className="scroll mt-3 max-h-[240px] space-y-2 overflow-y-auto pr-1">
+          {error ? (
+            <p className="text-[12px] text-[#B23B3B]">{error}</p>
+          ) : null}
+
+          {headlineOptions.length ? (
+            <div className="space-y-2">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[#5A6573]">
+                Choose a headline
+              </p>
+              {headlineOptions.map((headline, i) => (
+                <button
+                  key={`${headline}-${i}`}
+                  type="button"
+                  onClick={() => {
+                    onApplyHeadline(headline);
+                    setHeadlineOptions([]);
+                  }}
+                  className="flex w-full cursor-pointer flex-col gap-1.5 rounded-lg border border-[#DFE8FF] bg-white px-3 py-2.5 text-left transition-colors hover:border-accent hover:bg-[#F5F8FF]"
+                >
+                  <span className="text-[12.5px] leading-snug text-[#3a4250]">
+                    {headline}
+                  </span>
+                  <span className="text-[11px] font-semibold text-[#2456D6]">
+                    Use this headline →
+                  </span>
+                </button>
+              ))}
+            </div>
+          ) : null}
+
+          {suggestions.length ? (
+            <div className="space-y-2">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[#5A6573]">
+                Improvement ideas
+              </p>
+              {suggestions.map((item, i) => (
+                <div
+                  key={`${item}-${i}`}
+                  className="rounded-lg border border-[#DFE8FF] bg-white px-3 py-2.5"
+                >
+                  <p className="text-[12.5px] leading-relaxed text-[#3a4250]">
+                    {item}
+                  </p>
+                  <button
+                    type="button"
+                    disabled={
+                      loading === `implement-${i}` || appliedSuggestion === i
+                    }
+                    onClick={async () => {
+                      setAppliedSuggestion(null);
+                      const ok = await run("implement-suggestion", {
+                        suggestion: item,
+                        loadingKey: `implement-${i}`,
+                      });
+                      if (ok) setAppliedSuggestion(i);
+                    }}
+                    className="mt-2 cursor-pointer rounded-lg border-none bg-[#EAF1FF] px-3 py-1.5 text-[12px] font-semibold text-[#2456D6] hover:bg-[#dbe7ff] disabled:opacity-50"
+                  >
+                    {loading === `implement-${i}`
+                      ? "Applying…"
+                      : appliedSuggestion === i
+                        ? "Applied ✓"
+                        : "Apply this idea"}
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : null}
+
+          {answer ? (
+            <p className="rounded-lg border border-[#DFE8FF] bg-white px-3 py-2.5 text-[12.5px] leading-relaxed text-[#3a4250]">
+              {answer}
+            </p>
+          ) : null}
+        </div>
       ) : null}
     </div>
   );
