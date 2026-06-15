@@ -52,6 +52,47 @@ function FieldLabel({
 const inputClass =
   "rounded-[9px] border border-[#DFE3E8] px-[11px] py-[9px] text-sm text-ink focus:border-accent focus:outline-none";
 
+function AutoTextarea({
+  value,
+  onChange,
+  className = "",
+  placeholder,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  className?: string;
+  placeholder?: string;
+}) {
+  const ref = useRef<HTMLTextAreaElement>(null);
+
+  const resize = useCallback(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  }, []);
+
+  useEffect(() => {
+    resize();
+  }, [value, resize]);
+
+  useEffect(() => {
+    window.addEventListener("resize", resize);
+    return () => window.removeEventListener("resize", resize);
+  }, [resize]);
+
+  return (
+    <textarea
+      ref={ref}
+      rows={1}
+      value={value}
+      placeholder={placeholder}
+      onChange={(e) => onChange(e.target.value)}
+      className={`resize-none overflow-hidden ${className}`}
+    />
+  );
+}
+
 export function ResumeEditor({ version }: ResumeEditorProps) {
   const [name, setName] = useState(version.name);
   const [templateStyle, setTemplateStyle] = useState(version.template_style);
@@ -350,30 +391,26 @@ export function ResumeEditor({ version }: ResumeEditorProps) {
                     className="rounded-lg border border-[#E2E5EA] px-2 py-1.5 text-center text-[13px] focus:border-accent focus:outline-none"
                   />
                 </div>
-                <textarea
-                  rows={2}
+                <AutoTextarea
                   placeholder="One-line role summary (optional)"
                   value={exp.blurb ?? ""}
-                  onChange={(e) =>
-                    updateExperience(i, { blurb: e.target.value })
-                  }
-                  className="mb-2 w-full resize-y rounded-lg border border-[#E2E5EA] px-2.5 py-2 text-[12.8px] leading-normal focus:border-accent focus:outline-none"
+                  onChange={(value) => updateExperience(i, { blurb: value })}
+                  className="mb-2 w-full rounded-lg border border-[#E2E5EA] px-2.5 py-2 text-[12.8px] leading-normal focus:border-accent focus:outline-none"
                 />
                 <div className="flex flex-col gap-1.5">
                   {exp.bullets.map((bullet, j) => (
                     <div key={j} className="flex items-start gap-1.5">
-                      <span className="flex-none text-[15px] leading-[1.7] text-accent">
+                      <span className="flex-none pt-[7px] text-[15px] leading-none text-accent">
                         •
                       </span>
-                      <textarea
-                        rows={1}
+                      <AutoTextarea
                         value={bullet}
-                        onChange={(e) => {
+                        onChange={(value) => {
                           const bullets = [...exp.bullets];
-                          bullets[j] = e.target.value;
+                          bullets[j] = value;
                           updateExperience(i, { bullets });
                         }}
-                        className="min-h-[34px] flex-1 resize-y rounded-[7px] border border-[#EAEDF1] px-2 py-1.5 text-[12.8px] leading-[1.45] focus:border-accent focus:outline-none"
+                        className="min-h-[34px] flex-1 rounded-[7px] border border-[#EAEDF1] px-2 py-1.5 text-[12.8px] leading-[1.45] focus:border-accent focus:outline-none"
                       />
                       <button
                         type="button"
