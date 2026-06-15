@@ -38,10 +38,7 @@ export function MarketingHomePage() {
       <section className="hero">
         <div className="wrap hero-grid">
           <div>
-            <span className="eyebrow">
-              <span className="dot-tl" />
-              The Application OS
-            </span>
+            <span className="eyebrow">The Application OS</span>
             <h1>
               One system for your <span className="serif-i">entire</span> job search.
             </h1>
@@ -94,10 +91,7 @@ export function MarketingHomePage() {
         </div>
         <div className="snap-strip">
           <div className="wrap inner">
-            <span className="snap-saved">
-              <span className="d" />
-              Snapshot saved
-            </span>
+            <span className="snap-saved">Snapshot saved</span>
             <span className="sep">·</span>
             <span>
               Resume + cover + Q&amp;A frozen the moment you hit send — so your insights never lie to you.
@@ -110,10 +104,7 @@ export function MarketingHomePage() {
         <div className="problem-glow" />
         <div className="wrap" style={{ position: "relative" }}>
           <Reveal className="sec-head" style={{ maxWidth: 720 }}>
-            <span className="eyebrow dark">
-              <span className="dot" />
-              The problem
-            </span>
+            <span className="eyebrow dark">The problem</span>
             <h2>Job search shouldn&apos;t require a five-tool stack.</h2>
             <p>
               Most seekers stitch together a resume builder, ATS scanner, tracker, Google Doc, and an AI generator — then lose track of which version went where. That&apos;s not a workflow. That&apos;s duct tape.
@@ -144,10 +135,7 @@ export function MarketingHomePage() {
       <section id="features">
         <div className="wrap">
           <Reveal className="sec-head center">
-            <span className="eyebrow">
-              <span className="dot" />
-              The application OS
-            </span>
+            <span className="eyebrow">The application OS</span>
             <h2>Six modules. One closed loop.</h2>
             <p>
               Generators stop at the download. An application OS runs the full cycle — build, tailor, send, snapshot, and learn — so every application makes the next one smarter.
@@ -183,10 +171,7 @@ export function MarketingHomePage() {
       <section className="why">
         <div className="wrap">
           <Reveal className="sec-head" style={{ maxWidth: 680 }}>
-            <span className="eyebrow" style={{ background: "var(--cream)" }}>
-              <span className="dot" />
-              Why {SITE_NAME}
-            </span>
+            <span className="eyebrow" style={{ background: "var(--cream)" }}>Why {SITE_NAME}</span>
             <h2>Why an application OS beats another resume builder.</h2>
             <p>
               The market is split between expensive ATS scanners, tracker-first tools with weekly AI pricing, and builders with trial traps. {SITE_NAME} is the honest, affordable middle: one workspace from first draft to interview prep.
@@ -209,10 +194,7 @@ export function MarketingHomePage() {
       <section className="dark">
         <div className="wrap" style={{ maxWidth: 1060 }}>
           <Reveal className="sec-head center">
-            <span className="eyebrow dark">
-              <span className="dot" />
-              Generators vs. application OS
-            </span>
+            <span className="eyebrow dark">Generators vs. application OS</span>
             <h2>
               Fast PDFs are fine for 5 jobs.
               <br />
@@ -227,10 +209,7 @@ export function MarketingHomePage() {
               <div className="crow head">
                 <div className="c1">Dimension</div>
                 <div className="c2">AI resume generators</div>
-                <div className="c3">
-                  <span className="sq" />
-                  {SITE_NAME} · Application OS
-                </div>
+                <div className="c3">{SITE_NAME} · Application OS</div>
               </div>
               {GENERATOR_VS_OS.slice(0, 6).map((row) => (
                 <div key={row.dimension} className="crow">
@@ -247,10 +226,7 @@ export function MarketingHomePage() {
       <section>
         <div className="wrap">
           <Reveal className="sec-head center" style={{ maxWidth: 600 }}>
-            <span className="eyebrow">
-              <span className="dot" />
-              How it works
-            </span>
+            <span className="eyebrow">How it works</span>
             <h2>From blank page to tracked applications.</h2>
           </Reveal>
           <Reveal className="steps">
@@ -269,10 +245,7 @@ export function MarketingHomePage() {
       <section className="templates">
         <div className="wrap">
           <Reveal className="sec-head" style={{ maxWidth: 560 }}>
-            <span className="eyebrow" style={{ background: "var(--cream)" }}>
-              <span className="dot" />
-              Templates
-            </span>
+            <span className="eyebrow" style={{ background: "var(--cream)" }}>Templates</span>
             <h2>Three templates, print-ready.</h2>
             <p>
               Classic, Two-Column, and Editorial — ported pixel-for-pixel from the prototype with full PDF export support.
@@ -285,10 +258,7 @@ export function MarketingHomePage() {
       <section>
         <div className="wrap">
           <Reveal className="sec-head center" style={{ maxWidth: 560 }}>
-            <span className="eyebrow">
-              <span className="dot" />
-              Testimonials
-            </span>
+            <span className="eyebrow">Testimonials</span>
             <h2>Built for real job searches.</h2>
             <p>Early beta feedback from professionals, parents, and career switchers.</p>
           </Reveal>
@@ -318,10 +288,7 @@ export function MarketingHomePage() {
       <section className="pricing" id="pricing">
         <div className="wrap">
           <Reveal className="sec-head center" style={{ maxWidth: 600 }}>
-            <span className="eyebrow" style={{ background: "var(--cream)" }}>
-              <span className="dot" />
-              Pricing
-            </span>
+            <span className="eyebrow" style={{ background: "var(--cream)" }}>Pricing</span>
             <h2>Pricing that won&apos;t punish your job search.</h2>
             <p>
               Subscription access to the application OS — not credit packs. Student from $2.99. Full workspace without AI for $4.99.
