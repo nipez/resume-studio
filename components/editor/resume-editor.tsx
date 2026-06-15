@@ -234,7 +234,12 @@ export function ResumeEditor({ version }: ResumeEditorProps) {
       </div>
 
       <div className="relative min-h-0 flex-1">
-        <FitResumePreview html={previewHtml} className="absolute inset-0" />
+        <FitResumePreview
+          html={previewHtml}
+          className={`absolute bottom-0 right-0 top-0 transition-[left] duration-300 ease-out ${
+            editorOpen ? "left-[min(456px,calc(100%-2rem))]" : "left-0"
+          }`}
+        />
 
         <div
           className={`absolute bottom-4 left-4 top-4 z-10 flex w-[min(440px,calc(100%-2rem))] flex-col transition-all duration-300 ease-out ${
