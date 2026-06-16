@@ -1,5 +1,6 @@
 "use client";
 
+import { CoverLetterControls } from "@/components/applications/cover-letter-controls";
 import { ReplaceResumeControls } from "@/components/applications/replace-resume-controls";
 import { ResumePreviewModal } from "@/components/applications/resume-preview-modal";
 import type { Application, ApplicationStatus, HiringContact } from "@/lib/applications/types";
@@ -7,6 +8,7 @@ import {
   addApplicationEvent,
   deleteApplication,
   deleteApplicationEvent,
+  updateApplicationCoverLetter,
   updateApplicationEvent,
   updateApplicationHiringContacts,
   updateApplicationInsight,
@@ -28,6 +30,7 @@ import {
 } from "@/lib/applications/utils";
 import { mockBannerClass } from "@/components/shared/job-fields";
 import { Spinner } from "@/components/ui/spinner";
+import type { CoverLetter } from "@/lib/cover/actions";
 import type { ResumeVersion } from "@/lib/resume/db-types";
 import { templateLabel } from "@/lib/resume/build-resume-html";
 import {
@@ -42,6 +45,7 @@ import { useMemo, useState, useTransition } from "react";
 type ApplicationDetailViewProps = {
   application: Application;
   resumeVersions: ResumeVersion[];
+  savedCoverLetters: CoverLetter[];
   companyHistory: Pick<
     Application,
     "id" | "role" | "company" | "applied_at" | "status"
@@ -51,6 +55,7 @@ type ApplicationDetailViewProps = {
 export function ApplicationDetailView({
   application: initial,
   resumeVersions,
+  savedCoverLetters,
   companyHistory,
 }: ApplicationDetailViewProps) {
   const router = useRouter();
@@ -198,6 +203,14 @@ export function ApplicationDetailView({
     } finally {
       setContactsBusy(false);
     }
+  }
+
+  function saveCoverLetter(text: string) {
+    patchLocal({ cover_letter: text });
+    startTransition(async () => {
+      await updateApplicationCoverLetter(app.id, text);
+      router.refresh();
+    });
   }
 
   function copyCover() {
@@ -741,38 +754,49 @@ export function ApplicationDetailView({
             </div>
 
             <div className="rounded-2xl border border-border bg-white p-4">
-              <div className="mb-[11px] flex items-center justify-between">
+              <div className="mb-[11px] flex flex-wrap items-center justify-between gap-2">
                 <div className="font-display text-[13px] font-semibold uppercase tracking-[0.07em] text-[#8A92A0]">
                   Cover letter sent
                 </div>
-                {app.cover_letter.trim() && (
-                  <div className="flex gap-[7px]">
-                    <button
-                      type="button"
-                      onClick={copyCover}
-                      className="cursor-pointer rounded-lg border-none bg-[#F2F3F5] px-[11px] py-1.5 text-xs font-semibold text-[#3a4350] transition-colors hover:bg-[#E6E8EC]"
-                    >
-                      Copy
-                    </button>
-                    <button
-                      type="button"
-                      onClick={exportCover}
-                      className="cursor-pointer rounded-lg border-none bg-accent px-[11px] py-1.5 text-xs font-semibold text-white transition-colors hover:bg-accent-dark"
-                    >
-                      ↓ PDF
-                    </button>
-                  </div>
-                )}
-              </div>
-              {app.cover_letter.trim() ? (
-                <div className="whitespace-pre-wrap rounded-[10px] border border-[#EEF0F3] bg-[#FCFCFD] px-3.5 py-3 text-[13.3px] leading-[1.65] text-[#1a1f29]">
-                  {app.cover_letter}
+                <div className="flex flex-wrap items-center justify-end gap-[7px]">
+                  {app.cover_letter.trim() ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={copyCover}
+                        className="cursor-pointer rounded-lg border-none bg-[#F2F3F5] px-[11px] py-1.5 text-xs font-semibold text-[#3a4350] transition-colors hover:bg-[#E6E8EC]"
+                      >
+                        Copy
+                      </button>
+                      <button
+                        type="button"
+                        onClick={exportCover}
+                        className="cursor-pointer rounded-lg border-none bg-accent px-[11px] py-1.5 text-xs font-semibold text-white transition-colors hover:bg-accent-dark"
+                      >
+                        ↓ PDF
+                      </button>
+                    </>
+                  ) : null}
+                  <CoverLetterControls
+                    applicationId={app.id}
+                    role={app.role}
+                    company={app.company}
+                    savedLetters={savedCoverLetters}
+                    onImported={(text) => patchLocal({ cover_letter: text })}
+                  />
                 </div>
-              ) : (
-                <p className="text-[13px] text-[#8A92A0]">
-                  No cover letter was attached to this application.
-                </p>
-              )}
+              </div>
+              <textarea
+                value={app.cover_letter}
+                onChange={(e) => patchLocal({ cover_letter: e.target.value })}
+                onBlur={(e) => saveCoverLetter(e.target.value)}
+                rows={8}
+                placeholder="Paste the cover letter you sent with this application…"
+                className="w-full resize-y rounded-[10px] border border-[#DFE3E8] px-3.5 py-3 text-[13.3px] leading-[1.65] text-[#1a1f29] focus:border-accent"
+              />
+              <p className="mt-2 text-[11.5px] text-[#9AA3AF]">
+                Saves automatically. Use Attach to import from saved letters or your job draft.
+              </p>
             </div>
 
             {app.answers.length > 0 && (
