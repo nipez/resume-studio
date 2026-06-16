@@ -64,6 +64,28 @@ export async function saveJobDraft(draft: Partial<JobDraft>): Promise<void> {
   );
 }
 
+export async function clearWorkspaceJobDraft(): Promise<void> {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+
+  await supabase.from("workspace_drafts").upsert(
+    {
+      user_id: user.id,
+      job_role: "",
+      job_company: "",
+      job_desc: "",
+      job_url: "",
+      cover_text: "",
+      cover_hm: "",
+      context_notes: "",
+    },
+    { onConflict: "user_id" }
+  );
+}
+
 export async function saveQADraft(qa: QAItem[]): Promise<void> {
   const supabase = createClient();
   const {

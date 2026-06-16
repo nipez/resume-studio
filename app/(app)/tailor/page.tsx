@@ -2,11 +2,11 @@ import { TailorPanel } from "@/components/tailor/tailor-panel";
 import { getLibraryData, getResumeVersion } from "@/lib/resume/actions";
 
 type PageProps = {
-  searchParams: Promise<{ v?: string; r?: string }>;
+  searchParams: Promise<{ v?: string; r?: string; new?: string }>;
 };
 
 export default async function TailorPage({ searchParams }: PageProps) {
-  const { v, r } = await searchParams;
+  const { v, r, new: newParam } = await searchParams;
   const { versions, defaultVersionId } = await getLibraryData();
   const initialVersionId =
     v && versions.some((version) => version.id === v) ? v : null;
@@ -27,7 +27,9 @@ export default async function TailorPage({ searchParams }: PageProps) {
         </h1>
         <p className="mt-2 max-w-[640px] text-[14.5px] text-muted">
           Four steps: add the job, review your tailored resume, write a cover
-          letter, then log the application so it shows up in your tracker.
+          letter, then log the application. Job details stay filled while you
+          move between steps — choose Start new job when you&apos;re ready for a
+          different role.
         </p>
         <div className="mt-[26px]">
           <TailorPanel
@@ -35,6 +37,7 @@ export default async function TailorPage({ searchParams }: PageProps) {
             defaultVersionId={defaultVersionId}
             initialVersionId={initialVersionId}
             initialResultVersion={initialResultVersion}
+            startNewJob={newParam === "1"}
           />
         </div>
       </div>

@@ -24,13 +24,15 @@ import type { ResumeVersion } from "@/lib/resume/db-types";
 import type { ResumeData } from "@/lib/types/resume";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type TailorPanelProps = {
   versions: ResumeVersion[];
   defaultVersionId: string | null;
   initialVersionId?: string | null;
   initialResultVersion?: ResumeVersion | null;
+  /** When true, clear the shared job draft and start a blank form. */
+  startNewJob?: boolean;
 };
 
 const DEPTH_OPTIONS = [
@@ -53,9 +55,10 @@ export function TailorPanel({
   defaultVersionId,
   initialVersionId = null,
   initialResultVersion = null,
+  startNewJob = false,
 }: TailorPanelProps) {
   const router = useRouter();
-  const { draft, update } = useJobDraft();
+  const { draft, update, reset } = useJobDraft();
   const [baseId, setBaseId] = useState(
     initialVersionId ?? defaultVersionId ?? versions[0]?.id ?? ""
   );
@@ -88,6 +91,32 @@ export function TailorPanel({
 
   const base = versions.find((v) => v.id === baseId) ?? versions[0];
   const currentStep = phase === "result" && resultId ? 2 : 1;
+  const handledNewJob = useRef(false);
+
+  const hasDraftContent =
+    Boolean(draft.jobDesc.trim()) ||
+    Boolean(draft.jobRole.trim()) ||
+    Boolean(draft.jobCompany.trim()) ||
+    Boolean(draft.contextNotes.trim());
+
+  const handleStartNewJob = useCallback(() => {
+    reset();
+    setPhase("input");
+    setResultId(null);
+    setResultData(null);
+    setSavedName("");
+    setMatchNotes("");
+    setError("");
+    setPendingSave(null);
+    setSaveStatus("idle");
+    router.replace("/tailor", { scroll: false });
+  }, [reset, router]);
+
+  useEffect(() => {
+    if (!startNewJob || handledNewJob.current) return;
+    handledNewJob.current = true;
+    handleStartNewJob();
+  }, [startNewJob, handleStartNewJob]);
 
   useEffect(() => {
     if (!initialResultVersion?.id) return;
@@ -287,12 +316,13 @@ export function TailorPanel({
                 ) : null}
               </div>
             </div>
-            <Link
-              href="/tailor"
-              className="text-[12.5px] font-semibold text-[#5A6573] hover:text-[#2456D6]"
+            <button
+              type="button"
+              onClick={handleStartNewJob}
+              className="cursor-pointer border-none bg-transparent text-[12.5px] font-semibold text-[#5A6573] hover:text-[#2456D6]"
             >
-              Start over
-            </Link>
+              Start new job
+            </button>
           </div>
         </div>
       ) : null}
@@ -377,6 +407,27 @@ export function TailorPanel({
           <div className="rounded-2xl border border-[#E6E8EC] bg-white p-[22px]">
             {phase === "input" ? (
               <>
+                {hasDraftContent ? (
+                  <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#E6E9EE] bg-[#FAFBFC] px-4 py-3">
+                    <div className="text-[12.5px] leading-[1.45] text-[#5A6573]">
+                      <span className="font-semibold text-ink">
+                        {draft.jobRole || "Role"}
+                        {draft.jobCompany ? ` at ${draft.jobCompany}` : ""}
+                      </span>
+                      <span className="text-muted">
+                        {" "}
+                        — carries over to Cover Letter while you work on this job.
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleStartNewJob}
+                      className="cursor-pointer border-none bg-transparent p-0 text-[12.5px] font-semibold text-[#2456D6] hover:underline"
+                    >
+                      Start new job
+                    </button>
+                  </div>
+                ) : null}
                 {mockMode ? (
                   <div className={mockBannerClass}>
                     Demo mode — add ANTHROPIC_API_KEY for production-quality tailoring.
