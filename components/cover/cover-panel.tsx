@@ -311,8 +311,8 @@ export function CoverPanel({
                 disabled={!draft.coverText || saving}
                 className={`flex items-center gap-1.5 rounded-lg px-[13px] py-[7px] text-[12.5px] font-semibold transition-colors ${
                   draft.coverText && !saving
-                    ? "border border-[#BBD0FF] bg-[#EEF3FF] text-[#1E54E6] hover:bg-[#E1EBFF]"
-                    : "cursor-not-allowed border border-transparent bg-[#F2F3F5] text-[#AAB2BD]"
+                    ? "bg-accent text-white hover:bg-[#1E54E6]"
+                    : "cursor-not-allowed bg-[#F2F3F5] text-[#AAB2BD]"
                 }`}
               >
                 {saving ? <Spinner /> : null}
