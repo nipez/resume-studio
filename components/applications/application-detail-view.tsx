@@ -44,8 +44,6 @@ type ApplicationDetailViewProps = {
   >[];
 };
 
-type DetailTab = "overview" | "sent" | "prep";
-
 const DETAIL_TABS: { id: DetailTab; label: string; hint: string }[] = [
   { id: "overview", label: "Overview", hint: "Status, timeline, job posting" },
   { id: "sent", label: "What you sent", hint: "Resume, cover letter, answers" },
