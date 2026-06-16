@@ -55,6 +55,11 @@ export function applicationPeakRank(app: Application): number {
   return rank;
 }
 
+/** Pipeline stage from current status only (ignores status history). */
+export function applicationCurrentRank(app: Application): number {
+  return STAGE_RANK[app.status] ?? 0;
+}
+
 export function computeApplicationStats(apps: Application[]) {
   const total = apps.length;
   let respondedCount = 0;
@@ -62,7 +67,7 @@ export function computeApplicationStats(apps: Application[]) {
   let offerCount = 0;
 
   for (const app of apps) {
-    const rank = applicationPeakRank(app);
+    const rank = applicationCurrentRank(app);
     if (rank >= 1) respondedCount += 1;
     if (rank >= 2) interviewCount += 1;
     if (rank >= 3) offerCount += 1;
