@@ -298,6 +298,22 @@ export async function updateApplicationCoverLetter(id: string, coverLetter: stri
   revalidatePath("/insights");
 }
 
+export async function updateApplicationAnswers(
+  id: string,
+  answers: { q: string; a: string }[]
+) {
+  const cleaned = answers
+    .filter((item) => item.q?.trim() || item.a?.trim())
+    .map((item) => ({ q: item.q.trim(), a: item.a.trim() }));
+
+  const { error } = await updateApplicationRow(id, { answers: cleaned });
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/applications");
+  revalidatePath(`/applications/${id}`);
+}
+
 export async function updateApplicationMeta(
   id: string,
   patch: {

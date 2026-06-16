@@ -1,10 +1,11 @@
 "use client";
 
+import { ApplicationAnswersEditor } from "@/components/applications/application-answers-editor";
 import { CoverLetterControls } from "@/components/applications/cover-letter-controls";
 import { DetailSection } from "@/components/applications/detail-section";
 import { ReplaceResumeControls } from "@/components/applications/replace-resume-controls";
 import { Spinner } from "@/components/ui/spinner";
-import type { Application, ApplicationStatus } from "@/lib/applications/types";
+import type { Application, ApplicationAnswer, ApplicationStatus } from "@/lib/applications/types";
 import {
   APPLICATION_STATUSES,
   appEventLabel,
@@ -50,6 +51,7 @@ type ApplicationDetailPanelsProps = {
   saveMeta: (patch: Parameters<typeof updateApplicationMeta>[1]) => void;
   setStatus: (status: ApplicationStatus) => void;
   saveCoverLetter: (text: string) => void;
+  saveAnswers: (answers: ApplicationAnswer[]) => void;
   copyCover: () => void;
   exportResume: () => void;
   exportCover: () => void;
@@ -80,6 +82,7 @@ export function ApplicationDetailPanels({
   saveMeta,
   setStatus,
   saveCoverLetter,
+  saveAnswers,
   copyCover,
   exportResume,
   exportCover,
@@ -470,23 +473,12 @@ export function ApplicationDetailPanels({
           </p>
         </DetailSection>
 
-        {app.answers.length > 0 ? (
-          <DetailSection title="Application answers sent">
-            <div className="flex flex-col gap-[11px]">
-              {app.answers.map((qa, i) => (
-                <div
-                  key={i}
-                  className="rounded-[11px] border border-[#EEF0F3] bg-[#FCFCFD] px-3.5 py-3"
-                >
-                  <div className="mb-[5px] text-[13px] font-bold text-[#141821]">{qa.q}</div>
-                  <div className="whitespace-pre-wrap text-[13px] leading-[1.6] text-[#3a4350]">
-                    {qa.a}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </DetailSection>
-        ) : null}
+        <DetailSection
+          title="Application Q&A"
+          description="Questions from the application form and the answers you sent."
+        >
+          <ApplicationAnswersEditor application={app} onSave={saveAnswers} />
+        </DetailSection>
       </div>
     );
   }
