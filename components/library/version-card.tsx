@@ -1,5 +1,6 @@
 "use client";
 
+import { EditableVersionName } from "@/components/library/editable-version-name";
 import { LogApplicationButton } from "@/components/applications/log-application-button";
 import {
   createResumeVersion,
@@ -39,9 +40,11 @@ export function VersionCard({ version, isDefault, appCount = 0 }: VersionCardPro
   return (
     <div className="flex flex-col rounded-2xl border border-border bg-white p-5 transition-[border-color,box-shadow] hover:border-[#CDD3DB] hover:shadow-[0_8px_26px_rgba(15,17,22,0.07)]">
       <div className="flex items-start justify-between gap-2.5">
-        <div className="font-display text-[17px] font-semibold leading-tight tracking-[-0.01em]">
-          {version.name}
-        </div>
+        <EditableVersionName
+          versionId={version.id}
+          name={version.name}
+          className="min-w-0 flex-1"
+        />
         <div className="flex flex-none items-center gap-1.5">
           {isDefault && (
             <span className="inline-flex items-center gap-1 rounded-md bg-[#EEF3FF] px-2 py-1 text-[10.5px] font-bold uppercase tracking-[0.03em] text-[#1E54E6]">
@@ -84,6 +87,15 @@ export function VersionCard({ version, isDefault, appCount = 0 }: VersionCardPro
             </button>
           )}
         </span>
+      </div>
+
+      <div className="mt-2.5 flex flex-wrap gap-2">
+        <Link
+          href={`/tailor?v=${version.id}`}
+          className="flex flex-1 min-w-[140px] items-center justify-center rounded-[9px] border border-[#D6E4FF] bg-[#F5F8FF] px-3 py-2 text-[12.5px] font-semibold text-[#2456D6] transition-colors hover:border-accent hover:bg-[#EAF1FF]"
+        >
+          ⌖ Tailor to a job
+        </Link>
       </div>
 
       <div className="mt-2.5 flex gap-2">

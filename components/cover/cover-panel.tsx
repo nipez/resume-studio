@@ -9,6 +9,7 @@ import {
   mockBannerClass,
   primaryBtnClass,
 } from "@/components/shared/job-fields";
+import { JobDescParseButton } from "@/components/shared/job-desc-parse-button";
 import { JobUrlImport } from "@/components/shared/job-url-import";
 import { Spinner } from "@/components/ui/spinner";
 import { Toast } from "@/components/ui/toast";
@@ -189,6 +190,7 @@ export function CoverPanel({
           ) : null}
           <VersionSelect versions={versions} value={baseId} onChange={setBaseId} />
           <JobUrlImport
+            urlOnly
             onImported={(fields) =>
               update({
                 jobRole: fields.jobRole,
@@ -197,7 +199,7 @@ export function CoverPanel({
                 jobUrl: fields.jobUrl ?? draft.jobUrl,
               })
             }
-            hint="Career pages work via URL. For Indeed or LinkedIn, use Paste text."
+            hint="Career pages work via URL. For Indeed or LinkedIn, paste the full posting in the job description field below."
             successMessage="Imported — review the fields below, then generate."
           />
           <div className="mt-3.5 grid grid-cols-2 gap-3">
@@ -223,6 +225,18 @@ export function CoverPanel({
             value={draft.jobDesc}
             onChange={(v) => update({ jobDesc: v })}
             rows={9}
+          />
+          <JobDescParseButton
+            text={draft.jobDesc}
+            onParsed={(fields) =>
+              update({
+                jobRole: fields.jobRole || draft.jobRole,
+                jobCompany: fields.jobCompany || draft.jobCompany,
+                jobDesc: fields.jobDesc,
+                jobUrl: fields.jobUrl ?? draft.jobUrl,
+              })
+            }
+            className="mt-2"
           />
           {error ? <div className={errorBoxClass}>{error}</div> : null}
           <button

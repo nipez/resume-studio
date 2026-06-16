@@ -10,6 +10,7 @@ import {
   mockBannerClass,
   primaryBtnClass,
 } from "@/components/shared/job-fields";
+import { JobDescParseButton } from "@/components/shared/job-desc-parse-button";
 import { JobUrlImport } from "@/components/shared/job-url-import";
 import { Spinner } from "@/components/ui/spinner";
 import { useJobDraft } from "@/lib/job-draft/use-job-draft";
@@ -24,6 +25,7 @@ import { useMemo, useState } from "react";
 type TailorPanelProps = {
   versions: ResumeVersion[];
   defaultVersionId: string | null;
+  initialVersionId?: string | null;
 };
 
 const DEPTH_OPTIONS = [
@@ -39,10 +41,14 @@ const DEPTH_OPTIONS = [
   },
 ];
 
-export function TailorPanel({ versions, defaultVersionId }: TailorPanelProps) {
+export function TailorPanel({
+  versions,
+  defaultVersionId,
+  initialVersionId = null,
+}: TailorPanelProps) {
   const { draft, update } = useJobDraft();
   const [baseId, setBaseId] = useState(
-    defaultVersionId ?? versions[0]?.id ?? ""
+    initialVersionId ?? defaultVersionId ?? versions[0]?.id ?? ""
   );
   const [depth, setDepth] = useState<"light" | "deep">("light");
   const [busy, setBusy] = useState(false);
@@ -143,6 +149,7 @@ export function TailorPanel({ versions, defaultVersionId }: TailorPanelProps) {
         ) : null}
         <VersionSelect versions={versions} value={baseId} onChange={setBaseId} />
         <JobUrlImport
+          urlOnly
           onImported={(fields) =>
             update({
               jobRole: fields.jobRole,
@@ -151,7 +158,6 @@ export function TailorPanel({ versions, defaultVersionId }: TailorPanelProps) {
               jobUrl: fields.jobUrl ?? draft.jobUrl,
             })
           }
-          hint="Career pages (Greenhouse, Lever) work via URL. For Indeed or LinkedIn, use Paste text."
           successMessage="Imported — review the fields below, then tailor."
         />
         <div className="mt-3.5 grid grid-cols-2 gap-3">
@@ -167,6 +173,19 @@ export function TailorPanel({ versions, defaultVersionId }: TailorPanelProps) {
         <JobDescField
           value={draft.jobDesc}
           onChange={(v) => update({ jobDesc: v })}
+          label="Job description"
+        />
+        <JobDescParseButton
+          text={draft.jobDesc}
+          onParsed={(fields) =>
+            update({
+              jobRole: fields.jobRole || draft.jobRole,
+              jobCompany: fields.jobCompany || draft.jobCompany,
+              jobDesc: fields.jobDesc,
+              jobUrl: fields.jobUrl ?? draft.jobUrl,
+            })
+          }
+          className="mt-2"
         />
         <div className="mt-4">
           <div className="mb-2 text-[12.5px] font-semibold text-[#5A6573]">
