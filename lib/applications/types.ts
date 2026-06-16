@@ -36,6 +36,15 @@ export type AppPrep = {
   ask: string[];
 };
 
+export type InterviewDebrief = {
+  summary: string[];
+  landed: string[];
+  gaps: string[];
+  openQuestions: string[];
+  followUpEmail: string;
+  nextRoundPrep: string[];
+};
+
 export type HiringContact = {
   name: string;
   title: string;
@@ -73,6 +82,8 @@ export type Application = {
   status_history: StatusHistoryEntry[];
   insight: AppInsight | null;
   prep: AppPrep | null;
+  interview_transcript: string;
+  interview_debrief: InterviewDebrief | null;
   hiring_contacts: HiringContact[] | null;
   notes: string;
   created_at: string;

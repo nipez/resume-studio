@@ -183,6 +183,33 @@ export function mockComplete(prompt: string): string {
     });
   }
 
+  if (prompt.includes("Analyze this interview transcript")) {
+    return JSON.stringify({
+      summary: [
+        "Demo mode — paste a real transcript after adding ANTHROPIC_API_KEY.",
+        "Conversation covered role fit, past experience, and team dynamics.",
+        "Interviewer asked about prioritization and stakeholder management.",
+      ],
+      landed: [
+        "Strong examples of cross-functional work aligned with the JD.",
+        "Clear enthusiasm for the company and role scope.",
+      ],
+      gaps: [
+        "Could tie metrics more directly to outcomes the hiring manager mentioned.",
+        "One answer wandered — tighten the STAR structure for behavioral questions.",
+      ],
+      openQuestions: [
+        "Timeline for next steps and who else you would meet.",
+      ],
+      followUpEmail:
+        "Hi [Name],\n\nThank you for taking the time to speak with me today about the [Role] position. I enjoyed learning more about [specific topic from the interview] and how the team approaches [priority].\n\nOur conversation reinforced my interest in the role — especially [one concrete alignment]. I'd welcome the chance to continue the discussion.\n\nBest regards,\n[Your name]",
+      nextRoundPrep: [
+        "Prepare a deeper dive on the project you mentioned.",
+        "Research the panel if a team interview is next.",
+      ],
+    });
+  }
+
   if (prompt.includes("Rewrite the summary/profile")) {
     return (
       "Results-driven professional with a track record of delivering measurable outcomes across cross-functional teams. " +
