@@ -8,6 +8,7 @@ import { ResumePreviewModal } from "@/components/applications/resume-preview-mod
 import type { Application, ApplicationStatus, HiringContact } from "@/lib/applications/types";
 import {
   deleteApplication,
+  updateApplicationAnswers,
   updateApplicationCoverLetter,
   updateApplicationHiringContacts,
   updateApplicationInsight,
@@ -212,6 +213,14 @@ export function ApplicationDetailView({
     });
   }
 
+  function saveAnswers(answers: Application["answers"]) {
+    patchLocal({ answers });
+    startTransition(async () => {
+      await updateApplicationAnswers(app.id, answers);
+      router.refresh();
+    });
+  }
+
   function copyCover() {
     if (app.cover_letter) {
       void navigator.clipboard.writeText(app.cover_letter);
@@ -361,6 +370,7 @@ export function ApplicationDetailView({
           saveMeta={saveMeta}
           setStatus={setStatus}
           saveCoverLetter={saveCoverLetter}
+          saveAnswers={saveAnswers}
           copyCover={copyCover}
           exportResume={exportResume}
           exportCover={exportCover}
