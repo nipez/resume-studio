@@ -252,8 +252,10 @@ export function TailorPanel({
                 </div>
                 {savedName && saveStatus === "saved" ? (
                   <p className="mt-1 text-[13px] leading-[1.5] text-[#3D6B4F]">
-                    <strong>{savedName}</strong> is in your library. Your original
-                    resume is unchanged — you can come back here anytime.
+                    <strong>{savedName}</strong> is in your library for{" "}
+                    {draft.jobRole || "this role"}
+                    {draft.jobCompany ? ` at ${draft.jobCompany}` : ""}. Your
+                    original resume is unchanged.
                   </p>
                 ) : (
                   <p className="mt-1 text-[13px] leading-[1.5] text-[#3D6B4F]">
@@ -285,12 +287,34 @@ export function TailorPanel({
         </div>
       ) : null}
 
-      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
-        <div className="rounded-2xl border border-[#E6E8EC] bg-white p-[22px]">
-          {phase === "result" ? (
-            <div className="mb-4 rounded-xl border border-[#E6E9EE] bg-[#FAFBFC] px-4 py-3">
+      {phase === "result" && resultData ? (
+        <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <div className="flex min-w-0 flex-col gap-4">
+            {saveStatus === "error" && pendingSave ? (
+              <div className={errorBoxClass}>
+                <p>{error}</p>
+                <button
+                  type="button"
+                  onClick={handleRetrySave}
+                  disabled={busy}
+                  className="mt-2 cursor-pointer rounded-[8px] border-none bg-[#B23B3B] px-3 py-1.5 text-[12.5px] font-semibold text-white"
+                >
+                  {busy ? "Saving…" : "Retry save to library"}
+                </button>
+              </div>
+            ) : null}
+
+            <div className="h-[min(820px,calc(100vh-220px))] min-h-[480px] overflow-hidden rounded-2xl bg-[#EAECEF] p-4">
+              <div className="h-full overflow-hidden rounded-[5px] bg-white shadow-[0_4px_20px_rgba(15,17,22,0.1)]">
+                <ResumePreview html={previewHtml} title="Tailored resume preview" />
+              </div>
+            </div>
+          </div>
+
+          <aside className="flex flex-col gap-4 lg:sticky lg:top-8">
+            <div className="rounded-2xl border border-[#E6E8EC] bg-white px-4 py-3.5">
               <div className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[#8A92A0]">
-                Step 1 — Job details
+                Tailored for
               </div>
               <div className="mt-1 text-[14px] font-semibold text-ink">
                 {draft.jobRole || "Role"}
@@ -304,178 +328,184 @@ export function TailorPanel({
                 Edit job details
               </button>
             </div>
-          ) : null}
 
-          {phase === "input" ? (
-            <>
-              {mockMode ? (
-                <div className={mockBannerClass}>
-                  Demo mode — add ANTHROPIC_API_KEY for production-quality tailoring.
-                </div>
-              ) : null}
-              <VersionSelect versions={versions} value={baseId} onChange={setBaseId} />
-              <JobUrlImport
-                urlOnly
-                onImported={(fields) =>
-                  update({
-                    jobRole: fields.jobRole,
-                    jobCompany: fields.jobCompany,
-                    jobDesc: fields.jobDesc,
-                    jobUrl: fields.jobUrl ?? draft.jobUrl,
-                  })
-                }
-                successMessage="Imported — review the fields below, then tailor."
-              />
-              <div className="mt-3.5 grid grid-cols-2 gap-3">
-                <JobRoleField
-                  value={draft.jobRole}
-                  onChange={(v) => update({ jobRole: v })}
-                />
-                <JobCompanyField
-                  value={draft.jobCompany}
-                  onChange={(v) => update({ jobCompany: v })}
-                />
+            <div className="rounded-2xl bg-sidebar px-5 py-4 text-[#E4E8EE]">
+              <div className="mb-2 flex items-center gap-2 font-display text-sm font-semibold text-[#9FC0FF]">
+                ✦ Why this fits
               </div>
-              <JobDescField
-                value={draft.jobDesc}
-                onChange={(v) => update({ jobDesc: v })}
-                label="Job description"
-              />
-              <JobDescParseButton
-                text={draft.jobDesc}
-                onParsed={(fields) =>
-                  update({
-                    jobRole: fields.jobRole || draft.jobRole,
-                    jobCompany: fields.jobCompany || draft.jobCompany,
-                    jobDesc: fields.jobDesc,
-                    jobUrl: fields.jobUrl ?? draft.jobUrl,
-                  })
-                }
-                className="mt-2"
-              />
-              <ResumeContextNotesField
-                className="mt-4"
-                value={draft.contextNotes}
-                onChange={(v) => update({ contextNotes: v })}
-              />
-              <div className="mt-4">
-                <div className="mb-2 text-[12.5px] font-semibold text-[#5A6573]">
-                  Tailoring depth
-                </div>
-                <div className="flex gap-2">
-                  {DEPTH_OPTIONS.map((o) => {
-                    const active = depth === o.id;
-                    return (
-                      <button
-                        key={o.id}
-                        type="button"
-                        onClick={() => setDepth(o.id)}
-                        className={`flex-1 rounded-[10px] border px-3 py-2.5 text-left transition-colors ${
-                          active
-                            ? "border-accent bg-[#EAF1FF] text-[#1E54E6]"
-                            : "border-[#E2E5EA] bg-[#FAFBFC] text-[#5A6573] hover:border-[#CFD5DD]"
-                        }`}
-                      >
-                        <div className="text-[13px] font-bold">{o.title}</div>
-                        <div className="mt-[3px] text-[11.5px] leading-[1.35] opacity-85">
-                          {o.desc}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-              {error ? <div className={errorBoxClass}>{error}</div> : null}
+              <p className="text-[13.4px] leading-[1.6] text-[#C7CDD6]">{matchNotes}</p>
               <button
                 type="button"
-                onClick={handleTailor}
-                disabled={busy}
-                className={primaryBtnClass}
+                onClick={handleExport}
+                className="mt-4 rounded-[9px] bg-white/10 px-[15px] py-2 text-[13px] font-semibold text-white hover:bg-white/[0.18]"
               >
-                {busy ? <Spinner /> : null}
-                {busy
-                  ? saveStatus === "saving"
-                    ? "Saving to library…"
-                    : "Tailoring…"
-                  : "Tailor & save resume"}
+                ↓ Export PDF
               </button>
-            </>
-          ) : null}
-        </div>
-
-        <div className="flex min-h-[300px] flex-col gap-4">
-          {resultData ? (
-            <>
-              {saveStatus === "error" && pendingSave ? (
-                <div className={errorBoxClass}>
-                  <p>{error}</p>
-                  <button
-                    type="button"
-                    onClick={handleRetrySave}
-                    disabled={busy}
-                    className="mt-2 cursor-pointer rounded-[8px] border-none bg-[#B23B3B] px-3 py-1.5 text-[12.5px] font-semibold text-white"
-                  >
-                    {busy ? "Saving…" : "Retry save to library"}
-                  </button>
-                </div>
-              ) : null}
-
-              <div className="animate-[fadeUp_0.4s_ease_both] rounded-2xl bg-sidebar px-[22px] py-5 text-[#E4E8EE]">
-                <div className="mb-2 flex items-center gap-2 font-display text-sm font-semibold text-[#9FC0FF]">
-                  ✦ Why this fits
-                </div>
-                <p className="text-[13.6px] leading-[1.6] text-[#C7CDD6]">{matchNotes}</p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    onClick={handleExport}
-                    className="rounded-[9px] bg-white/10 px-[15px] py-2 text-[13px] font-semibold text-white hover:bg-white/[0.18]"
-                  >
-                    ↓ Export PDF
-                  </button>
-                </div>
-              </div>
-
-              {saveStatus === "saved" && resultId ? (
-                <div className="animate-[fadeUp_0.4s_ease_both] rounded-2xl border border-[#E6E8EC] bg-white px-5 py-4">
-                  <div className="text-[13px] font-semibold text-ink">
-                    Step 3 — Cover letter
-                  </div>
-                  <p className="mt-1 text-[13px] leading-[1.5] text-muted">
-                    {draft.jobCompany?.trim()
-                      ? `Ready to write a cover letter for ${draft.jobCompany}?`
-                      : "Ready to write a cover letter for this role?"}{" "}
-                    Job details carry over and this tailored resume is already saved.
-                  </p>
-                  <Link
-                    href={`/cover?v=${resultId}`}
-                    className="mt-3 inline-flex rounded-[9px] bg-accent px-4 py-2 text-[13px] font-semibold text-white hover:bg-[#1E54E6]"
-                  >
-                    Continue to cover letter →
-                  </Link>
-                </div>
-              ) : null}
-
-              <div className="h-[760px] overflow-hidden rounded-2xl bg-[#EAECEF] p-4">
-                <div className="h-full overflow-hidden rounded-[5px] bg-white shadow-[0_4px_20px_rgba(15,17,22,0.1)]">
-                  <ResumePreview html={previewHtml} title="Tailored resume preview" />
-                </div>
-              </div>
-            </>
-          ) : (
-            <div className="rounded-2xl border-[1.5px] border-dashed border-[#D2D7DE] bg-[#FBFBFC] px-7 py-12 text-center text-[#8A92A0]">
-              <div className="mb-2.5 text-[34px] opacity-60">1</div>
-              <div className="font-display text-[15px] font-semibold text-[#5A6573]">
-                Step 1 — Add the job, then tailor & save
-              </div>
-              <div className="mt-1.5 text-[13px]">
-                Your tailored resume saves to the library automatically. You can
-                return to this step anytime from the progress bar above.
-              </div>
             </div>
-          )}
+
+            {saveStatus === "saved" && resultId ? (
+              <div className="rounded-2xl border border-[#E6E8EC] bg-white px-5 py-4">
+                <div className="text-[13px] font-semibold text-ink">Step 3 — Cover letter</div>
+                <p className="mt-1 text-[13px] leading-[1.5] text-muted">
+                  {draft.jobCompany?.trim()
+                    ? `Ready to write a cover letter for ${draft.jobCompany}?`
+                    : "Ready to write a cover letter for this role?"}
+                </p>
+                <Link
+                  href={`/cover?v=${resultId}`}
+                  className="mt-3 inline-flex w-full justify-center rounded-[9px] bg-accent px-4 py-2.5 text-[13px] font-semibold text-white hover:bg-[#1E54E6]"
+                >
+                  Continue to cover letter →
+                </Link>
+              </div>
+            ) : null}
+          </aside>
         </div>
-      </div>
+      ) : (
+        <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
+          <div className="rounded-2xl border border-[#E6E8EC] bg-white p-[22px]">
+            {phase === "input" ? (
+              <>
+                {mockMode ? (
+                  <div className={mockBannerClass}>
+                    Demo mode — add ANTHROPIC_API_KEY for production-quality tailoring.
+                  </div>
+                ) : null}
+                <VersionSelect versions={versions} value={baseId} onChange={setBaseId} />
+                <JobUrlImport
+                  urlOnly
+                  onImported={(fields) =>
+                    update({
+                      jobRole: fields.jobRole,
+                      jobCompany: fields.jobCompany,
+                      jobDesc: fields.jobDesc,
+                      jobUrl: fields.jobUrl ?? draft.jobUrl,
+                    })
+                  }
+                  successMessage="Imported — review the fields below, then tailor."
+                />
+                <div className="mt-3.5 grid grid-cols-2 gap-3">
+                  <JobRoleField
+                    value={draft.jobRole}
+                    onChange={(v) => update({ jobRole: v })}
+                  />
+                  <JobCompanyField
+                    value={draft.jobCompany}
+                    onChange={(v) => update({ jobCompany: v })}
+                  />
+                </div>
+                <JobDescField
+                  value={draft.jobDesc}
+                  onChange={(v) => update({ jobDesc: v })}
+                  label="Job description"
+                />
+                <JobDescParseButton
+                  text={draft.jobDesc}
+                  onParsed={(fields) =>
+                    update({
+                      jobRole: fields.jobRole || draft.jobRole,
+                      jobCompany: fields.jobCompany || draft.jobCompany,
+                      jobDesc: fields.jobDesc,
+                      jobUrl: fields.jobUrl ?? draft.jobUrl,
+                    })
+                  }
+                  className="mt-2"
+                />
+                <ResumeContextNotesField
+                  className="mt-4"
+                  value={draft.contextNotes}
+                  onChange={(v) => update({ contextNotes: v })}
+                />
+                <div className="mt-4">
+                  <div className="mb-2 text-[12.5px] font-semibold text-[#5A6573]">
+                    Tailoring depth
+                  </div>
+                  <div className="flex gap-2">
+                    {DEPTH_OPTIONS.map((o) => {
+                      const active = depth === o.id;
+                      return (
+                        <button
+                          key={o.id}
+                          type="button"
+                          onClick={() => setDepth(o.id)}
+                          className={`flex-1 rounded-[10px] border px-3 py-2.5 text-left transition-colors ${
+                            active
+                              ? "border-accent bg-[#EAF1FF] text-[#1E54E6]"
+                              : "border-[#E2E5EA] bg-[#FAFBFC] text-[#5A6573] hover:border-[#CFD5DD]"
+                          }`}
+                        >
+                          <div className="text-[13px] font-bold">{o.title}</div>
+                          <div className="mt-[3px] text-[11.5px] leading-[1.35] opacity-85">
+                            {o.desc}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+                {error ? <div className={errorBoxClass}>{error}</div> : null}
+                <button
+                  type="button"
+                  onClick={handleTailor}
+                  disabled={busy}
+                  className={primaryBtnClass}
+                >
+                  {busy ? <Spinner /> : null}
+                  {busy
+                    ? saveStatus === "saving"
+                      ? "Saving to library…"
+                      : "Tailoring…"
+                    : "Tailor & save resume"}
+                </button>
+              </>
+            ) : null}
+          </div>
+
+          <div className="flex min-h-[300px] flex-col gap-4">
+            {resultData ? (
+              <>
+                {saveStatus === "error" && pendingSave ? (
+                  <div className={errorBoxClass}>
+                    <p>{error}</p>
+                    <button
+                      type="button"
+                      onClick={handleRetrySave}
+                      disabled={busy}
+                      className="mt-2 cursor-pointer rounded-[8px] border-none bg-[#B23B3B] px-3 py-1.5 text-[12.5px] font-semibold text-white"
+                    >
+                      {busy ? "Saving…" : "Retry save to library"}
+                    </button>
+                  </div>
+                ) : null}
+
+                <div className="animate-[fadeUp_0.4s_ease_both] rounded-2xl bg-sidebar px-[22px] py-5 text-[#E4E8EE]">
+                  <div className="mb-2 flex items-center gap-2 font-display text-sm font-semibold text-[#9FC0FF]">
+                    ✦ Why this fits
+                  </div>
+                  <p className="text-[13.6px] leading-[1.6] text-[#C7CDD6]">{matchNotes}</p>
+                </div>
+
+                <div className="h-[760px] overflow-hidden rounded-2xl bg-[#EAECEF] p-4">
+                  <div className="h-full overflow-hidden rounded-[5px] bg-white shadow-[0_4px_20px_rgba(15,17,22,0.1)]">
+                    <ResumePreview html={previewHtml} title="Tailored resume preview" />
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="rounded-2xl border-[1.5px] border-dashed border-[#D2D7DE] bg-[#FBFBFC] px-7 py-12 text-center text-[#8A92A0]">
+                <div className="mb-2.5 text-[34px] opacity-60">1</div>
+                <div className="font-display text-[15px] font-semibold text-[#5A6573]">
+                  Step 1 — Add the job, then tailor & save
+                </div>
+                <div className="mt-1.5 text-[13px]">
+                  Your tailored resume saves to the library automatically. You can
+                  return to this step anytime from the progress bar above.
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
