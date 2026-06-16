@@ -21,6 +21,16 @@ export function buildPositioningContext(
   ].join("\n");
 }
 
+export function buildExtraContextBlock(contextNotes: string): string {
+  const notes = contextNotes.trim();
+  if (!notes) return "";
+  return (
+    "USER CONTEXT NOTES (honor when tailoring; do not invent facts beyond the resume, job description, and these notes):\n" +
+    notes +
+    "\n\n"
+  );
+}
+
 export function parseResumePrompt(raw: string): string {
   return (
     "You are parsing a resume into structured JSON for a resume builder. Return ONLY valid minified JSON — no markdown, no commentary.\n\n" +
@@ -59,11 +69,14 @@ export function tailorMetaPrompt(
   jobRole: string,
   jobCompany: string,
   jobDesc: string,
-  data: ResumeData
+  data: ResumeData,
+  contextNotes = ""
 ): string {
   const ctx =
     buildPositioningContext(positioning, userName) +
-    "\n\nTARGET ROLE: " +
+    "\n\n" +
+    buildExtraContextBlock(contextNotes) +
+    "TARGET ROLE: " +
     (jobRole || "(not specified)") +
     " at " +
     (jobCompany || "(not specified)") +
@@ -92,7 +105,8 @@ export function tailorDeepRolesPrompt(
   jobCompany: string,
   jobDesc: string,
   data: ResumeData,
-  roles: { index: number; company: string; title: string; dates: string; bullets: string[] }[]
+  roles: { index: number; company: string; title: string; dates: string; bullets: string[] }[],
+  contextNotes = ""
 ): string {
   const block = roles
     .map((e) => {
@@ -113,7 +127,9 @@ export function tailorDeepRolesPrompt(
 
   const ctx =
     buildPositioningContext(positioning, userName) +
-    "\n\nTARGET ROLE: " +
+    "\n\n" +
+    buildExtraContextBlock(contextNotes) +
+    "TARGET ROLE: " +
     (jobRole || "(not specified)") +
     " at " +
     (jobCompany || "(not specified)") +
@@ -147,11 +163,14 @@ export function tailorLightPrompt(
   jobRole: string,
   jobCompany: string,
   jobDesc: string,
-  data: ResumeData
+  data: ResumeData,
+  contextNotes = ""
 ): string {
   const ctx =
     buildPositioningContext(positioning, userName) +
-    "\n\nTARGET ROLE: " +
+    "\n\n" +
+    buildExtraContextBlock(contextNotes) +
+    "TARGET ROLE: " +
     (jobRole || "(not specified)") +
     " at " +
     (jobCompany || "(not specified)") +
@@ -386,6 +405,24 @@ export function resumeAssistPrompt(
     ctx +
     "TASK: Offer 3 specific, actionable suggestions to improve this resume. Return ONLY valid minified JSON: " +
     '{"suggestions":["suggestion 1","suggestion 2","suggestion 3"]}'
+  );
+}
+
+export function applyResumeContextPrompt(
+  positioning: string,
+  userName: string,
+  data: ResumeData,
+  contextNotes: string
+): string {
+  return (
+    buildPositioningContext(positioning, userName) +
+    "\n\n" +
+    buildExtraContextBlock(contextNotes) +
+    "CURRENT RESUME (JSON):\n" +
+    JSON.stringify(data) +
+    "\n\n" +
+    "TASK: Refine this resume so the user's context notes are reflected — emphasize what they asked for in headline, summary, skills, and relevant experience bullets. Do NOT invent companies, titles, dates, or metrics. Keep structure and all roles; preserve contact info exactly.\n" +
+    'Return ONLY valid minified JSON with the same shape as the input resume: {"name":"","headline":"","phone":"","email":"","location":"","linkedin":"","summary":"","skills":[],"experience":[{"company":"","title":"","dates":"","blurb":"","bullets":[]}],"education":[{"school":"","degree":"","year":""}],"awards":[]}'
   );
 }
 

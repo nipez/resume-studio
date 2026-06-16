@@ -32,6 +32,7 @@ export async function loadWorkspaceDraft(): Promise<WorkspaceDraft | null> {
       jobUrl: (data.job_url as string) ?? "",
       coverText: (data.cover_text as string) ?? "",
       coverHM: (data.cover_hm as string) ?? "",
+      contextNotes: (data.context_notes as string) ?? "",
     },
     qa: Array.isArray(data.qa) ? (data.qa as QAItem[]) : [],
   };
@@ -57,6 +58,7 @@ export async function saveJobDraft(draft: Partial<JobDraft>): Promise<void> {
       job_url: merged.jobUrl,
       cover_text: merged.coverText,
       cover_hm: merged.coverHM,
+      context_notes: merged.contextNotes,
     },
     { onConflict: "user_id" }
   );

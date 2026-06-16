@@ -10,6 +10,7 @@ export type GuidedDraft = {
   templateStyle: TemplateStyle;
   makeDefault: boolean;
   data: ResumeData;
+  contextNotes: string;
 };
 
 export async function getGuidedDraft(): Promise<GuidedDraft | null> {
@@ -32,6 +33,7 @@ export async function getGuidedDraft(): Promise<GuidedDraft | null> {
     templateStyle: (data.template_style as TemplateStyle) ?? "twocol",
     makeDefault: data.make_default ?? true,
     data: normalizeResumeData(data.data),
+    contextNotes: (data.context_notes as string) ?? "",
   };
 }
 
@@ -49,6 +51,7 @@ export async function saveGuidedDraft(draft: GuidedDraft) {
       template_style: draft.templateStyle,
       make_default: draft.makeDefault,
       data: normalizeResumeData(draft.data),
+      context_notes: draft.contextNotes ?? "",
     },
     { onConflict: "user_id" }
   );

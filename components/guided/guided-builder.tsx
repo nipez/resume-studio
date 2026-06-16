@@ -1,6 +1,7 @@
 "use client";
 
 import { ScaledResumePreview } from "@/components/resume/resume-preview";
+import { ResumeContextNotesField } from "@/components/shared/resume-context-notes-field";
 import {
   discardGuidedDraft,
   finishGuidedDraft,
@@ -90,6 +91,7 @@ export function GuidedBuilder({
     initialDraft?.templateStyle ?? "twocol"
   );
   const [makeDefault, setMakeDefault] = useState(initialDraft?.makeDefault ?? true);
+  const [contextNotes, setContextNotes] = useState(initialDraft?.contextNotes ?? "");
   const [data, setData] = useState<ResumeData>(
     initialDraft?.data ?? createEmptyResumeData(userName, userEmail)
   );
@@ -100,10 +102,10 @@ export function GuidedBuilder({
   const [creating, setCreating] = useState(false);
 
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const latest = useRef({ step, templateStyle, makeDefault, data });
+  const latest = useRef({ step, templateStyle, makeDefault, contextNotes, data });
   useEffect(() => {
-    latest.current = { step, templateStyle, makeDefault, data };
-  }, [step, templateStyle, makeDefault, data]);
+    latest.current = { step, templateStyle, makeDefault, contextNotes, data };
+  }, [step, templateStyle, makeDefault, contextNotes, data]);
 
   // Debounced autosave so progress is resumable from guided_drafts.
   useEffect(() => {
@@ -117,7 +119,7 @@ export function GuidedBuilder({
     return () => {
       if (saveTimer.current) clearTimeout(saveTimer.current);
     };
-  }, [step, templateStyle, makeDefault, data]);
+  }, [step, templateStyle, makeDefault, contextNotes, data]);
 
   // Students lead with education — make sure there's a row to fill in.
   useEffect(() => {
@@ -187,11 +189,24 @@ export function GuidedBuilder({
           () => {}
         );
       }
+
+      let finalData = data;
+      if (contextNotes.trim()) {
+        const res = await fetch("/api/ai/apply-resume-context", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ data, contextNotes }),
+        });
+        const j = await res.json();
+        if (!res.ok) throw new Error(j.error || "Could not apply your notes");
+        finalData = j.data;
+      }
+
       const { id } = await finishGuidedDraft({
         name: resumeName,
         templateStyle,
         makeDefault,
-        data,
+        data: finalData,
       });
       router.push(`/editor/${id}`);
     } catch {
@@ -353,19 +368,27 @@ export function GuidedBuilder({
               ) : null}
 
               {current.id === "summary" ? (
-                <Field label="Summary">
-                  <textarea
-                    rows={6}
-                    className={`${inputClass} resize-y leading-[1.55]`}
-                    value={data.summary}
-                    placeholder={
-                      isStudent
-                        ? "What grade or year are you in, what are you into, and what are you looking for? e.g. 'Motivated high school senior with leadership in athletics and community service, seeking a part-time role…'"
-                        : "What do you do, who for, and what are you known for? A couple of sentences is plenty."
-                    }
-                    onChange={(e) => updateData({ summary: e.target.value })}
+                <div className="space-y-4">
+                  <Field label="Summary">
+                    <textarea
+                      rows={6}
+                      className={`${inputClass} resize-y leading-[1.55]`}
+                      value={data.summary}
+                      placeholder={
+                        isStudent
+                          ? "What grade or year are you in, what are you into, and what are you looking for? e.g. 'Motivated high school senior with leadership in athletics and community service, seeking a part-time role…'"
+                          : "What do you do, who for, and what are you known for? A couple of sentences is plenty."
+                      }
+                      onChange={(e) => updateData({ summary: e.target.value })}
+                    />
+                  </Field>
+                  <ResumeContextNotesField
+                    value={contextNotes}
+                    onChange={setContextNotes}
+                    label="Extra context for your resume"
+                    hint="Optional — anything you want emphasized when we create your resume (pivot story, projects to highlight, keywords). Applied when you finish if you add notes here."
                   />
-                </Field>
+                </div>
               ) : null}
 
               {current.id === "experience" ? (
@@ -715,7 +738,11 @@ export function GuidedBuilder({
                   onClick={handleCreate}
                   className="cursor-pointer rounded-[10px] border-none bg-accent px-5 py-2.5 text-[13.5px] font-semibold text-white shadow-[0_4px_14px_rgba(47,107,255,0.32)] hover:bg-[#1E54E6] disabled:opacity-60"
                 >
-                  {creating ? "Creating…" : "Create my resume"}
+                  {creating
+                    ? contextNotes.trim()
+                      ? "Applying your notes…"
+                      : "Creating…"
+                    : "Create my resume"}
                 </button>
               )}
             </div>

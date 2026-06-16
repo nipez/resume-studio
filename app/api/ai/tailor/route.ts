@@ -16,6 +16,7 @@ const bodySchema = z.object({
   jobDesc: z.string().min(1),
   depth: z.enum(["light", "deep"]),
   data: z.custom<ResumeData>(),
+  contextNotes: z.string().optional(),
 });
 
 type TailorMeta = {
@@ -45,7 +46,7 @@ export async function POST(request: Request) {
   }
 
   const { userName, positioning } = auth;
-  const { jobRole, jobCompany, jobDesc, depth, data } = body;
+  const { jobRole, jobCompany, jobDesc, depth, data, contextNotes = "" } = body;
 
   try {
     const metaPrompt = tailorMetaPrompt(
@@ -54,7 +55,8 @@ export async function POST(request: Request) {
       jobRole,
       jobCompany,
       jobDesc,
-      data
+      data,
+      contextNotes
     );
     const { text: metaText, mock } = await completeWithFallback(metaPrompt);
     const meta = extractJSON<TailorMeta>(metaText) || {};
@@ -99,7 +101,8 @@ export async function POST(request: Request) {
           jobCompany,
           jobDesc,
           data,
-          roles
+          roles,
+          contextNotes
         );
         const { text } = await completeWithFallback(rp);
         const part = extractJSON<{ roles?: TailorRole[] }>(text);
@@ -124,7 +127,8 @@ export async function POST(request: Request) {
         jobRole,
         jobCompany,
         jobDesc,
-        data
+        data,
+        contextNotes
       );
       const { text } = await completeWithFallback(lp);
       const lj = extractJSON<{ highlights?: Record<string, string[]> }>(text);
