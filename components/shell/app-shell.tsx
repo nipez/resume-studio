@@ -20,7 +20,7 @@ const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
     label: "Prepare",
     items: [
       { href: "/library", label: "Resume library", icon: "library" },
-      { href: "/tailor", label: "Tailor to a job", icon: "target" },
+      { href: "/tailor?new=1", label: "Tailor to a job", icon: "target" },
       { href: "/cover", label: "Cover letter", icon: "mail" },
       { href: "/questions", label: "Application Q&A", icon: "chat" },
     ],
