@@ -36,15 +36,22 @@ export function useJobDraft() {
           // ignore
         }
         if (remote?.draft) {
-          // Merge the account copy in WITHOUT clobbering in-progress local edits:
-          // a server field only wins when it actually has content. This prevents a
-          // background hydration from wiping a just-generated cover letter (or any
-          // field the user is editing) when the server copy for that field is empty.
+          // Fill-only merge: the account copy only populates fields that are
+          // currently EMPTY locally. It never overwrites in-progress local edits,
+          // so a background hydration can't clear a just-generated/typed cover
+          // letter (which previously left draft.coverText empty and the Save
+          // button disabled while the letter was still visible). A fresh device
+          // has empty fields, so it still pulls the full account copy.
           const local = readJobDraft();
           const next: JobDraft = { ...local };
           (Object.keys(remote.draft) as (keyof JobDraft)[]).forEach((key) => {
             const remoteValue = remote.draft[key];
-            if (typeof remoteValue === "string" && remoteValue.trim() !== "") {
+            const localValue = local[key];
+            if (
+              typeof remoteValue === "string" &&
+              remoteValue.trim() !== "" &&
+              (!localValue || localValue.trim() === "")
+            ) {
               next[key] = remoteValue;
             }
           });
