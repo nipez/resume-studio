@@ -13,6 +13,7 @@ import type {
 } from "@/lib/types/resume";
 import type { ResumeEditSection } from "@/lib/types/resume-editor";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 const TEMPLATES: { id: TemplateStyle; label: string }[] = [
@@ -26,6 +27,7 @@ type ResumeEditorProps = {
 };
 
 export function ResumeEditor({ version }: ResumeEditorProps) {
+  const router = useRouter();
   const [name, setName] = useState(version.name);
   const [templateStyle, setTemplateStyle] = useState(version.template_style);
   const [data, setData] = useState<ResumeData>(version.data);
@@ -51,13 +53,21 @@ export function ResumeEditor({ version }: ResumeEditorProps) {
     const payload = latestRef.current;
     setSaveState("saving");
     updateResumeVersion(version.id, {
-      name: payload.name,
+      name: payload.name.trim() || version.name,
       template_style: payload.templateStyle,
       data: payload.data,
     })
-      .then(() => setSaveState("saved"))
+      .then(() => {
+        setSaveState("saved");
+        router.refresh();
+      })
       .catch(() => setSaveState("error"));
-  }, [version.id]);
+  }, [version.id, version.name, router]);
+
+  function flushSave() {
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    persist();
+  }
 
   useEffect(() => {
     if (saveTimer.current) clearTimeout(saveTimer.current);
@@ -153,7 +163,10 @@ export function ResumeEditor({ version }: ResumeEditorProps) {
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="min-w-0 flex-1 border-none bg-transparent font-display text-[17px] font-semibold tracking-[-0.01em] text-ink focus:outline-none"
+          onBlur={flushSave}
+          placeholder="Resume name"
+          aria-label="Resume name"
+          className="min-w-[120px] max-w-[280px] flex-1 rounded-lg border border-[#E2E5EA] bg-[#FAFBFC] px-2.5 py-1.5 font-display text-[17px] font-semibold tracking-[-0.01em] text-ink transition-colors focus:border-accent focus:bg-white focus:outline-none"
         />
         <div className="flex rounded-[10px] bg-[#F2F3F5] p-1">
           {TEMPLATES.map((tpl) => (

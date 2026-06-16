@@ -1,8 +1,15 @@
 import { TailorPanel } from "@/components/tailor/tailor-panel";
 import { getLibraryData } from "@/lib/resume/actions";
 
-export default async function TailorPage() {
+type PageProps = {
+  searchParams: Promise<{ v?: string }>;
+};
+
+export default async function TailorPage({ searchParams }: PageProps) {
+  const { v } = await searchParams;
   const { versions, defaultVersionId } = await getLibraryData();
+  const initialVersionId =
+    v && versions.some((version) => version.id === v) ? v : null;
 
   return (
     <div className="scroll flex-1 overflow-auto">
@@ -11,12 +18,17 @@ export default async function TailorPage() {
           Tailor to a Job
         </h1>
         <p className="mt-2 max-w-[640px] text-[14.5px] text-muted">
-          Paste a job description and AI will rewrite a version&apos;s summary,
-          prioritize the right skills, surface the most relevant roles, and sharpen
-          bullets — without changing your master copy.
+          Paste a job description (or import from a career-page URL) and AI will
+          rewrite a version&apos;s summary, prioritize the right skills, surface the
+          most relevant roles, and sharpen bullets — without changing your master
+          copy.
         </p>
         <div className="mt-[26px]">
-          <TailorPanel versions={versions} defaultVersionId={defaultVersionId} />
+          <TailorPanel
+            versions={versions}
+            defaultVersionId={defaultVersionId}
+            initialVersionId={initialVersionId}
+          />
         </div>
       </div>
     </div>

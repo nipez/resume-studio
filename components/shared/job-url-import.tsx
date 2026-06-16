@@ -16,6 +16,8 @@ type JobUrlImportProps = {
   className?: string;
   hint?: string;
   successMessage?: string;
+  /** Hide paste mode — use the job description field below for pasted text. */
+  urlOnly?: boolean;
 };
 
 type ImportMode = "url" | "paste";
@@ -32,6 +34,7 @@ export function JobUrlImport({
   className = "",
   hint,
   successMessage = "Imported — review the fields below.",
+  urlOnly = false,
 }: JobUrlImportProps) {
   const [mode, setMode] = useState<ImportMode>("url");
   const [url, setUrl] = useState("");
@@ -41,8 +44,9 @@ export function JobUrlImport({
   const [mockMode, setMockMode] = useState(false);
   const [imported, setImported] = useState(false);
 
-  const defaultHint =
-    mode === "url"
+  const defaultHint = urlOnly
+    ? "Fetch a career-page posting by URL. For Indeed or LinkedIn, paste the full posting in the job description field below."
+    : mode === "url"
       ? "Works best with company career pages (Greenhouse, Lever, etc.). Indeed and LinkedIn usually require Paste text."
       : "Copy the full job posting from your browser and paste it here — works with Indeed, LinkedIn, and anywhere else.";
 
@@ -137,9 +141,11 @@ export function JobUrlImport({
           <ModeButton active={mode === "url"} onClick={() => setMode("url")}>
             URL
           </ModeButton>
-          <ModeButton active={mode === "paste"} onClick={() => setMode("paste")}>
-            Paste text
-          </ModeButton>
+          {!urlOnly ? (
+            <ModeButton active={mode === "paste"} onClick={() => setMode("paste")}>
+              Paste text
+            </ModeButton>
+          ) : null}
         </div>
       </div>
 
