@@ -26,8 +26,8 @@ export default async function TailorPage({ searchParams }: PageProps) {
           Tailor to a Job
         </h1>
         <p className="mt-2 max-w-[640px] text-[14.5px] text-muted">
-          Three steps: add the job, review your tailored resume (saved to your
-          library), then write a cover letter — all with the same job details.
+          Four steps: add the job, review your tailored resume, write a cover
+          letter, then log the application so it shows up in your tracker.
         </p>
         <div className="mt-[26px]">
           <TailorPanel

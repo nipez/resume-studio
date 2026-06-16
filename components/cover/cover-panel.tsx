@@ -1,5 +1,6 @@
 "use client";
 
+import { LogApplicationButton } from "@/components/applications/log-application-button";
 import {
   JobCompanyField,
   JobDescField,
@@ -11,6 +12,7 @@ import {
 } from "@/components/shared/job-fields";
 import { JobDescParseButton } from "@/components/shared/job-desc-parse-button";
 import { JobUrlImport } from "@/components/shared/job-url-import";
+import { PrepFlowStepper } from "@/components/shared/prep-flow-stepper";
 import { Spinner } from "@/components/ui/spinner";
 import { Toast } from "@/components/ui/toast";
 import {
@@ -21,13 +23,15 @@ import {
 import { useJobDraft } from "@/lib/job-draft/use-job-draft";
 import { buildCoverHTML, openPrintHtml } from "@/lib/resume/build-cover-html";
 import type { ResumeVersion } from "@/lib/resume/db-types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type CoverPanelProps = {
   versions: ResumeVersion[];
   defaultVersionId: string | null;
   savedLetters?: CoverLetter[];
   initialVersionId?: string | null;
+  /** When set, show the 4-step prep flow stepper (from Tailor → Cover). */
+  prepFlowResultId?: string | null;
 };
 
 function formatWhen(iso: string) {
@@ -47,6 +51,7 @@ export function CoverPanel({
   defaultVersionId,
   savedLetters = [],
   initialVersionId = null,
+  prepFlowResultId = null,
 }: CoverPanelProps) {
   const { draft, update } = useJobDraft();
   const [baseId, setBaseId] = useState(
@@ -109,7 +114,18 @@ export function CoverPanel({
         location: base.data.location,
       })
     );
+    setToast("PDF exported — log this application to track it in Applications.");
   }
+
+  const prepStep = draft.coverText.trim() ? 4 : 3;
+  const showPrepFlow = Boolean(prepFlowResultId);
+
+  useEffect(() => {
+    if (!draft.coverText.trim()) return;
+    if (typeof window !== "undefined" && window.location.hash === "#log-application") {
+      document.getElementById("log-application")?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [draft.coverText]);
 
   async function handleSave() {
     if (!draft.coverText.trim()) {
@@ -183,6 +199,42 @@ export function CoverPanel({
 
   return (
     <>
+      {showPrepFlow ? (
+        <PrepFlowStepper
+          currentStep={prepStep}
+          resultId={prepFlowResultId}
+          className="mb-5"
+        />
+      ) : null}
+
+      {showPrepFlow && draft.coverText.trim() && base ? (
+        <div
+          id="log-application"
+          className="mb-5 scroll-mt-8 rounded-2xl border border-[#C8DAFF] bg-[#F4F8FF] px-5 py-4"
+        >
+          <div className="text-[14px] font-semibold text-ink">
+            Step 4 — Log this application
+          </div>
+          <p className="mt-1 max-w-[640px] text-[13px] leading-[1.55] text-muted">
+            Exporting or saving your letter doesn&apos;t add it to Applications
+            automatically. Log it here to track{" "}
+            {draft.jobCompany?.trim() || "this role"} with your tailored resume
+            and cover letter snapshot.
+          </p>
+          <div className="mt-3">
+            <LogApplicationButton
+              versionId={base.id}
+              resumeVersionName={base.name}
+              initialRole={draft.jobRole}
+              initialCompany={draft.jobCompany}
+              className="inline-flex items-center gap-1.5 rounded-[10px] border-none bg-accent px-4 py-2.5 text-[13px] font-semibold text-white shadow-[0_4px_14px_rgba(47,107,255,0.32)] hover:bg-[#1E54E6]"
+            >
+              Log application →
+            </LogApplicationButton>
+          </div>
+        </div>
+      ) : null}
+
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[420px_1fr]">
         <div className="rounded-2xl border border-[#E6E8EC] bg-white p-[22px]">
           {mockMode ? (

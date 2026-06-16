@@ -1,5 +1,4 @@
 import { CoverPanel } from "@/components/cover/cover-panel";
-import { PrepFlowStepper } from "@/components/shared/prep-flow-stepper";
 import { listCoverLetters } from "@/lib/cover/actions";
 import { getLibraryData } from "@/lib/resume/actions";
 
@@ -23,23 +22,16 @@ export default async function CoverPage({ searchParams }: PageProps) {
           Cover Letter
         </h1>
         <p className="mt-2 max-w-[640px] text-[14.5px] text-muted">
-          Step 3 of your application prep — generate a letter tied to the job and
-          your tailored resume. Use the progress bar to go back to your saved
-          resume anytime.
+          Step 3 of 4: generate your cover letter, then log the application so
+          it appears in your tracker with the resume and letter you sent.
         </p>
-        {initialVersionId ? (
-          <PrepFlowStepper
-            currentStep={3}
-            resultId={initialVersionId}
-            className="mt-5"
-          />
-        ) : null}
         <div className="mt-[26px]">
           <CoverPanel
             versions={versions}
             defaultVersionId={defaultVersionId}
             savedLetters={savedLetters}
             initialVersionId={initialVersionId}
+            prepFlowResultId={initialVersionId}
           />
         </div>
       </div>
