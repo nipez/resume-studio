@@ -9,14 +9,29 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTransition } from "react";
 
-const NAV_ITEMS: { href: string; label: string; icon: NavIconName }[] = [
-  { href: "/dashboard", label: "Home", icon: "home" },
-  { href: "/library", label: "Resume Library", icon: "library" },
-  { href: "/tailor", label: "Tailor to a Job", icon: "target" },
-  { href: "/cover", label: "Cover Letter", icon: "mail" },
-  { href: "/questions", label: "Application Q&A", icon: "chat" },
-  { href: "/applications", label: "Applications", icon: "briefcase" },
-  { href: "/insights", label: "Insights", icon: "chart" },
+type NavItem = { href: string; label: string; icon: NavIconName };
+
+const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
+  {
+    label: "",
+    items: [{ href: "/dashboard", label: "Home", icon: "home" }],
+  },
+  {
+    label: "Prepare",
+    items: [
+      { href: "/library", label: "Resume library", icon: "library" },
+      { href: "/tailor", label: "Tailor to a job", icon: "target" },
+      { href: "/cover", label: "Cover letter", icon: "mail" },
+      { href: "/questions", label: "Application Q&A", icon: "chat" },
+    ],
+  },
+  {
+    label: "Track",
+    items: [
+      { href: "/applications", label: "Applications", icon: "briefcase" },
+      { href: "/insights", label: "Insights", icon: "chart" },
+    ],
+  },
 ];
 
 type AppShellProps = {
@@ -82,65 +97,80 @@ export function AppShell({
 
   return (
     <div className="appshell flex h-screen w-screen overflow-hidden bg-page text-ink">
-      <aside className="flex w-[264px] flex-none flex-col bg-sidebar px-3.5 py-5 text-sidebar-muted">
-        <div className="flex items-center gap-[11px] px-2 pb-[22px]">
+      <aside className="flex w-[248px] flex-none flex-col border-r border-white/[0.06] bg-sidebar px-3 py-4 text-sidebar-muted">
+        <div className="flex items-center gap-2.5 px-2 pb-4">
           <Logo
-            size={36}
+            size={34}
             className="shrink-0 shadow-[0_4px_14px_rgba(47,107,255,0.4)]"
           />
-          <div>
-            <div className="font-display text-[15.5px] font-semibold tracking-[-0.01em] text-white">
+          <div className="min-w-0">
+            <div className="truncate font-display text-[15px] font-semibold tracking-[-0.01em] text-white">
               {SITE_NAME}
             </div>
-            <div className="mt-px text-[11.5px] text-sidebar-subtle">
-              {userName}
-            </div>
+            <div className="truncate text-[11px] text-sidebar-subtle">{userName}</div>
           </div>
         </div>
 
-        <nav className="flex flex-col gap-[3px]">
-          {NAV_ITEMS.map((item) => {
-            const active = isNavActive(pathname, item.href);
-            return (
+        <nav className="flex flex-1 flex-col gap-4 overflow-y-auto">
+          {NAV_GROUPS.map((group) => (
+            <div key={group.label || "home"}>
+              {group.label ? (
+                <div className="mb-1.5 px-2 text-[10px] font-bold uppercase tracking-[0.08em] text-sidebar-footer">
+                  {group.label}
+                </div>
+              ) : null}
+              <div className="flex flex-col gap-0.5">
+                {group.items.map((item) => {
+                  const active = isNavActive(pathname, item.href);
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`flex w-full items-center gap-2.5 rounded-[9px] px-2.5 py-2 text-left text-[13px] transition-[background,color] duration-150 ${
+                        active
+                          ? "bg-accent/18 font-semibold text-white"
+                          : "font-medium text-sidebar-nav hover:bg-white/[0.04] hover:text-white"
+                      }`}
+                    >
+                      <span className="flex h-[17px] w-[17px] items-center justify-center opacity-90">
+                        <NavIcon name={item.icon} />
+                      </span>
+                      <span className="truncate">{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+          {isAdmin ? (
+            <div>
+              <div className="mb-1.5 px-2 text-[10px] font-bold uppercase tracking-[0.08em] text-sidebar-footer">
+                Admin
+              </div>
               <Link
-                key={item.href}
-                href={item.href}
-                className={`flex w-full items-center gap-[11px] rounded-[10px] px-3 py-2.5 text-left text-[13.5px] transition-[background,color] duration-150 ${
-                  active
+                href="/admin"
+                className={`flex w-full items-center gap-2.5 rounded-[9px] px-2.5 py-2 text-left text-[13px] transition-[background,color] duration-150 ${
+                  isNavActive(pathname, "/admin")
                     ? "bg-accent/18 font-semibold text-white"
                     : "font-medium text-sidebar-nav hover:bg-white/[0.04] hover:text-white"
                 }`}
               >
-                <span className="flex h-[18px] w-[18px] items-center justify-center">
-                  <NavIcon name={item.icon} />
+                <span className="flex h-[17px] w-[17px] items-center justify-center opacity-90">
+                  <NavIcon name="chart" />
                 </span>
-                <span>{item.label}</span>
+                <span>Admin panel</span>
               </Link>
-            );
-          })}
-          {isAdmin ? (
-            <Link
-              href="/admin"
-              className={`flex w-full items-center gap-[11px] rounded-[10px] px-3 py-2.5 text-left text-[13.5px] transition-[background,color] duration-150 ${
-                isNavActive(pathname, "/admin")
-                  ? "bg-accent/18 font-semibold text-white"
-                  : "font-medium text-sidebar-nav hover:bg-white/[0.04] hover:text-white"
-              }`}
-            >
-              <span className="flex h-[18px] w-[18px] items-center justify-center">
-                <NavIcon name="chart" />
-              </span>
-              <span>Admin</span>
-            </Link>
+            </div>
           ) : null}
         </nav>
 
-        <div className="mt-auto border-t border-white/[0.07] pt-3.5">
-          <p className="px-2 text-[11px] leading-[1.55] text-sidebar-footer">
-            {positioning?.trim() ||
-              "Add positioning notes to your profile to guide AI drafts in your voice."}
-          </p>
-          <div className="mt-3 px-2">
+        <div className="mt-3 border-t border-white/[0.07] pt-3">
+          {positioning?.trim() ? (
+            <p className="mb-2.5 line-clamp-2 px-2 text-[10.5px] leading-[1.5] text-sidebar-footer">
+              {positioning.trim()}
+            </p>
+          ) : null}
+          <div className="px-1">
             <SignOutButton />
           </div>
         </div>
