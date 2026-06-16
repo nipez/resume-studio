@@ -123,7 +123,7 @@ export function CoverLetterControls({
         Write in Cover Letter →
       </Link>
       {open ? (
-        <div className="absolute right-0 top-full z-20 mt-2 w-[300px] rounded-xl border border-[#E2E5EA] bg-white p-3 shadow-[0_12px_40px_rgba(15,17,22,0.12)]">
+        <div className="absolute bottom-full right-0 z-20 mb-2 w-[300px] rounded-xl border border-[#E2E5EA] bg-white p-3 shadow-[0_12px_40px_rgba(15,17,22,0.12)]">
           <div className="text-[11px] font-bold uppercase tracking-[0.06em] text-[#8A92A0]">
             Add cover letter text
           </div>
