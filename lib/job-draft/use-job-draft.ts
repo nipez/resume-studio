@@ -36,7 +36,18 @@ export function useJobDraft() {
           // ignore
         }
         if (remote?.draft) {
-          const next = { ...readJobDraft(), ...remote.draft };
+          // Merge the account copy in WITHOUT clobbering in-progress local edits:
+          // a server field only wins when it actually has content. This prevents a
+          // background hydration from wiping a just-generated cover letter (or any
+          // field the user is editing) when the server copy for that field is empty.
+          const local = readJobDraft();
+          const next: JobDraft = { ...local };
+          (Object.keys(remote.draft) as (keyof JobDraft)[]).forEach((key) => {
+            const remoteValue = remote.draft[key];
+            if (typeof remoteValue === "string" && remoteValue.trim() !== "") {
+              next[key] = remoteValue;
+            }
+          });
           writeJobDraft(next);
           setDraft(next);
         }
