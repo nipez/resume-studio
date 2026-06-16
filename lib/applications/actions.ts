@@ -283,6 +283,7 @@ export async function updateApplicationStatus(
 
   revalidatePath("/applications");
   revalidatePath(`/applications/${id}`);
+  revalidatePath("/insights");
 }
 
 export async function updateApplicationMeta(

@@ -32,6 +32,42 @@ export function isPositiveStatus(status: ApplicationStatus): boolean {
   return status === "response" || status === "interview" || status === "offer";
 }
 
+/** Furthest pipeline stage reached (current status + history). */
+const STAGE_RANK: Record<ApplicationStatus, number> = {
+  applied: 0,
+  ghosted: 0,
+  rejected: 0,
+  response: 1,
+  interview: 2,
+  offer: 3,
+};
+
+export function applicationPeakRank(app: Application): number {
+  let rank = STAGE_RANK[app.status] ?? 0;
+  for (const entry of app.status_history ?? []) {
+    rank = Math.max(rank, STAGE_RANK[entry.status] ?? 0);
+  }
+  return rank;
+}
+
+export function computeApplicationStats(apps: Application[]) {
+  const total = apps.length;
+  let respondedCount = 0;
+  let interviewCount = 0;
+  let offerCount = 0;
+
+  for (const app of apps) {
+    const rank = applicationPeakRank(app);
+    if (rank >= 1) respondedCount += 1;
+    if (rank >= 2) interviewCount += 1;
+    if (rank >= 3) offerCount += 1;
+  }
+
+  const respRate = total ? Math.round((respondedCount / total) * 100) : 0;
+
+  return { total, respondedCount, interviewCount, offerCount, respRate };
+}
+
 export function appEventLabel(type: string): string {
   if (type === "interview") return "Interview";
   if (type === "followup") return "Follow-up";
@@ -161,18 +197,6 @@ export function nextOpenEvent(events: ApplicationEvent[]): ApplicationEvent | nu
       .slice()
       .sort((a, b) => String(a.date).localeCompare(String(b.date)))[0] ?? null
   );
-}
-
-export function computeApplicationStats(apps: Application[]) {
-  const total = apps.length;
-  const respondedCount = apps.filter((a) => isPositiveStatus(a.status)).length;
-  const interviewCount = apps.filter(
-    (a) => a.status === "interview" || a.status === "offer"
-  ).length;
-  const offerCount = apps.filter((a) => a.status === "offer").length;
-  const respRate = total ? Math.round((respondedCount / total) * 100) : 0;
-
-  return { total, respondedCount, interviewCount, offerCount, respRate };
 }
 
 export function normalizeResumeSnapshot(raw: unknown): Application["resume_snapshot"] {

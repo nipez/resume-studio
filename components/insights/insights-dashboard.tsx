@@ -52,8 +52,8 @@ export function InsightsDashboard({ data }: { data: InsightsData }) {
           </h1>
           <p className="mt-2 max-w-[620px] text-[14.5px] leading-relaxed text-muted">
             Your pipeline funnel, what each resume version is actually getting,
-            and what&apos;s coming up — computed from the immutable snapshot of
-            every application you log.
+            and what&apos;s coming up — based on the furthest stage each
+            application reached in its status history.
           </p>
         </div>
 

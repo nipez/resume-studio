@@ -1,25 +1,10 @@
 import type { Application, ApplicationStatus } from "@/lib/applications/types";
-import { computeApplicationStats, applicationInsightsTitle, todayISO } from "@/lib/applications/utils";
-
-// How far an application progressed. Later stages imply earlier ones.
-const STAGE_RANK: Record<ApplicationStatus, number> = {
-  applied: 0,
-  ghosted: 0,
-  rejected: 0,
-  response: 1,
-  interview: 2,
-  offer: 3,
-};
-
-// The furthest stage an application ever reached — even if it later ended in
-// rejection — by reading its status history (not just the current status).
-function furthestRank(app: Application): number {
-  let rank = STAGE_RANK[app.status] ?? 0;
-  for (const entry of app.status_history ?? []) {
-    rank = Math.max(rank, STAGE_RANK[entry.status] ?? 0);
-  }
-  return rank;
-}
+import {
+  applicationInsightsTitle,
+  applicationPeakRank,
+  computeApplicationStats,
+  todayISO,
+} from "@/lib/applications/utils";
 
 export type FunnelStage = {
   key: string;
@@ -69,7 +54,7 @@ export function computeInsights(apps: Application[]): InsightsData {
   let interviewed = 0;
   let offers = 0;
   for (const app of apps) {
-    const rank = furthestRank(app);
+    const rank = applicationPeakRank(app);
     if (rank >= 1) responded += 1;
     if (rank >= 2) interviewed += 1;
     if (rank >= 3) offers += 1;
@@ -125,7 +110,7 @@ export function computeInsights(apps: Application[]): InsightsData {
       versionMap.set(key, perf);
     }
     perf.sent += 1;
-    const rank = furthestRank(app);
+    const rank = applicationPeakRank(app);
     if (rank >= 1) perf.responded += 1;
     if (rank >= 2) perf.interviewed += 1;
     if (rank >= 3) perf.offers += 1;
