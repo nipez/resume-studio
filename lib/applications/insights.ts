@@ -1,7 +1,7 @@
 import type { Application, ApplicationStatus } from "@/lib/applications/types";
 import {
+  applicationCurrentRank,
   applicationInsightsTitle,
-  applicationPeakRank,
   computeApplicationStats,
   todayISO,
 } from "@/lib/applications/utils";
@@ -54,7 +54,7 @@ export function computeInsights(apps: Application[]): InsightsData {
   let interviewed = 0;
   let offers = 0;
   for (const app of apps) {
-    const rank = applicationPeakRank(app);
+    const rank = applicationCurrentRank(app);
     if (rank >= 1) responded += 1;
     if (rank >= 2) interviewed += 1;
     if (rank >= 3) offers += 1;
@@ -110,7 +110,7 @@ export function computeInsights(apps: Application[]): InsightsData {
       versionMap.set(key, perf);
     }
     perf.sent += 1;
-    const rank = applicationPeakRank(app);
+    const rank = applicationCurrentRank(app);
     if (rank >= 1) perf.responded += 1;
     if (rank >= 2) perf.interviewed += 1;
     if (rank >= 3) perf.offers += 1;
