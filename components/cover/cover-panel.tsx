@@ -309,7 +309,11 @@ export function CoverPanel({
                 type="button"
                 onClick={handleSave}
                 disabled={!draft.coverText || saving}
-                className="flex items-center gap-1.5 rounded-lg bg-[#F2F3F5] px-[13px] py-[7px] text-[12.5px] font-semibold text-[#3a4350] hover:bg-[#E6E8EC] disabled:opacity-50"
+                className={`flex items-center gap-1.5 rounded-lg px-[13px] py-[7px] text-[12.5px] font-semibold transition-colors ${
+                  draft.coverText && !saving
+                    ? "bg-accent text-white hover:bg-[#1E54E6]"
+                    : "cursor-not-allowed bg-[#F2F3F5] text-[#AAB2BD]"
+                }`}
               >
                 {saving ? <Spinner /> : null}
                 {saving
