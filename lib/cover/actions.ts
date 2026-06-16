@@ -1,18 +1,8 @@
 "use server";
 
+import type { CoverLetter, CoverLetterSaveResult } from "@/lib/cover/types";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
-
-export type CoverLetter = {
-  id: string;
-  title: string;
-  role: string;
-  company: string;
-  body: string;
-  resume_version_id: string | null;
-  created_at: string;
-  updated_at: string;
-};
 
 function mapRow(row: Record<string, unknown>): CoverLetter {
   return {
@@ -36,6 +26,22 @@ function deriveTitle(role: string, company: string) {
   return "Cover letter";
 }
 
+function friendlyDbError(message: string): string {
+  const lower = message.toLowerCase();
+  if (
+    lower.includes("cover_letters") &&
+    (lower.includes("does not exist") ||
+      lower.includes("schema cache") ||
+      lower.includes("could not find"))
+  ) {
+    return "Cover letter storage is not set up in the database yet. Apply the cover_letters migration in Supabase (see supabase/migrations/0005_cover_letters.sql).";
+  }
+  if (lower.includes("violates foreign key") && lower.includes("resume_version")) {
+    return "That resume version is no longer available. Pick another base version and try again.";
+  }
+  return message || "Failed to save cover letter.";
+}
+
 export async function listCoverLetters(): Promise<CoverLetter[]> {
   const supabase = createClient();
   const {
@@ -43,12 +49,13 @@ export async function listCoverLetters(): Promise<CoverLetter[]> {
   } = await supabase.auth.getUser();
   if (!user) return [];
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("cover_letters")
     .select("*")
     .eq("user_id", user.id)
     .order("updated_at", { ascending: false });
 
+  if (error) return [];
   return (data ?? []).map(mapRow);
 }
 
@@ -59,62 +66,78 @@ export async function saveCoverLetter(input: {
   company?: string;
   body: string;
   resumeVersionId?: string | null;
-}): Promise<CoverLetter> {
+}): Promise<CoverLetterSaveResult> {
   const supabase = createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
+  if (!user) return { ok: false, error: "Not authenticated. Sign in and try again." };
 
   const role = input.role?.trim() ?? "";
   const company = input.company?.trim() ?? "";
   const title = (input.title?.trim() || deriveTitle(role, company)).slice(0, 200);
+  const body = input.body.trim();
+  if (!body) return { ok: false, error: "Write or generate a letter before saving." };
 
-  // Update an existing letter when an id is supplied, otherwise insert a new one.
+  let resumeVersionId = input.resumeVersionId ?? null;
+  if (resumeVersionId) {
+    const { data: version } = await supabase
+      .from("resume_versions")
+      .select("id")
+      .eq("id", resumeVersionId)
+      .eq("user_id", user.id)
+      .maybeSingle();
+    if (!version) resumeVersionId = null;
+  }
+
+  const payload = {
+    title,
+    role,
+    company,
+    body,
+    resume_version_id: resumeVersionId,
+  };
+
   if (input.id) {
     const { data, error } = await supabase
       .from("cover_letters")
-      .update({
-        title,
-        role,
-        company,
-        body: input.body,
-        resume_version_id: input.resumeVersionId ?? null,
-      })
+      .update(payload)
       .eq("id", input.id)
       .eq("user_id", user.id)
       .select("*")
       .single();
 
-    if (error || !data) throw new Error(error?.message ?? "Failed to save");
+    if (error || !data) {
+      return { ok: false, error: friendlyDbError(error?.message ?? "") };
+    }
     revalidatePath("/cover");
-    return mapRow(data);
+    return { ok: true, letter: mapRow(data) };
   }
 
   const { data, error } = await supabase
     .from("cover_letters")
     .insert({
       user_id: user.id,
-      title,
-      role,
-      company,
-      body: input.body,
-      resume_version_id: input.resumeVersionId ?? null,
+      ...payload,
     })
     .select("*")
     .single();
 
-  if (error || !data) throw new Error(error?.message ?? "Failed to save");
+  if (error || !data) {
+    return { ok: false, error: friendlyDbError(error?.message ?? "") };
+  }
   revalidatePath("/cover");
-  return mapRow(data);
+  return { ok: true, letter: mapRow(data) };
 }
 
-export async function deleteCoverLetter(id: string): Promise<void> {
+export async function deleteCoverLetter(
+  id: string
+): Promise<{ ok: true } | { ok: false; error: string }> {
   const supabase = createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
+  if (!user) return { ok: false, error: "Not authenticated." };
 
   const { error } = await supabase
     .from("cover_letters")
@@ -122,6 +145,7 @@ export async function deleteCoverLetter(id: string): Promise<void> {
     .eq("id", id)
     .eq("user_id", user.id);
 
-  if (error) throw new Error(error.message);
+  if (error) return { ok: false, error: friendlyDbError(error.message) };
   revalidatePath("/cover");
+  return { ok: true };
 }
