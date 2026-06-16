@@ -37,6 +37,11 @@ export function writeJobDraft(patch: Partial<JobDraft>) {
   localStorage.setItem(JOB_DRAFT_KEY, JSON.stringify(next));
 }
 
+export function clearJobDraftLocal() {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(JOB_DRAFT_KEY, JSON.stringify(EMPTY_JOB_DRAFT));
+}
+
 export type QAItem = { id: string; q: string; a: string };
 
 export const QA_DRAFT_KEY = "resume_studio_qa_draft_v1";

@@ -10,7 +10,9 @@ import { Toast } from "@/components/ui/toast";
 import { Spinner } from "@/components/ui/spinner";
 import { logApplication } from "@/lib/applications/actions";
 import { parseJobFromVersionName } from "@/lib/applications/utils";
+import { clearWorkspaceJobDraft } from "@/lib/job-draft/actions";
 import {
+  clearJobDraftLocal,
   readJobDraft,
   readQADraft,
   writeJobDraft,
@@ -115,6 +117,8 @@ export function LogApplicationModal({
           coverLetter: ctx.coverLetter,
           answers: ctx.answers,
         });
+        clearJobDraftLocal();
+        await clearWorkspaceJobDraft();
         setToast("Application logged — snapshot saved");
         onClose();
         if (onSuccess) {

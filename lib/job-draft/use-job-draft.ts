@@ -1,7 +1,13 @@
 "use client";
 
-import { loadWorkspaceDraft, saveJobDraft } from "@/lib/job-draft/actions";
-import { readJobDraft, writeJobDraft, type JobDraft } from "@/lib/job-draft/storage";
+import { loadWorkspaceDraft, saveJobDraft, clearWorkspaceJobDraft } from "@/lib/job-draft/actions";
+import {
+  clearJobDraftLocal,
+  readJobDraft,
+  writeJobDraft,
+  EMPTY_JOB_DRAFT,
+  type JobDraft,
+} from "@/lib/job-draft/storage";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 // Hydrate from the server once per tab session. Within a tab, later mounts read
@@ -78,5 +84,12 @@ export function useJobDraft() {
     });
   }, []);
 
-  return { draft, update };
+  const reset = useCallback(() => {
+    clearJobDraftLocal();
+    setDraft(EMPTY_JOB_DRAFT);
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    clearWorkspaceJobDraft().catch(() => {});
+  }, []);
+
+  return { draft, update, reset };
 }
