@@ -26,6 +26,7 @@ import {
   eventDotColor,
   fitScoreStyle,
   formatAppDate,
+  formatHiringContactDisplay,
   todayISO,
 } from "@/lib/applications/utils";
 import { mockBannerClass } from "@/components/shared/job-fields";
@@ -651,17 +652,22 @@ export function ApplicationDetailView({
 
             <div className="rounded-2xl border border-border bg-white p-5">
               <div className="mb-[11px] flex items-center justify-between gap-3">
-                <div className="font-display text-[13px] font-semibold uppercase tracking-[0.07em] text-[#8A92A0]">
-                  Hiring contacts
+                <div>
+                  <div className="font-display text-[13px] font-semibold uppercase tracking-[0.07em] text-[#8A92A0]">
+                    Who to look up
+                  </div>
+                  <p className="mt-1 text-[12px] leading-[1.45] text-[#8A92A0]">
+                    AI suggests roles to search on LinkedIn — not real people or emails.
+                  </p>
                 </div>
                 <button
                   type="button"
                   disabled={contactsBusy}
                   onClick={handleFindContacts}
-                  className="inline-flex cursor-pointer items-center gap-[7px] rounded-[9px] border-none bg-[#F2F3F5] px-[13px] py-[7px] text-[12.5px] font-semibold text-[#3a4350] transition-colors hover:bg-[#E6E8EC] disabled:opacity-60"
+                  className="inline-flex shrink-0 cursor-pointer items-center gap-[7px] rounded-[9px] border-none bg-[#F2F3F5] px-[13px] py-[7px] text-[12.5px] font-semibold text-[#3a4350] transition-colors hover:bg-[#E6E8EC] disabled:opacity-60"
                 >
                   {contactsBusy && <Spinner className="h-3.5 w-3.5" />}
-                  {contactsBusy ? "Researching…" : "✦ Suggest contacts"}
+                  {contactsBusy ? "Suggesting…" : "✦ Suggest roles"}
                 </button>
               </div>
               {contactsError ? (
@@ -669,36 +675,47 @@ export function ApplicationDetailView({
               ) : null}
               {app.hiring_contacts && app.hiring_contacts.length > 0 ? (
                 <div className="flex flex-col gap-3">
-                  {app.hiring_contacts.map((contact, index) => (
-                    <div
-                      key={`${contact.name}-${index}`}
-                      className="rounded-[11px] border border-[#EEF0F3] bg-[#FCFCFD] px-3.5 py-3"
-                    >
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-[14px] font-bold text-ink">
-                          {contact.name || "Unknown name"}
-                        </span>
-                        <span className="text-[12px] font-semibold text-muted">
-                          {contact.title}
-                        </span>
-                        <span className="rounded-md bg-[#F2F3F5] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.05em] text-[#6B7480]">
-                          {contact.confidence} confidence
-                        </span>
+                  {app.hiring_contacts.map((contact, index) => {
+                    const display = formatHiringContactDisplay(contact);
+                    return (
+                      <div
+                        key={`${contact.name}-${contact.title}-${index}`}
+                        className="rounded-[11px] border border-[#EEF0F3] bg-[#FCFCFD] px-3.5 py-3"
+                      >
+                        <div className="flex flex-wrap items-center gap-2">
+                          {display.kind === "role" ? (
+                            <span className="rounded-md bg-[#EAF1FF] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.05em] text-[#2456D6]">
+                              Role to research
+                            </span>
+                          ) : null}
+                          <span className="text-[14px] font-bold text-ink">
+                            {display.headline}
+                          </span>
+                          {display.subtitle ? (
+                            <span className="text-[12px] font-semibold text-muted">
+                              {display.subtitle}
+                            </span>
+                          ) : null}
+                          <span className="rounded-md bg-[#F2F3F5] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.05em] text-[#6B7480]">
+                            {contact.confidence} confidence
+                          </span>
+                        </div>
+                        <p className="mt-2 text-[13px] leading-[1.55] text-muted">
+                          {contact.rationale}
+                        </p>
                       </div>
-                      <p className="mt-2 text-[13px] leading-[1.55] text-muted">
-                        {contact.rationale}
-                      </p>
-                    </div>
-                  ))}
+                    );
+                  })}
                   <p className="text-[11.5px] text-[#9AA3AF]">
-                    AI-suggested roles — verify on LinkedIn or the company site before
-                    reaching out. We don&apos;t store verified emails.
+                    Search these titles on LinkedIn or the company site — we don&apos;t look
+                    anyone up for you or store verified contact info.
                   </p>
                 </div>
               ) : (
                 <p className="text-[13px] leading-[1.55] text-[#8A92A0]">
-                  Get likely hiring manager or recruiter titles based on this role and
-                  company. Best after the job description is filled in.
+                  Get 2–4 likely hiring-manager or recruiter titles inferred from this job
+                  description, then search for real people yourself. Works best when the job
+                  description is filled in.
                 </p>
               )}
             </div>
@@ -782,7 +799,7 @@ export function ApplicationDetailView({
                     role={app.role}
                     company={app.company}
                     savedLetters={savedCoverLetters}
-                    onImported={(text) => patchLocal({ cover_letter: text })}
+                    onApplied={(text) => patchLocal({ cover_letter: text })}
                   />
                 </div>
               </div>
@@ -795,7 +812,8 @@ export function ApplicationDetailView({
                 className="w-full resize-y rounded-[10px] border border-[#DFE3E8] px-3.5 py-3 text-[13.3px] leading-[1.65] text-[#1a1f29] focus:border-accent"
               />
               <p className="mt-2 text-[11.5px] text-[#9AA3AF]">
-                Saves automatically. Use Attach to import from saved letters or your job draft.
+                Paste text, upload a PDF you sent, or pull from a saved letter. Saves
+                automatically.
               </p>
             </div>
 

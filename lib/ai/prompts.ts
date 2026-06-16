@@ -395,7 +395,7 @@ export function hiringContactsPrompt(
   jobDesc: string
 ): string {
   return (
-    "You help job seekers identify LIKELY hiring contacts for outreach research — not verified contact info.\n\n" +
+    "You help job seekers decide WHO TO LOOK UP on LinkedIn or a company site — not find verified contact info.\n\n" +
     "ROLE: " +
     (jobRole.trim() || "Unknown role") +
     "\nCOMPANY: " +
@@ -403,8 +403,9 @@ export function hiringContactsPrompt(
     "\nJOB DESCRIPTION:\n" +
     (jobDesc.trim() || "(not provided)") +
     "\n\n" +
-    "Suggest 2-4 plausible people or roles who might own hiring for this opening — e.g. hiring manager, department head, recruiter, talent acquisition.\n" +
-    "Do NOT invent personal email addresses or phone numbers. Names may be illustrative if unknown; say so in rationale.\n" +
+    "Suggest 2-4 plausible roles or teams who might own hiring for this opening — e.g. hiring manager, department head, recruiter, talent acquisition.\n" +
+    "Put the job title or role in the title field. Leave name empty unless the JD names a specific person.\n" +
+    "Do NOT invent personal names, email addresses, or phone numbers.\n" +
     "confidence is high only when the JD names a person or team; medium for standard role titles; low for guesses.\n\n" +
     'Return ONLY valid minified JSON: {"contacts":[{"name":"...","title":"...","rationale":"...","confidence":"high"|"medium"|"low"}]}'
   );

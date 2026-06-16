@@ -5,14 +5,14 @@ import type { CoverLetter } from "@/lib/cover/actions";
 import { readJobDraft } from "@/lib/job-draft/storage";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useRef, useState, useTransition } from "react";
 
 type CoverLetterControlsProps = {
   applicationId: string;
   role: string;
   company: string;
   savedLetters: CoverLetter[];
-  onImported: (text: string) => void;
+  onApplied: (text: string) => void;
 };
 
 function letterMatchesApp(letter: CoverLetter, role: string, company: string) {
@@ -32,9 +32,10 @@ export function CoverLetterControls({
   role,
   company,
   savedLetters,
-  onImported,
+  onApplied,
 }: CoverLetterControlsProps) {
   const router = useRouter();
+  const fileRef = useRef<HTMLInputElement>(null);
   const [pending, startTransition] = useTransition();
   const [open, setOpen] = useState(false);
   const [error, setError] = useState("");
@@ -51,16 +52,56 @@ export function CoverLetterControls({
     });
   }, [savedLetters, role, company]);
 
-  function importText(text: string) {
+  function applyText(text: string) {
     setError("");
     startTransition(async () => {
       try {
         await updateApplicationCoverLetter(applicationId, text);
-        onImported(text);
+        onApplied(text);
         setOpen(false);
         router.refresh();
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Could not attach cover letter");
+        setError(e instanceof Error ? e.message : "Could not save cover letter");
+      }
+    });
+  }
+
+  async function handleFileUpload(file: File) {
+    setError("");
+    startTransition(async () => {
+      try {
+        let text = "";
+        if (file.type === "text/plain" || file.name.toLowerCase().endsWith(".txt")) {
+          text = (await file.text()).trim();
+        } else if (
+          file.type === "application/pdf" ||
+          file.name.toLowerCase().endsWith(".pdf")
+        ) {
+          const form = new FormData();
+          form.append("file", file);
+          const res = await fetch("/api/ai/extract-text", {
+            method: "POST",
+            body: form,
+          });
+          const data = await res.json();
+          if (!res.ok) {
+            throw new Error(data.error || "Could not read PDF");
+          }
+          text = String(data.text ?? "").trim();
+        } else {
+          throw new Error("Upload a PDF or .txt file, or paste the text below.");
+        }
+
+        if (!text) {
+          throw new Error("That file had no readable text — paste the letter instead.");
+        }
+
+        await updateApplicationCoverLetter(applicationId, text);
+        onApplied(text);
+        setOpen(false);
+        router.refresh();
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Upload failed");
       }
     });
   }
@@ -73,7 +114,7 @@ export function CoverLetterControls({
         onClick={() => setOpen((v) => !v)}
         className="cursor-pointer rounded-lg border-none bg-[#F2F3F5] px-[11px] py-1.5 text-xs font-semibold text-[#3a4350] transition-colors hover:bg-[#E6E8EC] disabled:opacity-60"
       >
-        {pending ? "Saving…" : "Attach cover letter"}
+        {pending ? "Saving…" : "Add letter"}
       </button>
       <Link
         href="/cover"
@@ -84,18 +125,37 @@ export function CoverLetterControls({
       {open ? (
         <div className="absolute right-0 top-full z-20 mt-2 w-[300px] rounded-xl border border-[#E2E5EA] bg-white p-3 shadow-[0_12px_40px_rgba(15,17,22,0.12)]">
           <div className="text-[11px] font-bold uppercase tracking-[0.06em] text-[#8A92A0]">
-            Attach what you sent
+            Add cover letter text
           </div>
           <p className="mt-1 text-[12px] leading-[1.45] text-muted">
-            Import a saved letter or use the cover letter from your current job
-            draft.
+            Upload the PDF you sent, pull from a saved letter, or paste in the box
+            below.
           </p>
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() => fileRef.current?.click()}
+            className="mt-3 flex w-full cursor-pointer items-center justify-center rounded-lg border border-dashed border-[#CFD5DD] bg-[#FAFBFC] px-3 py-2.5 text-[12.5px] font-semibold text-[#2456D6] hover:border-accent hover:bg-[#F5F8FF] disabled:opacity-60"
+          >
+            ↑ Upload PDF or .txt
+          </button>
+          <input
+            ref={fileRef}
+            type="file"
+            accept=".pdf,application/pdf,.txt,text/plain"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) void handleFileUpload(file);
+              e.target.value = "";
+            }}
+          />
           {draftCover ? (
             <button
               type="button"
               disabled={pending}
-              onClick={() => importText(draftCover)}
-              className="mt-3 flex w-full cursor-pointer flex-col rounded-lg border border-[#D6E4FF] bg-[#F5F8FF] px-2.5 py-2 text-left transition-colors hover:border-accent disabled:opacity-60"
+              onClick={() => applyText(draftCover)}
+              className="mt-2 flex w-full cursor-pointer flex-col rounded-lg border border-[#D6E4FF] bg-[#F5F8FF] px-2.5 py-2 text-left transition-colors hover:border-accent disabled:opacity-60"
             >
               <span className="text-[13px] font-semibold text-[#2456D6]">
                 Use current job draft
@@ -108,12 +168,15 @@ export function CoverLetterControls({
           ) : null}
           {sortedLetters.length > 0 ? (
             <div className="mt-3 max-h-[200px] overflow-auto">
+              <div className="mb-1.5 text-[11px] font-bold uppercase tracking-[0.06em] text-[#8A92A0]">
+                Saved in Cover Letter
+              </div>
               {sortedLetters.map((letter) => (
                 <button
                   key={letter.id}
                   type="button"
                   disabled={pending}
-                  onClick={() => importText(letter.body)}
+                  onClick={() => applyText(letter.body)}
                   className="mb-1 flex w-full cursor-pointer flex-col rounded-lg border border-transparent px-2.5 py-2 text-left transition-colors hover:border-[#E2E5EA] hover:bg-[#FAFBFC] disabled:opacity-60"
                 >
                   <span className="text-[13px] font-semibold text-ink">
@@ -129,7 +192,7 @@ export function CoverLetterControls({
             </div>
           ) : (
             <p className="mt-3 text-[12px] text-muted">
-              No saved cover letters yet. Paste text below or{" "}
+              No saved cover letters yet. Upload a file, paste below, or{" "}
               <Link href="/cover" className="font-semibold text-[#2456D6] hover:underline">
                 write one
               </Link>
