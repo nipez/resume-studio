@@ -28,7 +28,7 @@ export async function POST(request: Request) {
   } catch (err) {
     const message =
       err instanceof z.ZodError
-        ? err.errors[0]?.message ?? "Invalid request body"
+        ? err.issues[0]?.message ?? "Invalid request body"
         : "Invalid request body";
     return NextResponse.json({ error: message }, { status: 400 });
   }
