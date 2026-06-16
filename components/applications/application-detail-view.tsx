@@ -12,6 +12,8 @@ import {
   updateApplicationCoverLetter,
   updateApplicationHiringContacts,
   updateApplicationInsight,
+  updateApplicationInterviewDebrief,
+  updateApplicationInterviewTranscript,
   updateApplicationMeta,
   updateApplicationPrep,
   updateApplicationStatus,
@@ -48,7 +50,7 @@ type ApplicationDetailViewProps = {
 const DETAIL_TABS: { id: DetailTab; label: string; hint: string }[] = [
   { id: "overview", label: "Overview", hint: "Status, timeline, job posting" },
   { id: "sent", label: "What you sent", hint: "Resume, cover letter, answers" },
-  { id: "prep", label: "Prepare", hint: "Fit, interview prep, research" },
+  { id: "prep", label: "Prepare", hint: "Fit, prep, debrief, research" },
 ];
 
 export function ApplicationDetailView({
@@ -64,6 +66,9 @@ export function ApplicationDetailView({
   const [insightError, setInsightError] = useState("");
   const [prepBusy, setPrepBusy] = useState(false);
   const [prepError, setPrepError] = useState("");
+  const [debriefBusy, setDebriefBusy] = useState(false);
+  const [debriefError, setDebriefError] = useState("");
+  const [debriefFocus, setDebriefFocus] = useState("");
   const [contactsBusy, setContactsBusy] = useState(false);
   const [contactsError, setContactsError] = useState("");
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -175,6 +180,58 @@ export function ApplicationDetailView({
       setPrepError(e instanceof Error ? e.message : "Something went wrong");
     } finally {
       setPrepBusy(false);
+    }
+  }
+
+  async function handleAnalyzeDebrief() {
+    const transcript = app.interview_transcript.trim();
+    if (transcript.length < 40) {
+      setDebriefError("Paste at least a few lines of transcript first.");
+      return;
+    }
+
+    setDebriefBusy(true);
+    setDebriefError("");
+    try {
+      const res = await fetch("/api/ai/interview-debrief", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          jobRole: app.role,
+          jobCompany: app.company,
+          jobDesc: app.job_desc,
+          summary: app.resume_snapshot.data.summary,
+          coverLetter: app.cover_letter,
+          prepQuestions: app.prep?.questions ?? [],
+          transcript,
+          focusNote: debriefFocus,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Debrief failed");
+      setMockMode(Boolean(data.mock));
+      patchLocal({ interview_debrief: data.debrief });
+      await updateApplicationInterviewDebrief(app.id, data.debrief);
+      router.refresh();
+    } catch (e) {
+      setDebriefError(e instanceof Error ? e.message : "Something went wrong");
+    } finally {
+      setDebriefBusy(false);
+    }
+  }
+
+  function saveInterviewTranscript(text: string) {
+    patchLocal({ interview_transcript: text });
+    startTransition(async () => {
+      await updateApplicationInterviewTranscript(app.id, text);
+      router.refresh();
+    });
+  }
+
+  function copyFollowUpEmail() {
+    const email = app.interview_debrief?.followUpEmail?.trim();
+    if (email) {
+      void navigator.clipboard.writeText(email);
     }
   }
 
@@ -364,6 +421,10 @@ export function ApplicationDetailView({
           insightError={insightError}
           prepBusy={prepBusy}
           prepError={prepError}
+          debriefBusy={debriefBusy}
+          debriefError={debriefError}
+          debriefFocus={debriefFocus}
+          onDebriefFocusChange={setDebriefFocus}
           contactsBusy={contactsBusy}
           contactsError={contactsError}
           patchLocal={patchLocal}
@@ -377,6 +438,9 @@ export function ApplicationDetailView({
           setPreviewOpen={setPreviewOpen}
           handleAnalyze={handleAnalyze}
           handleGenPrep={handleGenPrep}
+          handleAnalyzeDebrief={handleAnalyzeDebrief}
+          saveInterviewTranscript={saveInterviewTranscript}
+          copyFollowUpEmail={copyFollowUpEmail}
           handleFindContacts={handleFindContacts}
           startTransition={startTransition}
           router={router}

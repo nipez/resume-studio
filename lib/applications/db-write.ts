@@ -1,4 +1,9 @@
-const OPTIONAL_APPLICATION_COLUMNS = ["job_url", "hiring_contacts"] as const;
+const OPTIONAL_APPLICATION_COLUMNS = [
+  "job_url",
+  "hiring_contacts",
+  "interview_transcript",
+  "interview_debrief",
+] as const;
 
 export function isMissingApplicationColumnError(
   message: string,

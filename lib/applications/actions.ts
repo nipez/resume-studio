@@ -8,6 +8,7 @@ import type {
   ApplicationStatus,
   EventType,
   HiringContact,
+  InterviewDebrief,
   LogApplicationInput,
   ResumeSnapshot,
   StatusHistoryEntry,
@@ -63,6 +64,8 @@ function mapApplication(
       : [],
     insight: (row.insight as AppInsight | null) ?? null,
     prep: (row.prep as AppPrep | null) ?? null,
+    interview_transcript: String(row.interview_transcript ?? ""),
+    interview_debrief: (row.interview_debrief as InterviewDebrief | null) ?? null,
     hiring_contacts: Array.isArray(row.hiring_contacts)
       ? (row.hiring_contacts as HiringContact[])
       : null,
@@ -448,6 +451,46 @@ export async function updateApplicationPrep(id: string, prep: AppPrep) {
     .update({ prep })
     .eq("id", id);
 
+  if (error) throw new Error(error.message);
+  revalidatePath(`/applications/${id}`);
+}
+
+export async function updateApplicationInterviewTranscript(
+  id: string,
+  interview_transcript: string
+) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("applications")
+    .update({ interview_transcript })
+    .eq("id", id);
+
+  if (
+    error &&
+    isMissingApplicationColumnError(error.message, "interview_transcript")
+  ) {
+    return;
+  }
+  if (error) throw new Error(error.message);
+  revalidatePath(`/applications/${id}`);
+}
+
+export async function updateApplicationInterviewDebrief(
+  id: string,
+  interview_debrief: InterviewDebrief
+) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("applications")
+    .update({ interview_debrief })
+    .eq("id", id);
+
+  if (
+    error &&
+    isMissingApplicationColumnError(error.message, "interview_debrief")
+  ) {
+    return;
+  }
   if (error) throw new Error(error.message);
   revalidatePath(`/applications/${id}`);
 }

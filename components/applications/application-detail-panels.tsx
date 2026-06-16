@@ -45,6 +45,10 @@ type ApplicationDetailPanelsProps = {
   insightError: string;
   prepBusy: boolean;
   prepError: string;
+  debriefBusy: boolean;
+  debriefError: string;
+  debriefFocus: string;
+  onDebriefFocusChange: (value: string) => void;
   contactsBusy: boolean;
   contactsError: string;
   patchLocal: (patch: Partial<Application>) => void;
@@ -58,6 +62,9 @@ type ApplicationDetailPanelsProps = {
   setPreviewOpen: (open: boolean) => void;
   handleAnalyze: () => void;
   handleGenPrep: () => void;
+  handleAnalyzeDebrief: () => void;
+  saveInterviewTranscript: (text: string) => void;
+  copyFollowUpEmail: () => void;
   handleFindContacts: () => void;
   startTransition: TransitionStartFunction;
   router: AppRouterInstance;
@@ -76,6 +83,10 @@ export function ApplicationDetailPanels({
   insightError,
   prepBusy,
   prepError,
+  debriefBusy,
+  debriefError,
+  debriefFocus,
+  onDebriefFocusChange,
   contactsBusy,
   contactsError,
   patchLocal,
@@ -89,6 +100,9 @@ export function ApplicationDetailPanels({
   setPreviewOpen,
   handleAnalyze,
   handleGenPrep,
+  handleAnalyzeDebrief,
+  saveInterviewTranscript,
+  copyFollowUpEmail,
   handleFindContacts,
   startTransition,
   router,
@@ -594,6 +608,131 @@ export function ApplicationDetailPanels({
           <p className="text-[13px] leading-normal text-[#8A92A0]">
             Generate likely questions, proof points, and smart questions to ask — from this
             job description and the resume you sent.
+          </p>
+        )}
+      </DetailSection>
+
+      <DetailSection
+        title="Post-interview debrief"
+        description="Paste a transcript from Otter, Granola, Zoom, Meet, or your note taker — we'll summarize it against this application and draft a follow-up."
+        actions={
+          <button
+            type="button"
+            disabled={debriefBusy || !app.interview_transcript.trim()}
+            onClick={handleAnalyzeDebrief}
+            className="inline-flex cursor-pointer items-center gap-[7px] rounded-[9px] border-none bg-sidebar px-[13px] py-[7px] text-[12.5px] font-semibold text-white transition-colors hover:bg-[#272b33] disabled:opacity-60"
+          >
+            {debriefBusy && <Spinner className="h-3.5 w-3.5 border-white/40 border-t-white" />}
+            {debriefBusy ? "Analyzing…" : app.interview_debrief ? "↻ Re-analyze" : "✦ Analyze debrief"}
+          </button>
+        }
+      >
+        {debriefError ? (
+          <div className="mb-2 text-[12.5px] text-[#B23B3B]">{debriefError}</div>
+        ) : null}
+        <textarea
+          value={app.interview_transcript}
+          onChange={(e) => patchLocal({ interview_transcript: e.target.value })}
+          onBlur={(e) => saveInterviewTranscript(e.target.value)}
+          rows={10}
+          placeholder="Paste your interview transcript here…"
+          className="w-full resize-y rounded-[10px] border border-[#DFE3E8] px-3.5 py-3 font-mono text-[12.5px] leading-[1.55] text-[#1a1f29] focus:border-accent"
+        />
+        <p className="mt-2 text-[11.5px] text-[#9AA3AF]">
+          Transcript saves automatically. No recording needed — use whatever note taker you already have.
+        </p>
+        <label className="mt-3 block text-[12.5px] font-semibold text-[#5A6573]">
+          Anything to weigh heavily?{" "}
+          <span className="font-normal text-muted">(optional, not saved)</span>
+          <textarea
+            value={debriefFocus}
+            onChange={(e) => onDebriefFocusChange(e.target.value)}
+            rows={2}
+            placeholder="e.g. They seemed skeptical about my management experience…"
+            className="mt-1.5 w-full resize-y rounded-[10px] border border-[#DFE3E8] px-3.5 py-2.5 text-[13px] leading-[1.5] text-[#1a1f29] focus:border-accent"
+          />
+        </label>
+
+        {app.interview_debrief ? (
+          <div className="mt-4 flex flex-col gap-4 border-t border-[#EEF0F3] pt-4">
+            <div>
+              <div className="text-[11.5px] font-bold uppercase tracking-[0.05em] text-[#2456D6]">
+                Summary
+              </div>
+              <ul className="mt-1.5 list-disc pl-[18px] text-[13px] leading-[1.55] text-[#2b3140]">
+                {app.interview_debrief.summary.map((x, i) => (
+                  <li key={i}>{x}</li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <div className="text-[11.5px] font-bold uppercase tracking-[0.05em] text-[#0E7C4B]">
+                What landed
+              </div>
+              <ul className="mt-1.5 list-disc pl-[18px] text-[13px] leading-[1.55] text-[#2b3140]">
+                {app.interview_debrief.landed.map((x, i) => (
+                  <li key={i}>{x}</li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <div className="text-[11.5px] font-bold uppercase tracking-[0.05em] text-[#9A6212]">
+                Gaps to address
+              </div>
+              <ul className="mt-1.5 list-disc pl-[18px] text-[13px] leading-[1.55] text-[#2b3140]">
+                {app.interview_debrief.gaps.map((x, i) => (
+                  <li key={i}>{x}</li>
+                ))}
+              </ul>
+            </div>
+            {app.interview_debrief.openQuestions.length > 0 ? (
+              <div>
+                <div className="text-[11.5px] font-bold uppercase tracking-[0.05em] text-[#5A6573]">
+                  Open questions
+                </div>
+                <ul className="mt-1.5 list-disc pl-[18px] text-[13px] leading-[1.55] text-[#2b3140]">
+                  {app.interview_debrief.openQuestions.map((x, i) => (
+                    <li key={i}>{x}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            {app.interview_debrief.followUpEmail.trim() ? (
+              <div>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="text-[11.5px] font-bold uppercase tracking-[0.05em] text-[#2456D6]">
+                    Follow-up email draft
+                  </div>
+                  <button
+                    type="button"
+                    onClick={copyFollowUpEmail}
+                    className="cursor-pointer rounded-lg border-none bg-[#EAF1FF] px-[11px] py-1.5 text-xs font-semibold text-[#2456D6] transition-colors hover:bg-[#dbe7ff]"
+                  >
+                    Copy email
+                  </button>
+                </div>
+                <pre className="mt-2 whitespace-pre-wrap rounded-[10px] border border-[#EEF0F3] bg-[#FCFCFD] px-3.5 py-3 text-[13px] leading-[1.6] text-[#2b3140]">
+                  {app.interview_debrief.followUpEmail}
+                </pre>
+              </div>
+            ) : null}
+            {app.interview_debrief.nextRoundPrep.length > 0 ? (
+              <div>
+                <div className="text-[11.5px] font-bold uppercase tracking-[0.05em] text-[#0E7C4B]">
+                  Next round prep
+                </div>
+                <ul className="mt-1.5 list-disc pl-[18px] text-[13px] leading-[1.55] text-[#2b3140]">
+                  {app.interview_debrief.nextRoundPrep.map((x, i) => (
+                    <li key={i}>{x}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+          </div>
+        ) : (
+          <p className="mt-3 text-[13px] leading-normal text-[#8A92A0]">
+            After an interview, paste the transcript and analyze — get a recap, honest read on
+            what landed, and a follow-up email tied to this role.
           </p>
         )}
       </DetailSection>

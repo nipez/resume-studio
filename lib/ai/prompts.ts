@@ -318,6 +318,54 @@ export function interviewPrepPrompt(
   );
 }
 
+export function interviewDebriefPrompt(
+  positioning: string,
+  userName: string,
+  jobRole: string,
+  jobCompany: string,
+  jobDesc: string,
+  summary: string,
+  coverLetter: string,
+  prepQuestions: string[],
+  transcript: string,
+  focusNote?: string
+): string {
+  const prepBlock =
+    prepQuestions.length > 0
+      ? "PREP QUESTIONS WE GENERATED:\n" + prepQuestions.map((q) => `- ${q}`).join("\n") + "\n\n"
+      : "";
+
+  const focusBlock = focusNote?.trim()
+    ? "CANDIDATE FOCUS FOR THIS DEBRIEF:\n" + focusNote.trim() + "\n\n"
+    : "";
+
+  return (
+    buildPositioningContext(positioning, userName) +
+    "\n\nTASK: Analyze this interview transcript for " +
+    userName +
+    ". Ground everything in what was actually said and how it maps to the target role and materials they sent. Be candid and practical. Return ONLY valid minified JSON, no markdown:\n" +
+    '{"summary":["3-5 bullet recap of what happened"],"landed":["2-4 bullets on answers or themes that landed well"],"gaps":["2-4 bullets on weak spots, missed chances, or concerns to address"],"openQuestions":["1-3 open items they should clarify or follow up on"],"followUpEmail":"A concise, professional thank-you / follow-up email draft (plain text, 2-4 short paragraphs max)","nextRoundPrep":["2-4 bullets to prep if there is a next round, or empty array if unclear"]}\n\n' +
+    "TARGET ROLE: " +
+    (jobRole || "(n/a)") +
+    " at " +
+    (jobCompany || "(n/a)") +
+    "\n" +
+    "JOB DESCRIPTION:\n" +
+    (jobDesc || "(none provided)") +
+    "\n\n" +
+    "RESUME SUMMARY: " +
+    summary +
+    "\n" +
+    "COVER LETTER SENT:\n" +
+    (coverLetter || "(none)") +
+    "\n\n" +
+    prepBlock +
+    focusBlock +
+    "INTERVIEW TRANSCRIPT:\n" +
+    (transcript || "(empty)")
+  );
+}
+
 export function resumeAssistPrompt(
   positioning: string,
   userName: string,
