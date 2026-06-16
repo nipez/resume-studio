@@ -2,11 +2,18 @@ import { CoverPanel } from "@/components/cover/cover-panel";
 import { listCoverLetters } from "@/lib/cover/actions";
 import { getLibraryData } from "@/lib/resume/actions";
 
-export default async function CoverPage() {
+type PageProps = {
+  searchParams: Promise<{ v?: string }>;
+};
+
+export default async function CoverPage({ searchParams }: PageProps) {
+  const { v } = await searchParams;
   const [{ versions, defaultVersionId }, savedLetters] = await Promise.all([
     getLibraryData(),
     listCoverLetters(),
   ]);
+  const initialVersionId =
+    v && versions.some((version) => version.id === v) ? v : null;
 
   return (
     <div className="scroll flex-1 overflow-auto">
@@ -23,6 +30,7 @@ export default async function CoverPage() {
             versions={versions}
             defaultVersionId={defaultVersionId}
             savedLetters={savedLetters}
+            initialVersionId={initialVersionId}
           />
         </div>
       </div>

@@ -241,7 +241,7 @@ export function TailorPanel({
                 ✦ Why this fits
               </div>
               <p className="text-[13.6px] leading-[1.6] text-[#C7CDD6]">{matchNotes}</p>
-              <div className="mt-4 flex gap-2">
+              <div className="mt-4 flex flex-wrap gap-2">
                 {resultId ? (
                   <Link
                     href={`/editor/${resultId}`}
@@ -258,6 +258,23 @@ export function TailorPanel({
                   ↓ Export PDF
                 </button>
               </div>
+            </div>
+            <div className="animate-[fadeUp_0.4s_ease_both] rounded-2xl border border-[#E6E8EC] bg-white px-5 py-4">
+              <div className="text-[13px] font-semibold text-ink">Next step</div>
+              <p className="mt-1 text-[13px] leading-[1.5] text-muted">
+                {draft.jobCompany?.trim()
+                  ? `Want a cover letter for ${draft.jobCompany}?`
+                  : "Want a cover letter for this role?"}{" "}
+                Your job details carry over, and we&apos;ll use this tailored resume.
+              </p>
+              {resultId ? (
+                <Link
+                  href={`/cover?v=${resultId}`}
+                  className="mt-3 inline-flex rounded-[9px] bg-accent px-4 py-2 text-[13px] font-semibold text-white hover:bg-[#1E54E6]"
+                >
+                  Write cover letter →
+                </Link>
+              ) : null}
             </div>
             <div className="h-[760px] overflow-hidden rounded-2xl bg-[#EAECEF] p-4">
               <div className="h-full overflow-hidden rounded-[5px] bg-white shadow-[0_4px_20px_rgba(15,17,22,0.1)]">

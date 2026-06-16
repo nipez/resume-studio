@@ -27,6 +27,7 @@ type CoverPanelProps = {
   versions: ResumeVersion[];
   defaultVersionId: string | null;
   savedLetters?: CoverLetter[];
+  initialVersionId?: string | null;
 };
 
 function formatWhen(iso: string) {
@@ -45,10 +46,11 @@ export function CoverPanel({
   versions,
   defaultVersionId,
   savedLetters = [],
+  initialVersionId = null,
 }: CoverPanelProps) {
   const { draft, update } = useJobDraft();
   const [baseId, setBaseId] = useState(
-    defaultVersionId ?? versions[0]?.id ?? ""
+    initialVersionId ?? defaultVersionId ?? versions[0]?.id ?? ""
   );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
