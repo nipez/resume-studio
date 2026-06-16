@@ -17,3 +17,7 @@ grant all on all functions in schema public to anon, authenticated, service_role
 alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
 alter default privileges in schema public grant all on sequences to anon, authenticated, service_role;
 alter default privileges in schema public grant all on functions to anon, authenticated, service_role;
+
+-- Rich demo persona (Alex Rivera): run `npm run seed:demo` after db reset.
+-- Creates auth user alex.rivera@demo.resumetrakr.local with resumes, cover
+-- letters, 12 applications (insights + events), and workspace draft.

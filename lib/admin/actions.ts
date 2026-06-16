@@ -6,6 +6,8 @@ import {
   decodeImpersonator,
   encodeImpersonator,
 } from "@/lib/admin/impersonation";
+import { DEMO_PERSONA } from "@/lib/demo/persona-data";
+import { seedDemoPersona } from "@/lib/demo/seed-persona";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
@@ -76,6 +78,11 @@ export async function createDemoUser(input: {
     label: input.label.trim() || "Demo user",
   });
   if (insErr) throw new Error(insErr.message);
+
+  await seedDemoPersona(svc, demoId, {
+    fullName: input.label.trim() || DEMO_PERSONA.fullName,
+    replace: false,
+  });
 
   if (input.makeStudent) {
     await svc
