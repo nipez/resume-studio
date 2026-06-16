@@ -104,6 +104,33 @@ export function mockComplete(prompt: string): string {
     return JSON.stringify({ roles });
   }
 
+  if (prompt.includes("Refine this resume so the user's context notes")) {
+    const resumeMatch = prompt.match(/CURRENT RESUME \(JSON\):\n([\s\S]+?)\n\nTASK:/);
+    const notesMatch = prompt.match(
+      /USER CONTEXT NOTES[\s\S]*?\n([\s\S]+?)\n\nCURRENT RESUME/
+    );
+    const base = resumeMatch?.[1] ? extractJSON<ResumeData>(resumeMatch[1]) : null;
+    const note = notesMatch?.[1]?.trim() || "your priorities";
+    if (base) {
+      return JSON.stringify({
+        ...base,
+        summary:
+          (base.summary || "") +
+          (base.summary ? " " : "") +
+          `[Demo: would emphasize ${note.slice(0, 80)}… — add ANTHROPIC_API_KEY for real output.]`,
+      });
+    }
+    return JSON.stringify({
+      name: "Demo Resume",
+      headline: "Professional · Demo mode",
+      summary:
+        "Demo mode — configure ANTHROPIC_API_KEY to weave your context notes into the resume.",
+      skills: ["Communication", "Leadership"],
+      experience: [],
+      education: [],
+    });
+  }
+
   if (prompt.includes("cover letter")) {
     return (
       "Dear Hiring Team,\n\n" +

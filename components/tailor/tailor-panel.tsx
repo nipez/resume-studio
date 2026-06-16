@@ -12,6 +12,7 @@ import {
 } from "@/components/shared/job-fields";
 import { JobDescParseButton } from "@/components/shared/job-desc-parse-button";
 import { JobUrlImport } from "@/components/shared/job-url-import";
+import { ResumeContextNotesField } from "@/components/shared/resume-context-notes-field";
 import { Spinner } from "@/components/ui/spinner";
 import { useJobDraft } from "@/lib/job-draft/use-job-draft";
 import { buildResumeHTML } from "@/lib/resume/build-resume-html";
@@ -91,6 +92,7 @@ export function TailorPanel({
           jobDesc: draft.jobDesc,
           depth,
           data: base.data,
+          contextNotes: draft.contextNotes,
         }),
       });
       const j = await res.json();
@@ -186,6 +188,11 @@ export function TailorPanel({
             })
           }
           className="mt-2"
+        />
+        <ResumeContextNotesField
+          className="mt-4"
+          value={draft.contextNotes}
+          onChange={(v) => update({ contextNotes: v })}
         />
         <div className="mt-4">
           <div className="mb-2 text-[12.5px] font-semibold text-[#5A6573]">

@@ -5,6 +5,7 @@ export type JobDraft = {
   jobUrl: string;
   coverText: string;
   coverHM: string;
+  contextNotes: string;
 };
 
 export const JOB_DRAFT_KEY = "resume_studio_job_draft_v1";
@@ -16,6 +17,7 @@ export const EMPTY_JOB_DRAFT: JobDraft = {
   jobUrl: "",
   coverText: "",
   coverHM: "",
+  contextNotes: "",
 };
 
 export function readJobDraft(): JobDraft {
