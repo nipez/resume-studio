@@ -1,4 +1,9 @@
-import type { Application, ApplicationEvent, ApplicationStatus } from "@/lib/applications/types";
+import type {
+  Application,
+  ApplicationEvent,
+  ApplicationStatus,
+  HiringContact,
+} from "@/lib/applications/types";
 
 export type StatusMeta = {
   label: string;
@@ -231,5 +236,37 @@ export function normalizeResumeSnapshot(raw: unknown): Application["resume_snaps
           }))
         : [],
     },
+  };
+}
+
+const ROLE_LIKE_PATTERN =
+  /\b(chief|director|manager|officer|head of|vp|ceo|coo|cmo|hr|recruiter|talent|people|executive|lead|\bor\b|\/)\b/i;
+
+/** Present AI hiring hints as a person name or a role to look up on LinkedIn. */
+export function formatHiringContactDisplay(contact: HiringContact): {
+  headline: string;
+  subtitle: string | null;
+  kind: "person" | "role";
+} {
+  const name = contact.name.trim();
+  const title = contact.title.trim();
+  const nameLooksLikeRole =
+    !name ||
+    name.toLowerCase() === title.toLowerCase() ||
+    ROLE_LIKE_PATTERN.test(name) ||
+    name.split(/\s+/).length > 6;
+
+  if (name && !nameLooksLikeRole) {
+    return {
+      headline: name,
+      subtitle: title || null,
+      kind: "person",
+    };
+  }
+
+  return {
+    headline: title || name || "Unknown role",
+    subtitle: null,
+    kind: "role",
   };
 }

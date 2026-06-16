@@ -26,7 +26,7 @@ export async function POST(request: Request) {
 
   if (!body.jobRole.trim() && !body.jobCompany.trim()) {
     return NextResponse.json(
-      { error: "Add a role or company before searching for contacts." },
+      { error: "Add a role or company before suggesting roles to look up." },
       { status: 400 }
     );
   }
