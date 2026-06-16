@@ -16,7 +16,7 @@ import {
   formatHiringContactDisplay,
   todayISO,
 } from "@/lib/applications/utils";
-import type { CoverLetter } from "@/lib/cover/actions";
+import type { CoverLetter } from "@/lib/cover/types";
 import type { ResumeVersion } from "@/lib/resume/db-types";
 import { templateLabel } from "@/lib/resume/build-resume-html";
 import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";

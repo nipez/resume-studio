@@ -23,7 +23,7 @@ import {
   formatAppDate,
 } from "@/lib/applications/utils";
 import { mockBannerClass } from "@/components/shared/job-fields";
-import type { CoverLetter } from "@/lib/cover/actions";
+import type { CoverLetter } from "@/lib/cover/types";
 import type { ResumeVersion } from "@/lib/resume/db-types";
 import { templateLabel } from "@/lib/resume/build-resume-html";
 import {

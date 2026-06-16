@@ -16,8 +16,8 @@ import { Toast } from "@/components/ui/toast";
 import {
   deleteCoverLetter,
   saveCoverLetter,
-  type CoverLetter,
 } from "@/lib/cover/actions";
+import type { CoverLetter } from "@/lib/cover/types";
 import { useJobDraft } from "@/lib/job-draft/use-job-draft";
 import { buildCoverHTML, openPrintHtml } from "@/lib/resume/build-cover-html";
 import type { ResumeVersion } from "@/lib/resume/db-types";
@@ -119,13 +119,18 @@ export function CoverPanel({
     setSaving(true);
     setError("");
     try {
-      const saved = await saveCoverLetter({
+      const result = await saveCoverLetter({
         id: currentLetterId ?? undefined,
         role: draft.jobRole,
         company: draft.jobCompany,
         body: draft.coverText,
         resumeVersionId: baseId || null,
       });
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      const saved = result.letter;
       setLetters((prev) => {
         const without = prev.filter((l) => l.id !== saved.id);
         return [saved, ...without];
@@ -165,7 +170,12 @@ export function CoverPanel({
     setLetters((curr) => curr.filter((l) => l.id !== id));
     if (currentLetterId === id) setCurrentLetterId(null);
     try {
-      await deleteCoverLetter(id);
+      const result = await deleteCoverLetter(id);
+      if (!result.ok) {
+        setLetters(prev);
+        setError(result.error);
+        return;
+      }
       setToast("Deleted");
     } catch {
       setLetters(prev);

@@ -1,7 +1,7 @@
 "use client";
 
 import { updateApplicationCoverLetter } from "@/lib/applications/actions";
-import type { CoverLetter } from "@/lib/cover/actions";
+import type { CoverLetter } from "@/lib/cover/types";
 import { readJobDraft } from "@/lib/job-draft/storage";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
