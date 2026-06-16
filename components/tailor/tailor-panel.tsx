@@ -443,8 +443,8 @@ export function TailorPanel({
                   </div>
                   <p className="mt-1 text-[13px] leading-[1.5] text-muted">
                     {draft.jobCompany?.trim()
-                      ? `Ready to write a cover letter for ${draft.jobCompany}?`
-                      : "Ready to write a cover letter for this role?"}{" "}
+                      ? `Write a cover letter for ${draft.jobCompany}, then log the application.`
+                      : "Write a cover letter, then log the application."}{" "}
                     Job details carry over and this tailored resume is already saved.
                   </p>
                   <Link

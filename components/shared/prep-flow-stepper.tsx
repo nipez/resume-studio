@@ -3,8 +3,8 @@
 import Link from "next/link";
 
 type PrepFlowStepperProps = {
-  currentStep: 1 | 2 | 3;
-  /** Saved tailored resume version id — unlocks steps 2 and 3 */
+  currentStep: 1 | 2 | 3 | 4;
+  /** Saved tailored resume version id — unlocks steps 2–4 */
   resultId?: string | null;
   className?: string;
 };
@@ -13,13 +13,15 @@ const STEPS = [
   { step: 1 as const, label: "Job details" },
   { step: 2 as const, label: "Tailored resume" },
   { step: 3 as const, label: "Cover letter" },
+  { step: 4 as const, label: "Log application" },
 ];
 
-function stepHref(step: 1 | 2 | 3, resultId?: string | null): string | null {
+function stepHref(step: 1 | 2 | 3 | 4, resultId?: string | null): string | null {
   if (step === 1) return "/tailor";
   if (!resultId) return null;
   if (step === 2) return `/tailor?r=${resultId}`;
-  return `/cover?v=${resultId}`;
+  if (step === 3) return `/cover?v=${resultId}`;
+  return `/cover?v=${resultId}#log-application`;
 }
 
 export function PrepFlowStepper({
