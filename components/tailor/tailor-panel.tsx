@@ -14,6 +14,7 @@ import { JobDescParseButton } from "@/components/shared/job-desc-parse-button";
 import { JobUrlImport } from "@/components/shared/job-url-import";
 import { PrepFlowStepper } from "@/components/shared/prep-flow-stepper";
 import { ResumeContextNotesField } from "@/components/shared/resume-context-notes-field";
+import { TailorProgressOverlay } from "@/components/tailor/tailor-progress-overlay";
 import { Spinner } from "@/components/ui/spinner";
 import { useJobDraft } from "@/lib/job-draft/use-job-draft";
 import { buildResumeHTML } from "@/lib/resume/build-resume-html";
@@ -195,6 +196,7 @@ export function TailorPanel({
   async function handleRetrySave() {
     if (!pendingSave) return;
     setBusy(true);
+    setSaveStatus("saving");
     setError("");
     try {
       await persistTailoredVersion(
@@ -235,6 +237,14 @@ export function TailorPanel({
 
   return (
     <div className="space-y-5">
+      <TailorProgressOverlay
+        open={busy}
+        depth={depth}
+        phase={saveStatus === "tailoring" ? "tailoring" : "saving"}
+        jobRole={draft.jobRole}
+        jobCompany={draft.jobCompany}
+      />
+
       <PrepFlowStepper currentStep={currentStep} resultId={resultId} />
 
       {phase === "result" && resultData ? (
