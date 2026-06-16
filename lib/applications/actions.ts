@@ -286,6 +286,18 @@ export async function updateApplicationStatus(
   revalidatePath("/insights");
 }
 
+export async function updateApplicationCoverLetter(id: string, coverLetter: string) {
+  const { error } = await updateApplicationRow(id, {
+    cover_letter: coverLetter.trim(),
+  });
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/applications");
+  revalidatePath(`/applications/${id}`);
+  revalidatePath("/insights");
+}
+
 export async function updateApplicationMeta(
   id: string,
   patch: {
