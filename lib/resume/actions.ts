@@ -31,7 +31,13 @@ export async function getLibraryData() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { versions: [], defaultVersionId: null as string | null };
+    return {
+      versions: [],
+      archivedVersions: [],
+      defaultVersionId: null as string | null,
+      userEmail: "",
+      userName: "",
+    };
   }
 
   const [{ data: profile }, { data: versions }] = await Promise.all([
