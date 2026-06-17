@@ -11,6 +11,7 @@ with checks as (
   union all select 'table: guided_drafts', to_regclass('public.guided_drafts') is not null
   union all select 'table: cover_letters', to_regclass('public.cover_letters') is not null
   union all select 'table: workspace_drafts', to_regclass('public.workspace_drafts') is not null
+  union all select 'table: saved_jobs', to_regclass('public.saved_jobs') is not null
   union all select 'table: demo_users', to_regclass('public.demo_users') is not null
 
   union all select 'applications.job_url',
@@ -34,6 +35,8 @@ with checks as (
     exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'workspace_drafts' and column_name = 'context_notes')
   union all select 'guided_drafts.context_notes',
     exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'guided_drafts' and column_name = 'context_notes')
+  union all select 'saved_jobs.tailored_version_id',
+    exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'saved_jobs' and column_name = 'tailored_version_id')
 )
 select
   check_name,
@@ -48,6 +51,7 @@ order by ok asc, check_name asc;
 --   table: cover_letters           → 0005_cover_letters.sql
 --   applications.interview_*       → 0008_interview_debrief.sql
 --   resume_versions.archived_at    → 0009_resume_archive.sql
+--   table: saved_jobs              → 0010_saved_jobs.sql
 --   applications.job_url           → 0002_application_metadata.sql
 --   profiles.is_student            → 0003_student_profile.sql
 --   table: demo_users              → 0004_demo_users.sql (optional)

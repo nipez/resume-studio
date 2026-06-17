@@ -1,12 +1,13 @@
 import { TailorPanel } from "@/components/tailor/tailor-panel";
+import { JobDraftBootstrap } from "@/components/saved-jobs/job-draft-bootstrap";
 import { getLibraryData, getResumeVersion } from "@/lib/resume/actions";
 
 type PageProps = {
-  searchParams: Promise<{ v?: string; r?: string; new?: string }>;
+  searchParams: Promise<{ v?: string; r?: string; new?: string; job?: string }>;
 };
 
 export default async function TailorPage({ searchParams }: PageProps) {
-  const { v, r, new: newParam } = await searchParams;
+  const { v, r, new: newParam, job } = await searchParams;
   const { versions, defaultVersionId } = await getLibraryData();
   const initialVersionId =
     v && versions.some((version) => version.id === v) ? v : null;
@@ -32,12 +33,14 @@ export default async function TailorPage({ searchParams }: PageProps) {
           different role.
         </p>
         <div className="mt-[26px]">
+          <JobDraftBootstrap savedJobId={job ?? null} />
           <TailorPanel
             versions={versions}
             defaultVersionId={defaultVersionId}
             initialVersionId={initialVersionId}
             initialResultVersion={initialResultVersion}
-            startNewJob={newParam === "1"}
+            startNewJob={newParam === "1" && !job}
+            savedJobId={job ?? null}
           />
         </div>
       </div>

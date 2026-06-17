@@ -20,6 +20,7 @@ import {
   deleteCoverLetter,
   saveCoverLetter,
 } from "@/lib/cover/actions";
+import { updateSavedJob } from "@/lib/saved-jobs/actions";
 import type { CoverLetter } from "@/lib/cover/types";
 import { useJobDraft } from "@/lib/job-draft/use-job-draft";
 import { buildCoverHTML, openPrintHtml } from "@/lib/resume/build-cover-html";
@@ -33,6 +34,7 @@ type CoverPanelProps = {
   initialVersionId?: string | null;
   /** When set, show the 4-step prep flow stepper (from Tailor → Cover). */
   prepFlowResultId?: string | null;
+  savedJobId?: string | null;
 };
 
 function formatWhen(iso: string) {
@@ -53,6 +55,7 @@ export function CoverPanel({
   savedLetters = [],
   initialVersionId = null,
   prepFlowResultId = null,
+  savedJobId = null,
 }: CoverPanelProps) {
   const { draft, update } = useJobDraft();
   const [baseId, setBaseId] = useState(
@@ -93,6 +96,9 @@ export function CoverPanel({
       if (!res.ok) throw new Error(j.error || "Generation failed");
       setMockMode(Boolean(j.mock));
       update({ coverText: j.letter });
+      if (savedJobId) {
+        await updateSavedJob(savedJobId, { coverText: j.letter });
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong. Try again.");
     } finally {

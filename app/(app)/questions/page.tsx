@@ -1,7 +1,13 @@
 import { QAPanel } from "@/components/questions/qa-panel";
+import { JobDraftBootstrap } from "@/components/saved-jobs/job-draft-bootstrap";
 import { getLibraryData } from "@/lib/resume/actions";
 
-export default async function QuestionsPage() {
+type PageProps = {
+  searchParams: Promise<{ job?: string }>;
+};
+
+export default async function QuestionsPage({ searchParams }: PageProps) {
+  const { job } = await searchParams;
   const { versions, defaultVersionId } = await getLibraryData();
 
   return (
@@ -15,6 +21,7 @@ export default async function QuestionsPage() {
           voice — confident, specific, tied to real outcomes. Uses the shared job
           description for context.
         </p>
+        <JobDraftBootstrap savedJobId={job ?? null} />
         <QAPanel versions={versions} defaultVersionId={defaultVersionId} />
       </div>
     </div>

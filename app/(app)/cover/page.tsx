@@ -1,13 +1,14 @@
 import { CoverPanel } from "@/components/cover/cover-panel";
+import { JobDraftBootstrap } from "@/components/saved-jobs/job-draft-bootstrap";
 import { listCoverLetters } from "@/lib/cover/actions";
 import { getLibraryData } from "@/lib/resume/actions";
 
 type PageProps = {
-  searchParams: Promise<{ v?: string }>;
+  searchParams: Promise<{ v?: string; job?: string }>;
 };
 
 export default async function CoverPage({ searchParams }: PageProps) {
-  const { v } = await searchParams;
+  const { v, job } = await searchParams;
   const [{ versions, defaultVersionId }, savedLetters] = await Promise.all([
     getLibraryData(),
     listCoverLetters(),
@@ -26,12 +27,14 @@ export default async function CoverPage({ searchParams }: PageProps) {
           it appears in your tracker with the resume and letter you sent.
         </p>
         <div className="mt-[26px]">
+          <JobDraftBootstrap savedJobId={job ?? null} />
           <CoverPanel
             versions={versions}
             defaultVersionId={defaultVersionId}
             savedLetters={savedLetters}
             initialVersionId={initialVersionId}
             prepFlowResultId={initialVersionId}
+            savedJobId={job ?? null}
           />
         </div>
       </div>

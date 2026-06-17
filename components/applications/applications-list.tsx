@@ -1,7 +1,10 @@
 "use client";
 
 import { LogApplicationButton } from "@/components/applications/log-application-button";
+import { SaveJobButton } from "@/components/applications/save-job-button";
+import { SavedJobsSection } from "@/components/applications/saved-jobs-section";
 import type { Application, ApplicationStatus } from "@/lib/applications/types";
+import type { SavedJob } from "@/lib/saved-jobs/types";
 import {
   deleteApplication,
   updateApplicationStatus,
@@ -23,6 +26,7 @@ import { useTransition } from "react";
 
 type ApplicationsListProps = {
   applications: Application[];
+  savedJobs: SavedJob[];
   defaultVersionId: string | null;
   defaultVersionName?: string | null;
   defaultVersionRole?: string;
@@ -108,6 +112,7 @@ function StatusSelect({
 
 export function ApplicationsList({
   applications,
+  savedJobs,
   defaultVersionId,
   defaultVersionName,
   defaultVersionRole = "",
@@ -135,26 +140,40 @@ export function ApplicationsList({
               Applications
             </h1>
             <p className="mt-2 max-w-[600px] text-[14.5px] leading-relaxed text-muted">
-              Each application keeps a snapshot of the exact resume, cover
-              letter, and answers you sent. Open one to track its outcome,
-              schedule follow-ups, and see why it fits.
+              Save jobs you want to apply to, then track each application with a
+              snapshot of the resume, cover letter, and answers you sent.
             </p>
           </div>
-          {defaultVersionId ? (
-            <LogApplicationButton
-              versionId={defaultVersionId}
-              resumeVersionName={defaultVersionName ?? "Resume"}
-              initialRole={defaultVersionRole}
-              initialCompany={defaultVersionCompany}
-            />
-          ) : (
-            <Link
-              href="/library"
-              className="inline-flex items-center gap-1.5 rounded-[11px] bg-accent px-[17px] py-[11px] text-[13.5px] font-semibold text-white shadow-[0_4px_14px_rgba(47,107,255,0.32)] transition-colors hover:bg-accent-dark"
-            >
-              + Create a resume first
-            </Link>
-          )}
+          <div className="flex flex-wrap items-center gap-2">
+            <SaveJobButton />
+            {defaultVersionId ? (
+              <LogApplicationButton
+                versionId={defaultVersionId}
+                resumeVersionName={defaultVersionName ?? "Resume"}
+                initialRole={defaultVersionRole}
+                initialCompany={defaultVersionCompany}
+              />
+            ) : (
+              <Link
+                href="/library"
+                className="inline-flex items-center gap-1.5 rounded-[11px] bg-accent px-[17px] py-[11px] text-[13.5px] font-semibold text-white shadow-[0_4px_14px_rgba(47,107,255,0.32)] transition-colors hover:bg-accent-dark"
+              >
+                + Create a resume first
+              </Link>
+            )}
+          </div>
+        </div>
+
+        <SavedJobsSection
+          savedJobs={savedJobs}
+          defaultVersionId={defaultVersionId}
+          defaultVersionName={defaultVersionName ?? null}
+        />
+
+        <div className="mb-3">
+          <h2 className="font-display text-[17px] font-semibold text-ink">
+            Logged applications
+          </h2>
         </div>
 
         <div className="mb-6 flex flex-wrap gap-3">
