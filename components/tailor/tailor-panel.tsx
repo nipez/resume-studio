@@ -20,6 +20,7 @@ import { useJobDraft } from "@/lib/job-draft/use-job-draft";
 import { buildResumeHTML } from "@/lib/resume/build-resume-html";
 import { openPrintHtml } from "@/lib/resume/build-cover-html";
 import { saveTailoredVersion } from "@/lib/resume/actions";
+import { updateSavedJob } from "@/lib/saved-jobs/actions";
 import type { ResumeVersion } from "@/lib/resume/db-types";
 import type { ResumeData } from "@/lib/types/resume";
 import Link from "next/link";
@@ -33,6 +34,8 @@ type TailorPanelProps = {
   initialResultVersion?: ResumeVersion | null;
   /** When true, clear the shared job draft and start a blank form. */
   startNewJob?: boolean;
+  /** Links tailoring progress back to a saved job queue item. */
+  savedJobId?: string | null;
 };
 
 const DEPTH_OPTIONS = [
@@ -56,6 +59,7 @@ export function TailorPanel({
   initialVersionId = null,
   initialResultVersion = null,
   startNewJob = false,
+  savedJobId = null,
 }: TailorPanelProps) {
   const router = useRouter();
   const { draft, update, reset } = useJobDraft();
@@ -159,7 +163,11 @@ export function TailorPanel({
     setPhase("result");
     setSaveStatus("saved");
     setPendingSave(null);
-    router.replace(`/tailor?r=${saved.id}&v=${base.id}`, { scroll: false });
+    if (savedJobId) {
+      await updateSavedJob(savedJobId, { tailoredVersionId: saved.id });
+    }
+    const jobQuery = savedJobId ? `&job=${savedJobId}` : "";
+    router.replace(`/tailor?r=${saved.id}&v=${base.id}${jobQuery}`, { scroll: false });
     return saved;
   }
 

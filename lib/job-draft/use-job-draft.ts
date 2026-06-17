@@ -72,6 +72,13 @@ export function useJobDraft() {
     };
   }, []);
 
+  useEffect(() => {
+    const syncFromStorage = () => setDraft(readJobDraft());
+    window.addEventListener("resume-studio:job-draft-sync", syncFromStorage);
+    return () =>
+      window.removeEventListener("resume-studio:job-draft-sync", syncFromStorage);
+  }, []);
+
   const update = useCallback((patch: Partial<JobDraft>) => {
     setDraft((prev) => {
       const next = { ...prev, ...patch };
