@@ -202,10 +202,12 @@ export function coverLetterPrompt(
   jobCompany: string,
   jobDesc: string,
   hiringManager: string,
-  summary: string
+  summary: string,
+  contextNotes = ""
 ): string {
   return (
     buildPositioningContext(positioning, userName) +
+    buildExtraContextBlock(contextNotes) +
     "\n\nWrite a concise, confident cover letter (250-320 words) for " +
     userName +
     " applying to " +

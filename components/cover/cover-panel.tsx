@@ -13,6 +13,7 @@ import {
 import { JobDescParseButton } from "@/components/shared/job-desc-parse-button";
 import { JobUrlImport } from "@/components/shared/job-url-import";
 import { PrepFlowStepper } from "@/components/shared/prep-flow-stepper";
+import { ResumeContextNotesField } from "@/components/shared/resume-context-notes-field";
 import { Spinner } from "@/components/ui/spinner";
 import { Toast } from "@/components/ui/toast";
 import {
@@ -85,6 +86,7 @@ export function CoverPanel({
           jobDesc: draft.jobDesc,
           hiringManager: draft.coverHM,
           summary: base.data.summary,
+          contextNotes: draft.contextNotes,
         }),
       });
       const j = await res.json();
@@ -301,6 +303,13 @@ export function CoverPanel({
               })
             }
             className="mt-2"
+          />
+          <ResumeContextNotesField
+            className="mt-4"
+            value={draft.contextNotes}
+            onChange={(v) => update({ contextNotes: v })}
+            label="Extra context for your letter"
+            hint="Anything to weave in — referral, why this company, a story to lead with, or experience the job description underplays."
           />
           {error ? <div className={errorBoxClass}>{error}</div> : null}
           <button
