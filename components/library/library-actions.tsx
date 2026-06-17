@@ -24,6 +24,12 @@ export function LibraryActions() {
         >
           ↑ Import resume
         </button>
+        <Link
+          href="/tailor?new=1"
+          className="inline-flex items-center gap-1.5 rounded-[11px] border border-[#D6E4FF] bg-[#F5F8FF] px-[17px] py-[11px] text-[13.5px] font-semibold text-[#2456D6] transition-colors hover:border-accent hover:bg-[#EAF1FF]"
+        >
+          ⌖ Tailor to a job
+        </Link>
         <LibraryToolbar />
       </div>
       <ImportModal open={importOpen} onClose={() => setImportOpen(false)} />
