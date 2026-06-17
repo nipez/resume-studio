@@ -10,6 +10,7 @@ const bodySchema = z.object({
   jobDesc: z.string().min(1),
   hiringManager: z.string().optional(),
   summary: z.string(),
+  contextNotes: z.string().optional(),
 });
 
 export async function POST(request: Request) {
@@ -33,7 +34,8 @@ export async function POST(request: Request) {
       body.jobCompany,
       body.jobDesc,
       body.hiringManager ?? "",
-      body.summary
+      body.summary,
+      body.contextNotes ?? ""
     );
     const { text, mock } = await completeWithFallback(prompt);
     return NextResponse.json({ letter: (text || "").trim(), mock });
