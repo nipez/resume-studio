@@ -1,4 +1,6 @@
 import { requireAIUser } from "@/lib/ai/auth";
+import { aiCallOptions } from "@/lib/ai/context";
+import { aiRouteErrorResponse } from "@/lib/ai/route-error";
 import { extractJSON } from "@/lib/ai/extract-json";
 import { completeWithFallback } from "@/lib/ai/mock";
 import { resumeAssistPrompt } from "@/lib/ai/prompts";
@@ -61,7 +63,10 @@ export async function POST(request: Request) {
       body.sectionId,
       body.sectionIndex
     );
-    const { text, mock } = await completeWithFallback(prompt);
+    const { text, mock } = await completeWithFallback(
+      prompt,
+      aiCallOptions(auth, "resume_assist")
+    );
 
     if (body.action === "polish-bullets") {
       const parsed = extractJSON(text) as {
@@ -125,6 +130,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ text: (text || "").trim(), mock });
   } catch (err) {
+    const aiError = aiRouteErrorResponse(err);
+    if (aiError) return aiError;
     const message =
       err instanceof Error ? err.message : "Something went wrong.";
     return NextResponse.json({ error: message }, { status: 500 });

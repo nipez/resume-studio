@@ -1,4 +1,6 @@
 import { requireAIUser } from "@/lib/ai/auth";
+import { aiCallOptions } from "@/lib/ai/context";
+import { aiRouteErrorResponse } from "@/lib/ai/route-error";
 import { completeWithFallback, parseResumeFromAI } from "@/lib/ai/mock";
 import { parseResumePrompt } from "@/lib/ai/prompts";
 import { NextResponse } from "next/server";
@@ -23,7 +25,8 @@ export async function POST(request: Request) {
 
   try {
     const { text, mock } = await completeWithFallback(
-      parseResumePrompt(body.text.trim())
+      parseResumePrompt(body.text.trim()),
+      aiCallOptions(auth, "parse_resume")
     );
     const data = parseResumeFromAI(text);
     if (!data) {
@@ -34,6 +37,8 @@ export async function POST(request: Request) {
     }
     return NextResponse.json({ data, mock });
   } catch (err) {
+    const aiError = aiRouteErrorResponse(err);
+    if (aiError) return aiError;
     const message =
       err instanceof Error ? err.message : "Something went wrong. Try again.";
     return NextResponse.json({ error: message }, { status: 500 });

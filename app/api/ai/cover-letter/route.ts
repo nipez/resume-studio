@@ -1,4 +1,6 @@
 import { requireAIUser } from "@/lib/ai/auth";
+import { aiCallOptions } from "@/lib/ai/context";
+import { aiRouteErrorResponse } from "@/lib/ai/route-error";
 import { completeWithFallback } from "@/lib/ai/mock";
 import { coverLetterPrompt } from "@/lib/ai/prompts";
 import { NextResponse } from "next/server";
@@ -37,9 +39,14 @@ export async function POST(request: Request) {
       body.summary,
       body.contextNotes ?? ""
     );
-    const { text, mock } = await completeWithFallback(prompt);
+    const { text, mock } = await completeWithFallback(
+      prompt,
+      aiCallOptions(auth, "cover_letter")
+    );
     return NextResponse.json({ letter: (text || "").trim(), mock });
   } catch (err) {
+    const aiError = aiRouteErrorResponse(err);
+    if (aiError) return aiError;
     const message =
       err instanceof Error ? err.message : "Something went wrong. Try again.";
     return NextResponse.json({ error: message }, { status: 500 });

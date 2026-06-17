@@ -75,14 +75,23 @@ export function PricingPage() {
             </span>
             <h2>Three tiers. No credit traps.</h2>
             <p>
-              Student on-ramp, Essentials without AI costs, and Pro for active
-              searches — or a 3-month Job Search Pass at launch.
+              <strong>Essentials</strong> is the smart default — full workspace,
+              zero AI cost. Student on-ramp for first resumes. Pro when you&apos;re
+              applying aggressively and need AI (100 actions/mo).
             </p>
           </Reveal>
           <Reveal className="pgrid">
-            {PRICING_PLANS.map((plan) => (
+            {[...PRICING_PLANS]
+              .sort((a, b) => {
+                const order = { essentials: 0, pro: 1, student: 2 };
+                return order[a.id as keyof typeof order] - order[b.id as keyof typeof order];
+              })
+              .map((plan) => (
               <div key={plan.id} className={`plan${plan.highlighted ? " feat" : ""}`}>
-                {plan.highlighted ? <span className="pop">Most popular</span> : null}
+                {plan.highlighted ? <span className="pop">Best value</span> : null}
+                {!plan.highlighted && plan.id === "pro" ? (
+                  <span className="pop pro-pop">Active search</span>
+                ) : null}
                 <div className="kicker">{plan.badge}</div>
                 <div className="pname">{plan.name}</div>
                 <div className="priceline">
@@ -115,14 +124,13 @@ export function PricingPage() {
             </span>
             <h2>Job search is temporary — pricing shouldn&apos;t punish you.</h2>
             <p>
-              Students need a cheap on-ramp. Essentials covers organizing and
-              tracking without AI costs. Pro is for when you&apos;re applying
-              aggressively and need unlimited tailoring, cover letters, and
-              insights.
+              Students need a cheap on-ramp. <strong>Essentials</strong> covers organizing and
+              tracking without AI costs — keep it for your whole search. Pro is for when
+              you&apos;re applying aggressively and need AI (100 actions per month).
             </p>
           </Reveal>
           <Reveal className="tier-tags">
-            {["Student on-ramp", "No-AI essentials", "Unlimited Pro"].map((label) => (
+            {["Essentials anchor", "Student on-ramp", "Pro · 100 AI actions/mo"].map((label) => (
               <span key={label} className="tier-tag">
                 {label}
               </span>

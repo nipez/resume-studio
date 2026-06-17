@@ -1,9 +1,11 @@
 import { completeWithFallback, parseJobPostingFromAI } from "@/lib/ai/mock";
 import { parseJobPostingPrompt } from "@/lib/ai/prompts";
+import type { PlanTier } from "@/lib/ai/config";
 
 export async function parseJobPostingText(
   pageText: string,
-  sourceUrl?: string
+  sourceUrl: string | undefined,
+  aiContext: { userId: string; planTier: PlanTier }
 ) {
   const trimmed = pageText.trim();
   if (trimmed.length < 80) {
@@ -13,7 +15,12 @@ export async function parseJobPostingText(
   }
 
   const { text, mock } = await completeWithFallback(
-    parseJobPostingPrompt(trimmed.slice(0, 30_000), sourceUrl)
+    parseJobPostingPrompt(trimmed.slice(0, 30_000), sourceUrl),
+    {
+      userId: aiContext.userId,
+      planTier: aiContext.planTier,
+      action: "job_parse",
+    }
   );
   const parsed = parseJobPostingFromAI(text);
   if (!parsed) {

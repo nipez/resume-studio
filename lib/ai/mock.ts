@@ -292,13 +292,35 @@ export function mockComplete(prompt: string): string {
   return "Demo AI response — configure ANTHROPIC_API_KEY for real generation.";
 }
 
-export async function completeWithFallback(prompt: string): Promise<{
+import { modelTierForAction, type AIAction, type PlanTier } from "@/lib/ai/config";
+import { assertAIAllowed, recordAIUsage, type AICompletionContext } from "@/lib/ai/usage";
+
+export type AICompletionOptions = {
+  userId: string;
+  planTier: PlanTier;
+  action: AIAction;
+};
+
+export async function completeWithFallback(
+  prompt: string,
+  options: AICompletionOptions
+): Promise<{
   text: string;
   mock: boolean;
 }> {
+  const ctx: AICompletionContext = {
+    userId: options.userId,
+    planTier: options.planTier,
+    action: options.action,
+  };
+
+  await assertAIAllowed(ctx);
+
   const { complete, isAIConfigured } = await import("@/lib/ai/client");
   if (isAIConfigured()) {
-    const text = await complete(prompt);
+    const tier = modelTierForAction(options.action);
+    const { text, usage } = await complete(prompt, { tier });
+    await recordAIUsage(ctx, usage);
     return { text, mock: false };
   }
   return { text: mockComplete(prompt), mock: true };

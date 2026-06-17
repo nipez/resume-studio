@@ -1,4 +1,6 @@
 import { requireAIUser } from "@/lib/ai/auth";
+import { aiCallOptions } from "@/lib/ai/context";
+import { aiRouteErrorResponse } from "@/lib/ai/route-error";
 import { extractJSON } from "@/lib/ai/extract-json";
 import { completeWithFallback } from "@/lib/ai/mock";
 import {
@@ -58,7 +60,10 @@ export async function POST(request: Request) {
       data,
       contextNotes
     );
-    const { text: metaText, mock } = await completeWithFallback(metaPrompt);
+    const { text: metaText, mock } = await completeWithFallback(
+      metaPrompt,
+      aiCallOptions(auth, "tailor_meta")
+    );
     const meta = extractJSON<TailorMeta>(metaText) || {};
 
     if (
@@ -104,7 +109,10 @@ export async function POST(request: Request) {
           roles,
           contextNotes
         );
-        const { text } = await completeWithFallback(rp);
+        const { text } = await completeWithFallback(
+          rp,
+          aiCallOptions(auth, "tailor_role_batch")
+        );
         const part = extractJSON<{ roles?: TailorRole[] }>(text);
         if (part?.roles) {
           part.roles.forEach((r) => {
@@ -130,7 +138,10 @@ export async function POST(request: Request) {
         data,
         contextNotes
       );
-      const { text } = await completeWithFallback(lp);
+      const { text } = await completeWithFallback(
+        lp,
+        aiCallOptions(auth, "tailor_light")
+      );
       const lj = extractJSON<{ highlights?: Record<string, string[]> }>(text);
       if (lj?.highlights && typeof lj.highlights === "object") {
         tailored.experience = tailored.experience.map((e) => {
@@ -156,6 +167,8 @@ export async function POST(request: Request) {
       mock,
     });
   } catch (err) {
+    const aiError = aiRouteErrorResponse(err);
+    if (aiError) return aiError;
     const message =
       err instanceof Error ? err.message : "Something went wrong. Try again.";
     return NextResponse.json({ error: message }, { status: 500 });

@@ -144,7 +144,7 @@ export const GENERATOR_VS_OS = [
   {
     dimension: "Pricing model",
     generator: "Credits that burn fast ($5–20 packs)",
-    applicationOs: "Subscription from $2.99–$12/mo — predictable",
+    applicationOs: "Subscription from $2.99–$19/mo — predictable",
   },
   {
     dimension: "AI approach",
@@ -180,7 +180,7 @@ export const POSITIONING_PILLARS = [
   {
     title: "Pricing that respects job search",
     description:
-      "No $50/mo scanner tax. No credit packs that vanish in a week. A $4.99 workspace plan without AI, a $2.99 student plan, and Pro only when you need unlimited tailoring.",
+      "No $50/mo scanner tax. No credit packs that vanish in a week. Essentials at $4.99 for the full workspace without AI, $2.99 for students, and Pro at $19 when you need AI tailoring.",
     accent: "Fair pricing",
   },
 ] as const;
@@ -332,26 +332,26 @@ export const PRICING_PLANS = [
       "PDF export — no AI costs",
     ],
     cta: "Get Essentials",
-    highlighted: false,
-    badge: "Most affordable",
+    highlighted: true,
+    badge: "Best value · no AI burn",
   },
   {
     id: "pro",
     name: "Pro",
-    price: "$12",
+    price: "$19",
     period: "/month",
     description:
-      "Unlimited AI for active job seekers — or $39 for a 3-month Job Search Pass.",
+      "100 AI actions per month for active job seekers — or $39 for a 3-month Job Search Pass.",
     features: [
       "Everything in Essentials",
-      "Unlimited AI tailoring",
-      "Cover letters & Q&A",
+      "100 AI actions / month",
+      "Tailor, cover letters & Q&A",
       "Fit & gaps analysis",
       "Interview prep & cross-app insights",
     ],
     cta: "Go Pro",
-    highlighted: true,
-    badge: "Best for job search",
+    highlighted: false,
+    badge: "For active searches",
   },
 ];
 
@@ -570,9 +570,14 @@ export const FAQ_ITEMS = [
       "No. Tailoring and AI drafts only reframe your real input. The prompts explicitly forbid fabricating credentials, roles, or metrics.",
   },
   {
+    question: "What counts as an AI action on Pro?",
+    answer:
+      "Each AI generation counts as one action — a cover letter, Q&A answer, tailor step, interview prep run, etc. Deep tailoring may use several actions in one session. Pro includes 100 actions per month — enough for most active job searches. Limits reset on the 1st.",
+  },
+  {
     question: "What's the $4.99 Essentials plan for?",
     answer:
-      "Job search is expensive enough. Essentials gives you the full workspace — library, editor, templates, PDF export, and application tracking — without AI. Upgrade to Pro only when you want unlimited tailoring.",
+      "Job search is expensive enough. Essentials gives you the full workspace — library, editor, templates, PDF export, and application tracking — without AI. Upgrade to Pro ($19/mo) when you want AI tailoring, cover letters, and insights — 100 actions per month.",
   },
   {
     question: "Is there a plan for high school students?",
@@ -593,7 +598,7 @@ export const FAQ_ITEMS = [
 
 export const GO_TO_MARKET = {
   targetSubs: 10_000,
-  blendedArpu: 6.5,
-  monthlyRevenueAtGoal: 65_000,
-  annualRevenueAtGoal: 780_000,
+  blendedArpu: 8.5,
+  monthlyRevenueAtGoal: 85_000,
+  annualRevenueAtGoal: 1_020_000,
 };

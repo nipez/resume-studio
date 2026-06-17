@@ -54,7 +54,7 @@ We offer:
 
 - **Student** — $2.99/mo with guided builder for first resumes
 - **Essentials** — $4.99/mo, full workspace, no AI (for people who just need structure)
-- **Pro** — $12/mo with unlimited tailoring when you need it
+- **Pro** — $19/mo with 100 AI actions per month when you need tailoring
 
 No surprise weekly bills. No $50/mo scanner tax.
 

@@ -1,4 +1,6 @@
 import { requireAIUser } from "@/lib/ai/auth";
+import { aiCallOptions } from "@/lib/ai/context";
+import { aiRouteErrorResponse } from "@/lib/ai/route-error";
 import { extractJSON } from "@/lib/ai/extract-json";
 import { completeWithFallback } from "@/lib/ai/mock";
 import { interviewPrepPrompt } from "@/lib/ai/prompts";
@@ -34,7 +36,10 @@ export async function POST(request: Request) {
       body.jobDesc,
       body.summary
     );
-    const { text, mock } = await completeWithFallback(prompt);
+    const { text, mock } = await completeWithFallback(
+      prompt,
+      aiCallOptions(auth, "interview_prep")
+    );
     const j = extractJSON<{
       questions?: string[];
       talkingPoints?: string[];
@@ -59,6 +64,8 @@ export async function POST(request: Request) {
       mock,
     });
   } catch (err) {
+    const aiError = aiRouteErrorResponse(err);
+    if (aiError) return aiError;
     const message =
       err instanceof Error ? err.message : "Something went wrong. Try again.";
     return NextResponse.json({ error: message }, { status: 500 });

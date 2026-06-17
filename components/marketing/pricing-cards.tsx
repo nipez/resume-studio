@@ -15,7 +15,7 @@ export function PricingCards() {
         >
           {plan.highlighted ? (
             <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-accent px-4 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-accent">
-              Most popular
+              Best value
             </span>
           ) : null}
           <span className="inline-flex w-fit rounded-full bg-page px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-muted ring-1 ring-border">

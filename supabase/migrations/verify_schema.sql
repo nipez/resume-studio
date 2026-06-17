@@ -27,6 +27,11 @@ with checks as (
     exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'profiles' and column_name = 'is_student')
   union all select 'profiles.student_level',
     exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'profiles' and column_name = 'student_level')
+  union all select 'profiles.plan_tier',
+    exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'profiles' and column_name = 'plan_tier')
+
+  union all select 'table: ai_usage_monthly', to_regclass('public.ai_usage_monthly') is not null
+  union all select 'table: ai_usage_events', to_regclass('public.ai_usage_events') is not null
 
   union all select 'resume_versions.archived_at',
     exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'resume_versions' and column_name = 'archived_at')
@@ -52,6 +57,8 @@ order by ok asc, check_name asc;
 --   applications.interview_*       → 0008_interview_debrief.sql
 --   resume_versions.archived_at    → 0009_resume_archive.sql
 --   table: saved_jobs              → 0010_saved_jobs.sql
+--   profiles.plan_tier             → 0011_ai_usage.sql
+--   table: ai_usage_*              → 0011_ai_usage.sql
 --   applications.job_url           → 0002_application_metadata.sql
 --   profiles.is_student            → 0003_student_profile.sql
 --   table: demo_users              → 0004_demo_users.sql (optional)

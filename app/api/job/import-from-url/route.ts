@@ -1,4 +1,5 @@
 import { requireAIUser } from "@/lib/ai/auth";
+import { aiRouteErrorResponse } from "@/lib/ai/route-error";
 import { fetchJobPageText, normalizeJobPostingUrl } from "@/lib/job/fetch-job-url";
 import { parseJobPostingText } from "@/lib/job/parse-job-posting";
 import { NextResponse } from "next/server";
@@ -27,9 +28,14 @@ export async function POST(request: Request) {
   try {
     const normalizedUrl = normalizeJobPostingUrl(body.url);
     const pageText = await fetchJobPageText(normalizedUrl);
-    const result = await parseJobPostingText(pageText, normalizedUrl);
+    const result = await parseJobPostingText(pageText, normalizedUrl, {
+      userId: auth.user.id,
+      planTier: auth.planTier,
+    });
     return NextResponse.json(result);
   } catch (err) {
+    const aiError = aiRouteErrorResponse(err);
+    if (aiError) return aiError;
     const message =
       err instanceof Error ? err.message : "Something went wrong. Try again.";
     return NextResponse.json({ error: message }, { status: 422 });

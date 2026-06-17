@@ -1,4 +1,6 @@
 import { requireAIUser } from "@/lib/ai/auth";
+import { aiCallOptions } from "@/lib/ai/context";
+import { aiRouteErrorResponse } from "@/lib/ai/route-error";
 import { completeWithFallback } from "@/lib/ai/mock";
 import { answerQuestionPrompt } from "@/lib/ai/prompts";
 import { NextResponse } from "next/server";
@@ -35,9 +37,14 @@ export async function POST(request: Request) {
       body.question.trim(),
       body.summary
     );
-    const { text, mock } = await completeWithFallback(prompt);
+    const { text, mock } = await completeWithFallback(
+      prompt,
+      aiCallOptions(auth, "answer_question")
+    );
     return NextResponse.json({ answer: (text || "").trim(), mock });
   } catch (err) {
+    const aiError = aiRouteErrorResponse(err);
+    if (aiError) return aiError;
     const message =
       err instanceof Error ? err.message : "Something went wrong.";
     return NextResponse.json({ error: message }, { status: 500 });
