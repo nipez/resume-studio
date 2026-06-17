@@ -7,9 +7,25 @@ import "@/components/marketing/shared/marketing-subpage.css";
 import "./pricing.css";
 
 const COMPARISON_SNIPPETS = [
-  { tool: "AI generators", cost: "$9–29/mo", note: "Credit packs, no tracking" },
-  { tool: "ATS scanners", cost: "$50/mo", note: "Score only, no workspace" },
-  { tool: SITE_NAME, cost: "From $2.99", note: "Full application OS", highlight: true },
+  {
+    tool: "AI generators",
+    cost: "$9–29/mo",
+    note: "Credit packs, no tracking",
+    strikethrough: true,
+  },
+  {
+    tool: "ATS scanners",
+    cost: "$50/mo",
+    note: "Score only, no workspace",
+    strikethrough: true,
+  },
+  {
+    tool: SITE_NAME,
+    cost: "From $2.99",
+    note: "Full application OS",
+    savings: "Save $76–150/mo",
+    highlight: true,
+  },
 ] as const;
 
 export function PricingPage() {
@@ -34,7 +50,14 @@ export function PricingPage() {
                   className={`price-chip${"highlight" in item && item.highlight ? " highlight" : ""}`}
                 >
                   <div className="label">{item.tool}</div>
-                  <div className="amt">{item.cost}</div>
+                  <div
+                    className={`amt${"strikethrough" in item && item.strikethrough ? " struck" : ""}`}
+                  >
+                    {item.cost}
+                  </div>
+                  {"savings" in item && item.savings ? (
+                    <div className="savings">{item.savings}</div>
+                  ) : null}
                   <div className="note">{item.note}</div>
                 </div>
               ))}

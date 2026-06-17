@@ -104,6 +104,25 @@
   color: var(--ink);
 }
 
+.marketing-home .price-chip .amt.struck {
+  color: var(--muted2);
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+  text-decoration-color: rgba(255, 92, 56, 0.55);
+}
+
+.marketing-home .price-chip .savings {
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #1a7a52;
+}
+
+.marketing-home .price-chip.highlight .savings {
+  color: #0d6b45;
+}
+
 .marketing-home .price-chip .note {
   font-size: 12.5px;
   color: var(--muted);
