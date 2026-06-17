@@ -69,6 +69,12 @@ export function VersionCard({ version, isDefault, appCount = 0 }: VersionCardPro
 
       <div className="mt-3 flex items-center gap-3 border-t border-[#F0F1F4] pt-3 text-xs text-[#8A92A0]">
         <span>{meta.meta}</span>
+        <Link
+          href={`/tailor?v=${version.id}&new=1`}
+          className="text-xs font-semibold text-[#2456D6] hover:underline"
+        >
+          Tailor from this →
+        </Link>
         <span className="ml-auto">
           {isDefault ? (
             <span className="text-[#9AA3AF]">Your starting point</span>
@@ -87,15 +93,6 @@ export function VersionCard({ version, isDefault, appCount = 0 }: VersionCardPro
             </button>
           )}
         </span>
-      </div>
-
-      <div className="mt-2.5 flex flex-wrap gap-2">
-        <Link
-          href={`/tailor?v=${version.id}`}
-          className="flex flex-1 min-w-[140px] items-center justify-center rounded-[9px] border border-[#D6E4FF] bg-[#F5F8FF] px-3 py-2 text-[12.5px] font-semibold text-[#2456D6] transition-colors hover:border-accent hover:bg-[#EAF1FF]"
-        >
-          ⌖ Tailor to a job
-        </Link>
       </div>
 
       <div className="mt-2.5 flex gap-2">
