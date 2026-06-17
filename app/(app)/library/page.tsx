@@ -1,15 +1,13 @@
 import { LibraryActions } from "@/components/library/library-actions";
-import { VersionCard } from "@/components/library/version-card";
+import { LibraryView } from "@/components/library/library-view";
 import { getApplicationCountsByVersion } from "@/lib/applications/actions";
 import { getLibraryData } from "@/lib/resume/actions";
 import Link from "next/link";
 
 export default async function LibraryPage() {
-  const [{ versions, defaultVersionId }, versionCounts] = await Promise.all([
-    getLibraryData(),
-    getApplicationCountsByVersion(),
-  ]);
-  const hasVersions = versions.length > 0;
+  const [{ versions, archivedVersions, defaultVersionId }, versionCounts] =
+    await Promise.all([getLibraryData(), getApplicationCountsByVersion()]);
+  const hasVersions = versions.length > 0 || archivedVersions.length > 0;
 
   return (
     <div className="scroll flex-1 overflow-auto">
@@ -53,16 +51,12 @@ export default async function LibraryPage() {
         ) : null}
 
         {hasVersions ? (
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(330px,1fr))] gap-[18px]">
-            {versions.map((version) => (
-              <VersionCard
-                key={version.id}
-                version={version}
-                isDefault={version.id === defaultVersionId}
-                appCount={versionCounts[version.id] ?? 0}
-              />
-            ))}
-          </div>
+          <LibraryView
+            activeVersions={versions}
+            archivedVersions={archivedVersions}
+            defaultVersionId={defaultVersionId}
+            versionCounts={versionCounts}
+          />
         ) : (
           <div className="rounded-2xl border border-dashed border-border bg-white px-6 py-10 text-center">
             <p className="text-[14px] text-muted">

@@ -16,7 +16,12 @@ function mapRow(row: Record<string, unknown>): ResumeVersion {
     data: normalizeResumeData(row.data),
     created_at: row.created_at as string,
     updated_at: row.updated_at as string,
+    archived_at: row.archived_at ? String(row.archived_at) : null,
   };
+}
+
+function isActiveVersion(version: Pick<ResumeVersion, "archived_at">) {
+  return !version.archived_at;
 }
 
 export async function getLibraryData() {
@@ -42,9 +47,22 @@ export async function getLibraryData() {
       .order("updated_at", { ascending: false }),
   ]);
 
+  const allVersions = (versions ?? []).map(mapRow);
+  const activeVersions = allVersions.filter(isActiveVersion);
+  const archivedVersions = allVersions.filter((v) => !isActiveVersion(v));
+
+  let defaultVersionId = profile?.default_version_id ?? null;
+  if (
+    defaultVersionId &&
+    !activeVersions.some((version) => version.id === defaultVersionId)
+  ) {
+    defaultVersionId = activeVersions[0]?.id ?? null;
+  }
+
   return {
-    versions: (versions ?? []).map(mapRow),
-    defaultVersionId: profile?.default_version_id ?? null,
+    versions: activeVersions,
+    archivedVersions,
+    defaultVersionId,
     userEmail: user.email ?? "",
     userName:
       (user.user_metadata?.full_name as string | undefined) ??
@@ -168,12 +186,23 @@ export async function deleteResumeVersion(id: string) {
   } = await supabase.auth.getUser();
   if (!user) throw new Error("Not authenticated");
 
-  const { data: versions } = await supabase
+  const { data: rows } = await supabase
     .from("resume_versions")
-    .select("id")
+    .select("id, archived_at")
     .eq("user_id", user.id);
 
-  if ((versions?.length ?? 0) <= 1) {
+  const versions = (rows ?? []).map((row) => ({
+    id: row.id as string,
+    archived_at: row.archived_at ? String(row.archived_at) : null,
+  }));
+  const target = versions.find((v) => v.id === id);
+  if (!target) throw new Error("Resume version not found");
+
+  const activeVersions = versions.filter(isActiveVersion);
+  if (isActiveVersion(target) && activeVersions.length <= 1) {
+    throw new Error("You need at least one active resume version");
+  }
+  if (versions.length <= 1) {
     throw new Error("You need at least one resume version");
   }
 
@@ -187,7 +216,7 @@ export async function deleteResumeVersion(id: string) {
   if (error) throw new Error(error.message);
 
   if (profile?.default_version_id === id) {
-    const remaining = versions?.find((v) => v.id !== id);
+    const remaining = activeVersions.find((v) => v.id !== id);
     if (remaining) {
       await supabase
         .from("profiles")
@@ -199,12 +228,90 @@ export async function deleteResumeVersion(id: string) {
   revalidatePath("/library");
 }
 
+export async function archiveResumeVersion(id: string) {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not authenticated");
+
+  const { data: rows } = await supabase
+    .from("resume_versions")
+    .select("id, archived_at")
+    .eq("user_id", user.id);
+
+  const versions = (rows ?? []).map((row) => ({
+    id: row.id as string,
+    archived_at: row.archived_at ? String(row.archived_at) : null,
+  }));
+  const target = versions.find((v) => v.id === id);
+  if (!target) throw new Error("Resume version not found");
+  if (!isActiveVersion(target)) return;
+
+  const activeVersions = versions.filter(isActiveVersion);
+  if (activeVersions.length <= 1) {
+    throw new Error("You need at least one active resume version");
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("default_version_id")
+    .eq("id", user.id)
+    .single();
+
+  const { error } = await supabase
+    .from("resume_versions")
+    .update({ archived_at: new Date().toISOString() })
+    .eq("id", id);
+
+  if (error) throw new Error(error.message);
+
+  if (profile?.default_version_id === id) {
+    const nextDefault = activeVersions.find((v) => v.id !== id);
+    if (nextDefault) {
+      await supabase
+        .from("profiles")
+        .update({ default_version_id: nextDefault.id })
+        .eq("id", user.id);
+    }
+  }
+
+  revalidatePath("/library");
+  revalidatePath("/tailor");
+  revalidatePath("/cover");
+}
+
+export async function restoreResumeVersion(id: string) {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not authenticated");
+
+  const { error } = await supabase
+    .from("resume_versions")
+    .update({ archived_at: null })
+    .eq("id", id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/library");
+  revalidatePath("/tailor");
+  revalidatePath("/cover");
+}
+
 export async function setDefaultResumeVersion(id: string) {
   const supabase = createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) throw new Error("Not authenticated");
+
+  const version = await getResumeVersion(id);
+  if (!version) throw new Error("Resume version not found");
+  if (version.archived_at) {
+    throw new Error("Restore this resume before setting it as default");
+  }
 
   const { error } = await supabase
     .from("profiles")
