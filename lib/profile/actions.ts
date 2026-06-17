@@ -52,3 +52,28 @@ export async function setStudentSegment(input: {
   if (error) throw new Error(error.message);
   revalidatePath("/build");
 }
+
+export async function updateProfileFullName(fullName: string): Promise<void> {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not authenticated");
+
+  const trimmed = fullName.trim();
+  if (!trimmed) {
+    throw new Error("Enter a name to display.");
+  }
+  if (trimmed.length > 80) {
+    throw new Error("Name is too long.");
+  }
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ full_name: trimmed })
+    .eq("id", user.id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/", "layout");
+}

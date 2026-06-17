@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { resolveDisplayName } from "@/lib/profile/utils";
 
 export async function getSessionProfile() {
   const supabase = createClient();
@@ -8,7 +9,13 @@ export async function getSessionProfile() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { user: null, profile: null, displayName: null, avatarLetter: null };
+    return {
+      user: null,
+      profile: null,
+      displayName: null,
+      avatarLetter: null,
+      profileFullName: null,
+    };
   }
 
   const { data: profile } = await supabase
@@ -17,13 +24,13 @@ export async function getSessionProfile() {
     .eq("id", user.id)
     .single();
 
-  const displayName =
-    profile?.full_name ||
-    user.user_metadata?.full_name ||
-    user.email?.split("@")[0] ||
-    "there";
+  const displayName = resolveDisplayName({
+    profileFullName: profile?.full_name,
+    metadataFullName: user.user_metadata?.full_name as string | undefined,
+    email: user.email,
+  });
 
   const avatarLetter = displayName.charAt(0).toUpperCase();
 
-  return { user, profile, displayName, avatarLetter };
+  return { user, profile, displayName, avatarLetter, profileFullName: profile?.full_name ?? null };
 }

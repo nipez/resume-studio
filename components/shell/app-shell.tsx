@@ -1,5 +1,6 @@
 "use client";
 
+import { DisplayNameEditor } from "@/components/profile/display-name-editor";
 import { Logo } from "@/components/brand/logo";
 import { NavIcon, type NavIconName } from "@/components/icons/nav-icons";
 import { SignOutButton } from "@/components/sign-out-button";
@@ -37,6 +38,8 @@ const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
 type AppShellProps = {
   children: React.ReactNode;
   userName: string;
+  profileFullName: string | null;
+  userEmail: string | null;
   positioning?: string | null;
   isAdmin?: boolean;
   impersonatingLabel?: string | null;
@@ -89,6 +92,8 @@ function isNavActive(pathname: string, href: string): boolean {
 export function AppShell({
   children,
   userName,
+  profileFullName,
+  userEmail,
   positioning,
   isAdmin = false,
   impersonatingLabel = null,
@@ -107,7 +112,11 @@ export function AppShell({
             <div className="truncate font-display text-[15px] font-semibold tracking-[-0.01em] text-white">
               {SITE_NAME}
             </div>
-            <div className="truncate text-[11px] text-sidebar-subtle">{userName}</div>
+            <DisplayNameEditor
+              displayName={userName}
+              profileFullName={profileFullName}
+              email={userEmail}
+            />
           </div>
         </div>
 

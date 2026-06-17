@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { resolveDisplayName } from "@/lib/profile/utils";
 
 export async function requireAIUser() {
   const supabase = createClient();
@@ -16,11 +17,11 @@ export async function requireAIUser() {
     .eq("id", user.id)
     .single();
 
-  const userName =
-    profile?.full_name ||
-    (user.user_metadata?.full_name as string | undefined) ||
-    user.email?.split("@")[0] ||
-    "Candidate";
+  const userName = resolveDisplayName({
+    profileFullName: profile?.full_name,
+    metadataFullName: user.user_metadata?.full_name as string | undefined,
+    email: user.email,
+  });
 
   return {
     user,

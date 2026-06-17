@@ -11,7 +11,7 @@ export default async function AppLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, profile, displayName } = await getSessionProfile();
+  const { user, profile, displayName, profileFullName } = await getSessionProfile();
 
   if (!user) {
     redirect("/login");
@@ -23,6 +23,8 @@ export default async function AppLayout({
   return (
     <AppShell
       userName={displayName}
+      profileFullName={profileFullName}
+      userEmail={user.email ?? null}
       positioning={profile?.positioning}
       isAdmin={isAdmin}
       impersonatingLabel={impersonation.impersonating ? impersonation.label : null}

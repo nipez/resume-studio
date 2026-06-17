@@ -5,6 +5,7 @@ import type { ResumeVersion } from "@/lib/resume/db-types";
 import type { ResumeData, TemplateStyle } from "@/lib/types/resume";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { resolveDisplayName } from "@/lib/profile/utils";
 
 function mapRow(row: Record<string, unknown>): ResumeVersion {
   return {
@@ -43,7 +44,7 @@ export async function getLibraryData() {
   const [{ data: profile }, { data: versions }] = await Promise.all([
     supabase
       .from("profiles")
-      .select("default_version_id")
+      .select("default_version_id, full_name")
       .eq("id", user.id)
       .single(),
     supabase
@@ -70,10 +71,11 @@ export async function getLibraryData() {
     archivedVersions,
     defaultVersionId,
     userEmail: user.email ?? "",
-    userName:
-      (user.user_metadata?.full_name as string | undefined) ??
-      user.email?.split("@")[0] ??
-      "",
+    userName: resolveDisplayName({
+      profileFullName: profile?.full_name,
+      metadataFullName: user.user_metadata?.full_name as string | undefined,
+      email: user.email,
+    }),
   };
 }
 
@@ -98,18 +100,21 @@ export async function createResumeVersion(copyFromId?: string) {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("default_version_id")
+    .select("default_version_id, full_name")
     .eq("id", user.id)
     .single();
 
   const sourceId = copyFromId ?? profile?.default_version_id ?? undefined;
 
+  const userName = resolveDisplayName({
+    profileFullName: profile?.full_name,
+    metadataFullName: user.user_metadata?.full_name as string | undefined,
+    email: user.email,
+  });
+
   let name = "Untitled Resume";
   let template_style: TemplateStyle = "twocol";
-  let data = createEmptyResumeData(
-    (user.user_metadata?.full_name as string) ?? "",
-    user.email ?? ""
-  );
+  let data = createEmptyResumeData(userName, user.email ?? "");
   let tailored_for = null;
 
   if (sourceId) {

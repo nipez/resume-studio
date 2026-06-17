@@ -2,6 +2,7 @@ import { DashboardHome } from "@/components/dashboard/dashboard-home";
 import { getApplicationsList } from "@/lib/applications/actions";
 import { computeInsights } from "@/lib/applications/insights";
 import { getStudentSegment } from "@/lib/profile/actions";
+import { resolveFirstName } from "@/lib/profile/utils";
 import { getLibraryData } from "@/lib/resume/actions";
 
 export const dynamic = "force-dynamic";
@@ -18,7 +19,7 @@ export default async function DashboardPage() {
   const primaryVersionId =
     library.defaultVersionId ?? versions[0]?.id ?? null;
   const hasTailored = versions.some((v) => v.tailored_for);
-  const firstName = (library.userName ?? "").split(" ")[0] ?? "";
+  const firstName = resolveFirstName(library.userName);
 
   return (
     <DashboardHome
