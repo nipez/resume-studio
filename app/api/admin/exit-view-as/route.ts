@@ -1,11 +1,12 @@
 import { restoreAdminFromImpersonation } from "@/lib/admin/restore-session";
+import { getPublicOrigin } from "@/lib/request/public-origin";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
 /** Full-page exit from view-as — restores the admin session then redirects. */
 export async function GET(request: Request) {
-  const origin = new URL(request.url).origin;
+  const origin = getPublicOrigin(request);
 
   try {
     await restoreAdminFromImpersonation();
