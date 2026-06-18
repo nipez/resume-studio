@@ -3,6 +3,7 @@
 import { Toast } from "@/components/ui/toast";
 import { Spinner } from "@/components/ui/spinner";
 import { importResumeVersion } from "@/lib/resume/actions";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
 
@@ -183,9 +184,12 @@ export function ImportModal({ open, onClose }: ImportModalProps) {
           ) : null}
 
           <div className="mt-5 flex flex-wrap items-center justify-between gap-2.5">
-            <span className="text-[13px] font-semibold text-[#2456D6] opacity-60">
-              Don&apos;t have a resume? Guided builder coming soon →
-            </span>
+            <Link
+              href="/build"
+              className="text-[13px] font-semibold text-accent hover:underline"
+            >
+              Don&apos;t have a resume? Build step by step →
+            </Link>
             <div className="flex gap-2.5">
               <button
                 type="button"

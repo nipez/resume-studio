@@ -1,13 +1,20 @@
 import { LibraryActions } from "@/components/library/library-actions";
 import { LibraryView } from "@/components/library/library-view";
+import { buildHref } from "@/components/dashboard/dashboard-shared";
 import { getApplicationCountsByVersion } from "@/lib/applications/actions";
+import { getStudentSegment } from "@/lib/profile/actions";
 import { getLibraryData } from "@/lib/resume/actions";
 import Link from "next/link";
 
 export default async function LibraryPage() {
-  const [{ versions, archivedVersions, defaultVersionId }, versionCounts] =
-    await Promise.all([getLibraryData(), getApplicationCountsByVersion()]);
+  const [{ versions, archivedVersions, defaultVersionId }, versionCounts, segment] =
+    await Promise.all([
+      getLibraryData(),
+      getApplicationCountsByVersion(),
+      getStudentSegment(),
+    ]);
   const hasVersions = versions.length > 0 || archivedVersions.length > 0;
+  const buildLink = buildHref(segment.isStudent);
 
   return (
     <div className="scroll flex-1 overflow-auto">
@@ -23,31 +30,33 @@ export default async function LibraryPage() {
               description.
             </p>
           </div>
-          <LibraryActions />
+          <LibraryActions buildHref={buildLink} />
         </div>
 
         {!hasVersions ? (
-          <Link
-            href="/build?mode=student"
-            className="mb-[22px] flex items-center gap-[18px] rounded-2xl bg-gradient-to-br from-sidebar to-[#1b2740] px-[22px] py-[19px] text-white transition-shadow hover:shadow-[0_14px_36px_rgba(15,17,22,0.22)]"
-          >
-            <div className="flex h-12 w-12 flex-none items-center justify-center rounded-[14px] bg-gradient-to-br from-accent to-[#7A53FF] text-[23px] shadow-[0_6px_18px_rgba(47,107,255,0.4)]">
-              ✎
+          <div className="mb-[22px] rounded-2xl border border-[#E4E7EC] bg-[#FAFBFC] px-6 py-6">
+            <h2 className="font-display text-[16.5px] font-semibold text-ink">
+              No resume yet
+            </h2>
+            <p className="mt-1.5 max-w-[520px] text-[13.5px] leading-relaxed text-muted">
+              Start on Home for a guided pick (student, experienced, or import),
+              or use the buttons above to build or import directly.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2.5">
+              <Link
+                href="/dashboard"
+                className="inline-flex rounded-[11px] bg-accent px-4 py-2.5 text-[13px] font-semibold text-white hover:bg-[#1E54E6]"
+              >
+                Go to Home →
+              </Link>
+              <Link
+                href={buildLink}
+                className="inline-flex rounded-[11px] border border-[#DCE0E6] bg-white px-4 py-2.5 text-[13px] font-semibold text-ink hover:bg-[#F4F5F7]"
+              >
+                Build step by step
+              </Link>
             </div>
-            <div className="min-w-0 flex-1">
-              <div className="font-display text-[16.5px] font-semibold">
-                No resume yet — or want a fresh start?
-              </div>
-              <div className="mt-[3px] text-[13.3px] leading-[1.5] text-[#AEB6C2]">
-                Don&apos;t love the one you have, or starting from a blank page?
-                I&apos;ll guide you through it one small step at a time. It&apos;s
-                easier than it feels.
-              </div>
-            </div>
-            <div className="flex-none whitespace-nowrap rounded-[11px] bg-white px-[18px] py-[11px] text-[13.5px] font-semibold text-ink">
-              Build step by step →
-            </div>
-          </Link>
+          </div>
         ) : null}
 
         {hasVersions ? (
@@ -60,9 +69,7 @@ export default async function LibraryPage() {
         ) : (
           <div className="rounded-2xl border border-dashed border-border bg-white px-6 py-10 text-center">
             <p className="text-[14px] text-muted">
-              No resume versions yet. Click{" "}
-              <span className="font-semibold text-ink">+ New version</span> to
-              create your first one.
+              Your resumes will show up here once you build or import one.
             </p>
           </div>
         )}

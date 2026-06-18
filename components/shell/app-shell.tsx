@@ -13,10 +13,13 @@ import { useTransition } from "react";
 type NavItem = { href: string; label: string; icon: NavIconName };
 
 const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
-  {
-    label: "",
-    items: [{ href: "/dashboard", label: "Home", icon: "home" }],
-  },
+    {
+      label: "",
+      items: [
+        { href: "/dashboard", label: "Home", icon: "home" },
+        { href: "/build", label: "Build resume", icon: "library" },
+      ],
+    },
   {
     label: "Prepare",
     items: [
@@ -74,6 +77,9 @@ function ImpersonationBanner({ label }: { label: string }) {
 }
 
 function isNavActive(pathname: string, href: string): boolean {
+  if (href === "/build") {
+    return pathname === "/build" || pathname.startsWith("/build/");
+  }
   if (href === "/library") {
     return (
       pathname === "/library" ||
