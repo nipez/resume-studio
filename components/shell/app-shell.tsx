@@ -31,7 +31,7 @@ function ImpersonationBanner({ label }: { label: string }) {
     <div className="flex flex-none items-center justify-between gap-3 bg-[#231a2e] px-5 py-2 text-[13px] text-[#fbe9e3]">
       <span>
         Viewing as <span className="font-semibold text-white">{label}</span> —
-        this is a demo persona.
+        you&apos;re seeing the app as this user.
       </span>
       <button
         type="button"
@@ -145,7 +145,7 @@ export function AppShell({
                 <span className="flex h-[17px] w-[17px] items-center justify-center opacity-90">
                   <NavIcon name="chart" />
                 </span>
-                <span>Admin panel</span>
+                <span>Super admin</span>
               </Link>
             </div>
           ) : null}
