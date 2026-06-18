@@ -2,41 +2,14 @@
 
 import { DisplayNameEditor } from "@/components/profile/display-name-editor";
 import { Logo } from "@/components/brand/logo";
-import { NavIcon, type NavIconName } from "@/components/icons/nav-icons";
+import { NavIcon } from "@/components/icons/nav-icons";
 import { SignOutButton } from "@/components/sign-out-button";
 import { stopViewingAs } from "@/lib/admin/actions";
 import { SITE_NAME } from "@/lib/marketing/content";
+import { buildNavGroups, isNavItemActive } from "@/lib/shell/nav-config";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useTransition } from "react";
-
-type NavItem = { href: string; label: string; icon: NavIconName };
-
-const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
-    {
-      label: "",
-      items: [
-        { href: "/dashboard", label: "Home", icon: "home" },
-        { href: "/build", label: "Build resume", icon: "library" },
-      ],
-    },
-  {
-    label: "Prepare",
-    items: [
-      { href: "/library", label: "Resume library", icon: "library" },
-      { href: "/tailor?new=1", label: "Tailor to a job", icon: "target" },
-      { href: "/cover", label: "Cover letter", icon: "mail" },
-      { href: "/questions", label: "Application Q&A", icon: "chat" },
-    ],
-  },
-  {
-    label: "Track",
-    items: [
-      { href: "/applications", label: "Applications", icon: "briefcase" },
-      { href: "/insights", label: "Insights", icon: "chart" },
-    ],
-  },
-];
+import { useMemo, useTransition } from "react";
 
 type AppShellProps = {
   children: React.ReactNode;
@@ -45,6 +18,8 @@ type AppShellProps = {
   userEmail: string | null;
   positioning?: string | null;
   isAdmin?: boolean;
+  isStudent?: boolean;
+  hasResume?: boolean;
   impersonatingLabel?: string | null;
 };
 
@@ -76,25 +51,6 @@ function ImpersonationBanner({ label }: { label: string }) {
   );
 }
 
-function isNavActive(pathname: string, href: string): boolean {
-  if (href === "/build") {
-    return pathname === "/build" || pathname.startsWith("/build/");
-  }
-  if (href === "/library") {
-    return (
-      pathname === "/library" ||
-      pathname.startsWith("/library/") ||
-      pathname.startsWith("/editor/")
-    );
-  }
-  if (href === "/applications") {
-    return (
-      pathname === "/applications" || pathname.startsWith("/applications/")
-    );
-  }
-  return pathname === href || pathname.startsWith(`${href}/`);
-}
-
 export function AppShell({
   children,
   userName,
@@ -102,9 +58,15 @@ export function AppShell({
   userEmail,
   positioning,
   isAdmin = false,
+  isStudent = false,
+  hasResume = false,
   impersonatingLabel = null,
 }: AppShellProps) {
   const pathname = usePathname();
+  const navGroups = useMemo(
+    () => buildNavGroups({ isStudent, hasResume }),
+    [isStudent, hasResume]
+  );
 
   return (
     <div className="appshell flex h-screen w-screen overflow-hidden bg-page text-ink">
@@ -123,11 +85,16 @@ export function AppShell({
               profileFullName={profileFullName}
               email={userEmail}
             />
+            {isStudent ? (
+              <span className="mt-1 inline-flex rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#c8d4f0]">
+                Student
+              </span>
+            ) : null}
           </div>
         </div>
 
         <nav className="flex flex-1 flex-col gap-4 overflow-y-auto">
-          {NAV_GROUPS.map((group) => (
+          {navGroups.map((group) => (
             <div key={group.label || "home"}>
               {group.label ? (
                 <div className="mb-1.5 px-2 text-[10px] font-bold uppercase tracking-[0.08em] text-sidebar-footer">
@@ -136,7 +103,10 @@ export function AppShell({
               ) : null}
               <div className="flex flex-col gap-0.5">
                 {group.items.map((item) => {
-                  const active = isNavActive(pathname, item.href);
+                  const active = isNavItemActive(pathname, item.href);
+                  const isPrimaryStudentCta =
+                    isStudent && item.href === "/tailor" && hasResume;
+
                   return (
                     <Link
                       key={item.href}
@@ -144,7 +114,9 @@ export function AppShell({
                       className={`flex w-full items-center gap-2.5 rounded-[9px] px-2.5 py-2 text-left text-[13px] transition-[background,color] duration-150 ${
                         active
                           ? "bg-accent/18 font-semibold text-white"
-                          : "font-medium text-sidebar-nav hover:bg-white/[0.04] hover:text-white"
+                          : isPrimaryStudentCta
+                            ? "bg-accent/12 font-semibold text-white hover:bg-accent/18"
+                            : "font-medium text-sidebar-nav hover:bg-white/[0.04] hover:text-white"
                       }`}
                     >
                       <span className="flex h-[17px] w-[17px] items-center justify-center opacity-90">
@@ -165,7 +137,7 @@ export function AppShell({
               <Link
                 href="/admin"
                 className={`flex w-full items-center gap-2.5 rounded-[9px] px-2.5 py-2 text-left text-[13px] transition-[background,color] duration-150 ${
-                  isNavActive(pathname, "/admin")
+                  isNavItemActive(pathname, "/admin")
                     ? "bg-accent/18 font-semibold text-white"
                     : "font-medium text-sidebar-nav hover:bg-white/[0.04] hover:text-white"
                 }`}
