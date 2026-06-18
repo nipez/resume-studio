@@ -14,7 +14,7 @@ export async function requireAIUser() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("full_name, positioning, plan_tier, is_student")
+    .select("full_name, positioning, plan_tier, is_student, persona")
     .eq("id", user.id)
     .single();
 
@@ -26,6 +26,7 @@ export async function requireAIUser() {
 
   const planTier: PlanTier = resolveEffectivePlanTier({
     planTier: profile?.plan_tier,
+    persona: profile?.persona,
     isStudent: profile?.is_student,
   });
 

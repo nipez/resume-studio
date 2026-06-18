@@ -1,8 +1,10 @@
 "use client";
 
 import { ImportModal } from "@/components/import/import-modal";
+import { setFirstRunPersona } from "@/lib/profile/actions";
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 
 type FirstRunPathPickerProps = {
   isStudent: boolean;
@@ -10,34 +12,69 @@ type FirstRunPathPickerProps = {
 
 const PATHS = [
   {
-    id: "student",
+    id: "student" as const,
     icon: "🎓",
     title: "Student or first resume",
     description: "Clubs, sports, volunteering — guided step by step.",
+    path: "student" as const,
     href: "/build?mode=student",
   },
   {
-    id: "experienced",
+    id: "experienced" as const,
     icon: "💼",
     title: "I have work experience",
     description: "Build a professional resume with the guided builder.",
+    path: "professional" as const,
     href: "/build",
   },
   {
-    id: "import",
+    id: "import" as const,
     icon: "↑",
     title: "I already have a resume",
     description: "Paste text or upload a PDF — we'll structure it for you.",
+    path: "import" as const,
     action: "import" as const,
   },
-] as const;
+];
 
 export function FirstRunPathPicker({ isStudent }: FirstRunPathPickerProps) {
+  const router = useRouter();
   const [importOpen, setImportOpen] = useState(false);
+  const [pending, startTransition] = useTransition();
+  const [error, setError] = useState("");
 
   const orderedPaths = isStudent
     ? PATHS
     : [PATHS[1], PATHS[2], PATHS[0]];
+
+  function choosePath(
+    path: "student" | "professional" | "import",
+    href: string
+  ) {
+    setError("");
+    startTransition(async () => {
+      try {
+        await setFirstRunPersona(path);
+        router.push(href);
+        router.refresh();
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Could not save your choice");
+      }
+    });
+  }
+
+  function openImport() {
+    setError("");
+    startTransition(async () => {
+      try {
+        await setFirstRunPersona("import");
+        setImportOpen(true);
+        router.refresh();
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Could not save your choice");
+      }
+    });
+  }
 
   return (
     <>
@@ -46,38 +83,46 @@ export function FirstRunPathPicker({ isStudent }: FirstRunPathPickerProps) {
           How do you want to start?
         </h2>
         <p className="mb-4 text-[13.5px] text-muted">
-          Pick one path — you can always import or build another version later.
+          Pick one path — we&apos;ll remember it and tailor the app for you.
         </p>
+        {error ? (
+          <p className="mb-3 text-[13px] font-medium text-[#B23B3B]">{error}</p>
+        ) : null}
         <div className="grid gap-3 sm:grid-cols-3">
           {orderedPaths.map((path) => {
-            if ("action" in path && path.action === "import") {
+            if (path.action === "import") {
               return (
                 <button
                   key={path.id}
                   type="button"
-                  onClick={() => setImportOpen(true)}
-                  className="flex cursor-pointer flex-col rounded-2xl border border-[#E4E7EC] bg-white p-5 text-left transition-colors hover:border-accent hover:bg-[#FAFBFF]"
+                  disabled={pending}
+                  onClick={openImport}
+                  className="flex cursor-pointer flex-col rounded-2xl border border-[#E4E7EC] bg-white p-5 text-left transition-colors hover:border-accent hover:bg-[#FAFBFF] disabled:opacity-60"
                 >
-                  <PathCardContent {...path} />
+                  <PathCardContent {...path} pending={pending} />
                 </button>
               );
             }
 
-            if ("href" in path) {
-              return (
-                <Link
-                  key={path.id}
-                  href={path.href}
-                  className="flex flex-col rounded-2xl border border-[#E4E7EC] bg-white p-5 transition-colors hover:border-accent hover:bg-[#FAFBFF]"
-                >
-                  <PathCardContent {...path} />
-                </Link>
-              );
-            }
-
-            return null;
+            return (
+              <button
+                key={path.id}
+                type="button"
+                disabled={pending}
+                onClick={() => choosePath(path.path, path.href)}
+                className="flex cursor-pointer flex-col rounded-2xl border border-[#E4E7EC] bg-white p-5 text-left transition-colors hover:border-accent hover:bg-[#FAFBFF] disabled:opacity-60"
+              >
+                <PathCardContent {...path} pending={pending} />
+              </button>
+            );
           })}
         </div>
+        <p className="mt-3 text-[12px] text-muted">
+          Already started?{" "}
+          <Link href="/build" className="font-semibold text-accent hover:underline">
+            Open the builder
+          </Link>
+        </p>
       </section>
       <ImportModal open={importOpen} onClose={() => setImportOpen(false)} />
     </>
@@ -88,10 +133,12 @@ function PathCardContent({
   icon,
   title,
   description,
+  pending,
 }: {
   icon: string;
   title: string;
   description: string;
+  pending?: boolean;
 }) {
   return (
     <>
@@ -105,7 +152,7 @@ function PathCardContent({
         {description}
       </span>
       <span className="mt-4 text-[12.5px] font-semibold text-accent">
-        Choose →
+        {pending ? "Saving…" : "Choose →"}
       </span>
     </>
   );

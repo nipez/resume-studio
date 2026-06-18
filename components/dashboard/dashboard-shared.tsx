@@ -15,6 +15,8 @@ export type DashboardUpcoming = {
 
 export type DashboardHomeData = {
   firstName: string;
+  persona: "student" | "professional" | null;
+  onboardingPersonaSet: boolean;
   isStudent: boolean;
   versionsCount: number;
   applicationsCount: number;
@@ -28,8 +30,10 @@ export const DASHBOARD_VIEW_STORAGE_KEY = "resumetrakr-dashboard-view";
 
 export type DashboardView = "simple" | "full";
 
+import { buildHrefForPersona } from "@/lib/profile/persona";
+
 export function buildHref(isStudent: boolean) {
-  return isStudent ? "/build?mode=student" : "/build";
+  return buildHrefForPersona(isStudent);
 }
 
 export const MODULES = [

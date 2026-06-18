@@ -2,19 +2,19 @@ import { LibraryActions } from "@/components/library/library-actions";
 import { LibraryView } from "@/components/library/library-view";
 import { buildHref } from "@/components/dashboard/dashboard-shared";
 import { getApplicationCountsByVersion } from "@/lib/applications/actions";
-import { getStudentSegment } from "@/lib/profile/actions";
+import { getUserProfileContext } from "@/lib/profile/actions";
 import { getLibraryData } from "@/lib/resume/actions";
 import Link from "next/link";
 
 export default async function LibraryPage() {
-  const [{ versions, archivedVersions, defaultVersionId }, versionCounts, segment] =
+  const [{ versions, archivedVersions, defaultVersionId }, versionCounts, profile] =
     await Promise.all([
       getLibraryData(),
       getApplicationCountsByVersion(),
-      getStudentSegment(),
+      getUserProfileContext(),
     ]);
   const hasVersions = versions.length > 0 || archivedVersions.length > 0;
-  const buildLink = buildHref(segment.isStudent);
+  const buildLink = buildHref(profile.isStudent);
 
   return (
     <div className="scroll flex-1 overflow-auto">

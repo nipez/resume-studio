@@ -80,7 +80,13 @@ export async function createDemoUser(input: {
   if (input.makeStudent) {
     await svc
       .from("profiles")
-      .update({ is_student: true, student_level: "high_school" })
+      .update({
+        is_student: true,
+        student_level: "high_school",
+        persona: "student",
+        onboarding_persona_set: true,
+        plan_tier: "student",
+      })
       .eq("id", demoId);
   }
 

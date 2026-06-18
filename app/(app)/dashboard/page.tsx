@@ -1,17 +1,17 @@
 import { DashboardHome } from "@/components/dashboard/dashboard-home";
 import { getApplicationsList } from "@/lib/applications/actions";
 import { computeInsights } from "@/lib/applications/insights";
-import { getStudentSegment } from "@/lib/profile/actions";
+import { getUserProfileContext } from "@/lib/profile/actions";
 import { resolveFirstName } from "@/lib/profile/utils";
 import { getLibraryData } from "@/lib/resume/actions";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const [library, { applications }, segment] = await Promise.all([
+  const [library, { applications }, profile] = await Promise.all([
     getLibraryData(),
     getApplicationsList(),
-    getStudentSegment(),
+    getUserProfileContext(),
   ]);
 
   const insights = computeInsights(applications);
@@ -24,7 +24,9 @@ export default async function DashboardPage() {
   return (
     <DashboardHome
       firstName={firstName}
-      isStudent={segment.isStudent}
+      persona={profile.persona}
+      onboardingPersonaSet={profile.onboardingPersonaSet}
+      isStudent={profile.isStudent}
       versionsCount={versions.length}
       applicationsCount={insights.stats.total}
       hasTailored={hasTailored}

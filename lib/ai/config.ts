@@ -70,6 +70,7 @@ export function isActionAllowedForTier(
 
 export function resolveEffectivePlanTier(input: {
   planTier?: string | null;
+  persona?: string | null;
   isStudent?: boolean | null;
 }): PlanTier {
   if (!AI_ENFORCE_PLAN_TIERS) {
@@ -79,6 +80,10 @@ export function resolveEffectivePlanTier(input: {
   const explicit = input.planTier?.trim().toLowerCase();
   if (explicit === "student" || explicit === "essentials" || explicit === "pro") {
     return explicit;
+  }
+
+  if (input.persona === "student") {
+    return "student";
   }
 
   if (input.isStudent) {
