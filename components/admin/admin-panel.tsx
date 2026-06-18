@@ -18,7 +18,7 @@ export function AdminPanel({ demoUsers, adminEmail }: AdminPanelProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [label, setLabel] = useState("");
-  const [makeStudent, setMakeStudent] = useState(true);
+  const [makeStudent, setMakeStudent] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState("");
 
@@ -76,7 +76,8 @@ export function AdminPanel({ demoUsers, adminEmail }: AdminPanelProps) {
         </h1>
         <p className="mt-2 max-w-[620px] text-[14.5px] leading-relaxed text-muted">
           Signed in as <span className="font-semibold text-ink">{adminEmail}</span>.
-          Create lightweight demo personas (no extra email needed) and{" "}
+          Create demo personas pre-loaded with resumes, cover letters, applications,
+          and insights — then{" "}
           <span className="font-semibold text-ink">View as</span> them to walk
           through exactly what a new user would experience. Return to your own
           account anytime from the banner.
@@ -91,7 +92,7 @@ export function AdminPanel({ demoUsers, adminEmail }: AdminPanelProps) {
               Label
               <input
                 value={label}
-                placeholder="e.g. High-school student"
+                placeholder="e.g. Alex Rivera · PM search"
                 onChange={(e) => setLabel(e.target.value)}
                 className="min-w-[220px] rounded-[10px] border border-[#DFE3E8] px-3 py-2.5 text-sm focus:border-accent focus:outline-none"
               />

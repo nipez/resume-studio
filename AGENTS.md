@@ -18,7 +18,8 @@ installed in the image, but **services are not auto-started** — start them eac
 1. Start the Docker daemon (no systemd here, run it in the background):
    `sudo dockerd` (e.g. in a tmux session). The socket may need `sudo chmod 666 /var/run/docker.sock` once so the Supabase CLI can reach it without sudo.
 2. Start Supabase: `supabase start` (first run pulls images; `supabase db reset` re-applies migrations + `supabase/seed.sql`).
-3. Start the app: `npm run dev` (port 3000).
+3. Seed the demo persona: `npm run seed:demo` (creates **Alex Rivera** with 5 resumes, 4 cover letters, 12 applications with insights, and workspace draft).
+4. Start the app: `npm run dev` (port 3000).
 
 `.env.local` is gitignored. If missing, recreate it with the **standard local Supabase
 demo keys** (identical on every machine — safe to hardcode for local dev):
@@ -46,3 +47,4 @@ PORT=3000
   enforces per-user row access. This file is local-only (not applied by `supabase db push`).
 - Supabase Studio (DB browser) is at `http://127.0.0.1:54323`.
 - Reinstalling deps does not require restarting Supabase; only restart `npm run dev`.
+- **Demo persona:** `alex.rivera@demo.resumetrakr.local` / `demo-alex-rivera` (after `npm run seed:demo`). Admins can also create pre-loaded personas from **Admin → Demo users**; each new persona gets the same rich sample data automatically.
