@@ -6,6 +6,11 @@ import {
   decodeImpersonator,
   encodeImpersonator,
 } from "@/lib/admin/impersonation";
+import {
+  getStoredImpersonatorEmail,
+  restoreAdminFromImpersonation,
+} from "@/lib/admin/restore-session";
+import { establishSession } from "@/lib/admin/session";
 import type {
   AdminDashboardStats,
   AdminUserRow,
@@ -120,25 +125,7 @@ export async function deleteDemoUser(id: string): Promise<void> {
   revalidatePath("/admin");
 }
 
-// Establish a real Supabase session for `email` on the current browser by
-// minting a magic-link token (service role) and verifying it server-side.
-async function establishSession(email: string): Promise<void> {
-  const svc = createServiceClient();
-  const { data, error } = await svc.auth.admin.generateLink({
-    type: "magiclink",
-    email,
-  });
-  const tokenHash = data?.properties?.hashed_token;
-  if (error || !tokenHash) {
-    throw new Error(error?.message ?? "Failed to generate session");
-  }
-  const supabase = createClient();
-  const { error: verifyErr } = await supabase.auth.verifyOtp({
-    token_hash: tokenHash,
-    type: "magiclink",
-  });
-  if (verifyErr) throw new Error(verifyErr.message);
-}
+export { getStoredImpersonatorEmail, restoreAdminFromImpersonation };
 
 export async function listAllUsers(): Promise<AdminUserRow[]> {
   await requireAdmin();
@@ -293,19 +280,7 @@ export async function viewAsDemoUser(id: string): Promise<void> {
 }
 
 export async function stopViewingAs(): Promise<void> {
-  const cookieStore = cookies();
-  const adminEmail = decodeImpersonator(
-    cookieStore.get(IMPERSONATOR_COOKIE)?.value
-  );
-  // Only restore an account that is a configured admin.
-  if (!adminEmail || !isAdminEmail(adminEmail)) {
-    cookieStore.delete(IMPERSONATOR_COOKIE);
-    throw new Error("No valid admin session to return to");
-  }
-
-  await establishSession(adminEmail);
-  cookieStore.delete(IMPERSONATOR_COOKIE);
-  revalidatePath("/", "layout");
+  await restoreAdminFromImpersonation();
 }
 
 export type ImpersonationState = {

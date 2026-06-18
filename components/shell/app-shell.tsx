@@ -4,12 +4,13 @@ import { DisplayNameEditor } from "@/components/profile/display-name-editor";
 import { Logo } from "@/components/brand/logo";
 import { NavIcon } from "@/components/icons/nav-icons";
 import { SignOutButton } from "@/components/sign-out-button";
-import { stopViewingAs } from "@/lib/admin/actions";
 import { SITE_NAME } from "@/lib/marketing/content";
 import { buildNavGroups, isNavItemActive } from "@/lib/shell/nav-config";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useMemo, useTransition } from "react";
+import { useMemo } from "react";
+
+const EXIT_VIEW_AS_HREF = "/api/admin/exit-view-as";
 
 type AppShellProps = {
   children: React.ReactNode;
@@ -23,59 +24,35 @@ type AppShellProps = {
   impersonatingLabel?: string | null;
 };
 
-function useExitToSuperAdmin() {
-  const [pending, startTransition] = useTransition();
-
-  function exitToSuperAdmin() {
-    startTransition(async () => {
-      try {
-        await stopViewingAs();
-      } finally {
-        window.location.href = "/admin";
-      }
-    });
-  }
-
-  return { exitToSuperAdmin, pending };
-}
-
 function ImpersonationBanner({ label }: { label: string }) {
-  const { exitToSuperAdmin, pending } = useExitToSuperAdmin();
-
   return (
     <div className="flex flex-none flex-wrap items-center justify-between gap-3 bg-[#231a2e] px-5 py-2.5 text-[13px] text-[#fbe9e3]">
       <span>
         Viewing as <span className="font-semibold text-white">{label}</span> —
         you&apos;re seeing the app as this user.
       </span>
-      <button
-        type="button"
-        disabled={pending}
-        onClick={exitToSuperAdmin}
-        className="cursor-pointer rounded-lg bg-white px-3 py-1.5 text-[12.5px] font-semibold text-[#231a2e] transition-colors hover:bg-[#f0f0f0] disabled:opacity-60"
+      <a
+        href={EXIT_VIEW_AS_HREF}
+        className="rounded-lg bg-white px-3 py-1.5 text-[12.5px] font-semibold text-[#231a2e] transition-colors hover:bg-[#f0f0f0]"
       >
-        {pending ? "Returning…" : "Back to Super admin"}
-      </button>
+        Back to Super admin
+      </a>
     </div>
   );
 }
 
 function SidebarExitToSuperAdmin() {
-  const { exitToSuperAdmin, pending } = useExitToSuperAdmin();
-
   return (
     <div className="mb-3 px-1">
-      <button
-        type="button"
-        disabled={pending}
-        onClick={exitToSuperAdmin}
-        className="flex w-full cursor-pointer items-center gap-2.5 rounded-[9px] border border-[#FFB86A]/35 bg-[#FFB86A]/15 px-2.5 py-2.5 text-left text-[13px] font-semibold text-[#FFE8CC] transition-colors hover:bg-[#FFB86A]/25 disabled:opacity-60"
+      <a
+        href={EXIT_VIEW_AS_HREF}
+        className="flex w-full items-center gap-2.5 rounded-[9px] border border-[#FFB86A]/35 bg-[#FFB86A]/15 px-2.5 py-2.5 text-left text-[13px] font-semibold text-[#FFE8CC] transition-colors hover:bg-[#FFB86A]/25"
       >
         <span className="flex h-[17px] w-[17px] items-center justify-center opacity-90">
           ←
         </span>
-        <span>{pending ? "Returning…" : "Back to Super admin"}</span>
-      </button>
+        <span>Back to Super admin</span>
+      </a>
     </div>
   );
 }
