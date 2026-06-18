@@ -8,7 +8,8 @@ import { stopViewingAs } from "@/lib/admin/actions";
 import { SITE_NAME } from "@/lib/marketing/content";
 import { buildNavGroups, isNavItemActive } from "@/lib/shell/nav-config";
 import Link from "next/link";
-import { usePathname, useMemo, useTransition } from "react";
+import { usePathname } from "next/navigation";
+import { useMemo, useTransition } from "react";
 
 type AppShellProps = {
   children: React.ReactNode;
