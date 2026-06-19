@@ -1,6 +1,8 @@
 import { CoverPanel } from "@/components/cover/cover-panel";
+import { VersionJobDraftBootstrap } from "@/components/cover/version-job-draft-bootstrap";
 import { JobDraftBootstrap } from "@/components/saved-jobs/job-draft-bootstrap";
 import { listCoverLetters } from "@/lib/cover/actions";
+import { getCoverPrepSeedForVersion } from "@/lib/cover/prep-seed";
 import { getLibraryData } from "@/lib/resume/actions";
 
 type PageProps = {
@@ -15,6 +17,9 @@ export default async function CoverPage({ searchParams }: PageProps) {
   ]);
   const initialVersionId =
     v && versions.some((version) => version.id === v) ? v : null;
+  const coverPrepSeed = initialVersionId
+    ? await getCoverPrepSeedForVersion(initialVersionId)
+    : null;
 
   return (
     <div className="scroll flex-1 overflow-auto">
@@ -28,6 +33,12 @@ export default async function CoverPage({ searchParams }: PageProps) {
         </p>
         <div className="mt-[26px]">
           <JobDraftBootstrap savedJobId={job ?? null} />
+          {initialVersionId ? (
+            <VersionJobDraftBootstrap
+              versionId={initialVersionId}
+              seed={coverPrepSeed}
+            />
+          ) : null}
           <CoverPanel
             versions={versions}
             defaultVersionId={defaultVersionId}

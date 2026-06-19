@@ -84,12 +84,20 @@ export function VersionCard({
       <div className="mt-3 flex items-center gap-3 border-t border-[#F0F1F4] pt-3 text-xs text-[#8A92A0]">
         <span>{meta.meta}</span>
         {!archived ? (
-          <Link
-            href={`/tailor?v=${version.id}&new=1`}
-            className="text-xs font-semibold text-[#2456D6] hover:underline"
-          >
-            Tailor from this →
-          </Link>
+          <>
+            <Link
+              href={`/tailor?v=${version.id}&new=1`}
+              className="text-xs font-semibold text-[#2456D6] hover:underline"
+            >
+              Tailor from this →
+            </Link>
+            <Link
+              href={`/cover?v=${version.id}`}
+              className="text-xs font-semibold text-[#2456D6] hover:underline"
+            >
+              Cover letter →
+            </Link>
+          </>
         ) : null}
         {!archived ? (
           <span className="ml-auto">
