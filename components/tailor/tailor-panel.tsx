@@ -148,6 +148,9 @@ export function TailorPanel({
       baseId: base.id,
       jobRole: draft.jobRole,
       jobCompany: draft.jobCompany,
+      jobDesc: draft.jobDesc,
+      jobUrl: draft.jobUrl,
+      contextNotes: draft.contextNotes,
       depth,
       data,
     });

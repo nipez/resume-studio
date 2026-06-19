@@ -1,5 +1,4 @@
 import { CoverPanel } from "@/components/cover/cover-panel";
-import { VersionJobDraftBootstrap } from "@/components/cover/version-job-draft-bootstrap";
 import { JobDraftBootstrap } from "@/components/saved-jobs/job-draft-bootstrap";
 import { listCoverLetters } from "@/lib/cover/actions";
 import { getCoverPrepSeedForVersion } from "@/lib/cover/prep-seed";
@@ -33,12 +32,6 @@ export default async function CoverPage({ searchParams }: PageProps) {
         </p>
         <div className="mt-[26px]">
           <JobDraftBootstrap savedJobId={job ?? null} />
-          {initialVersionId ? (
-            <VersionJobDraftBootstrap
-              versionId={initialVersionId}
-              seed={coverPrepSeed}
-            />
-          ) : null}
           <CoverPanel
             versions={versions}
             defaultVersionId={defaultVersionId}
@@ -46,6 +39,7 @@ export default async function CoverPage({ searchParams }: PageProps) {
             initialVersionId={initialVersionId}
             prepFlowResultId={initialVersionId}
             savedJobId={job ?? null}
+            prepSeed={coverPrepSeed}
           />
         </div>
       </div>
