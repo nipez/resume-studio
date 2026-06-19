@@ -2,7 +2,10 @@
 
 import { parseJobFromVersionName } from "@/lib/applications/utils";
 import type { JobDraft } from "@/lib/job-draft/storage";
-import { getResumeVersion } from "@/lib/resume/actions";
+import {
+  backfillTailoredJobContext,
+  getResumeVersion,
+} from "@/lib/resume/actions";
 import type { TailoredFor } from "@/lib/resume/db-types";
 import { createClient } from "@/lib/supabase/server";
 
@@ -17,6 +20,27 @@ function normalizeJobText(value: string | undefined | null): string {
   return value?.trim() ?? "";
 }
 
+function companiesMatch(
+  a: string | null | undefined,
+  b: string | null | undefined
+): boolean {
+  const left = normalizeJobText(a).toLowerCase();
+  const right = normalizeJobText(b).toLowerCase();
+  if (!left || !right) return false;
+  return left === right || left.includes(right) || right.includes(left);
+}
+
+function rolesCompatible(
+  a: string | null | undefined,
+  b: string | null | undefined
+): boolean {
+  const left = normalizeJobText(a).toLowerCase();
+  const right = normalizeJobText(b).toLowerCase();
+  if (!left || !right) return true;
+  if (left === right) return true;
+  return left.startsWith(right) || right.startsWith(left);
+}
+
 function jobContextMatches(
   seed: CoverPrepSeed,
   role: string | null | undefined,
@@ -28,14 +52,10 @@ function jobContextMatches(
   const otherCompany = normalizeJobText(company);
 
   if (!seedRole && !seedCompany) return true;
-  if (seedRole && otherRole && seedRole.toLowerCase() !== otherRole.toLowerCase()) {
+  if (seedRole && otherRole && !rolesCompatible(seedRole, otherRole)) {
     return false;
   }
-  if (
-    seedCompany &&
-    otherCompany &&
-    seedCompany.toLowerCase() !== otherCompany.toLowerCase()
-  ) {
+  if (seedCompany && otherCompany && !companiesMatch(seedCompany, otherCompany)) {
     return false;
   }
   return true;
@@ -56,6 +76,46 @@ function applyTailoredFor(seed: CoverPrepSeed, tailoredFor: TailoredFor): void {
   if (!seed.contextNotes?.trim() && tailoredFor.contextNotes?.trim()) {
     seed.contextNotes = tailoredFor.contextNotes.trim();
   }
+}
+
+function applyJobRecord(
+  seed: CoverPrepSeed,
+  record: {
+    role?: string | null;
+    company?: string | null;
+    job_desc?: string | null;
+    job_url?: string | null;
+    context_notes?: string | null;
+    cover_text?: string | null;
+  }
+): void {
+  if (!seed.jobRole && record.role) seed.jobRole = String(record.role);
+  if (!seed.jobCompany && record.company) seed.jobCompany = String(record.company);
+  if (!seed.jobDesc?.trim() && record.job_desc) {
+    seed.jobDesc = String(record.job_desc);
+  }
+  if (!seed.jobUrl?.trim() && record.job_url) {
+    seed.jobUrl = String(record.job_url);
+  }
+  if (!seed.contextNotes?.trim() && record.context_notes) {
+    seed.contextNotes = String(record.context_notes);
+  }
+  if (!seed.coverText?.trim() && record.cover_text) {
+    seed.coverText = String(record.cover_text);
+  }
+}
+
+async function maybeBackfillVersion(
+  versionId: string,
+  tailoredFor: TailoredFor,
+  seed: CoverPrepSeed
+): Promise<void> {
+  if (!tailoredFor || tailoredFor.jobDesc?.trim() || !seed.jobDesc?.trim()) return;
+  await backfillTailoredJobContext(versionId, {
+    jobDesc: seed.jobDesc,
+    jobUrl: seed.jobUrl,
+    contextNotes: seed.contextNotes,
+  });
 }
 
 /** Job context to pre-fill Cover when opening from a resume version. */
@@ -80,7 +140,7 @@ export async function getCoverPrepSeedForVersion(
   } = await supabase.auth.getUser();
   if (!user) return Object.keys(seed).length ? seed : null;
 
-  const { data: savedJob } = await supabase
+  const { data: savedJobByVersion } = await supabase
     .from("saved_jobs")
     .select("role, company, job_desc, job_url, context_notes, cover_text")
     .eq("user_id", user.id)
@@ -89,24 +149,7 @@ export async function getCoverPrepSeedForVersion(
     .limit(1)
     .maybeSingle();
 
-  if (savedJob) {
-    if (!seed.jobRole && savedJob.role) seed.jobRole = String(savedJob.role);
-    if (!seed.jobCompany && savedJob.company) {
-      seed.jobCompany = String(savedJob.company);
-    }
-    if (!seed.jobDesc?.trim() && savedJob.job_desc) {
-      seed.jobDesc = String(savedJob.job_desc);
-    }
-    if (!seed.jobUrl?.trim() && savedJob.job_url) {
-      seed.jobUrl = String(savedJob.job_url);
-    }
-    if (!seed.contextNotes?.trim() && savedJob.context_notes) {
-      seed.contextNotes = String(savedJob.context_notes);
-    }
-    if (!seed.coverText?.trim() && savedJob.cover_text) {
-      seed.coverText = String(savedJob.cover_text);
-    }
-  }
+  if (savedJobByVersion) applyJobRecord(seed, savedJobByVersion);
 
   if (!seed.jobDesc?.trim()) {
     const { data: application } = await supabase
@@ -118,43 +161,59 @@ export async function getCoverPrepSeedForVersion(
       .limit(1)
       .maybeSingle();
 
-    if (application) {
-      if (!seed.jobRole && application.role) seed.jobRole = String(application.role);
-      if (!seed.jobCompany && application.company) {
-        seed.jobCompany = String(application.company);
-      }
-      if (application.job_desc) seed.jobDesc = String(application.job_desc);
+    if (application) applyJobRecord(seed, application);
+  }
+
+  const { data: workspaceDraft } = await supabase
+    .from("workspace_drafts")
+    .select("job_role, job_company, job_desc, job_url, context_notes, cover_text")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (!seed.jobDesc?.trim() && workspaceDraft?.job_desc) {
+    const company = seed.jobCompany || version.tailored_for?.company;
+    const companyMatches = companiesMatch(workspaceDraft.job_company, company);
+    const contextMatches = jobContextMatches(
+      seed,
+      workspaceDraft.job_role,
+      workspaceDraft.job_company
+    );
+
+    if (companyMatches || contextMatches || !version.tailored_for) {
+      applyJobRecord(seed, {
+        role: workspaceDraft.job_role,
+        company: workspaceDraft.job_company,
+        job_desc: workspaceDraft.job_desc,
+        job_url: workspaceDraft.job_url,
+        context_notes: workspaceDraft.context_notes,
+        cover_text: workspaceDraft.cover_text,
+      });
     }
   }
 
-  if (!seed.jobDesc?.trim()) {
-    const { data: workspaceDraft } = await supabase
-      .from("workspace_drafts")
-      .select("job_role, job_company, job_desc, job_url, context_notes, cover_text")
+  if (!seed.jobDesc?.trim() && seed.jobCompany) {
+    const { data: savedJobByCompany } = await supabase
+      .from("saved_jobs")
+      .select("role, company, job_desc, job_url, context_notes, cover_text")
       .eq("user_id", user.id)
+      .ilike("company", `%${seed.jobCompany}%`)
+      .neq("job_desc", "")
+      .order("updated_at", { ascending: false })
+      .limit(1)
       .maybeSingle();
 
     if (
-      workspaceDraft?.job_desc &&
-      jobContextMatches(seed, workspaceDraft.job_role, workspaceDraft.job_company)
+      savedJobByCompany &&
+      rolesCompatible(seed.jobRole, savedJobByCompany.role)
     ) {
-      seed.jobDesc = String(workspaceDraft.job_desc);
-      if (!seed.jobUrl?.trim() && workspaceDraft.job_url) {
-        seed.jobUrl = String(workspaceDraft.job_url);
-      }
-      if (!seed.contextNotes?.trim() && workspaceDraft.context_notes) {
-        seed.contextNotes = String(workspaceDraft.context_notes);
-      }
-      if (!seed.coverText?.trim() && workspaceDraft.cover_text) {
-        seed.coverText = String(workspaceDraft.cover_text);
-      }
+      applyJobRecord(seed, savedJobByCompany);
     }
   }
 
   if (!seed.jobDesc?.trim() && seed.jobRole && seed.jobCompany) {
-    const { data: matchedJob } = await supabase
+    const { data: savedJobExact } = await supabase
       .from("saved_jobs")
-      .select("job_desc, job_url, context_notes, cover_text")
+      .select("role, company, job_desc, job_url, context_notes, cover_text")
       .eq("user_id", user.id)
       .ilike("role", seed.jobRole)
       .ilike("company", seed.jobCompany)
@@ -162,19 +221,10 @@ export async function getCoverPrepSeedForVersion(
       .limit(1)
       .maybeSingle();
 
-    if (matchedJob?.job_desc) {
-      seed.jobDesc = String(matchedJob.job_desc);
-      if (!seed.jobUrl?.trim() && matchedJob.job_url) {
-        seed.jobUrl = String(matchedJob.job_url);
-      }
-      if (!seed.contextNotes?.trim() && matchedJob.context_notes) {
-        seed.contextNotes = String(matchedJob.context_notes);
-      }
-      if (!seed.coverText?.trim() && matchedJob.cover_text) {
-        seed.coverText = String(matchedJob.cover_text);
-      }
-    }
+    if (savedJobExact) applyJobRecord(seed, savedJobExact);
   }
+
+  await maybeBackfillVersion(versionId, version.tailored_for, seed);
 
   return Object.keys(seed).length ? seed : null;
 }

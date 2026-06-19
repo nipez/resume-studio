@@ -20,6 +20,7 @@ import { useJobDraft } from "@/lib/job-draft/use-job-draft";
 import { buildResumeHTML } from "@/lib/resume/build-resume-html";
 import { openPrintHtml } from "@/lib/resume/build-cover-html";
 import { saveTailoredVersion } from "@/lib/resume/actions";
+import { saveJobDraft } from "@/lib/job-draft/actions";
 import { updateSavedJob } from "@/lib/saved-jobs/actions";
 import type { ResumeVersion } from "@/lib/resume/db-types";
 import type { ResumeData } from "@/lib/types/resume";
@@ -166,6 +167,13 @@ export function TailorPanel({
     setPhase("result");
     setSaveStatus("saved");
     setPendingSave(null);
+    await saveJobDraft({
+      jobRole: draft.jobRole,
+      jobCompany: draft.jobCompany,
+      jobDesc: draft.jobDesc,
+      jobUrl: draft.jobUrl,
+      contextNotes: draft.contextNotes,
+    });
     if (savedJobId) {
       await updateSavedJob(savedJobId, { tailoredVersionId: saved.id });
     }
