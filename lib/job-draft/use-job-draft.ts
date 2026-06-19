@@ -1,6 +1,8 @@
 "use client";
 
 import { loadWorkspaceDraft, saveJobDraft, clearWorkspaceJobDraft } from "@/lib/job-draft/actions";
+import { mergeSeedIntoDraft } from "@/lib/job-draft/merge-seed";
+import type { CoverPrepSeed } from "@/lib/cover/prep-seed";
 import {
   clearJobDraftLocal,
   readJobDraft,
@@ -17,8 +19,14 @@ import { useCallback, useEffect, useRef, useState } from "react";
 const HYDRATED_FLAG = "resume_studio_jobdraft_hydrated_v1";
 const SAVE_DEBOUNCE_MS = 600;
 
-export function useJobDraft() {
-  const [draft, setDraft] = useState<JobDraft>(() => readJobDraft());
+export function useJobDraft(prepSeed?: CoverPrepSeed | null) {
+  const [draft, setDraft] = useState<JobDraft>(() => {
+    const local = readJobDraft();
+    if (!prepSeed) return local;
+    const next = mergeSeedIntoDraft(local, prepSeed);
+    writeJobDraft(next);
+    return next;
+  });
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {

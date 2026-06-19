@@ -20,6 +20,7 @@ import {
   deleteCoverLetter,
   saveCoverLetter,
 } from "@/lib/cover/actions";
+import type { CoverPrepSeed } from "@/lib/cover/prep-seed";
 import { updateSavedJob } from "@/lib/saved-jobs/actions";
 import type { CoverLetter } from "@/lib/cover/types";
 import { useJobDraft } from "@/lib/job-draft/use-job-draft";
@@ -35,6 +36,7 @@ type CoverPanelProps = {
   /** When set, show the 4-step prep flow stepper (from Tailor → Cover). */
   prepFlowResultId?: string | null;
   savedJobId?: string | null;
+  prepSeed?: CoverPrepSeed | null;
 };
 
 function formatWhen(iso: string) {
@@ -56,8 +58,9 @@ export function CoverPanel({
   initialVersionId = null,
   prepFlowResultId = null,
   savedJobId = null,
+  prepSeed = null,
 }: CoverPanelProps) {
-  const { draft, update } = useJobDraft();
+  const { draft, update } = useJobDraft(prepSeed);
   const [baseId, setBaseId] = useState(
     initialVersionId ?? defaultVersionId ?? versions[0]?.id ?? ""
   );

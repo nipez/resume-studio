@@ -367,6 +367,9 @@ export async function saveTailoredVersion(input: {
   baseId: string;
   jobRole: string;
   jobCompany: string;
+  jobDesc?: string;
+  jobUrl?: string;
+  contextNotes?: string;
   depth: "light" | "deep";
   data: ResumeData;
 }) {
@@ -393,6 +396,9 @@ export async function saveTailoredVersion(input: {
         role: input.jobRole,
         company: input.jobCompany,
         depth: input.depth,
+        jobDesc: input.jobDesc?.trim() ?? "",
+        jobUrl: input.jobUrl?.trim() ?? "",
+        contextNotes: input.contextNotes?.trim() ?? "",
       },
       data: normalizeResumeData(input.data),
     })

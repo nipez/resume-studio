@@ -4,6 +4,9 @@ export type TailoredFor = {
   role?: string;
   company?: string;
   depth?: string;
+  jobDesc?: string;
+  jobUrl?: string;
+  contextNotes?: string;
 } | null;
 
 export type ResumeVersion = {
