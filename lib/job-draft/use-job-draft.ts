@@ -19,18 +19,28 @@ import { useCallback, useEffect, useRef, useState } from "react";
 const HYDRATED_FLAG = "resume_studio_jobdraft_hydrated_v1";
 const SAVE_DEBOUNCE_MS = 600;
 
+function applyDraft(next: JobDraft) {
+  writeJobDraft(next);
+  return next;
+}
+
 export function useJobDraft(prepSeed?: CoverPrepSeed | null) {
+  const prepSeedRef = useRef(prepSeed);
+  prepSeedRef.current = prepSeed;
+
   const [draft, setDraft] = useState<JobDraft>(() => {
     const local = readJobDraft();
     if (!prepSeed) return local;
-    const next = mergeSeedIntoDraft(local, prepSeed);
-    writeJobDraft(next);
-    return next;
+    return applyDraft(mergeSeedIntoDraft(local, prepSeed));
   });
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    setDraft(readJobDraft());
+    const local = readJobDraft();
+    const seeded = prepSeed
+      ? applyDraft(mergeSeedIntoDraft(local, prepSeed))
+      : local;
+    setDraft(seeded);
 
     let alreadyHydrated = false;
     try {
@@ -38,7 +48,9 @@ export function useJobDraft(prepSeed?: CoverPrepSeed | null) {
     } catch {
       // sessionStorage unavailable — fall through and hydrate anyway.
     }
-    if (alreadyHydrated) return;
+
+    const needsRemoteDesc = Boolean(prepSeed && !seeded.jobDesc.trim());
+    if (alreadyHydrated && !needsRemoteDesc) return;
 
     let cancelled = false;
     loadWorkspaceDraft()
@@ -49,36 +61,34 @@ export function useJobDraft(prepSeed?: CoverPrepSeed | null) {
         } catch {
           // ignore
         }
-        if (remote?.draft) {
-          // Fill-only merge: the account copy only populates fields that are
-          // currently EMPTY locally. It never overwrites in-progress local edits,
-          // so a background hydration can't clear a just-generated/typed cover
-          // letter (which previously left draft.coverText empty and the Save
-          // button disabled while the letter was still visible). A fresh device
-          // has empty fields, so it still pulls the full account copy.
-          const local = readJobDraft();
-          const next: JobDraft = { ...local };
-          (Object.keys(remote.draft) as (keyof JobDraft)[]).forEach((key) => {
-            const remoteValue = remote.draft[key];
-            const localValue = local[key];
-            if (
-              typeof remoteValue === "string" &&
-              remoteValue.trim() !== "" &&
-              (!localValue || localValue.trim() === "")
-            ) {
-              next[key] = remoteValue;
-            }
-          });
-          writeJobDraft(next);
-          setDraft(next);
-        }
+        if (!remote?.draft) return;
+
+        const current = readJobDraft();
+        const next: JobDraft = prepSeedRef.current
+          ? mergeSeedIntoDraft(current, prepSeedRef.current)
+          : { ...current };
+
+        (Object.keys(remote.draft) as (keyof JobDraft)[]).forEach((key) => {
+          const remoteValue = remote.draft[key];
+          const localValue = next[key];
+          if (
+            typeof remoteValue === "string" &&
+            remoteValue.trim() !== "" &&
+            (!localValue || localValue.trim() === "")
+          ) {
+            next[key] = remoteValue;
+          }
+        });
+
+        applyDraft(next);
+        setDraft(next);
       })
       .catch(() => {});
 
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [prepSeed]);
 
   useEffect(() => {
     const syncFromStorage = () => setDraft(readJobDraft());

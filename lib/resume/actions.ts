@@ -363,6 +363,38 @@ export async function importResumeVersion(data: ResumeData) {
   return mapRow(created);
 }
 
+export async function backfillTailoredJobContext(
+  versionId: string,
+  patch: { jobDesc?: string; jobUrl?: string; contextNotes?: string }
+): Promise<void> {
+  const version = await getResumeVersion(versionId);
+  if (!version?.tailored_for || version.tailored_for.jobDesc?.trim()) return;
+  if (!patch.jobDesc?.trim()) return;
+
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+
+  const next = {
+    ...version.tailored_for,
+    jobDesc: patch.jobDesc.trim(),
+    jobUrl: patch.jobUrl?.trim() ?? version.tailored_for.jobUrl ?? "",
+    contextNotes:
+      patch.contextNotes?.trim() ?? version.tailored_for.contextNotes ?? "",
+  };
+
+  await supabase
+    .from("resume_versions")
+    .update({ tailored_for: next })
+    .eq("id", versionId)
+    .eq("user_id", user.id);
+
+  revalidatePath("/cover");
+  revalidatePath("/library");
+}
+
 export async function saveTailoredVersion(input: {
   baseId: string;
   jobRole: string;
@@ -407,7 +439,42 @@ export async function saveTailoredVersion(input: {
 
   if (error || !created) throw new Error(error?.message ?? "Failed to save");
 
+  const tailoredFor = {
+    role: input.jobRole,
+    company: input.jobCompany,
+    depth: input.depth,
+    jobDesc: input.jobDesc?.trim() ?? "",
+    jobUrl: input.jobUrl?.trim() ?? "",
+    contextNotes: input.contextNotes?.trim() ?? "",
+  };
+
+  await supabase.from("workspace_drafts").upsert(
+    {
+      user_id: user.id,
+      job_role: input.jobRole,
+      job_company: input.jobCompany,
+      job_desc: input.jobDesc?.trim() ?? "",
+      job_url: input.jobUrl?.trim() ?? "",
+      context_notes: input.contextNotes?.trim() ?? "",
+    },
+    { onConflict: "user_id" }
+  );
+
+  if (input.jobCompany.trim()) {
+    await supabase
+      .from("saved_jobs")
+      .update({
+        tailored_version_id: created.id,
+        job_desc: input.jobDesc?.trim() ?? "",
+        job_url: input.jobUrl?.trim() ?? "",
+        context_notes: input.contextNotes?.trim() ?? "",
+      })
+      .eq("user_id", user.id)
+      .ilike("company", input.jobCompany.trim());
+  }
+
   revalidatePath("/library");
   revalidatePath("/tailor");
-  return mapRow(created);
+  revalidatePath("/cover");
+  return mapRow({ ...created, tailored_for: tailoredFor });
 }
