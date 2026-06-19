@@ -151,6 +151,13 @@ export function ResumeEditor({ version }: ResumeEditorProps) {
     setActiveSection({ id: "activities", index: 0 });
   }
 
+  const coverLetterHref = `/cover?v=${version.id}`;
+  const hasJobContext = Boolean(
+    version.tailored_for?.role?.trim() ||
+      version.tailored_for?.company?.trim() ||
+      version.name.includes(" · ")
+  );
+
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="flex flex-none flex-wrap items-center gap-3 border-b border-border bg-white px-6 py-3.5">
@@ -211,6 +218,16 @@ export function ResumeEditor({ version }: ResumeEditorProps) {
                 ? "Save failed"
                 : "Live preview"}
         </span>
+        <Link
+          href={coverLetterHref}
+          className={`inline-flex items-center gap-1.5 rounded-[10px] px-3.5 py-2.5 text-[13.5px] font-semibold transition-colors ${
+            hasJobContext
+              ? "border border-[#CFE0FF] bg-[#EAF1FF] text-[#1E54E6] hover:border-[#A8C4FF] hover:bg-[#DCE8FF]"
+              : "border border-[#DFE3E8] bg-white text-[#5A6573] hover:border-[#C8CED6] hover:text-ink"
+          }`}
+        >
+          ✉ Cover letter
+        </Link>
         <button
           type="button"
           onClick={previewPdf}
