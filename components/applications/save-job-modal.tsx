@@ -10,16 +10,28 @@ import { JobDescParseButton } from "@/components/shared/job-desc-parse-button";
 import { JobUrlImport } from "@/components/shared/job-url-import";
 import { ResumeContextNotesField } from "@/components/shared/resume-context-notes-field";
 import { Spinner } from "@/components/ui/spinner";
-import { createSavedJob } from "@/lib/saved-jobs/actions";
+import { createSavedJob, updateSavedJob } from "@/lib/saved-jobs/actions";
+import type { SavedJob } from "@/lib/saved-jobs/types";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 
 type SaveJobModalProps = {
   open: boolean;
   onClose: () => void;
+  /** When set, modal edits an existing saved job instead of creating one. */
+  job?: SavedJob | null;
 };
 
-export function SaveJobModal({ open, onClose }: SaveJobModalProps) {
+const emptyForm = {
+  role: "",
+  company: "",
+  jobDesc: "",
+  jobUrl: "",
+  contextNotes: "",
+  notes: "",
+};
+
+export function SaveJobModal({ open, onClose, job = null }: SaveJobModalProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [role, setRole] = useState("");
@@ -29,6 +41,27 @@ export function SaveJobModal({ open, onClose }: SaveJobModalProps) {
   const [contextNotes, setContextNotes] = useState("");
   const [notes, setNotes] = useState("");
   const [error, setError] = useState("");
+  const isEdit = Boolean(job);
+
+  useEffect(() => {
+    if (!open) return;
+    setError("");
+    if (job) {
+      setRole(job.role);
+      setCompany(job.company);
+      setJobDesc(job.job_desc);
+      setJobUrl(job.job_url);
+      setContextNotes(job.context_notes);
+      setNotes(job.notes);
+    } else {
+      setRole(emptyForm.role);
+      setCompany(emptyForm.company);
+      setJobDesc(emptyForm.jobDesc);
+      setJobUrl(emptyForm.jobUrl);
+      setContextNotes(emptyForm.contextNotes);
+      setNotes(emptyForm.notes);
+    }
+  }, [open, job]);
 
   if (!open) return null;
 
@@ -41,20 +74,25 @@ export function SaveJobModal({ open, onClose }: SaveJobModalProps) {
     setError("");
     startTransition(async () => {
       try {
-        await createSavedJob({
-          role,
-          company,
-          jobDesc,
-          jobUrl,
-          contextNotes,
-          notes,
-        });
-        setRole("");
-        setCompany("");
-        setJobDesc("");
-        setJobUrl("");
-        setContextNotes("");
-        setNotes("");
+        if (job) {
+          await updateSavedJob(job.id, {
+            role,
+            company,
+            jobDesc,
+            jobUrl,
+            contextNotes,
+            notes,
+          });
+        } else {
+          await createSavedJob({
+            role,
+            company,
+            jobDesc,
+            jobUrl,
+            contextNotes,
+            notes,
+          });
+        }
         onClose();
         router.refresh();
       } catch (e) {
@@ -73,33 +111,32 @@ export function SaveJobModal({ open, onClose }: SaveJobModalProps) {
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="font-display text-[20px] font-semibold text-ink">
-          Save job to apply to
+          {isEdit ? "Edit saved job" : "Save job to apply to"}
         </h2>
         <p className="mt-1.5 text-[13px] leading-relaxed text-muted">
-          Add a role you want to pursue later. Tailor a resume and cover letter
-          from your queue when you&apos;re ready.
+          {isEdit
+            ? "Update the posting link, description, or notes — your tailor progress is kept."
+            : "Add a role you want to pursue later. Tailor a resume and cover letter from your queue when you're ready."}
         </p>
 
         <div className="mt-4">
-          <JobUrlImport
-            urlOnly
-            onImported={(fields) => {
-              setRole(fields.jobRole);
-              setCompany(fields.jobCompany);
-              setJobDesc(fields.jobDesc);
-              setJobUrl(fields.jobUrl ?? jobUrl);
-            }}
-            successMessage="Imported — review the fields below."
-          />
-          <div className="mt-3 grid grid-cols-2 gap-3">
+          {!isEdit ? (
+            <JobUrlImport
+              urlOnly
+              onImported={(fields) => {
+                setRole(fields.jobRole);
+                setCompany(fields.jobCompany);
+                setJobDesc(fields.jobDesc);
+                setJobUrl(fields.jobUrl ?? jobUrl);
+              }}
+              successMessage="Imported — review the fields below."
+            />
+          ) : null}
+          <div className={`grid grid-cols-2 gap-3 ${isEdit ? "" : "mt-3"}`}>
             <JobRoleField value={role} onChange={setRole} />
             <JobCompanyField value={company} onChange={setCompany} />
           </div>
-          <JobDescField
-            value={jobDesc}
-            onChange={setJobDesc}
-            rows={6}
-          />
+          <JobDescField value={jobDesc} onChange={setJobDesc} rows={6} />
           <JobDescParseButton
             text={jobDesc}
             onParsed={(fields) => {
@@ -161,7 +198,7 @@ export function SaveJobModal({ open, onClose }: SaveJobModalProps) {
             className="inline-flex cursor-pointer items-center gap-2 rounded-[9px] border-none bg-accent px-4 py-2 text-[13px] font-semibold text-white hover:bg-[#1E54E6] disabled:opacity-50"
           >
             {pending ? <Spinner /> : null}
-            {pending ? "Saving…" : "Save job"}
+            {pending ? "Saving…" : isEdit ? "Save changes" : "Save job"}
           </button>
         </div>
       </div>

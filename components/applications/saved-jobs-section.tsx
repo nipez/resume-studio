@@ -1,11 +1,12 @@
 "use client";
 
 import { LogApplicationButton } from "@/components/applications/log-application-button";
+import { SaveJobModal } from "@/components/applications/save-job-modal";
 import { activateSavedJobForPrep, deleteSavedJob } from "@/lib/saved-jobs/actions";
 import type { SavedJob } from "@/lib/saved-jobs/types";
 import { writeJobDraft } from "@/lib/job-draft/storage";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 
 type SavedJobsSectionProps = {
   savedJobs: SavedJob[];
@@ -39,6 +40,7 @@ export function SavedJobsSection({
 }: SavedJobsSectionProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
+  const [editingJob, setEditingJob] = useState<SavedJob | null>(null);
 
   function startPrep(jobId: string, href: string) {
     startTransition(async () => {
@@ -80,7 +82,8 @@ export function SavedJobsSection({
   }
 
   return (
-    <section className="mb-8">
+    <>
+      <section className="mb-8">
       <div className="mb-3">
         <h2 className="font-display text-[17px] font-semibold text-ink">
           Jobs to apply to
@@ -108,8 +111,18 @@ export function SavedJobsSection({
               key={job.id}
               className="flex flex-col rounded-2xl border border-[#E6E8EC] bg-white p-4"
             >
-              <div className="font-display text-[15px] font-semibold leading-snug text-ink">
-                {jobTitle(job)}
+              <div className="flex items-start justify-between gap-2">
+                <div className="font-display text-[15px] font-semibold leading-snug text-ink">
+                  {jobTitle(job)}
+                </div>
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={() => setEditingJob(job)}
+                  className="cursor-pointer flex-none border-none bg-transparent p-0 text-[12px] font-semibold text-[#2456D6] hover:underline disabled:opacity-50"
+                >
+                  Edit
+                </button>
               </div>
               <div className="mt-1 text-[12px] text-[#8A92A0]">
                 Saved {formatSavedDate(job.updated_at)}
@@ -215,6 +228,13 @@ export function SavedJobsSection({
           );
         })}
       </div>
-    </section>
+      </section>
+
+      <SaveJobModal
+        open={editingJob !== null}
+        job={editingJob}
+        onClose={() => setEditingJob(null)}
+      />
+    </>
   );
 }
