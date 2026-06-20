@@ -6,6 +6,7 @@ import {
   UpcomingSection,
   buildHref,
 } from "@/components/dashboard/dashboard-shared";
+import { StudentWelcomePanel } from "@/components/dashboard/student-welcome-panel";
 
 export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
   const {
@@ -96,14 +97,22 @@ export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
       <div className="mx-auto max-w-[1080px] px-12 pb-16 pt-[42px]">
         <div className="mb-7">
           <h1 className="font-display text-[30px] font-semibold tracking-[-0.025em] text-ink">
-            Welcome{firstName ? `, ${firstName}` : ""} 👋
+            {isStudent && isNew
+              ? `Hi${firstName ? ` ${firstName}` : ""} 👋`
+              : `Welcome${firstName ? `, ${firstName}` : ""} 👋`}
           </h1>
-          <p className="mt-2 max-w-[620px] text-[14.5px] leading-relaxed text-muted">
-            {isStudent
-              ? "Build your resume, tailor it for jobs and internships, then track every application in one place."
-              : "This is your job-search command center — build and tailor resumes, send cover letters and Q&A, then track what actually lands."}
-          </p>
+          {!isStudent || !isNew ? (
+            <p className="mt-2 max-w-[620px] text-[14.5px] leading-relaxed text-muted">
+              {isStudent
+                ? "Build your resume, tailor it for jobs and internships, then track every application in one place."
+                : "This is your job-search command center — build and tailor resumes, send cover letters and Q&A, then track what actually lands."}
+            </p>
+          ) : null}
         </div>
+
+        {isStudent && isNew ? (
+          <StudentWelcomePanel firstName={firstName || undefined} />
+        ) : null}
 
         {isNew ? (
           <Link
