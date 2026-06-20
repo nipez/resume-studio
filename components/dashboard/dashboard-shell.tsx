@@ -10,9 +10,10 @@ import { DashboardHomeSimple } from "@/components/dashboard/dashboard-home-simpl
 import { useEffect, useState } from "react";
 
 function readStoredView(): DashboardView {
-  if (typeof window === "undefined") return "simple";
+  if (typeof window === "undefined") return "full";
   const stored = window.localStorage.getItem(DASHBOARD_VIEW_STORAGE_KEY);
-  return stored === "full" ? "full" : "simple";
+  if (stored === "simple") return "simple";
+  return "full";
 }
 
 function DashboardViewToggle({
@@ -55,7 +56,7 @@ function DashboardViewToggle({
 }
 
 export function DashboardShell({ data }: { data: DashboardHomeData }) {
-  const [view, setView] = useState<DashboardView>("simple");
+  const [view, setView] = useState<DashboardView>("full");
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -69,7 +70,7 @@ export function DashboardShell({ data }: { data: DashboardHomeData }) {
   }
 
   if (!ready) {
-    return <DashboardHomeSimple data={data} />;
+    return <DashboardHomeFull data={data} />;
   }
 
   return (

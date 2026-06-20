@@ -1,16 +1,12 @@
 "use server";
 
 import { isAdminEmail, isAdminUser } from "@/lib/auth/admin";
-import {
-  IMPERSONATOR_COOKIE,
-  decodeImpersonator,
-  encodeImpersonator,
-} from "@/lib/admin/impersonation";
+import { IMPERSONATOR_COOKIE } from "@/lib/admin/impersonation";
 import {
   getStoredImpersonatorEmail,
   restoreAdminFromImpersonation,
 } from "@/lib/admin/restore-session";
-import { establishSession } from "@/lib/admin/session";
+import { startViewingAsUser } from "@/lib/admin/view-as-session";
 import type {
   AdminDashboardStats,
   AdminUserRow,
@@ -231,37 +227,8 @@ export async function getAdminDashboardData(): Promise<{
   return { users, stats: computeAdminStats(users) };
 }
 
-async function resolveUserEmail(userId: string): Promise<string> {
-  const svc = createServiceClient();
-  const { data, error } = await svc.auth.admin.getUserById(userId);
-  if (error || !data.user?.email) {
-    throw new Error("User not found");
-  }
-  return data.user.email;
-}
-
 export async function viewAsUser(userId: string): Promise<void> {
-  const admin = await requireAdmin();
-  const email = await resolveUserEmail(userId);
-
-  if (isAdminEmail(email)) {
-    throw new Error("Cannot view as another admin account");
-  }
-
-  if (email.toLowerCase() === admin.email?.toLowerCase()) {
-    throw new Error("You are already signed in as this account");
-  }
-
-  cookies().set(IMPERSONATOR_COOKIE, encodeImpersonator(admin.email!), {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: 60 * 60 * 8,
-  });
-
-  await establishSession(email);
-  revalidatePath("/", "layout");
+  await startViewingAsUser(userId);
 }
 
 export async function viewAsDemoUser(id: string): Promise<void> {
@@ -290,13 +257,14 @@ export type ImpersonationState = {
 
 export async function getImpersonationState(): Promise<ImpersonationState> {
   const cookieStore = cookies();
-  const adminEmail = decodeImpersonator(
-    cookieStore.get(IMPERSONATOR_COOKIE)?.value
-  );
-  if (!adminEmail) return { impersonating: false, label: null };
+  const cookieValue = cookieStore.get(IMPERSONATOR_COOKIE)?.value;
+  if (!cookieValue) return { impersonating: false, label: null };
 
   const user = await getRealUser();
-  if (!user) return { impersonating: false, label: null };
+
+  if (!user) {
+    return { impersonating: true, label: "another user" };
+  }
 
   const svc = createServiceClient();
   const [{ data: demo }, { data: profile }] = await Promise.all([
