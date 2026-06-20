@@ -51,4 +51,5 @@ PORT=3000
 
 Real-user Anthropic spend benchmarks for plan pricing live in
 [`docs/ai-cost-benchmarks.md`](docs/ai-cost-benchmarks.md). Append new sessions there
-when beta testers or production usage gives you a billing data point.
+when beta testers or production usage gives you a billing data point. Live aggregates
+also appear in **Super admin → AI costs** (`ai_usage_events` / `ai_usage_monthly`).

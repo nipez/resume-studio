@@ -10,6 +10,7 @@ import {
   getAdminOpenSupportCount,
   listAdminSupportTickets,
 } from "@/lib/support/actions";
+import { getAdminAIUsageDashboard } from "@/lib/admin/ai-usage";
 import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
@@ -30,17 +31,30 @@ export default async function AdminPage() {
     listDemoUsers(),
   ]);
 
-  let supportTickets: Awaited<ReturnType<typeof listAdminSupportTickets>> = [];
-  let openSupportCount = 0;
-  try {
-    [supportTickets, openSupportCount] = await Promise.all([
-      listAdminSupportTickets(),
-      getAdminOpenSupportCount(),
-    ]);
-  } catch {
-    supportTickets = [];
-    openSupportCount = 0;
-  }
+  const [supportResult, aiUsage] = await Promise.all([
+    Promise.all([
+      listAdminSupportTickets().catch(() => [] as Awaited<ReturnType<typeof listAdminSupportTickets>>),
+      getAdminOpenSupportCount().catch(() => 0),
+    ]),
+    getAdminAIUsageDashboard().catch(() => null),
+  ]);
+
+  const [supportTickets, openSupportCount] = supportResult;
+  const aiUsageData =
+    aiUsage ?? {
+      available: false,
+      costTodayUsd: 0,
+      costLast7DaysUsd: 0,
+      costMonthToDateUsd: 0,
+      costAllTimeUsd: 0,
+      actionsToday: 0,
+      actionsMonthToDate: 0,
+      actionsAllTime: 0,
+      dailyLast30Days: [],
+      monthlyHistory: [],
+      topUsersThisMonth: [],
+      recentEvents: [],
+    };
 
   return (
     <AdminPanel
@@ -50,6 +64,7 @@ export default async function AdminPage() {
       demoUsers={demoUsers}
       supportTickets={supportTickets}
       openSupportCount={openSupportCount}
+      aiUsage={aiUsageData}
     />
   );
 }

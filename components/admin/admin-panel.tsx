@@ -7,7 +7,9 @@ import {
   type DemoUser,
 } from "@/lib/admin/actions";
 import { AdminSupportTab } from "@/components/admin/admin-support-tab";
+import { AdminAIUsageTab } from "@/components/admin/admin-ai-usage-tab";
 import type { AdminDashboardStats, AdminUserRow } from "@/lib/admin/types";
+import { formatUsdCost, type AdminAIUsageDashboard } from "@/lib/admin/ai-usage-types";
 import type { AdminSupportTicket } from "@/lib/support/types";
 import {
   formatAdminDate,
@@ -24,9 +26,10 @@ type AdminPanelProps = {
   demoUsers: DemoUser[];
   supportTickets: AdminSupportTicket[];
   openSupportCount: number;
+  aiUsage: AdminAIUsageDashboard;
 };
 
-type Tab = "users" | "demos" | "support";
+type Tab = "users" | "demos" | "support" | "ai";
 type PersonaFilter = "all" | "student" | "professional" | "none";
 type SortKey =
   | "lastSignIn"
@@ -45,6 +48,7 @@ export function AdminPanel({
   demoUsers,
   supportTickets,
   openSupportCount,
+  aiUsage,
 }: AdminPanelProps) {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("users");
@@ -224,6 +228,30 @@ export function AdminPanel({
           <StatCard label="No persona" value={String(stats.noPersona)} />
         </div>
 
+        {aiUsage.available ? (
+          <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <StatCard
+              label="API cost today"
+              value={formatUsdCost(aiUsage.costTodayUsd)}
+              hint={`${aiUsage.actionsToday} AI actions`}
+            />
+            <StatCard
+              label="API cost (7d)"
+              value={formatUsdCost(aiUsage.costLast7DaysUsd)}
+            />
+            <StatCard
+              label="API cost (MTD)"
+              value={formatUsdCost(aiUsage.costMonthToDateUsd)}
+              hint={`${aiUsage.actionsMonthToDate} actions this month`}
+            />
+            <StatCard
+              label="API cost (all time)"
+              value={formatUsdCost(aiUsage.costAllTimeUsd)}
+              hint="Last 365 days logged"
+            />
+          </div>
+        ) : null}
+
         <div className="mt-6 flex gap-1 rounded-xl border border-[#E4E7EC] bg-[#FAFBFC] p-1">
           <TabButton active={tab === "users"} onClick={() => setTab("users")}>
             All users ({users.length})
@@ -233,6 +261,9 @@ export function AdminPanel({
           </TabButton>
           <TabButton active={tab === "support"} onClick={() => setTab("support")}>
             Support{openSupportCount > 0 ? ` (${openSupportCount})` : ""}
+          </TabButton>
+          <TabButton active={tab === "ai"} onClick={() => setTab("ai")}>
+            AI costs
           </TabButton>
         </div>
 
@@ -370,6 +401,8 @@ export function AdminPanel({
           </div>
         ) : tab === "support" ? (
           <AdminSupportTab tickets={supportTickets} />
+        ) : tab === "ai" ? (
+          <AdminAIUsageTab data={aiUsage} />
         ) : (
           <>
             <div className="mt-4 rounded-2xl border border-border bg-white p-6">
