@@ -246,7 +246,7 @@ export async function getAdminAIUsageDashboard(): Promise<AdminAIUsageDashboard>
     monthlyAggregate.set(period, bucket);
   }
 
-  const monthlyHistory: AdminAIMonthlyPoint[] = [...monthlyAggregate.entries()]
+  const monthlyHistory: AdminAIMonthlyPoint[] = Array.from(monthlyAggregate.entries())
     .sort((a, b) => b[0].localeCompare(a[0]))
     .slice(0, 12)
     .map(([periodStart, bucket]) => ({
@@ -256,7 +256,7 @@ export async function getAdminAIUsageDashboard(): Promise<AdminAIUsageDashboard>
       activeUsers: bucket.users.size,
     }));
 
-  const topUserIds = [...userMonthMap.entries()]
+  const topUserIds = Array.from(userMonthMap.entries())
     .sort((a, b) => b[1].costUsd - a[1].costUsd)
     .slice(0, 10)
     .map(([userId]) => userId);
@@ -265,7 +265,7 @@ export async function getAdminAIUsageDashboard(): Promise<AdminAIUsageDashboard>
     new Set(events.slice(0, 25).map((e) => e.user_id))
   );
 
-  const labelIds = Array.from(new Set([...topUserIds, ...recentUserIds]));
+  const labelIds = Array.from(new Set(topUserIds.concat(recentUserIds)));
   const { emailById, nameById } = await resolveUserLabels(svc, labelIds);
 
   const topUsersThisMonth: AdminAIUserCostRow[] = topUserIds.map((userId) => {
