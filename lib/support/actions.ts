@@ -200,7 +200,7 @@ export async function listAdminSupportTickets(): Promise<AdminSupportTicket[]> {
   if (error) throw new Error(error.message);
   if (!tickets?.length) return [];
 
-  const userIds = [...new Set(tickets.map((t) => t.user_id as string))];
+  const userIds = Array.from(new Set(tickets.map((t) => t.user_id as string)));
   const ticketIds = tickets.map((t) => t.id as string);
 
   const [{ data: profiles }, { data: messages }] = await Promise.all([
