@@ -5,7 +5,9 @@ import {
   deleteDemoUser,
   type DemoUser,
 } from "@/lib/admin/actions";
+import { AdminSupportTab } from "@/components/admin/admin-support-tab";
 import type { AdminDashboardStats, AdminUserRow } from "@/lib/admin/types";
+import type { AdminSupportTicket } from "@/lib/support/types";
 import {
   formatAdminDate,
   isActiveUser,
@@ -19,15 +21,19 @@ type AdminPanelProps = {
   stats: AdminDashboardStats;
   users: AdminUserRow[];
   demoUsers: DemoUser[];
+  supportTickets: AdminSupportTicket[];
+  openSupportCount: number;
 };
 
-type Tab = "users" | "demos";
+type Tab = "users" | "demos" | "support";
 
 export function AdminPanel({
   adminEmail,
   stats,
   users,
   demoUsers,
+  supportTickets,
+  openSupportCount,
 }: AdminPanelProps) {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("users");
@@ -123,6 +129,9 @@ export function AdminPanel({
           <TabButton active={tab === "demos"} onClick={() => setTab("demos")}>
             Demo personas ({demoUsers.length})
           </TabButton>
+          <TabButton active={tab === "support"} onClick={() => setTab("support")}>
+            Support{openSupportCount > 0 ? ` (${openSupportCount})` : ""}
+          </TabButton>
         </div>
 
         {error ? (
@@ -165,6 +174,8 @@ export function AdminPanel({
               ))
             )}
           </div>
+        ) : tab === "support" ? (
+          <AdminSupportTab tickets={supportTickets} />
         ) : (
           <>
             <div className="mt-4 rounded-2xl border border-border bg-white p-6">

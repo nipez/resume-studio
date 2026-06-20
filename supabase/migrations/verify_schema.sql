@@ -14,6 +14,9 @@ with checks as (
   union all select 'table: saved_jobs', to_regclass('public.saved_jobs') is not null
   union all select 'table: demo_users', to_regclass('public.demo_users') is not null
 
+  union all select 'table: support_tickets', to_regclass('public.support_tickets') is not null
+  union all select 'table: support_messages', to_regclass('public.support_messages') is not null
+
   union all select 'applications.job_url',
     exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'applications' and column_name = 'job_url')
   union all select 'applications.hiring_contacts',
