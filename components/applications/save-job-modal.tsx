@@ -110,6 +110,21 @@ export function SaveJobModal({ open, onClose }: SaveJobModalProps) {
             }}
             className="mt-2"
           />
+          <label className="mt-3 flex flex-col gap-1.5 text-[12.5px] font-semibold text-[#5A6573]">
+            Job posting URL (optional)
+            <input
+              type="url"
+              value={jobUrl}
+              onChange={(e) => setJobUrl(e.target.value)}
+              placeholder="https://company.com/careers/role — saved for later"
+              className="rounded-[9px] border border-[#DFE3E8] px-[11px] py-2.5 text-sm font-normal text-ink focus:border-accent focus:outline-none"
+            />
+            <span className="text-[11.5px] font-normal leading-snug text-[#8A92A0]">
+              Link to the live posting — especially if you pasted the description from
+              Indeed or LinkedIn. Shows as &ldquo;Posting&rdquo; on your saved job
+              card.
+            </span>
+          </label>
           <ResumeContextNotesField
             className="mt-4"
             value={contextNotes}
