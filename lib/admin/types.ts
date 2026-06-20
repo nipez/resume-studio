@@ -5,6 +5,7 @@ export type AdminUserRow = {
   email: string;
   fullName: string | null;
   persona: UserPersona | null;
+  onboardingPersonaSet: boolean;
   createdAt: string;
   lastSignInAt: string | null;
   resumeCount: number;
@@ -18,6 +19,8 @@ export type AdminDashboardStats = {
   activeUsers30d: number;
   signedInToday: number;
   studentPersonas: number;
+  professionalPersonas: number;
+  noPersona: number;
 };
 
 export function isActiveUser(lastSignInAt: string | null, withinDays = 30): boolean {

@@ -9,7 +9,12 @@ import {
 import { Toast } from "@/components/ui/toast";
 import { Spinner } from "@/components/ui/spinner";
 import { logApplication } from "@/lib/applications/actions";
-import { parseJobFromVersionName } from "@/lib/applications/utils";
+import type { ApplicationType } from "@/lib/applications/types";
+import {
+  APPLICATION_TYPES,
+  defaultApplicationType,
+  parseJobFromVersionName,
+} from "@/lib/applications/utils";
 import { clearWorkspaceJobDraft } from "@/lib/job-draft/actions";
 import {
   clearJobDraftLocal,
@@ -28,6 +33,7 @@ type LogApplicationModalProps = {
   resumeVersionName: string;
   initialRole?: string;
   initialCompany?: string;
+  isStudent?: boolean;
   onSuccess?: (applicationId: string) => void;
 };
 
@@ -60,6 +66,7 @@ export function LogApplicationModal({
   resumeVersionName,
   initialRole = "",
   initialCompany = "",
+  isStudent = false,
   onSuccess,
 }: LogApplicationModalProps) {
   const router = useRouter();
@@ -68,6 +75,9 @@ export function LogApplicationModal({
   const [company, setCompany] = useState("");
   const [jobDesc, setJobDesc] = useState("");
   const [jobUrl, setJobUrl] = useState("");
+  const [applicationType, setApplicationType] = useState<ApplicationType>(
+    defaultApplicationType(isStudent)
+  );
   const [error, setError] = useState("");
   const [toast, setToast] = useState<string | null>(null);
 
@@ -79,8 +89,9 @@ export function LogApplicationModal({
     setCompany(ctx.jobCompany || initialCompany || fromName.company);
     setJobDesc(ctx.jobDesc);
     setJobUrl(ctx.jobUrl);
+    setApplicationType(defaultApplicationType(isStudent));
     setError("");
-  }, [open, initialRole, initialCompany, resumeVersionName]);
+  }, [open, initialRole, initialCompany, resumeVersionName, isStudent]);
 
   function handleClose() {
     if (pending) return;
@@ -92,7 +103,11 @@ export function LogApplicationModal({
     const trimmedCompany = company.trim();
 
     if (!trimmedRole && !trimmedCompany) {
-      setError("Enter the role and company you applied to so you can find this later.");
+      setError(
+        isStudent
+          ? "Enter the role and organization so you can find this later."
+          : "Enter the role and company you applied to so you can find this later."
+      );
       return;
     }
 
@@ -116,6 +131,7 @@ export function LogApplicationModal({
           jobUrl: jobUrl.trim(),
           coverLetter: ctx.coverLetter,
           answers: ctx.answers,
+          applicationType,
         });
         clearJobDraftLocal();
         await clearWorkspaceJobDraft();
@@ -150,11 +166,12 @@ export function LogApplicationModal({
           <div className="flex items-start justify-between gap-4">
             <div>
               <h2 className="font-display text-[21px] font-semibold tracking-[-0.02em] text-ink">
-                Log application
+                {isStudent ? "Log this opportunity" : "Log application"}
               </h2>
               <p className="mt-[7px] max-w-[440px] text-[13.5px] leading-[1.5] text-muted">
-                Save a snapshot of what you sent. Role and company are how this
-                shows up in your tracker — the resume is stored separately below.
+                {isStudent
+                  ? "Save a snapshot of what you sent — internships, part-time jobs, volunteer roles, and more. Role and organization are how this shows up in your tracker."
+                  : "Save a snapshot of what you sent. Role and company are how this shows up in your tracker — the resume is stored separately below."}
               </p>
             </div>
             <button
@@ -175,6 +192,23 @@ export function LogApplicationModal({
               {resumeVersionName}
             </div>
           </div>
+
+          {isStudent ? (
+            <label className="mt-5 flex flex-col gap-1.5 text-[12.5px] font-semibold text-[#5A6573]">
+              Opportunity type
+              <select
+                value={applicationType}
+                onChange={(e) => setApplicationType(e.target.value as ApplicationType)}
+                className="cursor-pointer rounded-[9px] border border-[#DFE3E8] px-[11px] py-2.5 text-sm text-ink focus:border-accent focus:outline-none"
+              >
+                {APPLICATION_TYPES.map((type) => (
+                  <option key={type.id} value={type.id}>
+                    {type.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
 
           <div className="mt-5 grid grid-cols-2 gap-3">
             <JobRoleField value={role} onChange={setRole} />

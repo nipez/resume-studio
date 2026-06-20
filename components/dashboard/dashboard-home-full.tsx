@@ -22,32 +22,65 @@ export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
   const buildLink = buildHref(isStudent);
   const isNew = versionsCount === 0;
 
-  const checklist = [
-    {
-      label: "Create your first resume",
-      done: versionsCount > 0,
-      href: versionsCount > 0 && primaryVersionId ? `/editor/${primaryVersionId}` : buildLink,
-      cta: versionsCount > 0 ? "Open editor" : "Build now",
-    },
-    {
-      label: "Tailor a version to a job",
-      done: hasTailored,
-      href: "/tailor",
-      cta: "Tailor",
-    },
-    {
-      label: "Log your first application",
-      done: applicationsCount > 0,
-      href: "/applications",
-      cta: "Log it",
-    },
-    {
-      label: "See what's working in Insights",
-      done: applicationsCount > 0,
-      href: "/insights",
-      cta: "View",
-    },
-  ];
+  const checklist = isStudent
+    ? [
+        {
+          label: "Build your first resume",
+          done: versionsCount > 0,
+          href:
+            versionsCount > 0 && primaryVersionId
+              ? `/editor/${primaryVersionId}`
+              : buildLink,
+          cta: versionsCount > 0 ? "Open editor" : "Build now",
+        },
+        {
+          label: "Tailor for a job or internship",
+          done: hasTailored,
+          href: "/tailor",
+          cta: "Tailor",
+        },
+        {
+          label: "Log your first application",
+          done: applicationsCount > 0,
+          href: "/applications",
+          cta: "Log it",
+        },
+        {
+          label: "See what's working in Insights",
+          done: applicationsCount > 0,
+          href: "/insights",
+          cta: "View",
+        },
+      ]
+    : [
+        {
+          label: "Create your first resume",
+          done: versionsCount > 0,
+          href:
+            versionsCount > 0 && primaryVersionId
+              ? `/editor/${primaryVersionId}`
+              : buildLink,
+          cta: versionsCount > 0 ? "Open editor" : "Build now",
+        },
+        {
+          label: "Tailor a version to a job",
+          done: hasTailored,
+          href: "/tailor",
+          cta: "Tailor",
+        },
+        {
+          label: "Log your first application",
+          done: applicationsCount > 0,
+          href: "/applications",
+          cta: "Log it",
+        },
+        {
+          label: "See what's working in Insights",
+          done: applicationsCount > 0,
+          href: "/insights",
+          cta: "View",
+        },
+      ];
   const doneCount = checklist.filter((c) => c.done).length;
 
   const quickActions = [
@@ -66,8 +99,9 @@ export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
             Welcome{firstName ? `, ${firstName}` : ""} 👋
           </h1>
           <p className="mt-2 max-w-[620px] text-[14.5px] leading-relaxed text-muted">
-            This is your job-search command center — build and tailor resumes,
-            send cover letters and Q&amp;A, then track what actually lands.
+            {isStudent
+              ? "Build your resume, tailor it for jobs and internships, then track every application in one place."
+              : "This is your job-search command center — build and tailor resumes, send cover letters and Q&A, then track what actually lands."}
           </p>
         </div>
 
@@ -113,7 +147,9 @@ export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
               </span>
             </div>
             <p className="mb-4 text-[12.5px] text-muted">
-              A quick path from blank page to tracked applications.
+              {isStudent
+                ? "From first resume to tracked applications — built for students and early careers."
+                : "A quick path from blank page to tracked applications."}
             </p>
             <div className="space-y-2.5">
               {checklist.map((item) => (
