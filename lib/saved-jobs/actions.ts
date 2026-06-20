@@ -101,12 +101,12 @@ export async function updateSavedJob(
 ): Promise<SavedJob> {
   const supabase = createClient();
   const payload: Record<string, unknown> = {};
-  if (input.role !== undefined) payload.role = input.role;
-  if (input.company !== undefined) payload.company = input.company;
-  if (input.jobDesc !== undefined) payload.job_desc = input.jobDesc;
-  if (input.jobUrl !== undefined) payload.job_url = input.jobUrl;
-  if (input.contextNotes !== undefined) payload.context_notes = input.contextNotes;
-  if (input.notes !== undefined) payload.notes = input.notes;
+  if (input.role !== undefined) payload.role = input.role.trim();
+  if (input.company !== undefined) payload.company = input.company.trim();
+  if (input.jobDesc !== undefined) payload.job_desc = input.jobDesc.trim();
+  if (input.jobUrl !== undefined) payload.job_url = input.jobUrl.trim();
+  if (input.contextNotes !== undefined) payload.context_notes = input.contextNotes.trim();
+  if (input.notes !== undefined) payload.notes = input.notes.trim();
   if (input.tailoredVersionId !== undefined) {
     payload.tailored_version_id = input.tailoredVersionId;
   }
