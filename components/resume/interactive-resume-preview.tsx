@@ -14,6 +14,7 @@ type InteractiveResumePreviewProps = {
   html: string;
   activeSection: ResumeEditSection | null;
   onSectionSelect: (section: ResumeEditSection) => void;
+  onPageCountChange?: (pageCount: number) => void;
   reservedRight?: number;
   className?: string;
 };
@@ -43,6 +44,7 @@ export function InteractiveResumePreview({
   html,
   activeSection,
   onSectionSelect,
+  onPageCountChange,
   reservedRight = 0,
   className = "",
 }: InteractiveResumePreviewProps) {
@@ -112,6 +114,10 @@ export function InteractiveResumePreview({
       "*"
     );
   }, [activeSection, html]);
+
+  useEffect(() => {
+    onPageCountChange?.(pageCount);
+  }, [pageCount, onPageCountChange]);
 
   return (
     <div
