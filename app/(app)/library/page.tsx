@@ -65,6 +65,7 @@ export default async function LibraryPage() {
             archivedVersions={archivedVersions}
             defaultVersionId={defaultVersionId}
             versionCounts={versionCounts}
+            isStudent={profile.isStudent}
           />
         ) : (
           <div className="rounded-2xl border border-dashed border-border bg-white px-6 py-10 text-center">

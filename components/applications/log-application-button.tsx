@@ -11,6 +11,7 @@ type LogApplicationButtonProps = {
   initialRole?: string;
   initialCompany?: string;
   savedJobId?: string;
+  isStudent?: boolean;
   className?: string;
   children?: ReactNode;
   onSuccess?: (applicationId: string) => void;
@@ -22,6 +23,7 @@ export function LogApplicationButton({
   initialRole,
   initialCompany,
   savedJobId,
+  isStudent = false,
   className = "",
   children,
   onSuccess,
@@ -62,6 +64,7 @@ export function LogApplicationButton({
         resumeVersionName={resumeVersionName}
         initialRole={initialRole}
         initialCompany={initialCompany}
+        isStudent={isStudent}
         onSuccess={onSuccess}
       />
     </>

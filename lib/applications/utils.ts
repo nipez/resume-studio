@@ -2,6 +2,7 @@ import type {
   Application,
   ApplicationEvent,
   ApplicationStatus,
+  ApplicationType,
   HiringContact,
 } from "@/lib/applications/types";
 
@@ -20,6 +21,22 @@ export const APPLICATION_STATUSES: { id: ApplicationStatus; label: string }[] = 
   { id: "rejected", label: "Rejected" },
   { id: "ghosted", label: "No response" },
 ];
+
+export const APPLICATION_TYPES: { id: ApplicationType; label: string }[] = [
+  { id: "internship", label: "Internship" },
+  { id: "part_time", label: "Part-time job" },
+  { id: "volunteer", label: "Volunteer" },
+  { id: "full_time", label: "Full-time job" },
+];
+
+export function applicationTypeLabel(type: ApplicationType | null | undefined): string | null {
+  if (!type) return null;
+  return APPLICATION_TYPES.find((t) => t.id === type)?.label ?? null;
+}
+
+export function defaultApplicationType(isStudent: boolean): ApplicationType {
+  return isStudent ? "internship" : "full_time";
+}
 
 export function appStatusMeta(id: ApplicationStatus | string): StatusMeta {
   const m: Record<ApplicationStatus, StatusMeta> = {
@@ -133,7 +150,10 @@ export function fitScoreStyle(score: number | null | undefined): {
 }
 
 export function applicationTags(app: Application): string[] {
-  const tags = [`Resume: ${app.resume_version_name ?? "Unknown"}`];
+  const tags: string[] = [];
+  const typeLabel = applicationTypeLabel(app.application_type);
+  if (typeLabel) tags.push(typeLabel);
+  tags.push(`Resume: ${app.resume_version_name ?? "Unknown"}`);
   if (app.cover_letter?.trim()) tags.push("Cover letter");
   if (app.answers?.length) tags.push(`${app.answers.length} Q&A`);
   return tags;

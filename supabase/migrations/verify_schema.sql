@@ -33,6 +33,8 @@ with checks as (
     exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'profiles' and column_name = 'persona')
   union all select 'profiles.onboarding_persona_set',
     exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'profiles' and column_name = 'onboarding_persona_set')
+  union all select 'applications.application_type',
+    exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'applications' and column_name = 'application_type')
 
   union all select 'table: ai_usage_monthly', to_regclass('public.ai_usage_monthly') is not null
   union all select 'table: ai_usage_events', to_regclass('public.ai_usage_events') is not null

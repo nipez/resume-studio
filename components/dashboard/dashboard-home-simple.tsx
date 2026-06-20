@@ -8,6 +8,7 @@ import {
   UpcomingSection,
 } from "@/components/dashboard/dashboard-shared";
 import { FirstRunPathPicker } from "@/components/dashboard/first-run-path-picker";
+import { StudentWelcomePanel } from "@/components/dashboard/student-welcome-panel";
 import Link from "next/link";
 
 export function DashboardHomeSimple({ data }: { data: DashboardHomeData }) {
@@ -106,7 +107,7 @@ export function DashboardHomeSimple({ data }: { data: DashboardHomeData }) {
           <p className="mt-2 max-w-[520px] text-[14.5px] leading-relaxed text-muted">
             {!hasResume
               ? isStudent
-                ? "Built for first resumes — clubs, sports, volunteering, and part-time jobs."
+                ? "You're getting ahead — let's build your first resume, then apply and track."
                 : "We'll keep this simple. One resume, one job application at a time."
               : !hasApplication
                 ? isStudent
@@ -115,6 +116,10 @@ export function DashboardHomeSimple({ data }: { data: DashboardHomeData }) {
                 : "Your search is underway. Apply to more roles or see what's getting responses."}
           </p>
         </div>
+
+        {isStudent && !hasResume && !showPathPicker ? (
+          <StudentWelcomePanel firstName={firstName || undefined} compact />
+        ) : null}
 
         {showPathPicker ? (
           <FirstRunPathPicker isStudent={isStudent} />

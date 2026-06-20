@@ -2,6 +2,7 @@ import { CoverPanel } from "@/components/cover/cover-panel";
 import { JobDraftBootstrap } from "@/components/saved-jobs/job-draft-bootstrap";
 import { listCoverLetters } from "@/lib/cover/actions";
 import { getCoverPrepSeedForVersion } from "@/lib/cover/prep-seed";
+import { getUserProfileContext } from "@/lib/profile/actions";
 import { getLibraryData } from "@/lib/resume/actions";
 
 type PageProps = {
@@ -10,9 +11,10 @@ type PageProps = {
 
 export default async function CoverPage({ searchParams }: PageProps) {
   const { v, job } = await searchParams;
-  const [{ versions, defaultVersionId }, savedLetters] = await Promise.all([
+  const [{ versions, defaultVersionId }, savedLetters, profile] = await Promise.all([
     getLibraryData(),
     listCoverLetters(),
+    getUserProfileContext(),
   ]);
   const initialVersionId =
     v && versions.some((version) => version.id === v) ? v : null;
@@ -40,6 +42,7 @@ export default async function CoverPage({ searchParams }: PageProps) {
             prepFlowResultId={initialVersionId}
             savedJobId={job ?? null}
             prepSeed={coverPrepSeed}
+            isStudent={profile.isStudent}
           />
         </div>
       </div>
