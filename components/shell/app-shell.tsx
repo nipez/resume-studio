@@ -57,6 +57,18 @@ function SidebarExitToSuperAdmin() {
   );
 }
 
+function FloatingExitToSuperAdmin() {
+  return (
+    <a
+      href={EXIT_VIEW_AS_HREF}
+      className="fixed bottom-6 left-[268px] z-[100] inline-flex items-center gap-2 rounded-full border border-[#FFB86A]/40 bg-[#231a2e] px-4 py-2.5 text-[13px] font-semibold text-[#FFE8CC] shadow-[0_8px_28px_rgba(0,0,0,0.28)] transition-colors hover:bg-[#2d2238]"
+    >
+      <span aria-hidden>←</span>
+      Back to Super admin
+    </a>
+  );
+}
+
 export function AppShell({
   children,
   userName,
@@ -175,6 +187,7 @@ export function AppShell({
           <ImpersonationBanner label={impersonatingLabel} />
         ) : null}
         {children}
+        {impersonatingLabel ? <FloatingExitToSuperAdmin /> : null}
       </main>
     </div>
   );

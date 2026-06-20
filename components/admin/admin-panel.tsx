@@ -3,8 +3,6 @@
 import {
   createDemoUser,
   deleteDemoUser,
-  viewAsDemoUser,
-  viewAsUser,
   type DemoUser,
 } from "@/lib/admin/actions";
 import type { AdminDashboardStats, AdminUserRow } from "@/lib/admin/types";
@@ -53,16 +51,7 @@ export function AdminPanel({
   function handleViewAs(userId: string) {
     setError("");
     setBusyId(userId);
-    startTransition(async () => {
-      try {
-        await viewAsUser(userId);
-        router.push("/dashboard");
-        router.refresh();
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "Failed to view as user");
-        setBusyId(null);
-      }
-    });
+    window.location.href = `/api/admin/view-as?userId=${encodeURIComponent(userId)}`;
   }
 
   function handleCreateDemo() {
@@ -84,16 +73,7 @@ export function AdminPanel({
   function handleOpenDemoAs(id: string) {
     setError("");
     setBusyId(id);
-    startTransition(async () => {
-      try {
-        await viewAsDemoUser(id);
-        router.push("/dashboard");
-        router.refresh();
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "Failed to open as user");
-        setBusyId(null);
-      }
-    });
+    window.location.href = `/api/admin/view-as?userId=${encodeURIComponent(id)}`;
   }
 
   function handleDeleteDemo(id: string) {
