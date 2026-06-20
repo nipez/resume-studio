@@ -4,6 +4,8 @@ import { DisplayNameEditor } from "@/components/profile/display-name-editor";
 import { Logo } from "@/components/brand/logo";
 import { NavIcon } from "@/components/icons/nav-icons";
 import { SignOutButton } from "@/components/sign-out-button";
+import { HelpMeWidget } from "@/components/support/help-me-widget";
+import { SupportInboxButton } from "@/components/support/support-inbox-button";
 import { SITE_NAME } from "@/lib/marketing/content";
 import { buildNavGroups, isNavItemActive } from "@/lib/shell/nav-config";
 import Link from "next/link";
@@ -22,6 +24,7 @@ type AppShellProps = {
   isStudent?: boolean;
   hasResume?: boolean;
   impersonatingLabel?: string | null;
+  supportUnreadCount?: number;
 };
 
 function ImpersonationBanner({ label }: { label: string }) {
@@ -79,6 +82,7 @@ export function AppShell({
   isStudent = false,
   hasResume = false,
   impersonatingLabel = null,
+  supportUnreadCount = 0,
 }: AppShellProps) {
   const pathname = usePathname();
   const navGroups = useMemo(
@@ -182,12 +186,24 @@ export function AppShell({
         </div>
       </aside>
 
-      <main className="flex min-w-0 flex-1 flex-col">
+      <main className="relative flex min-w-0 flex-1 flex-col">
+        <div
+          className={`pointer-events-none absolute right-6 z-40 ${
+            impersonatingLabel ? "top-[58px]" : "top-4"
+          }`}
+        >
+          <div className="pointer-events-auto">
+            <SupportInboxButton unreadCount={supportUnreadCount} />
+          </div>
+        </div>
         {impersonatingLabel ? (
           <ImpersonationBanner label={impersonatingLabel} />
         ) : null}
         {children}
         {impersonatingLabel ? <FloatingExitToSuperAdmin /> : null}
+        {!isAdmin || impersonatingLabel ? (
+          <HelpMeWidget isStudent={isStudent} />
+        ) : null}
       </main>
     </div>
   );

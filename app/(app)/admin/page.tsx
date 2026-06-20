@@ -6,6 +6,10 @@ import {
 import { getStoredImpersonatorEmail } from "@/lib/admin/restore-session";
 import { isAdminUser } from "@/lib/auth/admin";
 import { getSessionProfile } from "@/lib/auth/get-session-profile";
+import {
+  getAdminOpenSupportCount,
+  listAdminSupportTickets,
+} from "@/lib/support/actions";
 import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
@@ -26,12 +30,26 @@ export default async function AdminPage() {
     listDemoUsers(),
   ]);
 
+  let supportTickets: Awaited<ReturnType<typeof listAdminSupportTickets>> = [];
+  let openSupportCount = 0;
+  try {
+    [supportTickets, openSupportCount] = await Promise.all([
+      listAdminSupportTickets(),
+      getAdminOpenSupportCount(),
+    ]);
+  } catch {
+    supportTickets = [];
+    openSupportCount = 0;
+  }
+
   return (
     <AdminPanel
       adminEmail={user?.email ?? ""}
       stats={stats}
       users={users}
       demoUsers={demoUsers}
+      supportTickets={supportTickets}
+      openSupportCount={openSupportCount}
     />
   );
 }
