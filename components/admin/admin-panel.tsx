@@ -3,6 +3,7 @@
 import {
   createDemoUser,
   deleteDemoUser,
+  resetUserPersona,
   type DemoUser,
 } from "@/lib/admin/actions";
 import { AdminSupportTab } from "@/components/admin/admin-support-tab";
@@ -26,6 +27,16 @@ type AdminPanelProps = {
 };
 
 type Tab = "users" | "demos" | "support";
+type PersonaFilter = "all" | "student" | "professional" | "none";
+type SortKey =
+  | "lastSignIn"
+  | "name"
+  | "persona"
+  | "onboarding"
+  | "resumes"
+  | "apps";
+
+const PAGE_SIZE = 50;
 
 export function AdminPanel({
   adminEmail,
@@ -43,21 +54,110 @@ export function AdminPanel({
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
+  const [personaFilter, setPersonaFilter] = useState<PersonaFilter>("all");
+  const [sortKey, setSortKey] = useState<SortKey>("lastSignIn");
+  const [sortAsc, setSortAsc] = useState(false);
+  const [page, setPage] = useState(0);
 
   const filteredUsers = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return users;
-    return users.filter(
-      (u) =>
-        u.email.toLowerCase().includes(q) ||
-        (u.fullName?.toLowerCase().includes(q) ?? false)
-    );
-  }, [users, query]);
+    let rows = users;
+
+    if (personaFilter === "student") {
+      rows = rows.filter((u) => u.persona === "student");
+    } else if (personaFilter === "professional") {
+      rows = rows.filter((u) => u.persona === "professional");
+    } else if (personaFilter === "none") {
+      rows = rows.filter((u) => !u.persona);
+    }
+
+    if (q) {
+      rows = rows.filter(
+        (u) =>
+          u.email.toLowerCase().includes(q) ||
+          (u.fullName?.toLowerCase().includes(q) ?? false)
+      );
+    }
+
+    const sorted = [...rows].sort((a, b) => {
+      let cmp = 0;
+      switch (sortKey) {
+        case "name":
+          cmp = (a.fullName || a.email).localeCompare(b.fullName || b.email);
+          break;
+        case "persona":
+          cmp = (a.persona ?? "zzz").localeCompare(b.persona ?? "zzz");
+          break;
+        case "onboarding":
+          cmp = Number(a.onboardingPersonaSet) - Number(b.onboardingPersonaSet);
+          break;
+        case "resumes":
+          cmp = a.resumeCount - b.resumeCount;
+          break;
+        case "apps":
+          cmp = a.applicationCount - b.applicationCount;
+          break;
+        case "lastSignIn":
+        default: {
+          const aTime = a.lastSignInAt ? new Date(a.lastSignInAt).getTime() : 0;
+          const bTime = b.lastSignInAt ? new Date(b.lastSignInAt).getTime() : 0;
+          cmp = aTime - bTime;
+          break;
+        }
+      }
+      return sortAsc ? cmp : -cmp;
+    });
+
+    return sorted;
+  }, [users, query, personaFilter, sortKey, sortAsc]);
+
+  const pageCount = Math.max(1, Math.ceil(filteredUsers.length / PAGE_SIZE));
+  const safePage = Math.min(page, pageCount - 1);
+  const pagedUsers = filteredUsers.slice(
+    safePage * PAGE_SIZE,
+    safePage * PAGE_SIZE + PAGE_SIZE
+  );
+
+  function handleSort(next: SortKey) {
+    if (sortKey === next) {
+      setSortAsc((v) => !v);
+    } else {
+      setSortKey(next);
+      setSortAsc(next === "name" || next === "persona");
+    }
+    setPage(0);
+  }
+
+  function sortIndicator(key: SortKey) {
+    if (sortKey !== key) return "";
+    return sortAsc ? " ↑" : " ↓";
+  }
 
   function handleViewAs(userId: string) {
     setError("");
     setBusyId(userId);
     window.location.href = `/api/admin/view-as?userId=${encodeURIComponent(userId)}`;
+  }
+
+  function handleResetPersona(userId: string) {
+    if (
+      !confirm(
+        "Reset this user's persona? They'll see the first-run path picker again on Home."
+      )
+    ) {
+      return;
+    }
+    setBusyId(userId);
+    startTransition(async () => {
+      try {
+        await resetUserPersona(userId);
+        router.refresh();
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Failed to reset persona");
+      } finally {
+        setBusyId(null);
+      }
+    });
   }
 
   function handleCreateDemo() {
@@ -111,7 +211,7 @@ export function AdminPanel({
           time.
         </p>
 
-        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
           <StatCard label="Total users" value={String(stats.totalUsers)} />
           <StatCard
             label="Active (30 days)"
@@ -119,7 +219,9 @@ export function AdminPanel({
             hint="Signed in within 30 days"
           />
           <StatCard label="Signed in today" value={String(stats.signedInToday)} />
-          <StatCard label="Student personas" value={String(stats.studentPersonas)} />
+          <StatCard label="Students" value={String(stats.studentPersonas)} />
+          <StatCard label="Professionals" value={String(stats.professionalPersonas)} />
+          <StatCard label="No persona" value={String(stats.noPersona)} />
         </div>
 
         <div className="mt-6 flex gap-1 rounded-xl border border-[#E4E7EC] bg-[#FAFBFC] p-1">
@@ -146,33 +248,125 @@ export function AdminPanel({
               </h2>
               <input
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setPage(0);
+                }}
                 placeholder="Search email or name…"
                 className="min-w-[220px] rounded-[10px] border border-[#DFE3E8] px-3 py-2 text-[13px] focus:border-accent focus:outline-none"
               />
             </div>
-            <div className="hidden grid-cols-[minmax(180px,1.4fr)_minmax(120px,0.8fr)_100px_80px_80px_120px] gap-3 border-b border-[#EEF0F3] bg-[#FAFBFC] px-6 py-3 text-[11px] font-bold uppercase tracking-[0.06em] text-[#8A92A0] lg:grid">
-              <div>User</div>
-              <div>Last login</div>
-              <div>Persona</div>
-              <div>Resumes</div>
-              <div>Apps</div>
+
+            <div className="flex flex-wrap gap-2 border-b border-[#EEF0F3] px-6 py-3">
+              {(
+                [
+                  ["all", "All"],
+                  ["student", "Student"],
+                  ["professional", "Professional"],
+                  ["none", "No persona"],
+                ] as const
+              ).map(([id, labelText]) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => {
+                    setPersonaFilter(id);
+                    setPage(0);
+                  }}
+                  className={`cursor-pointer rounded-full border px-3 py-1.5 text-[12px] font-semibold transition-colors ${
+                    personaFilter === id
+                      ? "border-accent/30 bg-[#EEF3FF] text-accent"
+                      : "border-[#E2E5EA] bg-white text-muted hover:border-[#C8CED6] hover:text-ink"
+                  }`}
+                >
+                  {labelText}
+                </button>
+              ))}
+              <span className="ml-auto self-center text-[12px] text-muted">
+                {filteredUsers.length} match
+                {filteredUsers.length !== users.length ? ` of ${users.length}` : ""}
+              </span>
+            </div>
+
+            <div className="hidden grid-cols-[minmax(160px,1.2fr)_minmax(110px,0.7fr)_80px_72px_56px_56px_140px] gap-3 border-b border-[#EEF0F3] bg-[#FAFBFC] px-6 py-3 text-[11px] font-bold uppercase tracking-[0.06em] text-[#8A92A0] lg:grid">
+              <SortHeader label="User" active={sortKey === "name"} onClick={() => handleSort("name")}>
+                User{sortIndicator("name")}
+              </SortHeader>
+              <SortHeader
+                label="Last login"
+                active={sortKey === "lastSignIn"}
+                onClick={() => handleSort("lastSignIn")}
+              >
+                Last login{sortIndicator("lastSignIn")}
+              </SortHeader>
+              <SortHeader
+                label="Persona"
+                active={sortKey === "persona"}
+                onClick={() => handleSort("persona")}
+              >
+                Persona{sortIndicator("persona")}
+              </SortHeader>
+              <SortHeader
+                label="Onboarded"
+                active={sortKey === "onboarding"}
+                onClick={() => handleSort("onboarding")}
+              >
+                Onboarded{sortIndicator("onboarding")}
+              </SortHeader>
+              <SortHeader
+                label="Resumes"
+                active={sortKey === "resumes"}
+                onClick={() => handleSort("resumes")}
+              >
+                Res{sortIndicator("resumes")}
+              </SortHeader>
+              <SortHeader label="Apps" active={sortKey === "apps"} onClick={() => handleSort("apps")}>
+                Apps{sortIndicator("apps")}
+              </SortHeader>
               <div className="text-right">Actions</div>
             </div>
-            {filteredUsers.length === 0 ? (
+
+            {pagedUsers.length === 0 ? (
               <div className="px-6 py-10 text-center text-[13.5px] text-muted">
-                No users match your search.
+                No users match your filters.
               </div>
             ) : (
-              filteredUsers.map((u) => (
+              pagedUsers.map((u) => (
                 <UserRow
                   key={u.id}
                   user={u}
                   busy={pending && busyId === u.id}
                   onViewAs={() => handleViewAs(u.id)}
+                  onResetPersona={() => handleResetPersona(u.id)}
                 />
               ))
             )}
+
+            {pageCount > 1 ? (
+              <div className="flex items-center justify-between border-t border-[#EEF0F3] px-6 py-3">
+                <span className="text-[12.5px] text-muted">
+                  Page {safePage + 1} of {pageCount}
+                </span>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    disabled={safePage === 0}
+                    onClick={() => setPage((p) => Math.max(0, p - 1))}
+                    className="cursor-pointer rounded-lg border border-[#E0E3E8] bg-white px-3 py-1.5 text-[12px] font-semibold text-ink disabled:opacity-40"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    type="button"
+                    disabled={safePage >= pageCount - 1}
+                    onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
+                    className="cursor-pointer rounded-lg border border-[#E0E3E8] bg-white px-3 py-1.5 text-[12px] font-semibold text-ink disabled:opacity-40"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            ) : null}
           </div>
         ) : tab === "support" ? (
           <AdminSupportTab tickets={supportTickets} />
@@ -266,19 +460,44 @@ export function AdminPanel({
   );
 }
 
+function SortHeader({
+  children,
+  active,
+  onClick,
+}: {
+  label: string;
+  children: React.ReactNode;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`cursor-pointer border-none bg-transparent p-0 text-left text-[11px] font-bold uppercase tracking-[0.06em] ${
+        active ? "text-accent" : "text-[#8A92A0] hover:text-ink"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
 function UserRow({
   user,
   busy,
   onViewAs,
+  onResetPersona,
 }: {
   user: AdminUserRow;
   busy: boolean;
   onViewAs: () => void;
+  onResetPersona: () => void;
 }) {
   const active = isActiveUser(user.lastSignInAt);
 
   return (
-    <div className="border-b border-[#F2F3F5] px-6 py-4 last:border-b-0 lg:grid lg:grid-cols-[minmax(180px,1.4fr)_minmax(120px,0.8fr)_100px_80px_80px_120px] lg:items-center lg:gap-3 lg:py-3.5">
+    <div className="border-b border-[#F2F3F5] px-6 py-4 last:border-b-0 lg:grid lg:grid-cols-[minmax(160px,1.2fr)_minmax(110px,0.7fr)_80px_72px_56px_56px_140px] lg:items-center lg:gap-3 lg:py-3.5">
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
           <span className="truncate text-[14px] font-semibold text-ink">
@@ -291,11 +510,6 @@ function UserRow({
           {active ? <Badge tone="active">Active</Badge> : null}
         </div>
         <div className="truncate text-[12px] text-muted">{user.email}</div>
-        {user.fullName ? (
-          <div className="mt-1 text-[11px] text-[#9AA3AF] lg:hidden">
-            Joined {formatAdminDate(user.createdAt)}
-          </div>
-        ) : null}
       </div>
 
       <div className="mt-2 lg:mt-0">
@@ -309,21 +523,42 @@ function UserRow({
         {user.persona ?? "—"}
       </div>
 
+      <div className="mt-2 text-[12.5px] lg:mt-0">
+        {user.onboardingPersonaSet ? (
+          <span className="font-semibold text-[#0E7C4B]">Yes</span>
+        ) : (
+          <span className="text-muted">No</span>
+        )}
+      </div>
+
       <div className="mt-2 text-[13px] text-ink lg:mt-0">{user.resumeCount}</div>
       <div className="mt-2 text-[13px] text-ink lg:mt-0">{user.applicationCount}</div>
 
-      <div className="mt-3 flex justify-start lg:mt-0 lg:justify-end">
+      <div className="mt-3 flex flex-wrap justify-start gap-1.5 lg:mt-0 lg:justify-end">
         {user.isAdmin ? (
           <span className="text-[12px] text-muted">—</span>
         ) : (
-          <button
-            type="button"
-            disabled={busy}
-            onClick={onViewAs}
-            className="cursor-pointer rounded-lg bg-sidebar px-3 py-[7px] text-xs font-semibold text-white transition-colors hover:bg-[#272b33] disabled:opacity-60"
-          >
-            {busy ? "Opening…" : "View as"}
-          </button>
+          <>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={onViewAs}
+              className="cursor-pointer rounded-lg bg-sidebar px-3 py-[7px] text-xs font-semibold text-white transition-colors hover:bg-[#272b33] disabled:opacity-60"
+            >
+              {busy ? "…" : "View as"}
+            </button>
+            {user.onboardingPersonaSet || user.persona ? (
+              <button
+                type="button"
+                disabled={busy}
+                onClick={onResetPersona}
+                title="Clear persona so user sees first-run picker again"
+                className="cursor-pointer rounded-lg border border-[#E0E3E8] bg-white px-2.5 py-[7px] text-xs font-semibold text-[#5A6573] transition-colors hover:border-[#C8CED6] disabled:opacity-60"
+              >
+                Reset
+              </button>
+            ) : null}
+          </>
         )}
       </div>
     </div>

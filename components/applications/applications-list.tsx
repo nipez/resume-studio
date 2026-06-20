@@ -31,6 +31,7 @@ type ApplicationsListProps = {
   defaultVersionName?: string | null;
   defaultVersionRole?: string;
   defaultVersionCompany?: string;
+  isStudent?: boolean;
 };
 
 function StatCard({
@@ -117,6 +118,7 @@ export function ApplicationsList({
   defaultVersionName,
   defaultVersionRole = "",
   defaultVersionCompany = "",
+  isStudent = false,
 }: ApplicationsListProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -140,8 +142,9 @@ export function ApplicationsList({
               Applications
             </h1>
             <p className="mt-2 max-w-[600px] text-[14.5px] leading-relaxed text-muted">
-              Save jobs you want to apply to, then track each application with a
-              snapshot of the resume, cover letter, and answers you sent.
+              {isStudent
+                ? "Save jobs and internships you want to apply to, then track each one with a snapshot of the resume, cover letter, and answers you sent."
+                : "Save jobs you want to apply to, then track each application with a snapshot of the resume, cover letter, and answers you sent."}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -152,6 +155,7 @@ export function ApplicationsList({
                 resumeVersionName={defaultVersionName ?? "Resume"}
                 initialRole={defaultVersionRole}
                 initialCompany={defaultVersionCompany}
+                isStudent={isStudent}
               />
             ) : (
               <Link
@@ -168,6 +172,7 @@ export function ApplicationsList({
           savedJobs={savedJobs}
           defaultVersionId={defaultVersionId}
           defaultVersionName={defaultVersionName ?? null}
+          isStudent={isStudent}
         />
 
         <div className="mb-3">

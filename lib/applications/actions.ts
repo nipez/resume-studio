@@ -70,6 +70,7 @@ function mapApplication(
       ? (row.hiring_contacts as HiringContact[])
       : null,
     notes: String(row.notes ?? ""),
+    application_type: (row.application_type as Application["application_type"]) ?? null,
     created_at: row.created_at as string,
     events,
   };
@@ -239,6 +240,7 @@ export async function logApplication(input: LogApplicationInput) {
     company,
     job_desc: input.jobDesc?.trim() ?? "",
     job_url: input.jobUrl?.trim() ?? "",
+    application_type: input.applicationType ?? "full_time",
     applied_at: now,
     resume_version_id: version.id,
     resume_version_name: version.name,

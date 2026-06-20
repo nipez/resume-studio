@@ -158,7 +158,7 @@ export async function listAllUsers(): Promise<AdminUserRow[]> {
 
   const [{ data: profiles }, { data: demoRows }, { data: resumeRows }, { data: appRows }] =
     await Promise.all([
-      svc.from("profiles").select("id, full_name, persona, created_at").in("id", ids),
+      svc.from("profiles").select("id, full_name, persona, onboarding_persona_set, created_at").in("id", ids),
       svc.from("demo_users").select("id, label").in("id", ids),
       svc.from("resume_versions").select("user_id").in("user_id", ids),
       svc.from("applications").select("user_id").in("user_id", ids),
@@ -187,6 +187,7 @@ export async function listAllUsers(): Promise<AdminUserRow[]> {
         email,
         fullName: profile?.full_name ?? null,
         persona: (profile?.persona as UserPersona | null) ?? null,
+        onboardingPersonaSet: Boolean(profile?.onboarding_persona_set),
         createdAt: u.created_at ?? profile?.created_at ?? new Date().toISOString(),
         lastSignInAt: u.last_sign_in_at ?? null,
         resumeCount: resumeCounts.get(u.id) ?? 0,
@@ -216,6 +217,8 @@ function computeAdminStats(users: AdminUserRow[]): AdminDashboardStats {
     activeUsers30d: users.filter((u) => isActiveUser(u.lastSignInAt)).length,
     signedInToday: users.filter((u) => isSignedInToday(u.lastSignInAt)).length,
     studentPersonas: users.filter((u) => u.persona === "student").length,
+    professionalPersonas: users.filter((u) => u.persona === "professional").length,
+    noPersona: users.filter((u) => !u.persona).length,
   };
 }
 
@@ -248,6 +251,23 @@ export async function viewAsDemoUser(id: string): Promise<void> {
 
 export async function stopViewingAs(): Promise<void> {
   await restoreAdminFromImpersonation();
+}
+
+export async function resetUserPersona(userId: string): Promise<void> {
+  await requireAdmin();
+  const svc = createServiceClient();
+
+  const { error } = await svc
+    .from("profiles")
+    .update({
+      persona: null,
+      onboarding_persona_set: false,
+      is_student: false,
+    })
+    .eq("id", userId);
+
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin");
 }
 
 export type ImpersonationState = {

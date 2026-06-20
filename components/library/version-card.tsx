@@ -20,6 +20,7 @@ type VersionCardProps = {
   isDefault: boolean;
   appCount?: number;
   archived?: boolean;
+  isStudent?: boolean;
 };
 
 export function VersionCard({
@@ -27,6 +28,7 @@ export function VersionCard({
   isDefault,
   appCount = 0,
   archived = false,
+  isStudent = false,
 }: VersionCardProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -200,6 +202,7 @@ export function VersionCard({
             resumeVersionName={version.name}
             initialRole={version.tailored_for?.role ?? ""}
             initialCompany={version.tailored_for?.company ?? ""}
+            isStudent={isStudent}
             className="mt-3 flex w-full items-center justify-center gap-[7px] rounded-[9px] border border-dashed border-[#C6D8CC] bg-white px-2 py-2 text-[12.5px] font-semibold text-[#0E7C4B] transition-colors hover:border-[#0E9F6E] hover:bg-[#F2FBF6] disabled:opacity-50"
           >
             ✓ Log application
@@ -220,6 +223,7 @@ export function VersionCard({
               resumeVersionName={version.name}
               initialRole={version.tailored_for?.role ?? ""}
               initialCompany={version.tailored_for?.company ?? ""}
+              isStudent={isStudent}
               className="border-none bg-transparent p-0 text-[11.5px] font-semibold text-[#5d7a69] shadow-none hover:bg-transparent hover:text-[#0E7C4B] hover:underline disabled:opacity-50"
             >
               + Log again

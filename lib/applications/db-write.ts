@@ -1,5 +1,6 @@
 const OPTIONAL_APPLICATION_COLUMNS = [
   "job_url",
+  "application_type",
   "hiring_contacts",
   "interview_transcript",
   "interview_debrief",

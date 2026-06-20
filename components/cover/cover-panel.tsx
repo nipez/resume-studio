@@ -37,6 +37,7 @@ type CoverPanelProps = {
   prepFlowResultId?: string | null;
   savedJobId?: string | null;
   prepSeed?: CoverPrepSeed | null;
+  isStudent?: boolean;
 };
 
 function formatWhen(iso: string) {
@@ -59,6 +60,7 @@ export function CoverPanel({
   prepFlowResultId = null,
   savedJobId = null,
   prepSeed = null,
+  isStudent = false,
 }: CoverPanelProps) {
   const { draft, update } = useJobDraft(prepSeed);
   const [baseId, setBaseId] = useState(
@@ -248,6 +250,7 @@ export function CoverPanel({
               resumeVersionName={base.name}
               initialRole={draft.jobRole}
               initialCompany={draft.jobCompany}
+              isStudent={isStudent}
               className="inline-flex items-center gap-1.5 rounded-[10px] border-none bg-accent px-4 py-2.5 text-[13px] font-semibold text-white shadow-[0_4px_14px_rgba(47,107,255,0.32)] hover:bg-[#1E54E6]"
             >
               Log application →

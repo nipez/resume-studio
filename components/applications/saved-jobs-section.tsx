@@ -11,6 +11,7 @@ type SavedJobsSectionProps = {
   savedJobs: SavedJob[];
   defaultVersionId: string | null;
   defaultVersionName: string | null;
+  isStudent?: boolean;
 };
 
 function jobTitle(job: SavedJob) {
@@ -34,6 +35,7 @@ export function SavedJobsSection({
   savedJobs,
   defaultVersionId,
   defaultVersionName,
+  isStudent = false,
 }: SavedJobsSectionProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -186,6 +188,7 @@ export function SavedJobsSection({
                     resumeVersionName={versionName}
                     initialRole={job.role}
                     initialCompany={job.company}
+                    isStudent={isStudent}
                     className="rounded-[9px] border-none bg-accent px-3 py-2 text-[12.5px] font-semibold text-white hover:bg-[#1E54E6]"
                     onSuccess={() => {
                       void deleteSavedJob(job.id).then(() => router.refresh());

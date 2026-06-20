@@ -8,6 +8,12 @@ export type ApplicationStatus =
   | "rejected"
   | "ghosted";
 
+export type ApplicationType =
+  | "part_time"
+  | "internship"
+  | "volunteer"
+  | "full_time";
+
 export type EventType = "interview" | "followup" | "note";
 
 export type ResumeSnapshot = {
@@ -86,6 +92,7 @@ export type Application = {
   interview_debrief: InterviewDebrief | null;
   hiring_contacts: HiringContact[] | null;
   notes: string;
+  application_type: ApplicationType | null;
   created_at: string;
   events?: ApplicationEvent[];
 };
@@ -98,4 +105,5 @@ export type LogApplicationInput = {
   jobUrl?: string;
   coverLetter?: string;
   answers?: ApplicationAnswer[];
+  applicationType?: ApplicationType;
 };

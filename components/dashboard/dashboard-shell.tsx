@@ -9,11 +9,12 @@ import { DashboardHomeFull } from "@/components/dashboard/dashboard-home-full";
 import { DashboardHomeSimple } from "@/components/dashboard/dashboard-home-simple";
 import { useEffect, useState } from "react";
 
-function readStoredView(): DashboardView {
-  if (typeof window === "undefined") return "full";
+function readStoredView(isStudent: boolean): DashboardView {
+  if (typeof window === "undefined") return isStudent ? "simple" : "full";
   const stored = window.localStorage.getItem(DASHBOARD_VIEW_STORAGE_KEY);
   if (stored === "simple") return "simple";
-  return "full";
+  if (stored === "full") return "full";
+  return isStudent ? "simple" : "full";
 }
 
 function DashboardViewToggle({
@@ -56,13 +57,15 @@ function DashboardViewToggle({
 }
 
 export function DashboardShell({ data }: { data: DashboardHomeData }) {
-  const [view, setView] = useState<DashboardView>("full");
+  const [view, setView] = useState<DashboardView>(
+    data.isStudent ? "simple" : "full"
+  );
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    setView(readStoredView());
+    setView(readStoredView(data.isStudent));
     setReady(true);
-  }, []);
+  }, [data.isStudent]);
 
   function handleChange(next: DashboardView) {
     setView(next);
@@ -70,7 +73,11 @@ export function DashboardShell({ data }: { data: DashboardHomeData }) {
   }
 
   if (!ready) {
-    return <DashboardHomeFull data={data} />;
+    return data.isStudent ? (
+      <DashboardHomeSimple data={data} />
+    ) : (
+      <DashboardHomeFull data={data} />
+    );
   }
 
   return (
