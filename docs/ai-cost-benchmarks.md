@@ -75,4 +75,11 @@ Use this table as we add more benchmarks:
 
 ---
 
+## Related docs
+
+- **[docs/HANDOFF.md](./HANDOFF.md)** — project continuity
+- **Super admin → AI costs** — live aggregates from the same events
+
+---
+
 _Last updated: 2026-06-20_
