@@ -46,3 +46,9 @@ PORT=3000
   enforces per-user row access. This file is local-only (not applied by `supabase db push`).
 - Supabase Studio (DB browser) is at `http://127.0.0.1:54323`.
 - Reinstalling deps does not require restarting Supabase; only restart `npm run dev`.
+
+### Pricing / AI cost reference
+
+Real-user Anthropic spend benchmarks for plan pricing live in
+[`docs/ai-cost-benchmarks.md`](docs/ai-cost-benchmarks.md). Append new sessions there
+when beta testers or production usage gives you a billing data point.
