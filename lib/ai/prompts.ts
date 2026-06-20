@@ -376,7 +376,8 @@ export function resumeAssistPrompt(
   experienceIndex?: number,
   question?: string,
   sectionId?: string,
-  sectionIndex?: number
+  sectionIndex?: number,
+  targetPages = 2
 ): string {
   const ctx =
     buildPositioningContext(positioning, userName) +
@@ -448,6 +449,22 @@ export function resumeAssistPrompt(
       question.trim() +
       "\n\n" +
       'Return ONLY valid minified JSON with fields to update (omit fields that should not change): {"headline":"...","summary":"...","skills":["..."],"experience":{"index":0,"blurb":"...","bullets":["..."]}}'
+    );
+  }
+
+  if (action === "shorten-to-pages") {
+    const pages = Math.min(3, Math.max(1, targetPages));
+    return (
+      ctx +
+      `TASK: Compress this resume to fit approximately ${pages} US Letter printed page(s). The goal is fewer words and bullets while keeping the same career story.\n\n` +
+      "Rules:\n" +
+      "- Keep ALL companies, titles, and dates. Do not invent employers, titles, dates, or metrics.\n" +
+      "- Shorten the summary to 2–3 tight sentences.\n" +
+      "- Use 3–4 bullets for the most recent 2 roles, 2–3 for older roles; remove redundant or weak bullets.\n" +
+      "- Trim skills to the 10–12 most relevant.\n" +
+      "- Shorten activity/honors sections if present; omit only when necessary for length.\n" +
+      "- Preserve contact fields (name, phone, email, location, linkedin) exactly.\n\n" +
+      'Return ONLY valid minified JSON with the full resume: {"name":"","headline":"","phone":"","email":"","location":"","linkedin":"","summary":"","skills":[],"experience":[{"company":"","title":"","dates":"","blurb":"","bullets":[]}],"activities":[],"education":[{"school":"","degree":"","year":""}],"awards":[]}'
     );
   }
 

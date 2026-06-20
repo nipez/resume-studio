@@ -4,6 +4,7 @@ import { aiRouteErrorResponse } from "@/lib/ai/route-error";
 import { extractJSON } from "@/lib/ai/extract-json";
 import { completeWithFallback } from "@/lib/ai/mock";
 import { resumeAssistPrompt } from "@/lib/ai/prompts";
+import { normalizeResumeData } from "@/lib/resume/defaults";
 import type { ResumeData } from "@/lib/types/resume";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -25,6 +26,7 @@ const bodySchema = z.object({
     "suggest",
     "ask",
     "implement-suggestion",
+    "shorten-to-pages",
   ]),
   data: z.custom<ResumeData>(),
   experienceIndex: z.number().int().min(0).optional(),
@@ -32,6 +34,7 @@ const bodySchema = z.object({
   suggestion: z.string().optional(),
   sectionId: sectionIdSchema.optional(),
   sectionIndex: z.number().int().min(0).optional(),
+  targetPages: z.number().int().min(1).max(3).optional(),
 });
 
 export async function POST(request: Request) {
@@ -61,7 +64,8 @@ export async function POST(request: Request) {
       body.experienceIndex,
       promptText,
       body.sectionId,
-      body.sectionIndex
+      body.sectionIndex,
+      body.targetPages
     );
     const { text, mock } = await completeWithFallback(
       prompt,
@@ -124,6 +128,14 @@ export async function POST(request: Request) {
           skills: Array.isArray(parsed?.skills) ? parsed.skills : undefined,
           experience: parsed?.experience,
         },
+        mock,
+      });
+    }
+
+    if (body.action === "shorten-to-pages") {
+      const parsed = extractJSON(text);
+      return NextResponse.json({
+        data: normalizeResumeData(parsed ?? body.data),
         mock,
       });
     }

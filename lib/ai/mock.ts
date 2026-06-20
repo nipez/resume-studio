@@ -131,6 +131,31 @@ export function mockComplete(prompt: string): string {
     });
   }
 
+  if (prompt.includes("Compress this resume to fit approximately")) {
+    const resumeMatch = prompt.match(/RESUME \(JSON\):\n([\s\S]+?)\n\nTASK:/);
+    const base = resumeMatch?.[1] ? extractJSON<ResumeData>(resumeMatch[1]) : null;
+    if (base) {
+      return JSON.stringify({
+        ...base,
+        summary:
+          (base.summary
+            ? base.summary.slice(0, 280) +
+              (base.summary.length > 280 ? "…" : "")
+            : "") || "Concise professional summary (demo shorten mode).",
+        skills: (base.skills ?? []).slice(0, 10),
+        experience: (base.experience ?? []).map((role, index) => ({
+          ...role,
+          blurb: role.blurb ? role.blurb.slice(0, 120) : "",
+          bullets: (role.bullets ?? []).filter(Boolean).slice(0, index < 2 ? 4 : 3),
+        })),
+        activities: (base.activities ?? []).slice(0, 2).map((role) => ({
+          ...role,
+          bullets: (role.bullets ?? []).filter(Boolean).slice(0, 2),
+        })),
+      });
+    }
+  }
+
   if (prompt.includes("cover letter")) {
     return (
       "Dear Hiring Team,\n\n" +
