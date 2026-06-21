@@ -52,7 +52,7 @@ export function MessagesPageClient({ tickets }: MessagesPageProps) {
         <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
           <div>
             <h1 className="font-display text-[28px] font-semibold tracking-[-0.025em] text-ink">
-              Messages
+              Help & support
             </h1>
             <p className="mt-2 max-w-[520px] text-[14.5px] text-muted">
               Your help requests and replies from the ResumeTrakr team.
