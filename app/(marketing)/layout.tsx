@@ -27,7 +27,7 @@ export default async function MarketingLayout({
   }
 
   return (
-    <div className="marketing-site min-h-screen overflow-x-clip bg-[#fbf6f2] font-sans text-[#231a2e] antialiased">
+    <div className="marketing-site min-h-screen bg-[#fbf6f2] font-sans text-[#231a2e] antialiased">
       <BetaBanner />
       <MarketingHeader />
       {children}

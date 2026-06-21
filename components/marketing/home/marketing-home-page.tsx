@@ -231,8 +231,8 @@ export function MarketingHomePage() {
               Credit-based generators optimize a moment. {SITE_NAME} optimizes the entire search — with versions, tracking, snapshots, and insights that compound over months.
             </p>
           </Reveal>
-          <Reveal className="table-scroll">
-            <div className="ctable">
+          <Reveal className="compare-wrap">
+            <div className="ctable compare-table-desktop">
               <div className="crow head">
                 <div className="c1">Dimension</div>
                 <div className="c2">AI resume generators</div>
@@ -243,6 +243,21 @@ export function MarketingHomePage() {
                   <div className="c1">{row.dimension}</div>
                   <div className="c2">{row.generator}</div>
                   <div className="c3">{row.applicationOs}</div>
+                </div>
+              ))}
+            </div>
+            <div className="compare-cards">
+              {GENERATOR_VS_OS.slice(0, 6).map((row) => (
+                <div key={row.dimension} className="compare-card">
+                  <div className="compare-card-title">{row.dimension}</div>
+                  <div className="compare-card-col">
+                    <span className="compare-card-label">AI resume generators</span>
+                    <p>{row.generator}</p>
+                  </div>
+                  <div className="compare-card-col compare-card-col-us">
+                    <span className="compare-card-label">{SITE_NAME}</span>
+                    <p>{row.applicationOs}</p>
+                  </div>
                 </div>
               ))}
             </div>
