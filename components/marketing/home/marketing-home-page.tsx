@@ -56,7 +56,7 @@ export function MarketingHomePage() {
     <div className="marketing-home">
       <section className="hero">
         <div className="wrap hero-grid">
-          <div>
+          <div className="hero-copy">
             <span className="eyebrow">The Application OS</span>
             <h1>
               One system for your <span className="serif-i">entire</span> job search.
@@ -71,39 +71,6 @@ export function MarketingHomePage() {
               <Link href="/application-os" className="link-underline">
                 See the application OS →
               </Link>
-            </div>
-            <div className="trust">
-              <span className="trust-item">
-                <span className="check">✓</span>
-                One login, six modules
-              </span>
-              <span className="trust-item">
-                <span className="check">✓</span>
-                Immutable snapshots
-              </span>
-              <span className="trust-item">
-                <span className="check">✓</span>
-                Not another PDF generator
-              </span>
-            </div>
-          </div>
-          <div className="hero-mobile-summary">
-            <div className="hero-mobile-badge">
-              <span className="hero-mobile-badge-num">6→1</span>
-              <span className="hero-mobile-badge-label">
-                Six modules — library, tailor, cover, Q&amp;A, track, insights — in one
-                workspace.
-              </span>
-            </div>
-            <div className="hero-mobile-pills">
-              {LOOP_LABELS.map((label, index) => (
-                <span key={label} className="hero-mobile-pill">
-                  <span className="hero-mobile-pill-num">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  {label}
-                </span>
-              ))}
             </div>
           </div>
           <div className="loop-wrap">
@@ -125,6 +92,20 @@ export function MarketingHomePage() {
                 <span className="small">closed loop</span>
               </div>
             </div>
+          </div>
+          <div className="trust">
+            <span className="trust-item">
+              <span className="check">✓</span>
+              One login, six modules
+            </span>
+            <span className="trust-item">
+              <span className="check">✓</span>
+              Immutable snapshots
+            </span>
+            <span className="trust-item">
+              <span className="check">✓</span>
+              Not another PDF generator
+            </span>
           </div>
         </div>
         <div className="snap-strip">

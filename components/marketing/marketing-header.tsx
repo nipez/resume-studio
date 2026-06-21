@@ -34,7 +34,7 @@ export function MarketingHeader() {
 
         <div className="flex shrink-0 items-center gap-2 sm:gap-[18px]">
           <details className="relative md:hidden">
-            <summary className="cursor-pointer list-none rounded-lg border border-[rgba(40,20,30,.1)] px-2.5 py-1.5 text-[12.5px] font-semibold text-[#5c5269] marker:content-none sm:px-3 sm:py-2 sm:text-[13px]">
+            <summary className="cursor-pointer list-none rounded-lg border border-[rgba(40,20,30,.1)] bg-white px-3 py-2 text-[13px] font-semibold text-[#5c5269] marker:content-none">
               Menu
             </summary>
             <div className="absolute right-0 top-full z-50 mt-2 w-48 rounded-xl border border-[rgba(40,20,30,.1)] bg-white py-2 shadow-[0_12px_40px_rgba(40,20,30,.12)]">
@@ -58,7 +58,7 @@ export function MarketingHeader() {
           </Link>
           <Link
             href="/login"
-            className="inline-flex items-center justify-center whitespace-nowrap rounded-[10px] bg-[#231a2e] px-3 py-2 text-[13px] font-semibold text-white transition hover:-translate-y-px hover:shadow-[0_10px_22px_-8px_rgba(40,20,30,.5)] sm:px-[18px] sm:py-2.5 sm:text-[14.5px]"
+            className="hidden items-center justify-center whitespace-nowrap rounded-[10px] bg-[#231a2e] px-[18px] py-2.5 text-[14.5px] font-semibold text-white transition hover:-translate-y-px hover:shadow-[0_10px_22px_-8px_rgba(40,20,30,.5)] sm:inline-flex"
           >
             Get started
           </Link>

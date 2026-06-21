@@ -2,7 +2,7 @@
 
 .marketing-site {
   font-family: var(--font-marketing), system-ui, -apple-system, sans-serif;
-  --marketing-gutter: clamp(1.5rem, 6vw, 3rem);
+  --marketing-gutter: clamp(28px, 10vw, 48px);
 }
 
 .marketing-shell-pad {
