@@ -112,6 +112,47 @@ export async function createSupportTicket(input: {
   ]);
 }
 
+export async function addUserSupportMessage(
+  ticketId: string,
+  body: string
+): Promise<void> {
+  const trimmed = body.trim();
+  if (!trimmed) throw new Error("Write a message before sending.");
+  if (trimmed.length > 4000) throw new Error("Message is too long.");
+
+  const { supabase, userId } = await requireUserId();
+
+  const { data: ticket } = await supabase
+    .from("support_tickets")
+    .select("id, status")
+    .eq("id", ticketId)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (!ticket) throw new Error("Request not found.");
+  if (ticket.status === "closed") {
+    throw new Error("This request is closed. Start a new message instead.");
+  }
+
+  const { error: messageError } = await supabase.from("support_messages").insert({
+    ticket_id: ticketId,
+    sender_role: "user",
+    body: trimmed,
+  });
+
+  if (messageError) throw new Error(messageError.message);
+
+  const { error: ticketError } = await supabase
+    .from("support_tickets")
+    .update({ status: "open" })
+    .eq("id", ticketId);
+
+  if (ticketError) throw new Error(ticketError.message);
+
+  revalidatePath("/messages");
+  revalidatePath("/admin");
+}
+
 export async function getSupportUnreadCount(): Promise<number> {
   const { supabase, userId } = await requireUserId();
 
