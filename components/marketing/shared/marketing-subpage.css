@@ -492,12 +492,6 @@
   }
 
   .marketing-home .faq-item .faq-a {
-    padding-left: 28px;
-  }
-}
-
-@media (max-width: 768px) {
-  .marketing-home .wrap {
-    padding: 0 24px;
+    padding-left: 20px;
   }
 }
