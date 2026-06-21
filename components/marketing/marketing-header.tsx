@@ -5,7 +5,7 @@ import { NAV_LINKS } from "@/lib/marketing/content";
 export function MarketingHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-[rgba(40,20,30,.08)] bg-[#fbf6f2]/82 backdrop-blur-[16px]">
-      <div className="mx-auto flex max-w-[1180px] items-center justify-between gap-3 px-6 py-3 sm:gap-4 sm:px-8 sm:py-3.5 lg:px-12">
+      <div className="marketing-shell-pad mx-auto flex max-w-[1180px] items-center justify-between gap-3 py-3 sm:gap-4 sm:py-3.5">
         <div className="min-w-0 shrink">
           <MarketingBrand />
         </div>
