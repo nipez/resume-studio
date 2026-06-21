@@ -8,12 +8,14 @@ type EditableVersionNameProps = {
   versionId: string;
   name: string;
   className?: string;
+  compact?: boolean;
 };
 
 export function EditableVersionName({
   versionId,
   name: initialName,
   className = "",
+  compact = false,
 }: EditableVersionNameProps) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -82,7 +84,9 @@ export function EditableVersionName({
               cancel();
             }
           }}
-          className="w-full rounded-lg border border-accent bg-white px-2 py-1 font-display text-[17px] font-semibold leading-tight tracking-[-0.01em] text-ink focus:outline-none disabled:opacity-60"
+          className={`w-full rounded-lg border border-accent bg-white px-2 py-1 font-display font-semibold leading-tight tracking-[-0.01em] text-ink focus:outline-none disabled:opacity-60 ${
+            compact ? "text-[14px]" : "text-[17px]"
+          }`}
           aria-label="Resume name"
         />
         {error ? <p className="mt-1 text-[11px] text-[#B23B3B]">{error}</p> : null}
@@ -98,7 +102,11 @@ export function EditableVersionName({
         className="group flex w-full cursor-text items-start gap-1.5 rounded-lg border border-transparent px-1 py-0.5 text-left transition-colors hover:border-[#E2E5EA] hover:bg-[#FAFBFC]"
         title="Click to rename"
       >
-        <span className="min-w-0 flex-1 font-display text-[17px] font-semibold leading-tight tracking-[-0.01em] text-ink">
+        <span
+          className={`min-w-0 flex-1 font-display font-semibold leading-tight tracking-[-0.01em] text-ink ${
+            compact ? "text-[14px]" : "text-[17px]"
+          }`}
+        >
           {initialName}
         </span>
         <span className="mt-0.5 shrink-0 text-[11px] font-semibold text-[#9AA3AF] opacity-0 transition-opacity group-hover:opacity-100">
