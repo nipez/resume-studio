@@ -9,7 +9,7 @@ const LEGAL_LINKS = [
 
 export function MarketingFooter() {
   return (
-    <footer className="bg-[#231a2e] px-6 py-16 text-white sm:px-8 lg:px-12">
+    <footer className="marketing-shell-pad bg-[#231a2e] py-16 text-white">
       <div className="mx-auto max-w-[1180px]">
         <div className="grid gap-10 border-b border-white/10 pb-12 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
           <div className="sm:col-span-2 lg:col-span-1">

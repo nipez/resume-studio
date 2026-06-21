@@ -87,6 +87,25 @@ export function MarketingHomePage() {
               </span>
             </div>
           </div>
+          <div className="hero-mobile-summary">
+            <div className="hero-mobile-badge">
+              <span className="hero-mobile-badge-num">6→1</span>
+              <span className="hero-mobile-badge-label">
+                Six modules — library, tailor, cover, Q&amp;A, track, insights — in one
+                workspace.
+              </span>
+            </div>
+            <div className="hero-mobile-pills">
+              {LOOP_LABELS.map((label, index) => (
+                <span key={label} className="hero-mobile-pill">
+                  <span className="hero-mobile-pill-num">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  {label}
+                </span>
+              ))}
+            </div>
+          </div>
           <div className="loop-wrap">
             <div className="loop">
               <div className="loop-ring" />

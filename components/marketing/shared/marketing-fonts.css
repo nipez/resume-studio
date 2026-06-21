@@ -2,6 +2,12 @@
 
 .marketing-site {
   font-family: var(--font-marketing), system-ui, -apple-system, sans-serif;
+  --marketing-gutter: clamp(1.5rem, 6vw, 3rem);
+}
+
+.marketing-shell-pad {
+  padding-left: max(var(--marketing-gutter), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--marketing-gutter), env(safe-area-inset-right, 0px));
 }
 
 .marketing-site .font-display {
