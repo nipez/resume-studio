@@ -99,7 +99,7 @@
 .marketing-home .sec-head.center p{margin-left:auto;margin-right:auto;}
 
 /* dark sections */
-.marketing-home .dark{background:var(--ink);color:#fff;position:relative;overflow:hidden;}
+.marketing-home .dark{background:var(--ink);color:#fff;position:relative;overflow:visible;}
 .marketing-home .dark .sec-head h2{color:#fff;}
 .marketing-home .dark .sec-head p{color:#b8aec2;}
 .marketing-home .problem-glow{position:absolute;inset:0;background:radial-gradient(60% 50% at 85% 0%,rgba(255,92,56,.18),transparent 60%);pointer-events:none;}
@@ -145,7 +145,18 @@
 .marketing-home .why-card p{font-size:15.5px;line-height:1.55;color:var(--muted);margin-top:12px;}
 
 /* comparison */
+.marketing-home .compare-wrap{margin-top:48px;}
 .marketing-home .table-scroll{margin-top:48px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.marketing-home .compare-cards{display:none;}
+.marketing-home .compare-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:16px 18px;}
+.marketing-home .compare-card-title{font-family:var(--font-marketing),system-ui,sans-serif;font-size:15px;font-weight:600;color:#fff;margin-bottom:14px;}
+.marketing-home .compare-card-col{padding:12px 0;border-top:1px solid rgba(255,255,255,.08);}
+.marketing-home .compare-card-col:first-of-type{border-top:none;padding-top:0;}
+.marketing-home .compare-card-label{display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#9b91a6;margin-bottom:6px;}
+.marketing-home .compare-card-col p{margin:0;font-size:14px;line-height:1.55;color:#c4bacd;}
+.marketing-home .compare-card-col-us .compare-card-label{color:var(--coral-l);}
+.marketing-home .compare-card-col-us{background:rgba(255,92,56,.08);border:1px solid rgba(255,92,56,.22);border-radius:12px;padding:12px 14px;margin-top:10px;}
+.marketing-home .compare-card-col-us p{color:#fff;}
 .marketing-home .ctable{min-width:760px;border:1px solid rgba(255,255,255,.1);border-radius:20px;overflow:hidden;}
 .marketing-home .crow{display:grid;grid-template-columns:1.1fr 1fr 1.2fr;border-top:1px solid rgba(255,255,255,.08);}
 .marketing-home .crow:first-child{border-top:none;}
@@ -312,4 +323,8 @@
 .marketing-home .foot-bottom{flex-direction:column;align-items:flex-start;}
 .marketing-home .home-module-links{gap:14px;}
 .marketing-home .students-band-cta{gap:14px;}
+.marketing-home .steps{grid-template-columns:1fr;gap:24px;}
+.marketing-home .compare-wrap{margin-top:32px;}
+.marketing-home .compare-table-desktop{display:none;}
+.marketing-home .compare-cards{display:flex;flex-direction:column;gap:12px;}
 }
