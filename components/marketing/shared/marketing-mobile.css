@@ -1,0 +1,369 @@
+/**
+ * HubSpot-style mobile SaaS layout for all marketing pages.
+ * Pairs with marketing-home.css + page-specific styles.
+ */
+
+@media (max-width: 767px) {
+  /* ── Light heroes → dark centered band (matches home mobile) ── */
+  .marketing-home .features-hero,
+  .marketing-home.students-page .students-hero,
+  .marketing-home .sub-hero {
+    background: var(--ink) !important;
+    color: #fff;
+  }
+
+  .marketing-home .features-hero h1,
+  .marketing-home.students-page .students-hero h1,
+  .marketing-home .sub-hero h1 {
+    font-size: clamp(2rem, 8.5vw, 2.625rem);
+    line-height: 1.12;
+    color: #fff;
+  }
+
+  .marketing-home .features-hero h1 .serif-i,
+  .marketing-home.students-page .students-hero h1 .serif-i,
+  .marketing-home .sub-hero h1 .serif-i {
+    color: var(--coral-l);
+  }
+
+  .marketing-home .features-hero-sub,
+  .marketing-home.students-page .students-hero-sub,
+  .marketing-home .sub-hero-sub {
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    color: #b8aec2;
+    max-width: 36ch;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .marketing-home .features-hero .eyebrow,
+  .marketing-home.students-page .students-hero .eyebrow,
+  .marketing-home .sub-hero .eyebrow {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.14);
+    color: var(--coral-l);
+    box-shadow: none;
+  }
+
+  /* ── Two-column hero grids → centered stack ── */
+  .marketing-home .aos-hero-grid,
+  .marketing-home .features-hero-grid,
+  .marketing-home.students-page .students-hero-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 36px 0 40px;
+    gap: 0;
+  }
+
+  .marketing-home .aos-hero-grid > div:first-child,
+  .marketing-home .features-hero-grid > div:first-child,
+  .marketing-home.students-page .students-hero-grid > div:first-child {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 520px;
+  }
+
+  .marketing-home .aos-hero h1 {
+    font-size: clamp(2rem, 8.5vw, 2.625rem);
+    line-height: 1.12;
+    margin-top: 18px;
+  }
+
+  .marketing-home .aos-sub {
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    color: #b8aec2;
+    max-width: 36ch;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* ── Stacked full-width CTAs ── */
+  .marketing-home .aos-cta,
+  .marketing-home .features-hero-cta,
+  .marketing-home.students-page .students-hero-cta,
+  .marketing-home .sub-hero-cta {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    max-width: 360px;
+    margin: 28px auto 0;
+    gap: 12px;
+  }
+
+  .marketing-home .sub-hero-cta.left {
+    justify-content: center;
+    align-items: stretch;
+  }
+
+  .marketing-home .aos-cta .btn-coral,
+  .marketing-home .features-hero-cta .btn-coral,
+  .marketing-home.students-page .students-hero-cta .btn-coral,
+  .marketing-home .sub-hero-cta .btn-coral {
+    width: 100%;
+    font-size: 1rem;
+    padding: 16px 24px;
+    box-sizing: border-box;
+  }
+
+  .marketing-home .aos-ghost,
+  .marketing-home .features-hero-cta .link-underline,
+  .marketing-home.students-page .students-hero-cta .link-underline,
+  .marketing-home .sub-hero-cta .link-underline {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 20px;
+    border: 2px solid rgba(255, 255, 255, 0.38);
+    border-radius: 13px;
+    color: #fff;
+    font-size: 1rem;
+    white-space: normal;
+    line-height: 1.35;
+    box-sizing: border-box;
+    border-bottom-width: 2px;
+  }
+
+  .marketing-home .sub-hero-inner,
+  .marketing-home .sub-hero-inner.center {
+    padding: 36px 0 40px;
+    text-align: center;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  /* ── Application OS mockup ── */
+  .marketing-home .aos-mock-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 360px;
+    margin: 32px auto 0;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .marketing-home .aos-window {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .marketing-home .aos-loopback {
+    position: static;
+    margin-top: 14px;
+    align-self: center;
+  }
+
+  .marketing-home .aos-stats {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    width: 100%;
+    max-width: 360px;
+    margin-top: 28px;
+    text-align: left;
+  }
+
+  /* ── Features bento visual ── */
+  .marketing-home .features-bento-wrap {
+    width: 100%;
+    max-width: 360px;
+    margin: 32px auto 0;
+    min-height: auto;
+  }
+
+  .marketing-home .features-bento {
+    max-width: 100%;
+  }
+
+  .marketing-home .features-chips {
+    justify-content: center;
+  }
+
+  /* ── Students hero card + personas ── */
+  .marketing-home.students-page .students-hero-card {
+    width: 100%;
+    max-width: 360px;
+    margin: 24px auto 0;
+    text-align: left;
+  }
+
+  .marketing-home.students-page .students-personas {
+    justify-content: center;
+  }
+
+  .marketing-home.students-page .students-beta {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .marketing-home.students-page .students-audience-card .btn {
+    align-self: stretch;
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* ── Flow strip → vertical on mobile ── */
+  .marketing-home .aos-flow-strip {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 20px 18px;
+    margin-top: 32px;
+  }
+
+  .marketing-home .aos-flow-step {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .marketing-home .aos-flow-arrow {
+    display: none;
+  }
+
+  .marketing-home .aos-flow-loop {
+    margin-left: 0;
+    margin-top: 4px;
+    align-self: center;
+  }
+
+  /* ── Section headings ── */
+  .marketing-home .sec-head {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .marketing-home .sec-head p {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .marketing-home .mgrid,
+  .marketing-home .features-cap-grid,
+  .marketing-home .why-grid,
+  .marketing-home .steps,
+  .marketing-home .pgrid,
+  .marketing-home .tg,
+  .marketing-home .stack {
+    grid-template-columns: 1fr !important;
+  }
+
+  .marketing-home .steps-line {
+    display: none;
+  }
+
+  /* ── Pricing / about hero extras ── */
+  .marketing-home .price-chips {
+    margin-top: 28px;
+  }
+
+  .marketing-home .tier-tags {
+    justify-content: center;
+    margin-top: 24px;
+  }
+
+  .marketing-home .beta-note {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+    max-width: 360px;
+  }
+
+  /* ── FAQ ── */
+  .marketing-home .faq-panel {
+    margin-top: 32px;
+    border-radius: 18px;
+  }
+
+  .marketing-home .faq-item summary {
+    padding: 18px 20px;
+    font-size: 16px;
+  }
+
+  .marketing-home .faq-item .faq-a {
+    padding: 0 20px 18px 20px;
+    font-size: 15px;
+  }
+
+  /* ── Legal / blog ── */
+  .marketing-home .legal-prose h2 {
+    font-size: 22px;
+  }
+
+  .marketing-home .blog-card {
+    padding: 22px 20px;
+  }
+
+  .marketing-home .blog-card h2 {
+    font-size: 22px;
+  }
+
+  .marketing-home .blog-article-header {
+    padding: 32px 0 24px;
+  }
+
+  /* ── Bottom CTA rows ── */
+  .marketing-home .aos-cta-row {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    max-width: 360px;
+    margin: 0 auto;
+    gap: 12px;
+  }
+
+  .marketing-home .aos-cta-row .btn-dark {
+    width: 100%;
+  }
+
+  .marketing-home .aos-cta-row .link-underline {
+    display: flex;
+    justify-content: center;
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.38);
+  }
+
+  .marketing-home .cta {
+    padding: 44px 24px;
+  }
+
+  .marketing-home .cta .btn-dark {
+    width: 100%;
+    max-width: 360px;
+  }
+
+  .marketing-home .snap-strip .inner {
+    justify-content: center;
+    text-align: center;
+    padding: 18px 0;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  .marketing-home .replace {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px 22px;
+  }
+
+  .marketing-home .home-module-links,
+  .marketing-home .students-band-cta {
+    flex-direction: column;
+    align-items: stretch;
+    max-width: 360px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .marketing-home .home-module-links .btn-coral,
+  .marketing-home .students-band-cta .btn-coral {
+    width: 100%;
+  }
+}

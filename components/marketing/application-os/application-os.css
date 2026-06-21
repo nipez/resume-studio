@@ -346,20 +346,16 @@
     padding: 24px 0 48px;
   }
   .marketing-home .aos-mock-wrap {
-    justify-content: flex-start;
-  }
-  .marketing-home .aos-loopback {
-    right: 12px;
+    justify-content: center;
   }
 }
-@media (max-width: 600px) {
-  .marketing-home .aos-sub {
-    max-width: none;
-  }
-  .marketing-home .aos-window {
-    max-width: none;
-  }
-  .marketing-home .aos-hero-grid {
-    padding: 16px 0 40px;
+
+.marketing-home .aos-phase-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+@media (max-width: 767px) {
+  .marketing-home .aos-phase-grid {
+    grid-template-columns: 1fr;
   }
 }

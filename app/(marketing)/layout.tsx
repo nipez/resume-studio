@@ -2,6 +2,7 @@ import { BetaBanner } from "@/components/marketing/beta-banner";
 import { MarketingFooter } from "@/components/marketing/marketing-footer";
 import { MarketingHeader } from "@/components/marketing/marketing-header";
 import "@/components/marketing/shared/marketing-fonts.css";
+import "@/components/marketing/shared/marketing-mobile.css";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import type { Viewport } from "next";
