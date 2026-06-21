@@ -25,7 +25,7 @@ export function MarketingBrand({
         </span>
         {!hideTagline && (
           <span
-            className={`mt-[3px] block text-[10px] font-semibold uppercase tracking-[0.14em] ${light ? "text-[#ff8a5c]" : "text-[#ff5c38]"}`}
+            className={`mt-[3px] hidden text-[10px] font-semibold uppercase tracking-[0.14em] sm:block ${light ? "text-[#ff8a5c]" : "text-[#ff5c38]"}`}
           >
             {SITE_TAGLINE}
           </span>
