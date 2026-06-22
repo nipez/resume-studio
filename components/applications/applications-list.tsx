@@ -6,7 +6,9 @@ import { SavedJobsSection } from "@/components/applications/saved-jobs-section";
 import type { Application, ApplicationStatus } from "@/lib/applications/types";
 import type { SavedJob } from "@/lib/saved-jobs/types";
 import {
+  archiveApplication,
   deleteApplication,
+  restoreApplication,
   updateApplicationStatus,
 } from "@/lib/applications/actions";
 import {
@@ -22,10 +24,11 @@ import {
 } from "@/lib/applications/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 
 type ApplicationsListProps = {
   applications: Application[];
+  archivedApplications: Application[];
   savedJobs: SavedJob[];
   defaultVersionId: string | null;
   defaultVersionName?: string | null;
@@ -111,8 +114,139 @@ function StatusSelect({
   );
 }
 
+function ApplicationsTable({
+  applications,
+  archived,
+  pending,
+  onArchive,
+  onRestore,
+  onDelete,
+}: {
+  applications: Application[];
+  archived: boolean;
+  pending: boolean;
+  onArchive: (id: string) => void;
+  onRestore: (id: string) => void;
+  onDelete: (id: string) => void;
+}) {
+  if (applications.length === 0) {
+    return (
+      <div className="rounded-2xl border border-dashed border-[#D2D7DE] bg-[#FBFBFC] px-7 py-12 text-center text-[#8A92A0]">
+        <div className="mb-2.5 text-[32px] opacity-55">{archived ? "📦" : "✓"}</div>
+        <div className="font-display text-[15px] font-semibold text-muted">
+          {archived
+            ? "No archived applications"
+            : "No applications tracked yet"}
+        </div>
+        <div className="mt-1.5 text-[13px]">
+          {archived
+            ? "Archive old or rejected applications to keep your active list focused — snapshots are preserved."
+            : "Hit “Log application” and enter the role and company — we’ll snapshot the resume, cover letter, and Q&A you used."}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="overflow-hidden rounded-2xl border border-border bg-white">
+      <div className="grid grid-cols-[1fr_120px_150px_minmax(140px,1fr)] gap-3.5 border-b border-[#EEF0F3] bg-[#FAFBFC] px-[22px] py-[13px] text-[11px] font-bold uppercase tracking-[0.06em] text-[#8A92A0]">
+        <div>Role / Company</div>
+        <div>Applied</div>
+        <div>Status</div>
+        <div className="text-right">Actions</div>
+      </div>
+      {applications.map((app) => {
+        const tags = applicationTags(app);
+        const nextEv = nextOpenEvent(app.events ?? []);
+        const { primary, secondary } = applicationListHeading(app);
+
+        return (
+          <div
+            key={app.id}
+            className={`grid grid-cols-[1fr_120px_150px_minmax(140px,1fr)] items-center gap-3.5 border-b border-[#F2F3F5] px-[22px] py-[15px] last:border-b-0 ${
+              archived ? "bg-[#FAFBFC]/80" : ""
+            }`}
+          >
+            <Link
+              href={`/applications/${app.id}`}
+              className="min-w-0 cursor-pointer no-underline"
+            >
+              <div className="truncate text-[14.5px] font-bold text-[#141821]">
+                {primary}
+                {secondary && (
+                  <span className="font-semibold text-[#8A92A0]">
+                    {" "}
+                    · {secondary}
+                  </span>
+                )}
+              </div>
+              <div className="mt-[3px] truncate text-[12.3px] text-[#8A92A0]">
+                {tags.join("  ·  ")}
+              </div>
+              {nextEv && !archived ? (
+                <div className="mt-1.5 inline-flex items-center gap-1 rounded-md border border-[#E8ECF1] bg-[#F5F7FA] px-2 py-[3px] text-[11px] font-semibold text-muted">
+                  📅 {appEventLabel(nextEv.type)} · {formatDay(nextEv.date)}
+                </div>
+              ) : null}
+            </Link>
+            <div className="text-[13px] text-[#3a4350]">
+              {formatAppDate(app.applied_at)}
+            </div>
+            <div>
+              <StatusSelect
+                status={app.status}
+                applicationId={app.id}
+                disabled={pending}
+              />
+            </div>
+            <div className="flex flex-wrap justify-end gap-[7px]">
+              <Link
+                href={`/applications/${app.id}`}
+                className="rounded-lg bg-sidebar px-3 py-[7px] text-xs font-semibold text-white transition-colors hover:bg-[#272b33]"
+              >
+                Open
+              </Link>
+              {archived ? (
+                <>
+                  <button
+                    type="button"
+                    disabled={pending}
+                    onClick={() => onRestore(app.id)}
+                    className="cursor-pointer rounded-lg border border-[#CFE0FF] bg-[#EAF1FF] px-3 py-[7px] text-xs font-semibold text-[#2456D6] transition-colors hover:border-[#A8C4FF] disabled:opacity-50"
+                  >
+                    Restore
+                  </button>
+                  <button
+                    type="button"
+                    disabled={pending}
+                    onClick={() => onDelete(app.id)}
+                    title="Delete permanently"
+                    className="cursor-pointer rounded-lg border border-[#E0E3E8] bg-white px-2.5 py-[7px] text-xs text-[#B23B3B] transition-colors hover:border-[#E0A0A0] hover:bg-[#FFF6F6] disabled:opacity-50"
+                  >
+                    Delete
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={() => onArchive(app.id)}
+                  className="cursor-pointer rounded-lg border border-[#E0E3E8] bg-white px-3 py-[7px] text-xs font-semibold text-[#5A6573] transition-colors hover:border-[#C8CED6] hover:text-ink disabled:opacity-50"
+                >
+                  Archive
+                </button>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export function ApplicationsList({
   applications,
+  archivedApplications,
   savedJobs,
   defaultVersionId,
   defaultVersionName,
@@ -122,11 +256,41 @@ export function ApplicationsList({
 }: ApplicationsListProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
+  const [tab, setTab] = useState<"active" | "archived">("active");
   const stats = computeApplicationStats(applications);
+  const visibleApplications =
+    tab === "active" ? applications : archivedApplications;
+
+  function handleArchive(id: string) {
+    if (
+      !confirm(
+        "Archive this application? It moves out of your active list and insights — the snapshot is preserved."
+      )
+    ) {
+      return;
+    }
+    startTransition(async () => {
+      await archiveApplication(id);
+      router.refresh();
+    });
+  }
+
+  function handleRestore(id: string) {
+    startTransition(async () => {
+      await restoreApplication(id);
+      setTab("active");
+      router.refresh();
+    });
+  }
 
   function handleDelete(id: string) {
-    if (!confirm("Delete this application and its snapshot? This cannot be undone."))
+    if (
+      !confirm(
+        "Delete this archived application permanently? The snapshot cannot be recovered."
+      )
+    ) {
       return;
+    }
     startTransition(async () => {
       await deleteApplication(id);
       router.refresh();
@@ -175,120 +339,81 @@ export function ApplicationsList({
           isStudent={isStudent}
         />
 
-        <div className="mb-3">
+        <div className="mb-3 flex flex-wrap items-center gap-2">
           <h2 className="font-display text-[17px] font-semibold text-ink">
             Logged applications
           </h2>
         </div>
 
-        <div className="mb-6 flex flex-wrap gap-3">
-          <StatCard label="Total" value={String(stats.total)} />
-          <StatCard
-            label="Responses"
-            value={String(stats.respondedCount)}
-            meta={appStatusMeta("response")}
-          />
-          <StatCard
-            label="Interviews"
-            value={String(stats.interviewCount)}
-            meta={appStatusMeta("interview")}
-          />
-          <StatCard
-            label="Offers"
-            value={String(stats.offerCount)}
-            meta={appStatusMeta("offer")}
-          />
-          <StatCard
-            label="Response rate"
-            value={`${stats.respRate}%`}
-            meta={appStatusMeta("applied")}
-          />
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setTab("active")}
+            className={`cursor-pointer rounded-[10px] border px-3.5 py-2 text-[13px] font-semibold transition-colors ${
+              tab === "active"
+                ? "border-accent/30 bg-white text-accent shadow-[0_2px_10px_rgba(36,86,214,0.08)]"
+                : "border-transparent bg-[#ECEEF1]/70 text-[#5A6573] hover:border-[#E2E5EA] hover:bg-white"
+            }`}
+          >
+            Active
+            {applications.length > 0 ? (
+              <span className="ml-1.5 text-[12px] font-bold opacity-80">
+                {applications.length}
+              </span>
+            ) : null}
+          </button>
+          <button
+            type="button"
+            onClick={() => setTab("archived")}
+            className={`cursor-pointer rounded-[10px] border px-3.5 py-2 text-[13px] font-semibold transition-colors ${
+              tab === "archived"
+                ? "border-accent/30 bg-white text-accent shadow-[0_2px_10px_rgba(36,86,214,0.08)]"
+                : "border-transparent bg-[#ECEEF1]/70 text-[#5A6573] hover:border-[#E2E5EA] hover:bg-white"
+            }`}
+          >
+            Archived
+            {archivedApplications.length > 0 ? (
+              <span className="ml-1.5 text-[12px] font-bold opacity-80">
+                {archivedApplications.length}
+              </span>
+            ) : null}
+          </button>
         </div>
 
-        {applications.length > 0 ? (
-          <div className="overflow-hidden rounded-2xl border border-border bg-white">
-            <div className="grid grid-cols-[1fr_120px_150px_96px] gap-3.5 border-b border-[#EEF0F3] bg-[#FAFBFC] px-[22px] py-[13px] text-[11px] font-bold uppercase tracking-[0.06em] text-[#8A92A0]">
-              <div>Role / Company</div>
-              <div>Applied</div>
-              <div>Status</div>
-              <div className="text-right">Actions</div>
-            </div>
-            {applications.map((app) => {
-              const tags = applicationTags(app);
-              const nextEv = nextOpenEvent(app.events ?? []);
-              const { primary, secondary } = applicationListHeading(app);
+        {tab === "active" ? (
+          <div className="mb-6 flex flex-wrap gap-3">
+            <StatCard label="Total" value={String(stats.total)} />
+            <StatCard
+              label="Responses"
+              value={String(stats.respondedCount)}
+              meta={appStatusMeta("response")}
+            />
+            <StatCard
+              label="Interviews"
+              value={String(stats.interviewCount)}
+              meta={appStatusMeta("interview")}
+            />
+            <StatCard
+              label="Offers"
+              value={String(stats.offerCount)}
+              meta={appStatusMeta("offer")}
+            />
+            <StatCard
+              label="Response rate"
+              value={`${stats.respRate}%`}
+              meta={appStatusMeta("applied")}
+            />
+          </div>
+        ) : null}
 
-              return (
-                <div
-                  key={app.id}
-                  className="grid grid-cols-[1fr_120px_150px_96px] items-center gap-3.5 border-b border-[#F2F3F5] px-[22px] py-[15px] last:border-b-0"
-                >
-                  <Link
-                    href={`/applications/${app.id}`}
-                    className="min-w-0 cursor-pointer no-underline"
-                  >
-                    <div className="truncate text-[14.5px] font-bold text-[#141821]">
-                      {primary}
-                      {secondary && (
-                        <span className="font-semibold text-[#8A92A0]">
-                          {" "}
-                          · {secondary}
-                        </span>
-                      )}
-                    </div>
-                    <div className="mt-[3px] truncate text-[12.3px] text-[#8A92A0]">
-                      {tags.join("  ·  ")}
-                    </div>
-                    {nextEv && (
-                      <div className="mt-1.5 inline-flex items-center gap-1 rounded-md border border-[#E8ECF1] bg-[#F5F7FA] px-2 py-[3px] text-[11px] font-semibold text-muted">
-                        📅 {appEventLabel(nextEv.type)} ·{" "}
-                        {formatDay(nextEv.date)}
-                      </div>
-                    )}
-                  </Link>
-                  <div className="text-[13px] text-[#3a4350]">
-                    {formatAppDate(app.applied_at)}
-                  </div>
-                  <div>
-                    <StatusSelect
-                      status={app.status}
-                      applicationId={app.id}
-                      disabled={pending}
-                    />
-                  </div>
-                  <div className="flex justify-end gap-[7px]">
-                    <Link
-                      href={`/applications/${app.id}`}
-                      className="rounded-lg bg-sidebar px-3 py-[7px] text-xs font-semibold text-white transition-colors hover:bg-[#272b33]"
-                    >
-                      Open
-                    </Link>
-                    <button
-                      type="button"
-                      disabled={pending}
-                      onClick={() => handleDelete(app.id)}
-                      title="Delete application"
-                      className="cursor-pointer rounded-lg border border-[#E0E3E8] bg-white px-2.5 py-[7px] text-xs text-[#B23B3B] transition-colors hover:border-[#E0A0A0] hover:bg-[#FFF6F6] disabled:opacity-50"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="rounded-2xl border border-dashed border-[#D2D7DE] bg-[#FBFBFC] px-7 py-12 text-center text-[#8A92A0]">
-            <div className="mb-2.5 text-[32px] opacity-55">✓</div>
-            <div className="font-display text-[15px] font-semibold text-muted">
-              No applications tracked yet
-            </div>
-            <div className="mt-1.5 text-[13px]">
-              Hit &ldquo;Log application&rdquo; and enter the role and company —
-              we&apos;ll snapshot the resume, cover letter, and Q&amp;A you used.
-            </div>
-          </div>
-        )}
+        <ApplicationsTable
+          applications={visibleApplications}
+          archived={tab === "archived"}
+          pending={pending}
+          onArchive={handleArchive}
+          onRestore={handleRestore}
+          onDelete={handleDelete}
+        />
       </div>
     </div>
   );

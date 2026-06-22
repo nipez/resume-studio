@@ -77,6 +77,14 @@ export function applicationCurrentRank(app: Application): number {
   return STAGE_RANK[app.status] ?? 0;
 }
 
+export function isActiveApplication(app: Pick<Application, "archived_at">): boolean {
+  return !app.archived_at;
+}
+
+export function activeApplications(apps: Application[]): Application[] {
+  return apps.filter(isActiveApplication);
+}
+
 export function computeApplicationStats(apps: Application[]) {
   const total = apps.length;
   let respondedCount = 0;

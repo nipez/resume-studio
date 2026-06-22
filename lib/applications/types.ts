@@ -93,6 +93,7 @@ export type Application = {
   hiring_contacts: HiringContact[] | null;
   notes: string;
   application_type: ApplicationType | null;
+  archived_at: string | null;
   created_at: string;
   events?: ApplicationEvent[];
 };

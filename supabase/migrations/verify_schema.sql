@@ -42,6 +42,9 @@ with checks as (
   union all select 'table: ai_usage_monthly', to_regclass('public.ai_usage_monthly') is not null
   union all select 'table: ai_usage_events', to_regclass('public.ai_usage_events') is not null
 
+  union all select 'applications.archived_at',
+    exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'applications' and column_name = 'archived_at')
+
   union all select 'resume_versions.archived_at',
     exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'resume_versions' and column_name = 'archived_at')
 
@@ -65,6 +68,7 @@ order by ok asc, check_name asc;
 --   table: cover_letters           → 0005_cover_letters.sql
 --   applications.interview_*       → 0008_interview_debrief.sql
 --   resume_versions.archived_at    → 0009_resume_archive.sql
+--   applications.archived_at       → 0015_application_archive.sql
 --   table: saved_jobs              → 0010_saved_jobs.sql
 --   profiles.plan_tier             → 0011_ai_usage.sql
 --   profiles.persona             → 0012_student_persona.sql

@@ -4,6 +4,7 @@ const OPTIONAL_APPLICATION_COLUMNS = [
   "hiring_contacts",
   "interview_transcript",
   "interview_debrief",
+  "archived_at",
 ] as const;
 
 export function isMissingApplicationColumnError(
