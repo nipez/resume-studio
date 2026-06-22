@@ -7,7 +7,9 @@ import {
 import { ResumePreviewModal } from "@/components/applications/resume-preview-modal";
 import type { Application, ApplicationStatus, HiringContact } from "@/lib/applications/types";
 import {
+  archiveApplication,
   deleteApplication,
+  restoreApplication,
   updateApplicationAnswers,
   updateApplicationCoverLetter,
   updateApplicationHiringContacts,
@@ -118,9 +120,39 @@ export function ApplicationDetailView({
     });
   }
 
-  function handleDelete() {
-    if (!confirm("Delete this application and its snapshot? This cannot be undone."))
+  function handleArchive() {
+    if (
+      !confirm(
+        "Archive this application? It moves out of your active list and insights — the snapshot is preserved."
+      )
+    ) {
       return;
+    }
+    startTransition(async () => {
+      await archiveApplication(app.id);
+      patchLocal({ archived_at: new Date().toISOString() });
+      router.refresh();
+    });
+  }
+
+  function handleRestore() {
+    startTransition(async () => {
+      await restoreApplication(app.id);
+      patchLocal({ archived_at: null });
+      router.refresh();
+    });
+  }
+
+  function handleDelete() {
+    if (
+      !confirm(
+        app.archived_at
+          ? "Delete this archived application permanently? The snapshot cannot be recovered."
+          : "Delete this application and its snapshot? This cannot be undone."
+      )
+    ) {
+      return;
+    }
     startTransition(async () => {
       await deleteApplication(app.id);
       router.push("/applications");
@@ -335,6 +367,27 @@ export function ApplicationDetailView({
           </div>
         )}
 
+        {app.archived_at ? (
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#E2E5EA] bg-[#F5F7FA] px-4 py-3">
+            <div>
+              <div className="text-[12px] font-bold uppercase tracking-[0.06em] text-[#8A92A0]">
+                Archived
+              </div>
+              <p className="mt-1 text-[13px] text-[#3a4350]">
+                Hidden from your active list and insights. Restore to track it again.
+              </p>
+            </div>
+            <button
+              type="button"
+              disabled={pending}
+              onClick={handleRestore}
+              className="cursor-pointer rounded-[9px] border border-[#CFE0FF] bg-[#EAF1FF] px-3 py-2 text-[12.5px] font-semibold text-[#2456D6] transition-colors hover:border-[#A8C4FF] disabled:opacity-50"
+            >
+              Restore
+            </button>
+          </div>
+        ) : null}
+
         <div className="mb-5 flex flex-wrap items-start gap-3">
           <Link
             href="/applications"
@@ -364,14 +417,37 @@ export function ApplicationDetailView({
               {app.resume_version_name ? ` · ${app.resume_version_name}` : ""}
             </p>
           </div>
-          <button
-            type="button"
-            disabled={pending}
-            onClick={handleDelete}
-            className="cursor-pointer rounded-[9px] border border-[#E0E3E8] bg-white px-3 py-2 text-[12.5px] font-semibold text-[#B23B3B] transition-colors hover:border-[#E0A0A0] hover:bg-[#FFF6F6] disabled:opacity-50"
-          >
-            Delete
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            {app.archived_at ? (
+              <button
+                type="button"
+                disabled={pending}
+                onClick={handleDelete}
+                className="cursor-pointer rounded-[9px] border border-[#E0E3E8] bg-white px-3 py-2 text-[12.5px] font-semibold text-[#B23B3B] transition-colors hover:border-[#E0A0A0] hover:bg-[#FFF6F6] disabled:opacity-50"
+              >
+                Delete permanently
+              </button>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={handleArchive}
+                  className="cursor-pointer rounded-[9px] border border-[#E0E3E8] bg-white px-3 py-2 text-[12.5px] font-semibold text-[#5A6573] transition-colors hover:border-[#C8CED6] hover:text-ink disabled:opacity-50"
+                >
+                  Archive
+                </button>
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={handleDelete}
+                  className="cursor-pointer rounded-[9px] border border-[#E0E3E8] bg-white px-3 py-2 text-[12.5px] font-semibold text-[#B23B3B] transition-colors hover:border-[#E0A0A0] hover:bg-[#FFF6F6] disabled:opacity-50"
+                >
+                  Delete
+                </button>
+              </>
+            )}
+          </div>
         </div>
 
         <div className="mb-5 grid gap-2 sm:grid-cols-3">

@@ -71,6 +71,7 @@ function mapApplication(
       : null,
     notes: String(row.notes ?? ""),
     application_type: (row.application_type as Application["application_type"]) ?? null,
+    archived_at: row.archived_at ? String(row.archived_at) : null,
     created_at: row.created_at as string,
     events,
   };
@@ -130,6 +131,7 @@ async function updateApplicationRow(
 
 export async function getApplicationsList(): Promise<{
   applications: Application[];
+  archivedApplications: Application[];
   versionCounts: Record<string, number>;
 }> {
   const supabase = createClient();
@@ -138,7 +140,7 @@ export async function getApplicationsList(): Promise<{
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { applications: [], versionCounts: {} };
+    return { applications: [], archivedApplications: [], versionCounts: {} };
   }
 
   const [{ data: rows, error: appsError }, { data: events }] = await Promise.all([
@@ -156,7 +158,7 @@ export async function getApplicationsList(): Promise<{
 
   if (appsError) {
     console.error("getApplicationsList:", appsError.message);
-    return { applications: [], versionCounts: {} };
+    return { applications: [], archivedApplications: [], versionCounts: {} };
   }
 
   const eventsByApp = new Map<string, ApplicationEvent[]>();
@@ -167,7 +169,7 @@ export async function getApplicationsList(): Promise<{
     eventsByApp.set(ev.application_id, list);
   }
 
-  const applications = (rows ?? []).flatMap((row) => {
+  const allApplications = (rows ?? []).flatMap((row) => {
     try {
       return [mapApplication(row, eventsByApp.get(row.id as string) ?? [])];
     } catch (error) {
@@ -176,15 +178,18 @@ export async function getApplicationsList(): Promise<{
     }
   });
 
+  const applications = allApplications.filter((app) => !app.archived_at);
+  const archivedApplications = allApplications.filter((app) => app.archived_at);
+
   const versionCounts: Record<string, number> = {};
-  for (const app of applications) {
+  for (const app of allApplications) {
     if (app.resume_version_id) {
       versionCounts[app.resume_version_id] =
         (versionCounts[app.resume_version_id] ?? 0) + 1;
     }
   }
 
-  return { applications, versionCounts };
+  return { applications, archivedApplications, versionCounts };
 }
 
 export async function getApplicationCountsByVersion(): Promise<
@@ -416,13 +421,14 @@ export async function getCompanyApplicationHistory(
 
   const { data: rows } = await supabase
     .from("applications")
-    .select("id, role, company, applied_at, status")
+    .select("id, role, company, applied_at, status, archived_at")
     .eq("user_id", user.id)
     .order("applied_at", { ascending: false });
 
   const key = company.trim().toLowerCase();
   return (rows ?? [])
     .filter((row) => {
+      if (row.archived_at) return false;
       if (excludeId && row.id === excludeId) return false;
       return String(row.company ?? "").trim().toLowerCase() === key;
     })
@@ -497,6 +503,30 @@ export async function updateApplicationInterviewDebrief(
   revalidatePath(`/applications/${id}`);
 }
 
+export async function archiveApplication(id: string) {
+  const { error } = await updateApplicationRow(id, {
+    archived_at: new Date().toISOString(),
+  });
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/applications");
+  revalidatePath(`/applications/${id}`);
+  revalidatePath("/insights");
+  revalidatePath("/dashboard");
+}
+
+export async function restoreApplication(id: string) {
+  const { error } = await updateApplicationRow(id, { archived_at: null });
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/applications");
+  revalidatePath(`/applications/${id}`);
+  revalidatePath("/insights");
+  revalidatePath("/dashboard");
+}
+
 export async function deleteApplication(id: string) {
   const supabase = createClient();
   const { error } = await supabase.from("applications").delete().eq("id", id);
@@ -504,6 +534,8 @@ export async function deleteApplication(id: string) {
 
   revalidatePath("/applications");
   revalidatePath("/library");
+  revalidatePath("/insights");
+  revalidatePath("/dashboard");
 }
 
 export async function addApplicationEvent(
