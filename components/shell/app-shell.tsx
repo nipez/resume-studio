@@ -186,20 +186,16 @@ export function AppShell({
         </div>
       </aside>
 
-      <main className="relative flex min-w-0 flex-1 flex-col">
-        <div
-          className={`pointer-events-none absolute right-6 z-40 ${
-            impersonatingLabel ? "top-[58px]" : "top-4"
-          }`}
-        >
-          <div className="pointer-events-auto">
-            <SupportInboxButton unreadCount={supportUnreadCount} />
-          </div>
-        </div>
+      <main className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
         {impersonatingLabel ? (
           <ImpersonationBanner label={impersonatingLabel} />
         ) : null}
-        {children}
+        <div className="flex flex-none items-center justify-end border-b border-[#ECEEF1] bg-white px-6 py-2.5">
+          <SupportInboxButton unreadCount={supportUnreadCount} />
+        </div>
+        <div className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+          {children}
+        </div>
         {impersonatingLabel ? <FloatingExitToSuperAdmin /> : null}
         {!isAdmin || impersonatingLabel ? (
           <HelpMeWidget isStudent={isStudent} />

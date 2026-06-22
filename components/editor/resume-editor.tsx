@@ -222,123 +222,133 @@ export function ResumeEditor({ version }: ResumeEditorProps) {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="flex flex-none flex-wrap items-center gap-3 border-b border-border bg-white px-6 py-3.5">
-        <Link
-          href="/library"
-          className="text-[13px] font-semibold text-muted transition-colors hover:text-accent"
-        >
-          ← Library
-        </Link>
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          onBlur={flushSave}
-          placeholder="Resume name"
-          aria-label="Resume name"
-          className="min-w-[120px] max-w-[280px] flex-1 rounded-lg border border-[#E2E5EA] bg-[#FAFBFC] px-2.5 py-1.5 font-display text-[17px] font-semibold tracking-[-0.01em] text-ink transition-colors focus:border-accent focus:bg-white focus:outline-none"
-        />
-        <div className="flex flex-col gap-1">
-          <div className="flex rounded-[10px] bg-[#F2F3F5] p-1">
-            {TEMPLATES.map((tpl) => (
-              <button
-                key={tpl.id}
-                type="button"
-                onClick={() => setTemplateStyle(tpl.id)}
-                className={`cursor-pointer rounded-lg px-3 py-[7px] text-[12.5px] font-semibold transition-all ${
-                  templateStyle === tpl.id
-                    ? "bg-white text-ink shadow-[0_1px_3px_rgba(0,0,0,0.12)]"
-                    : "bg-transparent text-[#7A828F]"
-                }`}
-              >
-                <span className="inline-flex items-center gap-1.5">
-                  {tpl.label}
-                  {tpl.atsRecommended ? (
-                    <span className="rounded-full bg-[#E6F7EE] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-[#0E7C4B]">
-                      ATS
-                    </span>
-                  ) : null}
-                </span>
-              </button>
-            ))}
+      <div className="flex flex-none flex-col border-b border-border bg-white">
+        <div className="flex flex-wrap items-center gap-3 px-6 py-3">
+          <Link
+            href="/library"
+            className="text-[13px] font-semibold text-muted transition-colors hover:text-accent"
+          >
+            ← Library
+          </Link>
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onBlur={flushSave}
+            placeholder="Resume name"
+            aria-label="Resume name"
+            className="min-w-[120px] max-w-[280px] flex-1 rounded-lg border border-[#E2E5EA] bg-[#FAFBFC] px-2.5 py-1.5 font-display text-[17px] font-semibold tracking-[-0.01em] text-ink transition-colors focus:border-accent focus:bg-white focus:outline-none"
+          />
+          <div className="flex flex-col gap-1">
+            <div className="flex rounded-[10px] bg-[#F2F3F5] p-1">
+              {TEMPLATES.map((tpl) => (
+                <button
+                  key={tpl.id}
+                  type="button"
+                  onClick={() => setTemplateStyle(tpl.id)}
+                  className={`cursor-pointer rounded-lg px-3 py-[7px] text-[12.5px] font-semibold transition-all ${
+                    templateStyle === tpl.id
+                      ? "bg-white text-ink shadow-[0_1px_3px_rgba(0,0,0,0.12)]"
+                      : "bg-transparent text-[#7A828F]"
+                  }`}
+                >
+                  <span className="inline-flex items-center gap-1.5">
+                    {tpl.label}
+                    {tpl.atsRecommended ? (
+                      <span className="rounded-full bg-[#E6F7EE] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-[#0E7C4B]">
+                        ATS
+                      </span>
+                    ) : null}
+                  </span>
+                </button>
+              ))}
+            </div>
+            {templateStyle !== "classic" ? (
+              <p className="max-w-[280px] text-[11px] leading-snug text-[#8A92A0]">
+                Multi-column layouts may parse less reliably in some ATS — use{" "}
+                <button
+                  type="button"
+                  onClick={() => setTemplateStyle("classic")}
+                  className="cursor-pointer font-semibold text-[#2456D6] hover:underline"
+                >
+                  Classic
+                </button>{" "}
+                for automated applications.
+              </p>
+            ) : null}
           </div>
-          {templateStyle !== "classic" ? (
-            <p className="max-w-[280px] text-[11px] leading-snug text-[#8A92A0]">
-              Multi-column layouts may parse less reliably in some ATS — use{" "}
-              <button
-                type="button"
-                onClick={() => setTemplateStyle("classic")}
-                className="cursor-pointer font-semibold text-[#2456D6] hover:underline"
-              >
-                Classic
-              </button>{" "}
-              for automated applications.
-            </p>
-          ) : null}
+          <AccentColorPicker
+            value={data.accentColor}
+            onChange={(accentColor) => updateData({ accentColor })}
+          />
+          <button
+            type="button"
+            onClick={addExperienceRole}
+            className="cursor-pointer rounded-[10px] border border-[#DFE3E8] bg-white px-3 py-2 text-[12.5px] font-semibold text-[#5A6573] hover:border-[#C8CED6]"
+          >
+            + Role
+          </button>
+          <button
+            type="button"
+            onClick={addActivity}
+            className="cursor-pointer rounded-[10px] border border-[#DFE3E8] bg-white px-3 py-2 text-[12.5px] font-semibold text-[#5A6573] hover:border-[#C8CED6]"
+          >
+            + Activity
+          </button>
+          <span className="ml-auto hidden text-xs text-[#9AA3AF] lg:inline">
+            {saveState === "saving"
+              ? "Saving…"
+              : saveState === "saved"
+                ? "Saved"
+                : saveState === "error"
+                  ? "Save failed"
+                  : "Live preview"}
+          </span>
         </div>
-        <AccentColorPicker
-          value={data.accentColor}
-          onChange={(accentColor) => updateData({ accentColor })}
-        />
-        <button
-          type="button"
-          onClick={addExperienceRole}
-          className="cursor-pointer rounded-[10px] border border-[#DFE3E8] bg-white px-3 py-2 text-[12.5px] font-semibold text-[#5A6573] hover:border-[#C8CED6]"
-        >
-          + Role
-        </button>
-        <button
-          type="button"
-          onClick={addActivity}
-          className="cursor-pointer rounded-[10px] border border-[#DFE3E8] bg-white px-3 py-2 text-[12.5px] font-semibold text-[#5A6573] hover:border-[#C8CED6]"
-        >
-          + Activity
-        </button>
-        <span className="hidden text-xs text-[#9AA3AF] lg:inline">
-          {saveState === "saving"
-            ? "Saving…"
-            : saveState === "saved"
-              ? "Saved"
-              : saveState === "error"
-                ? "Save failed"
-                : "Live preview"}
-        </span>
-        <Link
-          href={coverLetterHref}
-          className={`inline-flex items-center gap-1.5 rounded-[10px] px-3.5 py-2.5 text-[13.5px] font-semibold transition-colors ${
-            hasJobContext
-              ? "border border-[#CFE0FF] bg-[#EAF1FF] text-[#1E54E6] hover:border-[#A8C4FF] hover:bg-[#DCE8FF]"
-              : "border border-[#DFE3E8] bg-white text-[#5A6573] hover:border-[#C8CED6] hover:text-ink"
-          }`}
-        >
-          ✉ Cover letter
-        </Link>
-        <button
-          type="button"
-          disabled={shortening || pageCount <= SHORTEN_TARGET_PAGES}
-          onClick={handleShortenToTwoPages}
-          title={
-            pageCount <= SHORTEN_TARGET_PAGES
-              ? `Resume already fits on ${pageCount} page${pageCount === 1 ? "" : "s"}`
-              : `AI compresses content to fit ${SHORTEN_TARGET_PAGES} pages`
-          }
-          className="inline-flex items-center gap-1.5 rounded-[10px] border border-[#DFE3E8] bg-white px-3.5 py-2.5 text-[13.5px] font-semibold text-[#5A6573] transition-colors hover:border-[#C8CED6] hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {shortening ? "Shortening…" : `Shorten to ${SHORTEN_TARGET_PAGES} pages`}
-        </button>
-        <button
-          type="button"
-          onClick={previewPdf}
-          className="inline-flex items-center gap-1.5 rounded-[10px] border border-[#DFE3E8] bg-white px-3.5 py-2.5 text-[13.5px] font-semibold text-[#5A6573] transition-colors hover:border-[#C8CED6] hover:text-ink"
-        >
-          ⤢ Preview PDF
-        </button>
-        <button
-          type="button"
-          onClick={exportPdf}
-          className="inline-flex items-center gap-1.5 rounded-[10px] bg-accent px-4 py-2.5 text-[13.5px] font-semibold text-white shadow-[0_4px_12px_rgba(47,107,255,0.3)] transition-colors hover:bg-[#1E54E6]"
-        >
-          ↓ Export PDF
-        </button>
+
+        <div className="flex flex-wrap items-center gap-3 border-t border-[#ECEEF1] bg-[#FAFBFC] px-6 py-2.5">
+          <span className="text-[12.5px] font-semibold text-[#8A92A0]">
+            {pageCount} page{pageCount === 1 ? "" : "s"} · Letter (8.5×11)
+          </span>
+          <div className="ml-auto flex flex-wrap items-center gap-2.5">
+            <Link
+              href={coverLetterHref}
+              className={`inline-flex items-center gap-1.5 rounded-[10px] px-3.5 py-2.5 text-[13.5px] font-semibold transition-colors ${
+                hasJobContext
+                  ? "border border-[#CFE0FF] bg-[#EAF1FF] text-[#1E54E6] hover:border-[#A8C4FF] hover:bg-[#DCE8FF]"
+                  : "border border-[#DFE3E8] bg-white text-[#5A6573] hover:border-[#C8CED6] hover:text-ink"
+              }`}
+            >
+              ✉ Cover letter
+            </Link>
+            <button
+              type="button"
+              disabled={shortening || pageCount <= SHORTEN_TARGET_PAGES}
+              onClick={handleShortenToTwoPages}
+              title={
+                pageCount <= SHORTEN_TARGET_PAGES
+                  ? `Resume already fits on ${pageCount} page${pageCount === 1 ? "" : "s"}`
+                  : `AI compresses content to fit ${SHORTEN_TARGET_PAGES} pages`
+              }
+              className="inline-flex items-center gap-1.5 rounded-[10px] border border-[#DFE3E8] bg-white px-3.5 py-2.5 text-[13.5px] font-semibold text-[#5A6573] transition-colors hover:border-[#C8CED6] hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {shortening ? "Shortening…" : `Shorten to ${SHORTEN_TARGET_PAGES} pages`}
+            </button>
+            <button
+              type="button"
+              onClick={previewPdf}
+              className="inline-flex items-center gap-1.5 rounded-[10px] border border-[#DFE3E8] bg-white px-3.5 py-2.5 text-[13.5px] font-semibold text-[#5A6573] transition-colors hover:border-[#C8CED6] hover:text-ink"
+            >
+              ⤢ Preview PDF
+            </button>
+            <button
+              type="button"
+              onClick={exportPdf}
+              className="inline-flex items-center gap-1.5 rounded-[10px] bg-accent px-4 py-2.5 text-[13.5px] font-semibold text-white shadow-[0_4px_12px_rgba(47,107,255,0.3)] transition-colors hover:bg-[#1E54E6]"
+            >
+              ↓ Export PDF
+            </button>
+          </div>
+        </div>
       </div>
 
       {shortenError ? (
