@@ -72,7 +72,9 @@ export default function LoginForm() {
 
   function friendlyAuthError(message: string) {
     if (message.toLowerCase().includes("rate")) {
-      return "Email rate limit exceeded. Try Google or email/password, or wait a few minutes before requesting another link.";
+      return GOOGLE_AUTH_ENABLED
+        ? "Email rate limit exceeded. Try Google or email/password, or wait before requesting another link."
+        : "Email rate limit exceeded. Use email/password if you already created a password, or wait before requesting another link.";
     }
 
     return message;
