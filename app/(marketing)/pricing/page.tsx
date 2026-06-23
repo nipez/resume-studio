@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: `Pricing — ${SITE_NAME}`,
   description:
-    "Subscription pricing for the application OS — not credit packs. Student $2.99/mo. Essentials $4.99/mo. Pro $19/mo. Free during beta.",
+    "Subscription pricing for the application OS — not credit packs. Student $2.99/mo. Standard $4.99/mo. Pro $19/mo. Free during pilot.",
 };
 
 export default function PricingRoute() {

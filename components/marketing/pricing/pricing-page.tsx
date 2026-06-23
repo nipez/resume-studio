@@ -41,7 +41,7 @@ export function PricingPage() {
             <p className="sub-hero-sub">
               AI generators charge per credit and often sound robotic. Scanners charge $50/mo.{" "}
               {SITE_NAME} is subscription pricing for the full application OS — Pro from $19 with
-              human-sounding tailoring, or Essentials at $4.99 to organize your search.
+              human-sounding tailoring, or Standard at $4.99 to organize your search.
             </p>
             <div className="price-chips">
               {COMPARISON_SNIPPETS.map((item) => (
@@ -76,7 +76,7 @@ export function PricingPage() {
             <h2>Three tiers. Pro is where the AI lives.</h2>
             <p>
               <strong>Pro</strong> is the full apply loop — job-tailored resumes, cover letters
-              that sound like you, Q&amp;A, and interview prep. <strong>Essentials</strong> is the
+              that sound like you, Q&amp;A, and interview prep. <strong>Standard</strong> is the
               smart budget pick for organizing your search yourself. <strong>Student</strong> for
               first resumes.
             </p>
@@ -84,7 +84,7 @@ export function PricingPage() {
           <Reveal className="pgrid">
             {[...PRICING_PLANS]
               .sort((a, b) => {
-                const order = { pro: 0, essentials: 1, student: 2 };
+                const order = { pro: 0, standard: 1, student: 2 };
                 return order[a.id as keyof typeof order] - order[b.id as keyof typeof order];
               })
               .map((plan) => (
@@ -126,12 +126,12 @@ export function PricingPage() {
             <h2>Job search is temporary — your tools shouldn&apos;t sound like a robot.</h2>
             <p>
               Pro gives you AI that reads like a human wrote it — tailored per job, editable,
-              and grounded in your real experience. Essentials keeps the workspace affordable
+              and grounded in your real experience. Standard keeps the workspace affordable
               when you write everything yourself. Student for the first resume on-ramp.
             </p>
           </Reveal>
           <Reveal className="tier-tags">
-            {["Pro · human-sounding AI", "Essentials · organize & track", "Student on-ramp"].map((label) => (
+            {["Pro · human-sounding AI", "Standard · organize & track", "Student on-ramp"].map((label) => (
               <span key={label} className="tier-tag">
                 {label}
               </span>
