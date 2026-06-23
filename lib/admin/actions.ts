@@ -16,6 +16,7 @@ import {
   isSignedInToday,
 } from "@/lib/admin/types";
 import type { UserPersona } from "@/lib/profile/persona";
+import type { BillingPlanId } from "@/lib/billing/plans";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
@@ -25,6 +26,8 @@ export type DemoUser = {
   email: string;
   label: string;
   created_at: string;
+  planTier: BillingPlanId;
+  persona: UserPersona | null;
 };
 
 async function getRealUser() {
@@ -46,23 +49,78 @@ function randomDemoEmail() {
   return `demo-${Date.now().toString(36)}-${rand}@demo.example.com`;
 }
 
+function profilePatchForDemoPlanTier(planTier: BillingPlanId) {
+  if (planTier === "student") {
+    return {
+      is_student: true,
+      student_level: "high_school" as const,
+      persona: "student" as const,
+      onboarding_persona_set: true,
+      plan_tier: "student",
+    };
+  }
+
+  return {
+    is_student: false,
+    student_level: null,
+    persona: "professional" as const,
+    onboarding_persona_set: true,
+    plan_tier: planTier,
+  };
+}
+
 export async function listDemoUsers(): Promise<DemoUser[]> {
   const admin = await requireAdmin();
   const svc = createServiceClient();
-  const { data } = await svc
+  const { data: demos } = await svc
     .from("demo_users")
     .select("id, email, label, created_at")
     .eq("created_by", admin.id)
     .order("created_at", { ascending: false });
-  return (data ?? []) as DemoUser[];
+
+  const rows = demos ?? [];
+  if (rows.length === 0) return [];
+
+  const ids = rows.map((row) => row.id as string);
+  const { data: profiles } = await svc
+    .from("profiles")
+    .select("id, plan_tier, persona")
+    .in("id", ids);
+
+  const profileById = new Map((profiles ?? []).map((p) => [p.id as string, p]));
+
+  return rows.map((row) => {
+    const profile = profileById.get(row.id as string);
+    const rawTier = String(profile?.plan_tier ?? "pro").toLowerCase();
+    const planTier: BillingPlanId =
+      rawTier === "student" || rawTier === "standard" || rawTier === "pro"
+        ? rawTier
+        : rawTier === "essentials"
+          ? "standard"
+          : "pro";
+
+    return {
+      id: row.id as string,
+      email: String(row.email ?? ""),
+      label: String(row.label ?? "Demo user"),
+      created_at: row.created_at as string,
+      planTier,
+      persona: (profile?.persona as UserPersona | null) ?? null,
+    };
+  });
 }
 
 export async function createDemoUser(input: {
   label: string;
+  planTier?: BillingPlanId;
+  /** @deprecated use planTier: "student" */
   makeStudent?: boolean;
 }): Promise<void> {
   const admin = await requireAdmin();
   const svc = createServiceClient();
+
+  const planTier: BillingPlanId =
+    input.planTier ?? (input.makeStudent ? "student" : "pro");
 
   const email = randomDemoEmail();
   const password = `Demo-${Math.random().toString(36).slice(2)}-${Date.now()}`;
@@ -87,18 +145,12 @@ export async function createDemoUser(input: {
   });
   if (insErr) throw new Error(insErr.message);
 
-  if (input.makeStudent) {
-    await svc
-      .from("profiles")
-      .update({
-        is_student: true,
-        student_level: "high_school",
-        persona: "student",
-        onboarding_persona_set: true,
-        plan_tier: "student",
-      })
-      .eq("id", demoId);
-  }
+  const { error: profileErr } = await svc
+    .from("profiles")
+    .update(profilePatchForDemoPlanTier(planTier))
+    .eq("id", demoId);
+
+  if (profileErr) throw new Error(profileErr.message);
 
   revalidatePath("/admin");
 }
