@@ -6,15 +6,17 @@ import {
   SITE_NAME,
   SITE_TAGLINE_PRIMARY,
   SITE_TAGLINE_SECONDARY,
+  PILOT_CTA,
+  PILOT_FINE_PRINT,
 } from "@/lib/marketing/content";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
 
 const TRUST_ITEMS = [
-  "One login, six modules",
+  "Cover letters & tailoring that sound human",
   "Immutable snapshots on every send",
-  "Free during beta",
+  PILOT_CTA + " — no card required",
 ] as const;
 
 export default function LoginForm() {
@@ -189,7 +191,8 @@ export default function LoginForm() {
               )}
 
               <p className="mt-6 text-center text-[12.5px] leading-relaxed text-[#8a8094]">
-                New here? The same link creates your account automatically.
+                New here? The same link creates your account automatically.{" "}
+                {PILOT_FINE_PRINT.split(" · ")[0]}.
               </p>
             </div>
 

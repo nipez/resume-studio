@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SITE_NAME } from "@/lib/marketing/content";
+import { PILOT_FINE_PRINT, PILOT_START_CTA, SITE_NAME } from "@/lib/marketing/content";
 import { Reveal } from "@/components/marketing/home/reveal-on-scroll";
 import "@/components/marketing/home/marketing-home.css";
 import "./application-os.css";
@@ -61,7 +61,7 @@ export function ApplicationOsPage() {
             </p>
             <div className="aos-cta">
               <Link href="/login" className="btn btn-coral">
-                Start free during beta
+                {PILOT_START_CTA}
               </Link>
               <Link href="/features" className="aos-ghost">
                 See what&apos;s included →
@@ -199,8 +199,8 @@ export function ApplicationOsPage() {
             <div className="cta-inner">
               <h2>Run your job search like a system.</h2>
               <p>
-                Free during beta. Understand the OS here — explore the full
-                product on the features page.
+                {PILOT_START_CTA}. Resumes and cover letters that sound like you — explore every
+                module on the features page.
               </p>
               <div className="aos-cta-row">
                 <Link href="/login" className="btn btn-dark">
@@ -210,7 +210,7 @@ export function ApplicationOsPage() {
                   Feature tour →
                 </Link>
               </div>
-              <div className="fine">No credit card · Magic link sign-in</div>
+              <div className="fine">{PILOT_FINE_PRINT}</div>
             </div>
           </Reveal>
         </div>

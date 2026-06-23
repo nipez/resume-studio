@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SITE_NAME } from "@/lib/marketing/content";
+import { PILOT_FINE_PRINT, SITE_NAME } from "@/lib/marketing/content";
 import { Reveal } from "@/components/marketing/home/reveal-on-scroll";
 
 type MarketingPageCtaProps = {
@@ -11,7 +11,7 @@ type MarketingPageCtaProps = {
 
 export function MarketingPageCta({
   title = "Ready when you are",
-  description = "Sign in with a magic link and run your job search from one application OS. Free during beta.",
+  description = "Sign in with a magic link and run your job search from one application OS. Free during pilot — full Pro access.",
   secondaryHref,
   secondaryLabel,
 }: MarketingPageCtaProps) {
@@ -38,7 +38,7 @@ export function MarketingPageCta({
                 </Link>
               </div>
             ) : null}
-            <div className="fine">No credit card · Magic link sign-in</div>
+            <div className="fine">{PILOT_FINE_PRINT}</div>
           </div>
         </Reveal>
       </div>

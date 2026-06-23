@@ -60,11 +60,11 @@ export function MarketingHero() {
               </p>
               <span className="hidden h-3 w-px bg-white/15 sm:block" />
               <p className="text-[12.5px] text-[#6E7686]">
-                From $2.99/mo students
+                Human-sounding AI on Pro
               </p>
               <span className="hidden h-3 w-px bg-white/15 sm:block" />
               <p className="text-[12.5px] text-[#6E7686]">
-                $4.99 workspace without AI
+                Pro from $19/mo
               </p>
             </div>
           </div>

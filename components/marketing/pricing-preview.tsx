@@ -1,6 +1,6 @@
 import { SectionHeader } from "@/components/marketing/primitives";
 import Link from "next/link";
-import { PRICING_PLANS } from "@/lib/marketing/content";
+import { PRICING_PLANS, PRICING_SECTION_HEADLINE, PRICING_SECTION_SUB } from "@/lib/marketing/content";
 
 export function PricingPreview() {
   return (
@@ -10,8 +10,8 @@ export function PricingPreview() {
         <div className="flex flex-wrap items-end justify-between gap-6">
           <SectionHeader
             eyebrow="Pricing"
-            title="Pricing that won't punish your job search"
-            description="Subscription access to the application OS — not credit packs. Student from $2.99. Full workspace without AI for $4.99."
+            title={PRICING_SECTION_HEADLINE}
+            description={PRICING_SECTION_SUB}
           />
           <Link
             href="/pricing"
@@ -33,7 +33,7 @@ export function PricingPreview() {
             >
               {plan.highlighted ? (
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-accent px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-accent">
-                  Most popular
+                  Recommended
                 </span>
               ) : null}
               <span className="inline-flex w-fit rounded-full bg-page px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-muted">
