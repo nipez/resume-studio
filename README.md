@@ -42,20 +42,20 @@ supabase db push
 1. Push this repo to GitHub.
 2. Create a Railway project from the repo.
 3. Add every variable from `.env.example` (except `PORT` — Railway injects it).
-4. Set `NEXT_PUBLIC_SITE_URL` to `https://resumetrackr.com` (or your Railway `*.up.railway.app` URL before the custom domain is live).
+4. Set `NEXT_PUBLIC_SITE_URL` to `https://resumetrakr.com` (or your Railway `*.up.railway.app` URL before the custom domain is live).
 5. Deploy — Railway healthcheck hits `/api/health`.
 
-### Custom domain (resumetrackr.com)
+### Custom domain (resumetrakr.com)
 
 1. In Railway: open your service → **Settings** → **Networking** → **Public Networking** → **+ Custom Domain**.
-2. Add **`resumetrackr.com`** (apex). Railway shows the DNS records to create at your registrar.
-3. Optionally add **`www.resumetrackr.com`** — usually a CNAME to the hostname Railway provides.
+2. Add **`resumetrakr.com`** (apex). Railway shows the DNS records to create at your registrar.
+3. Optionally add **`www.resumetrakr.com`** — usually a CNAME to the hostname Railway provides.
 4. At your domain registrar, add those records (apex often uses Railway’s ALIAS/ANAME or the A records they list; `www` is typically CNAME).
 5. Wait for DNS propagation and Railway to provision TLS (often 5–30 minutes; up to 48 hours in edge cases).
-6. In Railway **Variables**, set `NEXT_PUBLIC_SITE_URL=https://resumetrackr.com` and redeploy.
+6. In Railway **Variables**, set `NEXT_PUBLIC_SITE_URL=https://resumetrakr.com` and redeploy.
 7. In **Supabase** → **Authentication** → **URL Configuration**:
-   - **Site URL:** `https://resumetrackr.com`
-   - **Redirect URLs:** add `https://resumetrackr.com/**` and `https://resumetrackr.com/auth/callback`
+   - **Site URL:** `https://resumetrakr.com`
+   - **Redirect URLs:** add `https://resumetrakr.com/**` and `https://resumetrakr.com/auth/callback`
 8. Smoke-test: home page, magic-link login, and `GET /api/health`.
 
 ## Environment variables
