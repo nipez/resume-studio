@@ -6,6 +6,7 @@ import {
   resetUserPersona,
   type DemoUser,
 } from "@/lib/admin/actions";
+import { AdminPlansTab } from "@/components/admin/admin-plans-tab";
 import { AdminSupportTab } from "@/components/admin/admin-support-tab";
 import { AdminAIUsageTab } from "@/components/admin/admin-ai-usage-tab";
 import type { AdminDashboardStats, AdminUserRow } from "@/lib/admin/types";
@@ -29,7 +30,7 @@ type AdminPanelProps = {
   aiUsage: AdminAIUsageDashboard;
 };
 
-type Tab = "users" | "demos" | "support" | "ai";
+type Tab = "users" | "demos" | "support" | "ai" | "plans";
 type PersonaFilter = "all" | "student" | "professional" | "none";
 type SortKey =
   | "lastSignIn"
@@ -265,6 +266,9 @@ export function AdminPanel({
           <TabButton active={tab === "ai"} onClick={() => setTab("ai")}>
             AI costs
           </TabButton>
+          <TabButton active={tab === "plans"} onClick={() => setTab("plans")}>
+            Plans
+          </TabButton>
         </div>
 
         {error ? (
@@ -403,6 +407,8 @@ export function AdminPanel({
           <AdminSupportTab tickets={supportTickets} />
         ) : tab === "ai" ? (
           <AdminAIUsageTab data={aiUsage} />
+        ) : tab === "plans" ? (
+          <AdminPlansTab />
         ) : (
           <>
             <div className="mt-4 rounded-2xl border border-border bg-white p-6">

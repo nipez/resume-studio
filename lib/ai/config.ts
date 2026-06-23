@@ -1,4 +1,4 @@
-export type PlanTier = "student" | "essentials" | "pro";
+export type PlanTier = "student" | "standard" | "pro";
 
 export type AIAction =
   | "cover_letter"
@@ -49,11 +49,11 @@ export function isActionAllowedForTier(
   action: AIAction,
   planTier: PlanTier
 ): { allowed: boolean; reason?: string } {
-  if (planTier === "essentials") {
+  if (planTier === "standard") {
     return {
       allowed: false,
       reason:
-        "AI features require Pro. Essentials includes the full workspace without AI costs.",
+        "AI features require Pro. Standard includes the full workspace — upgrade for job-tailored AI.",
     };
   }
 
@@ -68,6 +68,8 @@ export function isActionAllowedForTier(
   return { allowed: true };
 }
 
+import { normalizePlanTierId } from "@/lib/billing/plans";
+
 export function resolveEffectivePlanTier(input: {
   planTier?: string | null;
   persona?: string | null;
@@ -77,9 +79,9 @@ export function resolveEffectivePlanTier(input: {
     return "pro";
   }
 
-  const explicit = input.planTier?.trim().toLowerCase();
-  if (explicit === "student" || explicit === "essentials" || explicit === "pro") {
-    return explicit;
+  const normalized = normalizePlanTierId(input.planTier);
+  if (normalized) {
+    return normalized;
   }
 
   if (input.persona === "student") {

@@ -1,3 +1,5 @@
+import { toPricingPlanCards } from "@/lib/billing/plans";
+
 export const SITE_NAME = "ResumeTrakr";
 export const SITE_URL = "https://resumetrakr.com";
 
@@ -29,7 +31,7 @@ export const HUMAN_VOICE_PILLAR =
 export const PRICING_SECTION_HEADLINE = "Pricing that won't punish your job search.";
 
 export const PRICING_SECTION_SUB =
-  "Subscription access to the application OS — not credit packs. Pro from $19 with human-sounding AI. Essentials at $4.99 to organize your search.";
+  "Subscription access to the application OS — not credit packs. Pro from $19 with human-sounding AI. Standard at $4.99 to organize your search.";
 
 export const NAV_LINKS = [
   { href: "/application-os", label: "Application OS" },
@@ -195,7 +197,7 @@ export const POSITIONING_PILLARS = [
   {
     title: "Pricing that respects job search",
     description:
-      "No $50/mo scanner tax. No credit packs that vanish in a week. Essentials at $4.99 to organize your search. Pro at $19 for job-tailored AI, human-sounding cover letters, and interview prep.",
+      "No $50/mo scanner tax. No credit packs that vanish in a week. Standard at $4.99 to organize your search. Pro at $19 for job-tailored AI, human-sounding cover letters, and interview prep.",
     accent: "Fair pricing",
   },
 ] as const;
@@ -313,62 +315,7 @@ export const HOW_IT_WORKS = [
   },
 ];
 
-export const PRICING_PLANS = [
-  {
-    id: "student",
-    name: "Student",
-    price: "$2.99",
-    period: "/month",
-    description:
-      "First resume? Clubs, sports, volunteering, honors — guided step-by-step.",
-    features: [
-      "Guided resume builder",
-      "Activities & clubs sections",
-      "3 print-ready templates",
-      "PDF export",
-      "2 human-sounding cover letters / month",
-    ],
-    cta: "Start as a student",
-    highlighted: false,
-    badge: "High school & college",
-  },
-  {
-    id: "pro",
-    name: "Pro",
-    price: "$19",
-    period: "/month",
-    description:
-      "The full AI-powered apply loop — job-tailored resumes, cover letters that sound like you, and interview prep. Or $39 for a 3-month Job Search Pass.",
-    features: [
-      "Tailor your resume to each job posting",
-      "Instant cover letters in your voice — not robotic AI",
-      "Application Q&A that reads naturally",
-      "Fit analysis, interview prep & cross-app insights",
-      "100 AI actions / month — predictable, no credit packs",
-    ],
-    cta: "Go Pro",
-    highlighted: true,
-    badge: "Human-sounding AI",
-  },
-  {
-    id: "essentials",
-    name: "Essentials",
-    price: "$4.99",
-    period: "/month",
-    description:
-      "Organize your entire search — library, editor, tracking, and snapshots — when you prefer to write everything yourself.",
-    features: [
-      "Unlimited resume versions",
-      "Full editor + 3 templates",
-      "Application tracking & timeline",
-      "Immutable send snapshots",
-      "PDF export — flat monthly price",
-    ],
-    cta: "Get Essentials",
-    highlighted: false,
-    badge: "Organize your search",
-  },
-];
+export const PRICING_PLANS = toPricingPlanCards();
 
 export const STUDENT_HIGHLIGHTS = [
   {
@@ -595,9 +542,9 @@ export const FAQ_ITEMS = [
       "Each AI generation counts as one action — a cover letter, Q&A answer, tailor step, interview prep run, etc. Deep tailoring may use several actions in one session. Pro includes 100 actions per month — enough for most active job searches. Limits reset on the 1st.",
   },
   {
-    question: "What's the $4.99 Essentials plan for?",
+    question: "What's the $4.99 Standard plan for?",
     answer:
-      "Essentials is for searchers who want the full workspace — library, editor, templates, PDF export, and application tracking with snapshots — and prefer to write their own materials. Upgrade to Pro ($19/mo) when you want job-tailored AI: resumes reframed per posting, human-sounding cover letters, Q&A, and interview prep.",
+      "Standard is for searchers who want the full workspace — library, editor, templates, PDF export, and application tracking with snapshots — and prefer to write their own materials. Upgrade to Pro ($19/mo) when you want job-tailored AI: resumes reframed per posting, human-sounding cover letters, Q&A, and interview prep.",
   },
   {
     question: "Is there a plan for high school students?",
