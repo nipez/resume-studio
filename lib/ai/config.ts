@@ -68,7 +68,19 @@ export function isActionAllowedForTier(
   return { allowed: true };
 }
 
-import { normalizePlanTierId } from "@/lib/billing/plans";
+const LEGACY_ESSENTIALS_PLAN_ID = "essentials";
+
+function normalizePlanTierFromDb(
+  value: string | null | undefined
+): PlanTier | null {
+  const raw = value?.trim().toLowerCase();
+  if (!raw) return null;
+  if (raw === LEGACY_ESSENTIALS_PLAN_ID) return "standard";
+  if (raw === "student" || raw === "standard" || raw === "pro") {
+    return raw;
+  }
+  return null;
+}
 
 export function resolveEffectivePlanTier(input: {
   planTier?: string | null;
@@ -79,7 +91,7 @@ export function resolveEffectivePlanTier(input: {
     return "pro";
   }
 
-  const normalized = normalizePlanTierId(input.planTier);
+  const normalized = normalizePlanTierFromDb(input.planTier);
   if (normalized) {
     return normalized;
   }
