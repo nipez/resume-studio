@@ -248,7 +248,9 @@ export default function LoginForm() {
                   Welcome back
                 </h2>
                 <p className="mt-1.5 text-[14px] leading-relaxed text-[#5c5269]">
-                  Use Google, email and password, or a one-time magic link.
+                  {GOOGLE_AUTH_ENABLED
+                    ? "Use Google, email and password, or a one-time magic link."
+                    : "Use email and password, or a one-time magic link."}
                 </p>
               </div>
 
