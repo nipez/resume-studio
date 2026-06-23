@@ -12,6 +12,8 @@ import { AdminAIUsageTab } from "@/components/admin/admin-ai-usage-tab";
 import type { AdminDashboardStats, AdminUserRow } from "@/lib/admin/types";
 import { formatUsdCost, type AdminAIUsageDashboard } from "@/lib/admin/ai-usage-types";
 import type { AdminSupportTicket } from "@/lib/support/types";
+import type { BillingPlanId } from "@/lib/billing/plans";
+import { BILLING_PLANS } from "@/lib/billing/plans";
 import {
   formatAdminDate,
   isActiveUser,
@@ -28,6 +30,7 @@ type AdminPanelProps = {
   supportTickets: AdminSupportTicket[];
   openSupportCount: number;
   aiUsage: AdminAIUsageDashboard;
+  aiEnforcePlanTiers?: boolean;
 };
 
 type Tab = "users" | "demos" | "support" | "ai" | "plans";
@@ -50,12 +53,13 @@ export function AdminPanel({
   supportTickets,
   openSupportCount,
   aiUsage,
+  aiEnforcePlanTiers = false,
 }: AdminPanelProps) {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("users");
   const [pending, startTransition] = useTransition();
   const [label, setLabel] = useState("");
-  const [makeStudent, setMakeStudent] = useState(true);
+  const [demoPlanTier, setDemoPlanTier] = useState<BillingPlanId>("pro");
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
@@ -170,8 +174,8 @@ export function AdminPanel({
     startTransition(async () => {
       try {
         await createDemoUser({
-          label: label.trim() || "Demo student",
-          makeStudent,
+          label: label.trim() || "Demo user",
+          planTier: demoPlanTier,
         });
         setLabel("");
         router.refresh();
@@ -415,25 +419,56 @@ export function AdminPanel({
               <h2 className="font-display text-[15px] font-semibold text-ink">
                 Create a demo persona
               </h2>
+              <p className="mt-1.5 max-w-[640px] text-[13px] leading-relaxed text-muted">
+                Pick a plan tier, then <span className="font-semibold text-ink">View as</span>{" "}
+                to walk through the product as that user. Student shows the student path;
+                Standard is workspace-only; Pro includes full AI.
+                {!aiEnforcePlanTiers ? (
+                  <>
+                    {" "}
+                    <span className="font-semibold text-[#1E54E6]">
+                      Note: AI tier gates are off in pilot — everyone still gets Pro AI until
+                      you set <code className="text-[12px]">AI_ENFORCE_PLAN_TIERS=true</code> on
+                      Railway.
+                    </span>
+                  </>
+                ) : null}
+              </p>
               <div className="mt-4 flex flex-wrap items-end gap-3">
-                <label className="flex flex-1 flex-col gap-1.5 text-xs font-semibold text-[#5A6573]">
+                <label className="flex min-w-[220px] flex-1 flex-col gap-1.5 text-xs font-semibold text-[#5A6573]">
                   Label
                   <input
                     value={label}
-                    placeholder="e.g. High-school student"
+                    placeholder={
+                      demoPlanTier === "student"
+                        ? "e.g. High-school student"
+                        : demoPlanTier === "standard"
+                          ? "e.g. DIY job searcher"
+                          : "e.g. Active job seeker (Pro)"
+                    }
                     onChange={(e) => setLabel(e.target.value)}
-                    className="min-w-[220px] rounded-[10px] border border-[#DFE3E8] px-3 py-2.5 text-sm focus:border-accent focus:outline-none"
+                    className="rounded-[10px] border border-[#DFE3E8] px-3 py-2.5 text-sm focus:border-accent focus:outline-none"
                   />
                 </label>
-                <label className="flex cursor-pointer items-center gap-2 pb-2.5 text-[13.5px] text-[#3a4350]">
-                  <input
-                    type="checkbox"
-                    checked={makeStudent}
-                    onChange={(e) => setMakeStudent(e.target.checked)}
-                    className="h-4 w-4 cursor-pointer accent-[#2F6BFF]"
-                  />
-                  Mark as student
-                </label>
+                <div className="flex flex-col gap-1.5 pb-0.5">
+                  <span className="text-xs font-semibold text-[#5A6573]">Plan tier</span>
+                  <div className="flex flex-wrap gap-1.5 rounded-[10px] border border-[#E2E5EA] bg-[#FAFBFC] p-1">
+                    {BILLING_PLANS.map((plan) => (
+                      <button
+                        key={plan.id}
+                        type="button"
+                        onClick={() => setDemoPlanTier(plan.id)}
+                        className={`cursor-pointer rounded-[8px] border-none px-3 py-2 text-[12.5px] font-semibold transition-colors ${
+                          demoPlanTier === plan.id
+                            ? "bg-white text-accent shadow-[0_1px_4px_rgba(15,17,22,0.08)]"
+                            : "bg-transparent text-[#5A6573] hover:text-ink"
+                        }`}
+                      >
+                        {plan.displayName}
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 <button
                   type="button"
                   disabled={pending}
@@ -446,8 +481,9 @@ export function AdminPanel({
             </div>
 
             <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-white">
-              <div className="grid grid-cols-[1fr_140px_160px] gap-3 border-b border-[#EEF0F3] bg-[#FAFBFC] px-6 py-3 text-[11px] font-bold uppercase tracking-[0.06em] text-[#8A92A0]">
+              <div className="grid grid-cols-[1fr_100px_120px_160px] gap-3 border-b border-[#EEF0F3] bg-[#FAFBFC] px-6 py-3 text-[11px] font-bold uppercase tracking-[0.06em] text-[#8A92A0]">
                 <div>Persona</div>
+                <div>Plan</div>
                 <div>Created</div>
                 <div className="text-right">Actions</div>
               </div>
@@ -459,13 +495,16 @@ export function AdminPanel({
                 demoUsers.map((u) => (
                   <div
                     key={u.id}
-                    className="grid grid-cols-[1fr_140px_160px] items-center gap-3 border-b border-[#F2F3F5] px-6 py-3.5 last:border-b-0"
+                    className="grid grid-cols-[1fr_100px_120px_160px] items-center gap-3 border-b border-[#F2F3F5] px-6 py-3.5 last:border-b-0"
                   >
                     <div className="min-w-0">
                       <div className="truncate text-[14px] font-semibold text-ink">
                         {u.label}
                       </div>
                       <div className="truncate text-[12px] text-muted">{u.email}</div>
+                    </div>
+                    <div>
+                      <PlanTierBadge tier={u.planTier} />
                     </div>
                     <div className="text-[12.5px] text-muted">
                       {new Date(u.created_at).toLocaleDateString()}
@@ -645,6 +684,27 @@ function TabButton({
     >
       {children}
     </button>
+  );
+}
+
+function PlanTierBadge({ tier }: { tier: BillingPlanId }) {
+  const styles: Record<BillingPlanId, string> = {
+    student: "bg-[#E1F6F9] text-[#0C7C8C]",
+    standard: "bg-[#F2F3F5] text-[#5A6573]",
+    pro: "bg-[#EEF3FF] text-[#1E54E6]",
+  };
+  const labels: Record<BillingPlanId, string> = {
+    student: "Student",
+    standard: "Standard",
+    pro: "Pro",
+  };
+
+  return (
+    <span
+      className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${styles[tier]}`}
+    >
+      {labels[tier]}
+    </span>
   );
 }
 

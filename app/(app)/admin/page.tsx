@@ -10,6 +10,7 @@ import {
   getAdminOpenSupportCount,
   listAdminSupportTickets,
 } from "@/lib/support/actions";
+import { AI_ENFORCE_PLAN_TIERS } from "@/lib/ai/config";
 import { getAdminAIUsageDashboard } from "@/lib/admin/ai-usage";
 import { redirect } from "next/navigation";
 
@@ -65,6 +66,7 @@ export default async function AdminPage() {
       supportTickets={supportTickets}
       openSupportCount={openSupportCount}
       aiUsage={aiUsageData}
+      aiEnforcePlanTiers={AI_ENFORCE_PLAN_TIERS}
     />
   );
 }
