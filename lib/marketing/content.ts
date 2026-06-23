@@ -1,5 +1,5 @@
 export const SITE_NAME = "ResumeTrakr";
-export const SITE_URL = "https://resumetrackr.com";
+export const SITE_URL = "https://resumetrakr.com";
 
 export const SITE_TAGLINE = "Application OS";
 
