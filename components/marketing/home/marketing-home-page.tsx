@@ -76,6 +76,13 @@ export function MarketingHomePage() {
                 See the application OS →
               </Link>
             </div>
+            <div className="first-resume-callout">
+              <div>
+                <p>Creating your first resume?</p>
+                <span>You&apos;re in the right place.</span>
+              </div>
+              <Link href={STUDENT_BUILD_HREF}>Get started →</Link>
+            </div>
           </div>
           <div className="loop-wrap">
             <div className="loop">

@@ -20,9 +20,19 @@ export default function AuthCallbackClient() {
     const supabase = createClient();
 
     let dest = "/dashboard";
+    const nextParam = searchParams.get("next");
+    if (nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//")) {
+      dest = nextParam;
+    }
+
     try {
       const stored = window.localStorage.getItem("postLoginNext");
-      if (stored && stored.startsWith("/") && !stored.startsWith("//")) {
+      if (
+        dest === "/dashboard" &&
+        stored &&
+        stored.startsWith("/") &&
+        !stored.startsWith("//")
+      ) {
         dest = stored;
       }
       window.localStorage.removeItem("postLoginNext");

@@ -1,7 +1,6 @@
 "use client";
 
 import { MarketingBrand } from "@/components/marketing/marketing-brand";
-import { createClient } from "@/lib/supabase/client";
 import {
   SITE_NAME,
   SITE_TAGLINE_PRIMARY,
@@ -9,8 +8,9 @@ import {
   PILOT_CTA,
   PILOT_FINE_PRINT,
 } from "@/lib/marketing/content";
+import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
 
 const TRUST_ITEMS = [
@@ -19,7 +19,17 @@ const TRUST_ITEMS = [
   PILOT_CTA + " — no card required",
 ] as const;
 
+const FIRST_RESUME_HREF = `/login?next=${encodeURIComponent("/build?mode=student")}`;
+
+type AuthMode = "password" | "magic";
+type PasswordFlow = "sign-in" | "create";
+type SentNotice = {
+  title: string;
+  body: string;
+};
+
 export default function LoginForm() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const authError = searchParams.get("error") === "auth";
   const nextParam = searchParams.get("next");
@@ -29,41 +39,141 @@ export default function LoginForm() {
       : null;
 
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [authMode, setAuthMode] = useState<AuthMode>("password");
+  const [passwordFlow, setPasswordFlow] = useState<PasswordFlow>("sign-in");
   const [loading, setLoading] = useState(false);
-  const [sent, setSent] = useState(false);
+  const [sentNotice, setSentNotice] = useState<SentNotice | null>(null);
   const [error, setError] = useState<string | null>(
     authError ? "That sign-in link expired or didn't work. Try again." : null
   );
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setLoading(true);
-    setError(null);
+  function redirectToWorkspace() {
+    router.replace(safeNext ?? "/dashboard");
+    router.refresh();
+  }
 
-    const supabase = createClient();
-    const redirectTo = `${window.location.origin}/auth/callback`;
+  function callbackUrl() {
+    const url = new URL("/auth/callback", window.location.origin);
+    if (safeNext) url.searchParams.set("next", safeNext);
+    return url.toString();
+  }
+
+  function rememberNext() {
     try {
       if (safeNext) window.localStorage.setItem("postLoginNext", safeNext);
       else window.localStorage.removeItem("postLoginNext");
     } catch {
       // ignore storage errors
     }
+  }
 
+  function friendlyAuthError(message: string) {
+    if (message.toLowerCase().includes("rate")) {
+      return "Email rate limit exceeded. Try Google or email/password, or wait a few minutes before requesting another link.";
+    }
+
+    return message;
+  }
+
+  async function handleGoogleSignIn() {
+    setLoading(true);
+    setError(null);
+    setSentNotice(null);
+    rememberNext();
+
+    const supabase = createClient();
+    const { error: signInError } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: callbackUrl(),
+      },
+    });
+
+    if (signInError) {
+      setLoading(false);
+      setError(friendlyAuthError(signInError.message));
+    }
+  }
+
+  async function handlePasswordSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setLoading(true);
+    setError(null);
+    setSentNotice(null);
+    rememberNext();
+
+    const supabase = createClient();
+
+    if (passwordFlow === "create") {
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: callbackUrl(),
+        },
+      });
+
+      setLoading(false);
+
+      if (signUpError) {
+        setError(friendlyAuthError(signUpError.message));
+        return;
+      }
+
+      if (data.session) {
+        redirectToWorkspace();
+        return;
+      }
+
+      setSentNotice({
+        title: "Confirm your email",
+        body: `We sent a confirmation email from ${SITE_NAME} to ${email}. After confirming, you can sign in with your password.`,
+      });
+      return;
+    }
+
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    setLoading(false);
+
+    if (signInError) {
+      setError(friendlyAuthError(signInError.message));
+      return;
+    }
+
+    redirectToWorkspace();
+  }
+
+  async function handleMagicLinkSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setLoading(true);
+    setError(null);
+    setSentNotice(null);
+    rememberNext();
+
+    const supabase = createClient();
     const { error: signInError } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: redirectTo,
+        emailRedirectTo: callbackUrl(),
       },
     });
 
     setLoading(false);
 
     if (signInError) {
-      setError(signInError.message);
+      setError(friendlyAuthError(signInError.message));
       return;
     }
 
-    setSent(true);
+    setSentNotice({
+      title: "Check your email",
+      body: `We sent a sign-in link from ${SITE_NAME} to ${email}. Click it once to open your workspace.`,
+    });
   }
 
   return (
@@ -136,73 +246,193 @@ export default function LoginForm() {
                   Welcome back
                 </h2>
                 <p className="mt-1.5 text-[14px] leading-relaxed text-[#5c5269]">
-                  Sign in with a one-time link — no password to remember.
+                  Use Google, email and password, or a one-time magic link.
                 </p>
               </div>
 
-              {sent ? (
+              {sentNotice ? (
                 <div className="rounded-[14px] border border-[rgba(15,181,166,.35)] bg-[rgba(15,181,166,.08)] px-4 py-4 text-[14px] leading-relaxed text-[#0a8478]">
-                  <p className="font-semibold text-[#066b62]">Check your email</p>
-                  <p className="mt-1.5 text-[#0a8478]">
-                    We sent a sign-in link from <strong>{SITE_NAME}</strong> to{" "}
-                    <strong className="text-[#066b62]">{email}</strong>. Click
-                    it once to open your workspace.
+                  <p className="font-semibold text-[#066b62]">
+                    {sentNotice.title}
                   </p>
+                  <p className="mt-1.5 text-[#0a8478]">{sentNotice.body}</p>
                   <button
                     type="button"
-                    onClick={() => {
-                      setSent(false);
-                      setEmail("");
-                    }}
+                    onClick={() => setSentNotice(null)}
                     className="mt-4 text-[13px] font-semibold text-[#066b62] underline-offset-2 hover:underline"
                   >
-                    Use a different email
+                    Back to sign in
                   </button>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <label className="flex flex-col gap-2 text-[12px] font-semibold uppercase tracking-[0.06em] text-[#8a8094]">
-                    Email address
-                    <input
-                      type="email"
-                      required
-                      autoComplete="email"
-                      value={email}
-                      onChange={(event) => setEmail(event.target.value)}
-                      placeholder="you@example.com"
-                      className="rounded-[12px] border border-[rgba(40,20,30,.12)] bg-[#fbf6f2]/40 px-3.5 py-3 text-[15px] normal-case tracking-normal text-[#231a2e] placeholder:text-[#b3aab8] focus:border-[#ff5c38] focus:outline-none focus:ring-2 focus:ring-[#ff5c38]/15"
-                    />
-                  </label>
-
-                  {error ? (
-                    <p className="rounded-[12px] border border-[#f0c7c7] bg-[#fff6f6] px-3.5 py-2.5 text-[13px] text-[#b23b3b]">
-                      {error}
-                    </p>
-                  ) : null}
-
+                <div className="space-y-5">
                   <button
-                    type="submit"
+                    type="button"
+                    onClick={handleGoogleSignIn}
                     disabled={loading}
-                    className="w-full rounded-[13px] bg-[#ff5c38] px-4 py-3.5 text-[15px] font-semibold text-white shadow-[0_14px_30px_-10px_rgba(255,92,56,.65)] transition hover:-translate-y-px hover:bg-[#f04f2d] disabled:opacity-60"
+                    className="flex w-full items-center justify-center gap-2 rounded-[13px] border border-[rgba(40,20,30,.14)] bg-white px-4 py-3.5 text-[15px] font-semibold text-[#231a2e] shadow-[0_12px_30px_-22px_rgba(40,20,30,.35)] transition hover:-translate-y-px hover:border-[#ff5c38]/35 disabled:opacity-60"
                   >
-                    {loading ? "Sending link…" : "Send magic link"}
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full border border-[rgba(40,20,30,.12)] text-[12px] font-bold text-[#ff5c38]">
+                      G
+                    </span>
+                    Continue with Google
                   </button>
-                </form>
+
+                  <div className="flex rounded-[14px] bg-[#fbf6f2] p-1">
+                    {(["password", "magic"] as const).map((mode) => (
+                      <button
+                        key={mode}
+                        type="button"
+                        onClick={() => {
+                          setAuthMode(mode);
+                          setError(null);
+                        }}
+                        className={`flex-1 rounded-[11px] px-3 py-2 text-[13px] font-semibold transition ${
+                          authMode === mode
+                            ? "bg-white text-[#231a2e] shadow-[0_8px_18px_-14px_rgba(40,20,30,.45)]"
+                            : "text-[#8a8094] hover:text-[#5c5269]"
+                        }`}
+                      >
+                        {mode === "password" ? "Email + password" : "Magic link"}
+                      </button>
+                    ))}
+                  </div>
+
+                  {authMode === "password" ? (
+                    <form onSubmit={handlePasswordSubmit} className="space-y-4">
+                      <label className="flex flex-col gap-2 text-[12px] font-semibold uppercase tracking-[0.06em] text-[#8a8094]">
+                        Email address
+                        <input
+                          type="email"
+                          required
+                          autoComplete="email"
+                          value={email}
+                          onChange={(event) => setEmail(event.target.value)}
+                          placeholder="you@example.com"
+                          className="rounded-[12px] border border-[rgba(40,20,30,.12)] bg-[#fbf6f2]/40 px-3.5 py-3 text-[15px] normal-case tracking-normal text-[#231a2e] placeholder:text-[#b3aab8] focus:border-[#ff5c38] focus:outline-none focus:ring-2 focus:ring-[#ff5c38]/15"
+                        />
+                      </label>
+
+                      <label className="flex flex-col gap-2 text-[12px] font-semibold uppercase tracking-[0.06em] text-[#8a8094]">
+                        Password
+                        <input
+                          type="password"
+                          required
+                          minLength={8}
+                          autoComplete={
+                            passwordFlow === "create"
+                              ? "new-password"
+                              : "current-password"
+                          }
+                          value={password}
+                          onChange={(event) => setPassword(event.target.value)}
+                          placeholder="At least 8 characters"
+                          className="rounded-[12px] border border-[rgba(40,20,30,.12)] bg-[#fbf6f2]/40 px-3.5 py-3 text-[15px] normal-case tracking-normal text-[#231a2e] placeholder:text-[#b3aab8] focus:border-[#ff5c38] focus:outline-none focus:ring-2 focus:ring-[#ff5c38]/15"
+                        />
+                      </label>
+
+                      {error ? (
+                        <p className="rounded-[12px] border border-[#f0c7c7] bg-[#fff6f6] px-3.5 py-2.5 text-[13px] text-[#b23b3b]">
+                          {error}
+                        </p>
+                      ) : null}
+
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full rounded-[13px] bg-[#ff5c38] px-4 py-3.5 text-[15px] font-semibold text-white shadow-[0_14px_30px_-10px_rgba(255,92,56,.65)] transition hover:-translate-y-px hover:bg-[#f04f2d] disabled:opacity-60"
+                      >
+                        {loading
+                          ? "Working..."
+                          : passwordFlow === "create"
+                            ? "Create account"
+                            : "Sign in"}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPasswordFlow(
+                            passwordFlow === "create" ? "sign-in" : "create"
+                          );
+                          setError(null);
+                        }}
+                        className="w-full text-center text-[12.5px] font-semibold text-[#5c5269] underline-offset-2 hover:text-[#ff5c38] hover:underline"
+                      >
+                        {passwordFlow === "create"
+                          ? "Already have an account? Sign in"
+                          : "New here? Create an account"}
+                      </button>
+                    </form>
+                  ) : (
+                    <form onSubmit={handleMagicLinkSubmit} className="space-y-4">
+                      <label className="flex flex-col gap-2 text-[12px] font-semibold uppercase tracking-[0.06em] text-[#8a8094]">
+                        Email address
+                        <input
+                          type="email"
+                          required
+                          autoComplete="email"
+                          value={email}
+                          onChange={(event) => setEmail(event.target.value)}
+                          placeholder="you@example.com"
+                          className="rounded-[12px] border border-[rgba(40,20,30,.12)] bg-[#fbf6f2]/40 px-3.5 py-3 text-[15px] normal-case tracking-normal text-[#231a2e] placeholder:text-[#b3aab8] focus:border-[#ff5c38] focus:outline-none focus:ring-2 focus:ring-[#ff5c38]/15"
+                        />
+                      </label>
+
+                      {error ? (
+                        <p className="rounded-[12px] border border-[#f0c7c7] bg-[#fff6f6] px-3.5 py-2.5 text-[13px] text-[#b23b3b]">
+                          {error}
+                        </p>
+                      ) : null}
+
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full rounded-[13px] bg-[#ff5c38] px-4 py-3.5 text-[15px] font-semibold text-white shadow-[0_14px_30px_-10px_rgba(255,92,56,.65)] transition hover:-translate-y-px hover:bg-[#f04f2d] disabled:opacity-60"
+                      >
+                        {loading ? "Sending link..." : "Send magic link"}
+                      </button>
+                    </form>
+                  )}
+                </div>
               )}
 
               <p className="mt-6 text-center text-[12.5px] leading-relaxed text-[#8a8094]">
-                New here? The same link creates your account automatically.{" "}
+                Google avoids email delays. Password reset and confirmation emails
+                still depend on your auth email provider.{" "}
                 {PILOT_FINE_PRINT.split(" · ")[0]}.
               </p>
             </div>
 
+            <div className="mt-4 rounded-[18px] border border-[#ff5c38]/20 bg-[#fff8f4] px-5 py-4 shadow-[0_12px_34px_-24px_rgba(255,92,56,0.55)]">
+              <p className="font-display text-[18px] font-semibold tracking-[-0.02em] text-[#231a2e]">
+                Creating your first resume?
+              </p>
+              <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#5c5269]">
+                You&apos;re in the right place. Use the guided builder for school,
+                activities, volunteering, and first jobs.
+              </p>
+              <Link
+                href={FIRST_RESUME_HREF}
+                className="mt-3 inline-flex text-[13.5px] font-semibold text-[#ff5c38] transition hover:text-[#e84d2f]"
+              >
+                Get started →
+              </Link>
+            </div>
+
             <p className="mt-5 text-center text-[12px] text-[#8a8094] lg:text-left">
               By continuing, you agree to our{" "}
-              <Link href="/terms" className="font-semibold text-[#5c5269] hover:text-[#ff5c38]">
+              <Link
+                href="/terms"
+                className="font-semibold text-[#5c5269] hover:text-[#ff5c38]"
+              >
                 Terms
               </Link>{" "}
               and{" "}
-              <Link href="/privacy" className="font-semibold text-[#5c5269] hover:text-[#ff5c38]">
+              <Link
+                href="/privacy"
+                className="font-semibold text-[#5c5269] hover:text-[#ff5c38]"
+              >
                 Privacy Policy
               </Link>
               .

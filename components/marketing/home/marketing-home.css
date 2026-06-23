@@ -58,6 +58,11 @@
 .marketing-home .hero h1 .serif-i{color:var(--coral);}
 .marketing-home .hero-sub{font-size:19px;line-height:1.55;color:var(--muted);max-width:500px;margin-top:20px;}
 .marketing-home .hero-cta{display:flex;align-items:center;gap:16px;margin-top:28px;flex-wrap:wrap;}
+.marketing-home .first-resume-callout{display:flex;align-items:center;justify-content:space-between;gap:18px;max-width:520px;margin-top:22px;padding:16px 18px;border:1px solid rgba(255,92,56,.2);border-radius:18px;background:rgba(255,255,255,.72);box-shadow:0 18px 42px -30px rgba(255,92,56,.55);}
+.marketing-home .first-resume-callout p{font-family:var(--font-marketing),system-ui,sans-serif;font-size:17px;font-weight:600;letter-spacing:-.02em;color:var(--ink);}
+.marketing-home .first-resume-callout span{display:block;margin-top:2px;font-size:14px;line-height:1.45;color:var(--muted);}
+.marketing-home .first-resume-callout a{flex-shrink:0;font-size:14px;font-weight:700;color:var(--coral);border-bottom:2px solid rgba(255,92,56,.28);padding-bottom:2px;white-space:nowrap;}
+.marketing-home .first-resume-callout a:hover{border-color:var(--coral);}
 .marketing-home .trust{display:flex;gap:26px;margin-top:32px;flex-wrap:wrap;}
 .marketing-home .trust-item{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);font-weight:500;}
 .marketing-home .check{display:flex;width:18px;height:18px;border-radius:50%;background:rgba(15,181,166,.14);color:var(--teal);align-items:center;justify-content:center;font-size:11px;flex-shrink:0;}
@@ -294,6 +299,10 @@
 .marketing-home .hero .btn-coral{width:100%;font-size:1rem;padding:16px 24px;border-radius:13px;box-shadow:0 14px 30px -10px rgba(255,92,56,.55);}
 .marketing-home .hero .link-underline{display:flex;width:100%;align-items:center;justify-content:center;padding:14px 20px;border:2px solid rgba(255,255,255,.38);border-radius:13px;color:#fff;font-size:1rem;white-space:normal;line-height:1.35;box-sizing:border-box;}
 .marketing-home .hero .link-underline:hover{border-color:rgba(255,255,255,.65);color:#fff;}
+.marketing-home .first-resume-callout{flex-direction:column;align-items:flex-start;width:100%;max-width:360px;margin-top:16px;text-align:left;background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.14);box-shadow:none;}
+.marketing-home .first-resume-callout p{color:#fff;}
+.marketing-home .first-resume-callout span{color:#c4bacd;}
+.marketing-home .first-resume-callout a{color:var(--coral-l);border-color:rgba(255,138,92,.42);}
 .marketing-home .trust{flex-direction:column;align-items:flex-start;gap:12px;margin-top:28px;width:100%;max-width:360px;text-align:left;margin-left:auto;margin-right:auto;}
 .marketing-home .trust-item{font-size:14px;color:#c4bacd;}
 .marketing-home .hero .check{background:rgba(15,181,166,.22);color:#5eead4;}
