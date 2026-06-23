@@ -1,13 +1,12 @@
-import type { AIAction } from "@/lib/ai/config";
-import {
-  AI_PRO_MONTHLY_CAP,
-  AI_STUDENT_COVER_LETTER_CAP,
-} from "@/lib/ai/config";
-
 export type BillingPlanId = "student" | "standard" | "pro";
 
 /** Legacy DB / env value — treated as {@link BillingPlanId.standard}. */
 export const LEGACY_ESSENTIALS_PLAN_ID = "essentials";
+
+/** Matches {@link AI_PRO_MONTHLY_CAP} default in lib/ai/config.ts */
+const PRO_AI_ACTIONS_CAP = 100;
+/** Matches {@link AI_STUDENT_COVER_LETTER_CAP} in lib/ai/config.ts */
+const STUDENT_COVER_LETTER_CAP = 2;
 
 export type BillingPlan = {
   id: BillingPlanId;
@@ -28,17 +27,17 @@ export type BillingPlan = {
     /** Pro fair-use cap; student cover-letter cap is separate. */
     aiActionsPerMonth: number | null;
     coverLettersPerMonth: number | null;
-    allowedAiActions: AIAction[] | "all" | "student_subset" | "none";
+    allowedAiActions: string[] | "all" | "student_subset" | "none";
   };
 };
 
-const STUDENT_AI_ACTIONS: AIAction[] = [
+const STUDENT_AI_ACTIONS = [
   "cover_letter",
   "apply_resume_context",
   "parse_resume",
-];
+] as const;
 
-const PRO_AI_ACTIONS: AIAction[] = [
+const PRO_AI_ACTIONS = [
   "cover_letter",
   "answer_question",
   "tailor_meta",
@@ -87,11 +86,11 @@ export const BILLING_PLANS: BillingPlan[] = [
       ...WORKSPACE_CORE.filter((f) => f !== "Insights dashboard"),
       "Student onboarding path",
     ],
-    aiSummary: `Light AI only — ${AI_STUDENT_COVER_LETTER_CAP} cover letters/mo plus resume parse & context assist. No tailor, Q&A, or interview prep.`,
+    aiSummary: `Light AI only — ${STUDENT_COVER_LETTER_CAP} cover letters/mo plus resume parse & context assist. No tailor, Q&A, or interview prep.`,
     entitlements: {
       aiEnabled: true,
       aiActionsPerMonth: null,
-      coverLettersPerMonth: AI_STUDENT_COVER_LETTER_CAP,
+      coverLettersPerMonth: STUDENT_COVER_LETTER_CAP,
       allowedAiActions: "student_subset",
     },
   },
@@ -113,10 +112,10 @@ export const BILLING_PLANS: BillingPlan[] = [
     highlighted: true,
     cta: "Go Pro",
     workspaceIncludes: [...WORKSPACE_CORE],
-    aiSummary: `Full AI — all actions including tailor, cover letters, Q&A, prep, debrief, insights. ${AI_PRO_MONTHLY_CAP} actions/mo fair-use cap.`,
+    aiSummary: `Full AI — all actions including tailor, cover letters, Q&A, prep, debrief, insights. ${PRO_AI_ACTIONS_CAP} actions/mo fair-use cap.`,
     entitlements: {
       aiEnabled: true,
-      aiActionsPerMonth: AI_PRO_MONTHLY_CAP,
+      aiActionsPerMonth: PRO_AI_ACTIONS_CAP,
       coverLettersPerMonth: null,
       allowedAiActions: "all",
     },
@@ -171,11 +170,11 @@ export function planTierDisplayName(id: BillingPlanId): string {
   return getBillingPlan(id).displayName;
 }
 
-export function studentAiActions(): AIAction[] {
+export function studentAiActions(): string[] {
   return [...STUDENT_AI_ACTIONS];
 }
 
-export function proAiActions(): AIAction[] {
+export function proAiActions(): string[] {
   return [...PRO_AI_ACTIONS];
 }
 
