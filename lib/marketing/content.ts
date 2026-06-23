@@ -7,14 +7,29 @@ export const SITE_TAGLINE_PRIMARY =
   "Track every application, resume to offer.";
 
 export const SITE_TAGLINE_SECONDARY =
-  "The application OS that tracks what you actually sent.";
+  "Resumes and cover letters that sound like you wrote them — with a workspace that tracks every send.";
 
 export const SITE_TITLE = `${SITE_NAME} — track every application, resume to offer`;
 
 export const SITE_DESCRIPTION = `${SITE_TAGLINE_PRIMARY} ${SITE_TAGLINE_SECONDARY} Resume library, tailor, cover letters, Q&A, tracking, and insights in one workspace with immutable snapshots.`;
 
+export const PILOT_CTA = "Free during pilot";
+
+export const PILOT_START_CTA = "Start free during pilot";
+
+export const PILOT_FINE_PRINT =
+  "Full Pro access while we build with early users. No credit card · Magic link sign-in";
+
 export const BETA_BANNER =
-  "Free during beta — all plans unlocked while we build. Pricing below is what launches at GA.";
+  "Free during pilot — full Pro unlocked while we refine the product. Pricing below previews launch tiers; invite codes for friends & family testers coming soon.";
+
+export const HUMAN_VOICE_PILLAR =
+  "AI that sounds human — tailored to each job, in your voice, never generic ChatGPT filler.";
+
+export const PRICING_SECTION_HEADLINE = "Pricing that won't punish your job search.";
+
+export const PRICING_SECTION_SUB =
+  "Subscription access to the application OS — not credit packs. Pro from $19 with human-sounding AI. Essentials at $4.99 to organize your search.";
 
 export const NAV_LINKS = [
   { href: "/application-os", label: "Application OS" },
@@ -29,7 +44,7 @@ export const NAV_LINKS = [
 export const HERO_STATS = [
   { value: "6", label: "Modules in the apply loop" },
   { value: "100%", label: "Snapshot fidelity" },
-  { value: "$4.99", label: "Full workspace from" },
+  { value: "$19", label: "Pro AI from" },
   { value: "1", label: "Login — not 5 tools" },
 ] as const;
 
@@ -46,7 +61,7 @@ export const APPLICATION_OS_LOOP = [
     step: "02",
     title: "Tailor to a Job",
     description:
-      "Paste a job description. AI reframes your real experience into a matched version — without touching your master.",
+      "Paste a job description. AI reframes your real experience into a matched version — written to sound like you, not a template.",
     icon: "target" as const,
     connectsTo: "Cover",
   },
@@ -54,7 +69,7 @@ export const APPLICATION_OS_LOOP = [
     step: "03",
     title: "Cover Letter",
     description:
-      "Generate a tight, editable letter in your voice from the resume and posting — not generic filler.",
+      "Draft a tight cover letter from your resume and the posting — human-sounding, editable, and ready to send in minutes.",
     icon: "mail" as const,
     connectsTo: "Q&A",
   },
@@ -148,8 +163,8 @@ export const GENERATOR_VS_OS = [
   },
   {
     dimension: "AI approach",
-    generator: "Keyword match optimization",
-    applicationOs: "Reframe real experience — never invent credentials",
+    generator: "Keyword match optimization — often sounds robotic",
+    applicationOs: "Reframe real experience in your voice — never invent credentials",
   },
   {
     dimension: "Best for",
@@ -172,15 +187,15 @@ export const POSITIONING_PILLARS = [
     accent: "Snapshots",
   },
   {
-    title: "AI that reframes — never invents",
+    title: "AI that sounds human — never invents",
     description:
-      "Competitors optimize for ATS match scores and keyword stuffing. ResumeTrakr is prompt-engineered to reposition your real experience, not fabricate roles or metrics.",
-    accent: "Honest AI",
+      "Competitors optimize for ATS scores and keyword stuffing. ResumeTrakr tailors your real story per job — cover letters and bullets that read like you wrote them, not a generic AI draft.",
+    accent: "Human voice",
   },
   {
     title: "Pricing that respects job search",
     description:
-      "No $50/mo scanner tax. No credit packs that vanish in a week. Essentials at $4.99 for the full workspace without AI, $2.99 for students, and Pro at $19 when you need AI tailoring.",
+      "No $50/mo scanner tax. No credit packs that vanish in a week. Essentials at $4.99 to organize your search. Pro at $19 for job-tailored AI, human-sounding cover letters, and interview prep.",
     accent: "Fair pricing",
   },
 ] as const;
@@ -209,13 +224,13 @@ export const FEATURES = [
   {
     title: "Tailor to a Job",
     description:
-      "Paste a job description and generate a role-specific version with match notes — without touching your master resume.",
+      "Paste a job description and generate a role-specific version with match notes — phrased in your voice, without touching your master resume.",
     icon: "target" as const,
   },
   {
     title: "Cover Letter",
     description:
-      "Write a tight, editable cover letter in your voice from your resume and the job posting.",
+      "Write a cover letter that sounds like you — tailored to the role, editable, and ready in minutes.",
     icon: "mail" as const,
   },
   {
@@ -247,7 +262,7 @@ export const FEATURE_CAPABILITIES = [
   {
     title: "Resume AI",
     description:
-      "Per-section AI: headline options, bullet polish, improvement ideas, and one-click undo. Reframes your real experience — never invents credentials.",
+      "Per-section AI: headline options, bullet polish, and improvement ideas — always reframing your real experience, never inventing credentials or robotic filler.",
   },
   {
     title: "Job import",
@@ -311,29 +326,11 @@ export const PRICING_PLANS = [
       "Activities & clubs sections",
       "3 print-ready templates",
       "PDF export",
-      "2 AI cover letters / month",
+      "2 human-sounding cover letters / month",
     ],
     cta: "Start as a student",
     highlighted: false,
     badge: "High school & college",
-  },
-  {
-    id: "essentials",
-    name: "Essentials",
-    price: "$4.99",
-    period: "/month",
-    description:
-      "The full workspace without AI — cheap enough to keep through your whole search.",
-    features: [
-      "Unlimited resume versions",
-      "Full editor + 3 templates",
-      "Application tracking",
-      "Timeline & reminders",
-      "PDF export — no AI costs",
-    ],
-    cta: "Get Essentials",
-    highlighted: true,
-    badge: "Best value · no AI burn",
   },
   {
     id: "pro",
@@ -341,17 +338,35 @@ export const PRICING_PLANS = [
     price: "$19",
     period: "/month",
     description:
-      "100 AI actions per month for active job seekers — or $39 for a 3-month Job Search Pass.",
+      "The full AI-powered apply loop — job-tailored resumes, cover letters that sound like you, and interview prep. Or $39 for a 3-month Job Search Pass.",
     features: [
-      "Everything in Essentials",
-      "100 AI actions / month",
-      "Tailor, cover letters & Q&A",
-      "Fit & gaps analysis",
-      "Interview prep & cross-app insights",
+      "Tailor your resume to each job posting",
+      "Instant cover letters in your voice — not robotic AI",
+      "Application Q&A that reads naturally",
+      "Fit analysis, interview prep & cross-app insights",
+      "100 AI actions / month — predictable, no credit packs",
     ],
     cta: "Go Pro",
+    highlighted: true,
+    badge: "Human-sounding AI",
+  },
+  {
+    id: "essentials",
+    name: "Essentials",
+    price: "$4.99",
+    period: "/month",
+    description:
+      "Organize your entire search — library, editor, tracking, and snapshots — when you prefer to write everything yourself.",
+    features: [
+      "Unlimited resume versions",
+      "Full editor + 3 templates",
+      "Application tracking & timeline",
+      "Immutable send snapshots",
+      "PDF export — flat monthly price",
+    ],
+    cta: "Get Essentials",
     highlighted: false,
-    badge: "For active searches",
+    badge: "Organize your search",
   },
 ];
 
@@ -523,7 +538,7 @@ export const STUDENT_FAQ_ITEMS = [
   {
     question: "How much does the Student plan cost?",
     answer:
-      "Right now it's completely free for students while we're in beta — a limited-time offer. You get the guided builder, activities sections, 3 templates, PDF export, and AI cover letters. Affordable student pricing comes later, after beta.",
+      "Right now it's completely free for students during our pilot — full access while we build with early users. You get the guided builder, activities sections, 3 templates, PDF export, and AI cover letters. Paid student pricing comes at launch.",
   },
 ] as const;
 
@@ -570,6 +585,11 @@ export const FAQ_ITEMS = [
       "No. Tailoring and AI drafts only reframe your real input. The prompts explicitly forbid fabricating credentials, roles, or metrics.",
   },
   {
+    question: "Will my resume and cover letter sound like AI wrote them?",
+    answer:
+      "No — that's the point. ResumeTrakr is prompt-engineered for a human voice: short sentences, your real experience, no buzzword soup. Every AI draft is editable, and we never invent roles or metrics you didn't provide.",
+  },
+  {
     question: "What counts as an AI action on Pro?",
     answer:
       "Each AI generation counts as one action — a cover letter, Q&A answer, tailor step, interview prep run, etc. Deep tailoring may use several actions in one session. Pro includes 100 actions per month — enough for most active job searches. Limits reset on the 1st.",
@@ -577,7 +597,7 @@ export const FAQ_ITEMS = [
   {
     question: "What's the $4.99 Essentials plan for?",
     answer:
-      "Job search is expensive enough. Essentials gives you the full workspace — library, editor, templates, PDF export, and application tracking — without AI. Upgrade to Pro ($19/mo) when you want AI tailoring, cover letters, and insights — 100 actions per month.",
+      "Essentials is for searchers who want the full workspace — library, editor, templates, PDF export, and application tracking with snapshots — and prefer to write their own materials. Upgrade to Pro ($19/mo) when you want job-tailored AI: resumes reframed per posting, human-sounding cover letters, Q&A, and interview prep.",
   },
   {
     question: "Is there a plan for high school students?",

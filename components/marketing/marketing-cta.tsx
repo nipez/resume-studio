@@ -1,4 +1,4 @@
-import { SITE_NAME } from "@/lib/marketing/content";
+import { PILOT_FINE_PRINT, SITE_NAME } from "@/lib/marketing/content";
 import { MeshBackground } from "@/components/marketing/primitives";
 import Link from "next/link";
 
@@ -9,7 +9,7 @@ type MarketingCtaProps = {
 
 export function MarketingCta({
   title = "Ready when you are",
-  description = "Sign in with a magic link and run your job search from one application OS. Free during beta.",
+  description = "Sign in with a magic link and run your job search from one application OS. Free during pilot — full Pro access.",
 }: MarketingCtaProps) {
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-sidebar via-[#1b2740] to-sidebar">
@@ -33,7 +33,7 @@ export function MarketingCta({
           Open {SITE_NAME}
         </Link>
         <p className="mt-5 text-[12.5px] text-[#6E7686]">
-          No credit card · Magic link sign-in
+          {PILOT_FINE_PRINT}
         </p>
       </div>
     </section>

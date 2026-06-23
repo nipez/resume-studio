@@ -6,6 +6,10 @@ import {
   HOW_IT_WORKS,
   POSITIONING_PILLARS,
   PRICING_PLANS,
+  PRICING_SECTION_HEADLINE,
+  PRICING_SECTION_SUB,
+  PILOT_CTA,
+  PILOT_FINE_PRINT,
   SITE_NAME,
   SITE_TAGLINE_PRIMARY,
   SITE_TAGLINE_SECONDARY,
@@ -104,7 +108,7 @@ export function MarketingHomePage() {
             </span>
             <span className="trust-item">
               <span className="check">✓</span>
-              Not another PDF generator
+              Human-sounding AI drafts
             </span>
           </div>
         </div>
@@ -312,7 +316,7 @@ export function MarketingHomePage() {
           <Reveal className="sec-head center" style={{ maxWidth: 560 }}>
             <span className="eyebrow">Testimonials</span>
             <h2>Built for real job searches.</h2>
-            <p>Early beta feedback from professionals, parents, and career switchers.</p>
+            <p>Early pilot feedback from professionals, parents, and career switchers.</p>
           </Reveal>
           <Reveal className="tg">
             {TESTIMONIALS.map((testimonial, index) => (
@@ -346,7 +350,7 @@ export function MarketingHomePage() {
               High school and college students turn clubs, sports, volunteering,
               and honors into a real resume with a guided, step-by-step builder.
               Parents: set them up in a single sitting — from $2.99/mo, free
-              during beta.
+              during pilot.
             </p>
           </Reveal>
           <Reveal className="students-chips">
@@ -371,15 +375,13 @@ export function MarketingHomePage() {
         <div className="wrap">
           <Reveal className="sec-head center" style={{ maxWidth: 600 }}>
             <span className="eyebrow" style={{ background: "var(--cream)" }}>Pricing</span>
-            <h2>Pricing that won&apos;t punish your job search.</h2>
-            <p>
-              Subscription access to the application OS — not credit packs. Student from $2.99. Full workspace without AI for $4.99.
-            </p>
+            <h2>{PRICING_SECTION_HEADLINE}</h2>
+            <p>{PRICING_SECTION_SUB}</p>
           </Reveal>
           <Reveal className="pgrid">
             {PRICING_PLANS.map((plan) => (
               <div key={plan.id} className={`plan${plan.highlighted ? " feat" : ""}`}>
-                {plan.highlighted && <span className="pop">Most popular</span>}
+                {plan.highlighted && <span className="pop">Recommended</span>}
                 <div className="kicker">{plan.badge}</div>
                 <div className="pname">{plan.name}</div>
                 <div className="priceline">
@@ -410,12 +412,12 @@ export function MarketingHomePage() {
             <div className="cta-inner">
               <h2>Run your job search like a system.</h2>
               <p>
-                Free during beta. The application OS — not another credit-based PDF generator.
+                {PILOT_CTA}. The application OS — resumes and cover letters that sound like you wrote them.
               </p>
               <Link href="/login" className="btn btn-dark">
                 Open {SITE_NAME}
               </Link>
-              <div className="fine">No credit card · Magic link sign-in</div>
+              <div className="fine">{PILOT_FINE_PRINT}</div>
             </div>
           </Reveal>
         </div>

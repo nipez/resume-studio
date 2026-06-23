@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Reveal } from "@/components/marketing/home/reveal-on-scroll";
 import { MarketingPageCta } from "@/components/marketing/shared/marketing-page-cta";
-import { BETA_BANNER, PRICING_PLANS, SITE_NAME } from "@/lib/marketing/content";
+import { BETA_BANNER, PRICING_PLANS, PILOT_CTA, SITE_NAME } from "@/lib/marketing/content";
 import "@/components/marketing/home/marketing-home.css";
 import "@/components/marketing/shared/marketing-subpage.css";
 import "./pricing.css";
@@ -39,9 +39,9 @@ export function PricingPage() {
               Pricing for a <span className="serif-i">tough</span> job market
             </h1>
             <p className="sub-hero-sub">
-              AI generators charge per credit. Scanners charge $50/mo. {SITE_NAME}{" "}
-              is subscription pricing for the full application OS — from $2.99 for
-              students and $4.99 for the workspace without AI.
+              AI generators charge per credit and often sound robotic. Scanners charge $50/mo.{" "}
+              {SITE_NAME} is subscription pricing for the full application OS — Pro from $19 with
+              human-sounding tailoring, or Essentials at $4.99 to organize your search.
             </p>
             <div className="price-chips">
               {COMPARISON_SNIPPETS.map((item) => (
@@ -73,24 +73,25 @@ export function PricingPage() {
             <span className="eyebrow" style={{ background: "var(--cream)" }}>
               Plans
             </span>
-            <h2>Three tiers. No credit traps.</h2>
+            <h2>Three tiers. Pro is where the AI lives.</h2>
             <p>
-              <strong>Essentials</strong> is the smart default — full workspace,
-              zero AI cost. Student on-ramp for first resumes. Pro when you&apos;re
-              applying aggressively and need AI (100 actions/mo).
+              <strong>Pro</strong> is the full apply loop — job-tailored resumes, cover letters
+              that sound like you, Q&amp;A, and interview prep. <strong>Essentials</strong> is the
+              smart budget pick for organizing your search yourself. <strong>Student</strong> for
+              first resumes.
             </p>
           </Reveal>
           <Reveal className="pgrid">
             {[...PRICING_PLANS]
               .sort((a, b) => {
-                const order = { essentials: 0, pro: 1, student: 2 };
+                const order = { pro: 0, essentials: 1, student: 2 };
                 return order[a.id as keyof typeof order] - order[b.id as keyof typeof order];
               })
               .map((plan) => (
               <div key={plan.id} className={`plan${plan.highlighted ? " feat" : ""}`}>
-                {plan.highlighted ? <span className="pop">Best value</span> : null}
-                {!plan.highlighted && plan.id === "pro" ? (
-                  <span className="pop pro-pop">Active search</span>
+                {plan.highlighted ? <span className="pop">Recommended</span> : null}
+                {!plan.highlighted && plan.id === "student" ? (
+                  <span className="pop pro-pop">First resume</span>
                 ) : null}
                 <div className="kicker">{plan.badge}</div>
                 <div className="pname">{plan.name}</div>
@@ -122,15 +123,15 @@ export function PricingPage() {
             <span className="eyebrow" style={{ background: "var(--cream)" }}>
               Why three tiers
             </span>
-            <h2>Job search is temporary — pricing shouldn&apos;t punish you.</h2>
+            <h2>Job search is temporary — your tools shouldn&apos;t sound like a robot.</h2>
             <p>
-              Students need a cheap on-ramp. <strong>Essentials</strong> covers organizing and
-              tracking without AI costs — keep it for your whole search. Pro is for when
-              you&apos;re applying aggressively and need AI (100 actions per month).
+              Pro gives you AI that reads like a human wrote it — tailored per job, editable,
+              and grounded in your real experience. Essentials keeps the workspace affordable
+              when you write everything yourself. Student for the first resume on-ramp.
             </p>
           </Reveal>
           <Reveal className="tier-tags">
-            {["Essentials anchor", "Student on-ramp", "Pro · 100 AI actions/mo"].map((label) => (
+            {["Pro · human-sounding AI", "Essentials · organize & track", "Student on-ramp"].map((label) => (
               <span key={label} className="tier-tag">
                 {label}
               </span>
@@ -149,8 +150,8 @@ export function PricingPage() {
       </section>
 
       <MarketingPageCta
-        title="Start free during beta"
-        description="All plans unlocked while we build. Sign in with a magic link and explore the full workspace."
+        title={`Start free — ${PILOT_CTA.toLowerCase()}`}
+        description="Full Pro access while we pilot with early users. Sign in with a magic link — no credit card."
         secondaryHref="/faq"
         secondaryLabel="Read the FAQ →"
       />
