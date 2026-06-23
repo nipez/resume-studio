@@ -64,6 +64,7 @@ supabase db push
 |---|---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | Client + server | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Client + server | Public anon key (RLS enforced) |
+| `NEXT_PUBLIC_AUTH_GOOGLE_ENABLED` | Client | Set to `true` after the Supabase Google provider is configured |
 | `SUPABASE_SERVICE_ROLE_KEY` | Server only | Admin operations |
 | `ANTHROPIC_API_KEY` | Server only | AI endpoints (PR #5+) |
 | `AI_MODEL` | Server only | Anthropic model id |

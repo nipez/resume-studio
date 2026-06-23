@@ -20,6 +20,8 @@ const TRUST_ITEMS = [
 ] as const;
 
 const FIRST_RESUME_HREF = `/login?next=${encodeURIComponent("/build?mode=student")}`;
+const GOOGLE_AUTH_ENABLED =
+  process.env.NEXT_PUBLIC_AUTH_GOOGLE_ENABLED === "true";
 
 type AuthMode = "password" | "magic";
 type PasswordFlow = "sign-in" | "create";
@@ -266,17 +268,19 @@ export default function LoginForm() {
                 </div>
               ) : (
                 <div className="space-y-5">
-                  <button
-                    type="button"
-                    onClick={handleGoogleSignIn}
-                    disabled={loading}
-                    className="flex w-full items-center justify-center gap-2 rounded-[13px] border border-[rgba(40,20,30,.14)] bg-white px-4 py-3.5 text-[15px] font-semibold text-[#231a2e] shadow-[0_12px_30px_-22px_rgba(40,20,30,.35)] transition hover:-translate-y-px hover:border-[#ff5c38]/35 disabled:opacity-60"
-                  >
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full border border-[rgba(40,20,30,.12)] text-[12px] font-bold text-[#ff5c38]">
-                      G
-                    </span>
-                    Continue with Google
-                  </button>
+                  {GOOGLE_AUTH_ENABLED ? (
+                    <button
+                      type="button"
+                      onClick={handleGoogleSignIn}
+                      disabled={loading}
+                      className="flex w-full items-center justify-center gap-2 rounded-[13px] border border-[rgba(40,20,30,.14)] bg-white px-4 py-3.5 text-[15px] font-semibold text-[#231a2e] shadow-[0_12px_30px_-22px_rgba(40,20,30,.35)] transition hover:-translate-y-px hover:border-[#ff5c38]/35 disabled:opacity-60"
+                    >
+                      <span className="flex h-5 w-5 items-center justify-center rounded-full border border-[rgba(40,20,30,.12)] text-[12px] font-bold text-[#ff5c38]">
+                        G
+                      </span>
+                      Continue with Google
+                    </button>
+                  ) : null}
 
                   <div className="flex rounded-[14px] bg-[#fbf6f2] p-1">
                     {(["password", "magic"] as const).map((mode) => (
@@ -398,8 +402,11 @@ export default function LoginForm() {
               )}
 
               <p className="mt-6 text-center text-[12.5px] leading-relaxed text-[#8a8094]">
-                Google avoids email delays. Password reset and confirmation emails
-                still depend on your auth email provider.{" "}
+                {GOOGLE_AUTH_ENABLED
+                  ? "Google avoids email delays. "
+                  : null}
+                Password reset and confirmation emails still depend on your auth
+                email provider.{" "}
                 {PILOT_FINE_PRINT.split(" · ")[0]}.
               </p>
             </div>
