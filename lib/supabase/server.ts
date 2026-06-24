@@ -15,6 +15,9 @@ export function createClient() {
   const cookieStore = cookies();
 
   return createServerClient(url, anonKey, {
+    cookieOptions: {
+      secure: process.env.NODE_ENV === "production",
+    },
     cookies: {
       getAll() {
         return cookieStore.getAll();

@@ -8,6 +8,7 @@ import {
   PILOT_CTA,
   PILOT_FINE_PRINT,
 } from "@/lib/marketing/content";
+import { getAuthCallbackUrl } from "@/lib/request/site-origin";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -56,7 +57,7 @@ export default function LoginForm() {
   }
 
   function callbackUrl() {
-    const url = new URL("/auth/callback", window.location.origin);
+    const url = new URL(getAuthCallbackUrl());
     if (safeNext) url.searchParams.set("next", safeNext);
     return url.toString();
   }

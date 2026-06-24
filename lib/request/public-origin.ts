@@ -9,14 +9,18 @@ export function getPublicOrigin(request: Request): string {
   if (forwardedHost) {
     const host = forwardedHost.split(",")[0]?.trim();
     if (host) {
-      const proto = forwardedProto ?? "https";
+      const proto =
+        forwardedProto ??
+        (host.includes("localhost") || host.startsWith("127.0.0.1")
+          ? "http"
+          : "https");
       return `${proto}://${host}`;
     }
   }
 
   const host = request.headers.get("host")?.split(",")[0]?.trim();
   if (host && !host.startsWith("localhost") && !host.startsWith("127.0.0.1")) {
-    const proto = forwardedProto ?? (host.includes("localhost") ? "http" : "https");
+    const proto = forwardedProto ?? "https";
     return `${proto}://${host}`;
   }
 
