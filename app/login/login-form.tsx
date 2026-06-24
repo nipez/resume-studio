@@ -9,6 +9,7 @@ import {
   PILOT_CTA,
   PILOT_FINE_PRINT,
 } from "@/lib/marketing/content";
+import { getAuthCallbackUrl } from "@/lib/request/site-origin";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
@@ -41,7 +42,7 @@ export default function LoginForm() {
     setError(null);
 
     const supabase = createClient();
-    const redirectTo = `${window.location.origin}/auth/callback`;
+    const redirectTo = getAuthCallbackUrl();
     try {
       if (safeNext) window.localStorage.setItem("postLoginNext", safeNext);
       else window.localStorage.removeItem("postLoginNext");
