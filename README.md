@@ -56,6 +56,7 @@ supabase db push
 7. In **Supabase** → **Authentication** → **URL Configuration**:
    - **Site URL:** `https://resumetrakr.com`
    - **Redirect URLs:** add `https://resumetrakr.com/**` and `https://resumetrakr.com/auth/callback`
+   - If magic links land on `https://resumetrakr.com/?code=...` instead of signing you in, the redirect URL list is missing or the link was sent from the Supabase dashboard (which uses Site URL). The app redirects `?code=` to `/auth/callback` automatically; still add the redirect URLs above for a clean flow.
 8. Smoke-test: home page, magic-link login, and `GET /api/health`.
 
 ## Environment variables
