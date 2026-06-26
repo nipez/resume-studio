@@ -35,6 +35,7 @@ export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const authError = searchParams.get("error") === "auth";
+  const authReason = searchParams.get("reason");
   const nextParam = searchParams.get("next");
   const safeNext =
     nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//")
@@ -47,9 +48,13 @@ export default function LoginForm() {
   const [passwordFlow, setPasswordFlow] = useState<PasswordFlow>("sign-in");
   const [loading, setLoading] = useState(false);
   const [sentNotice, setSentNotice] = useState<SentNotice | null>(null);
-  const [error, setError] = useState<string | null>(
-    authError ? "That sign-in link expired or didn't work. Try again." : null
-  );
+  const [error, setError] = useState<string | null>(() => {
+    if (!authError) return null;
+    if (authReason === "pkce") {
+      return "Open the magic link in the same browser where you requested it, or use email + password below.";
+    }
+    return "That sign-in link expired or didn't work. Try again, or use email + password.";
+  });
 
   function redirectToWorkspace() {
     router.replace(safeNext ?? "/dashboard");
