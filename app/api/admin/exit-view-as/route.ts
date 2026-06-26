@@ -1,17 +1,15 @@
-import { restoreAdminFromImpersonation } from "@/lib/admin/restore-session";
+import { exitViewAsRoute } from "@/lib/admin/view-as-route";
 import { getPublicOrigin } from "@/lib/request/public-origin";
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
 export const dynamic = "force-dynamic";
 
 /** Full-page exit from view-as — restores the admin session then redirects. */
-export async function GET(request: Request) {
-  const origin = getPublicOrigin(request);
-
+export async function GET(request: NextRequest) {
   try {
-    await restoreAdminFromImpersonation();
-    return NextResponse.redirect(new URL("/admin", origin));
+    return await exitViewAsRoute(request);
   } catch {
+    const origin = getPublicOrigin(request);
     return NextResponse.redirect(
       new URL("/dashboard?admin_exit_failed=1", origin)
     );

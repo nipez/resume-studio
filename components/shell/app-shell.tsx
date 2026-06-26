@@ -29,16 +29,15 @@ type AppShellProps = {
 
 function ImpersonationBanner({ label }: { label: string }) {
   return (
-    <div className="flex flex-none flex-wrap items-center justify-between gap-3 bg-[#231a2e] px-5 py-2.5 text-[13px] text-[#fbe9e3]">
-      <span>
-        Viewing as <span className="font-semibold text-white">{label}</span> —
-        you&apos;re seeing the app as this user.
+    <div className="sticky top-0 z-[300] flex flex-none flex-wrap items-center justify-between gap-3 border-b border-[#FFB86A]/30 bg-[#231a2e] px-4 py-3 text-[13px] text-[#fbe9e3] shadow-[0_4px_20px_rgba(0,0,0,0.18)] sm:px-5">
+      <span className="min-w-0">
+        Viewing as <span className="font-semibold text-white">{label}</span>
       </span>
       <a
         href={EXIT_VIEW_AS_HREF}
-        className="rounded-lg bg-white px-3 py-1.5 text-[12.5px] font-semibold text-[#231a2e] transition-colors hover:bg-[#f0f0f0]"
+        className="shrink-0 rounded-lg bg-[#FFB86A] px-4 py-2 text-[12.5px] font-bold text-[#231a2e] transition-colors hover:bg-[#ffc988]"
       >
-        Back to Super admin
+        ← Back to Super admin
       </a>
     </div>
   );
@@ -64,7 +63,7 @@ function FloatingExitToSuperAdmin() {
   return (
     <a
       href={EXIT_VIEW_AS_HREF}
-      className="fixed bottom-6 left-[268px] z-[100] inline-flex items-center gap-2 rounded-full border border-[#FFB86A]/40 bg-[#231a2e] px-4 py-2.5 text-[13px] font-semibold text-[#FFE8CC] shadow-[0_8px_28px_rgba(0,0,0,0.28)] transition-colors hover:bg-[#2d2238]"
+      className="fixed bottom-4 left-4 right-4 z-[300] inline-flex items-center justify-center gap-2 rounded-full border border-[#FFB86A]/50 bg-[#231a2e] px-5 py-3 text-[14px] font-bold text-[#FFE8CC] shadow-[0_10px_32px_rgba(0,0,0,0.35)] transition-colors hover:bg-[#2d2238] sm:left-auto sm:right-6 sm:w-auto"
     >
       <span aria-hidden>←</span>
       Back to Super admin
@@ -190,7 +189,16 @@ export function AppShell({
         {impersonatingLabel ? (
           <ImpersonationBanner label={impersonatingLabel} />
         ) : null}
-        <div className="flex flex-none items-center justify-end border-b border-[#ECEEF1] bg-white px-6 py-2.5">
+        <div className="flex flex-none items-center justify-end gap-3 border-b border-[#ECEEF1] bg-white px-4 py-2.5 sm:px-6">
+          {impersonatingLabel ? (
+            <a
+              href={EXIT_VIEW_AS_HREF}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#FFB86A]/45 bg-[#FFF8F0] px-3 py-1.5 text-[12.5px] font-bold text-[#231a2e] transition-colors hover:bg-[#FFE8CC]"
+            >
+              <span aria-hidden>←</span>
+              Super admin
+            </a>
+          ) : null}
           <SupportInboxButton unreadCount={supportUnreadCount} />
         </div>
         <div className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">

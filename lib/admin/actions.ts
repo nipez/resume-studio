@@ -1,7 +1,6 @@
 "use server";
 
 import { isAdminEmail, isAdminUser } from "@/lib/auth/admin";
-import { IMPERSONATOR_COOKIE } from "@/lib/admin/impersonation";
 import {
   getStoredImpersonatorEmail,
   restoreAdminFromImpersonation,
@@ -18,7 +17,6 @@ import {
 import type { UserPersona } from "@/lib/profile/persona";
 import type { BillingPlanId } from "@/lib/billing/plans";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
-import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 
 export type DemoUser = {
@@ -328,9 +326,8 @@ export type ImpersonationState = {
 };
 
 export async function getImpersonationState(): Promise<ImpersonationState> {
-  const cookieStore = cookies();
-  const cookieValue = cookieStore.get(IMPERSONATOR_COOKIE)?.value;
-  if (!cookieValue) return { impersonating: false, label: null };
+  const adminEmail = getStoredImpersonatorEmail();
+  if (!adminEmail) return { impersonating: false, label: null };
 
   const user = await getRealUser();
 
