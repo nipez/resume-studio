@@ -1,12 +1,15 @@
-import { isAdminEmail, isAdminUser } from "@/lib/auth/admin";
+import { isAdminEmail } from "@/lib/auth/admin";
+import {
+  attachSessionCookie,
+  readSessionFromRequest,
+} from "@/lib/auth";
 import {
   IMPERSONATOR_COOKIE,
   decodeImpersonator,
   encodeImpersonator,
 } from "@/lib/admin/impersonation";
-import { establishSessionWithClient } from "@/lib/admin/session";
+import { findUserIdByEmail } from "@/lib/supabase/admin";
 import { getPublicOrigin } from "@/lib/request/public-origin";
-import { createSupabaseRouteClient } from "@/lib/supabase/route-client";
 import { createServiceClient } from "@/lib/supabase/server";
 import { NextResponse, type NextRequest } from "next/server";
 
@@ -29,7 +32,7 @@ function impersonatorCookieOptions() {
   };
 }
 
-/** Start view-as from a route handler — cookies must land on the redirect response. */
+/** Start view-as from a route handler — swap app session to the target user. */
 export async function startViewingAsUserRoute(
   request: NextRequest,
   userId: string
@@ -38,15 +41,8 @@ export async function startViewingAsUserRoute(
   const dashboard = new URL("/dashboard", origin);
   const failed = new URL("/admin?view_as_failed=1", origin);
 
-  const { supabase, getResponse } = createSupabaseRouteClient(
-    request,
-    () => NextResponse.redirect(dashboard)
-  );
-
-  const {
-    data: { user: admin },
-  } = await supabase.auth.getUser();
-  if (!isAdminUser(admin)) {
+  const adminSession = readSessionFromRequest(request);
+  if (!adminSession || !isAdminEmail(adminSession.email)) {
     return NextResponse.redirect(failed);
   }
 
@@ -56,23 +52,22 @@ export async function startViewingAsUserRoute(
     return NextResponse.redirect(failed);
   }
 
-  if (email.toLowerCase() === admin!.email?.toLowerCase()) {
+  if (email.toLowerCase() === adminSession.email.toLowerCase()) {
     return NextResponse.redirect(failed);
   }
 
-  await establishSessionWithClient(email, supabase);
-
-  const response = getResponse();
+  let response = NextResponse.redirect(dashboard);
+  response = attachSessionCookie(response, userId, email);
   response.cookies.set(
     IMPERSONATOR_COOKIE,
-    encodeImpersonator(admin!.email!),
+    encodeImpersonator(adminSession.email),
     impersonatorCookieOptions()
   );
 
   return response;
 }
 
-/** Exit view-as from a route handler — restore admin session on the redirect response. */
+/** Exit view-as — restore the admin app session. */
 export async function exitViewAsRoute(request: NextRequest): Promise<NextResponse> {
   const origin = getPublicOrigin(request);
   const adminUrl = new URL("/admin", origin);
@@ -90,14 +85,15 @@ export async function exitViewAsRoute(request: NextRequest): Promise<NextRespons
     return response;
   }
 
-  const { supabase, getResponse } = createSupabaseRouteClient(
-    request,
-    () => NextResponse.redirect(adminUrl)
-  );
+  const adminUserId = await findUserIdByEmail(adminEmail);
+  if (!adminUserId) {
+    const response = NextResponse.redirect(failed);
+    response.cookies.delete(IMPERSONATOR_COOKIE);
+    return response;
+  }
 
-  await establishSessionWithClient(adminEmail, supabase);
-
-  const response = getResponse();
+  let response = NextResponse.redirect(adminUrl);
+  response = attachSessionCookie(response, adminUserId, adminEmail);
   response.cookies.delete(IMPERSONATOR_COOKIE);
   return response;
 }

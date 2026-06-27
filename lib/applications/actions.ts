@@ -21,7 +21,8 @@ import {
   stripOptionalApplicationColumns,
 } from "@/lib/applications/db-write";
 import { getResumeVersion } from "@/lib/resume/actions";
-import { createClient } from "@/lib/supabase/server";
+import { getAuthedDb, getAuthUser } from "@/lib/auth";
+import { createServiceClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
 function mapEvent(row: Record<string, unknown>): ApplicationEvent {
@@ -80,7 +81,7 @@ function mapApplication(
 async function insertApplicationRow(
   payload: Record<string, unknown>
 ): Promise<{ data: Record<string, unknown> | null; error: Error | null }> {
-  const supabase = createClient();
+  const supabase = createServiceClient();
   let { data, error } = await supabase
     .from("applications")
     .insert(payload)
@@ -105,7 +106,7 @@ async function updateApplicationRow(
   id: string,
   payload: Record<string, unknown>
 ): Promise<{ error: Error | null }> {
-  const supabase = createClient();
+  const supabase = createServiceClient();
   let { error } = await supabase.from("applications").update(payload).eq("id", id);
 
   if (error && isOptionalApplicationColumnError(error.message)) {
@@ -134,15 +135,12 @@ export async function getApplicationsList(): Promise<{
   archivedApplications: Application[];
   versionCounts: Record<string, number>;
 }> {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const user = await getAuthUser();
   if (!user) {
     return { applications: [], archivedApplications: [], versionCounts: {} };
   }
 
+  const supabase = createServiceClient();
   const [{ data: rows, error: appsError }, { data: events }] = await Promise.all([
     supabase
       .from("applications")
@@ -200,7 +198,7 @@ export async function getApplicationCountsByVersion(): Promise<
 }
 
 export async function getApplication(id: string): Promise<Application | null> {
-  const supabase = createClient();
+  const supabase = createServiceClient();
   const { data: row, error } = await supabase
     .from("applications")
     .select("*")
@@ -219,11 +217,7 @@ export async function getApplication(id: string): Promise<Application | null> {
 }
 
 export async function logApplication(input: LogApplicationInput) {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
+  const { userId } = await getAuthedDb();
 
   const version = await getResumeVersion(input.versionId);
   if (!version) throw new Error("Resume version not found");
@@ -240,7 +234,7 @@ export async function logApplication(input: LogApplicationInput) {
   );
 
   const insertPayload = {
-    user_id: user.id,
+    user_id: userId,
     role,
     company,
     job_desc: input.jobDesc?.trim() ?? "",
@@ -275,7 +269,7 @@ export async function updateApplicationStatus(
   id: string,
   status: ApplicationStatus
 ) {
-  const supabase = createClient();
+  const supabase = createServiceClient();
   const app = await getApplication(id);
   if (!app) throw new Error("Application not found");
 
@@ -355,7 +349,7 @@ export async function replaceApplicationResumeSnapshot(
   applicationId: string,
   input: { versionId: string } | { snapshot: ResumeSnapshot; resumeVersionName: string }
 ) {
-  const supabase = createClient();
+  const supabase = createServiceClient();
   const app = await getApplication(applicationId);
   if (!app) throw new Error("Application not found");
 
@@ -413,16 +407,13 @@ export async function getCompanyApplicationHistory(
   company: string,
   excludeId?: string
 ): Promise<Pick<Application, "id" | "role" | "company" | "applied_at" | "status">[]> {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user || !company.trim()) return [];
+  const { supabase, userId } = await getAuthedDb();
+  if (!company.trim()) return [];
 
   const { data: rows } = await supabase
     .from("applications")
     .select("id, role, company, applied_at, status, archived_at")
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .order("applied_at", { ascending: false });
 
   const key = company.trim().toLowerCase();
@@ -442,7 +433,7 @@ export async function getCompanyApplicationHistory(
 }
 
 export async function updateApplicationInsight(id: string, insight: AppInsight) {
-  const supabase = createClient();
+  const supabase = createServiceClient();
   const { error } = await supabase
     .from("applications")
     .update({ insight })
@@ -453,7 +444,7 @@ export async function updateApplicationInsight(id: string, insight: AppInsight) 
 }
 
 export async function updateApplicationPrep(id: string, prep: AppPrep) {
-  const supabase = createClient();
+  const supabase = createServiceClient();
   const { error } = await supabase
     .from("applications")
     .update({ prep })
@@ -467,7 +458,7 @@ export async function updateApplicationInterviewTranscript(
   id: string,
   interview_transcript: string
 ) {
-  const supabase = createClient();
+  const supabase = createServiceClient();
   const { error } = await supabase
     .from("applications")
     .update({ interview_transcript })
@@ -487,7 +478,7 @@ export async function updateApplicationInterviewDebrief(
   id: string,
   interview_debrief: InterviewDebrief
 ) {
-  const supabase = createClient();
+  const supabase = createServiceClient();
   const { error } = await supabase
     .from("applications")
     .update({ interview_debrief })
@@ -528,7 +519,7 @@ export async function restoreApplication(id: string) {
 }
 
 export async function deleteApplication(id: string) {
-  const supabase = createClient();
+  const supabase = createServiceClient();
   const { error } = await supabase.from("applications").delete().eq("id", id);
   if (error) throw new Error(error.message);
 
@@ -542,11 +533,7 @@ export async function addApplicationEvent(
   applicationId: string,
   type: EventType
 ) {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
+  const { supabase, userId } = await getAuthedDb();
 
   const labels: Record<EventType, string> = {
     interview: "Interview",
@@ -561,7 +548,7 @@ export async function addApplicationEvent(
     .from("application_events")
     .insert({
       application_id: applicationId,
-      user_id: user.id,
+      user_id: userId,
       type,
       title: labels[type],
       date,
@@ -589,7 +576,7 @@ export async function updateApplicationEvent(
     done?: boolean;
   }
 ) {
-  const supabase = createClient();
+  const supabase = createServiceClient();
   const payload: Record<string, unknown> = {};
   if (patch.date !== undefined) payload.date = patch.date || null;
   if (patch.time !== undefined) payload.time = patch.time;
@@ -611,7 +598,7 @@ export async function deleteApplicationEvent(
   eventId: string,
   applicationId: string
 ) {
-  const supabase = createClient();
+  const supabase = createServiceClient();
   const { error } = await supabase
     .from("application_events")
     .delete()

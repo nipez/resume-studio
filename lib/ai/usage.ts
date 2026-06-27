@@ -12,7 +12,7 @@ import {
   AIFeatureNotAvailableError,
   AIQuotaExceededError,
 } from "@/lib/ai/errors";
-import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/server";
 
 export type AICompletionContext = {
   userId: string;
@@ -34,7 +34,7 @@ function currentPeriodStart(): string {
 }
 
 async function getMonthlyTotals(userId: string) {
-  const supabase = createClient();
+  const supabase = createServiceClient();
   const periodStart = currentPeriodStart();
 
   const { data: monthly, error: monthlyError } = await supabase
@@ -130,7 +130,7 @@ async function maybeSendCostAlert(input: {
     })
   );
 
-  const supabase = createClient();
+  const supabase = createServiceClient();
   await supabase
     .from("ai_usage_monthly")
     .update({ cost_alert_sent: true })
@@ -142,7 +142,7 @@ export async function recordAIUsage(
   ctx: AICompletionContext,
   usage: AIUsageResult
 ): Promise<void> {
-  const supabase = createClient();
+  const supabase = createServiceClient();
   const periodStart = currentPeriodStart();
   const costDelta = estimateTokenCostUsd(
     usage.model,

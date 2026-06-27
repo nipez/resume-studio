@@ -16,7 +16,8 @@ import {
 } from "@/lib/admin/types";
 import type { UserPersona } from "@/lib/profile/persona";
 import type { BillingPlanId } from "@/lib/billing/plans";
-import { createClient, createServiceClient } from "@/lib/supabase/server";
+import { getAuthUser } from "@/lib/auth";
+import { createServiceClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
 export type DemoUser = {
@@ -29,11 +30,7 @@ export type DemoUser = {
 };
 
 async function getRealUser() {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  return user;
+  return getAuthUser();
 }
 
 async function requireAdmin() {

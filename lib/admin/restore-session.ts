@@ -1,9 +1,15 @@
 import { isAdminEmail } from "@/lib/auth/admin";
 import {
+  APP_SESSION_COOKIE,
+  createSessionPayload,
+  sessionCookieOptions,
+  signSession,
+} from "@/lib/session";
+import {
   IMPERSONATOR_COOKIE,
   decodeImpersonator,
 } from "@/lib/admin/impersonation";
-import { establishSession } from "@/lib/admin/session";
+import { findUserIdByEmail } from "@/lib/supabase/admin";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 
@@ -23,7 +29,17 @@ export async function restoreAdminFromImpersonation(): Promise<string> {
     throw new Error("No valid admin session to return to");
   }
 
-  await establishSession(adminEmail);
+  const adminUserId = await findUserIdByEmail(adminEmail);
+  if (!adminUserId) {
+    cookieStore.delete(IMPERSONATOR_COOKIE);
+    throw new Error("Admin account not found");
+  }
+
+  cookieStore.set(
+    APP_SESSION_COOKIE,
+    signSession(createSessionPayload(adminUserId, adminEmail)),
+    sessionCookieOptions()
+  );
   cookieStore.delete(IMPERSONATOR_COOKIE);
   revalidatePath("/", "layout");
   return adminEmail;

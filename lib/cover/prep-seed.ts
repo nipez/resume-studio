@@ -7,7 +7,7 @@ import {
   getResumeVersion,
 } from "@/lib/resume/actions";
 import type { TailoredFor } from "@/lib/resume/db-types";
-import { createClient } from "@/lib/supabase/server";
+import { getAuthedDb } from "@/lib/auth";
 
 export type CoverPrepSeed = Partial<
   Pick<
@@ -134,16 +134,12 @@ export async function getCoverPrepSeedForVersion(
     if (!seed.jobCompany && fromName.company) seed.jobCompany = fromName.company;
   }
 
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return Object.keys(seed).length ? seed : null;
+  const { supabase, userId } = await getAuthedDb();
 
   const { data: savedJobByVersion } = await supabase
     .from("saved_jobs")
     .select("role, company, job_desc, job_url, context_notes, cover_text")
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .eq("tailored_version_id", versionId)
     .order("updated_at", { ascending: false })
     .limit(1)
@@ -155,7 +151,7 @@ export async function getCoverPrepSeedForVersion(
     const { data: application } = await supabase
       .from("applications")
       .select("role, company, job_desc")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .eq("resume_version_id", versionId)
       .order("created_at", { ascending: false })
       .limit(1)
@@ -167,7 +163,7 @@ export async function getCoverPrepSeedForVersion(
   const { data: workspaceDraft } = await supabase
     .from("workspace_drafts")
     .select("job_role, job_company, job_desc, job_url, context_notes, cover_text")
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .maybeSingle();
 
   if (!seed.jobDesc?.trim() && workspaceDraft?.job_desc) {
@@ -195,7 +191,7 @@ export async function getCoverPrepSeedForVersion(
     const { data: savedJobByCompany } = await supabase
       .from("saved_jobs")
       .select("role, company, job_desc, job_url, context_notes, cover_text")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .ilike("company", `%${seed.jobCompany}%`)
       .neq("job_desc", "")
       .order("updated_at", { ascending: false })
@@ -214,7 +210,7 @@ export async function getCoverPrepSeedForVersion(
     const { data: savedJobExact } = await supabase
       .from("saved_jobs")
       .select("role, company, job_desc, job_url, context_notes, cover_text")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .ilike("role", seed.jobRole)
       .ilike("company", seed.jobCompany)
       .order("updated_at", { ascending: false })

@@ -34,7 +34,7 @@ supabase link --project-ref YOUR_PROJECT_REF
 supabase db push
 ```
 
-4. In the dashboard, enable **Email (magic link)** and **Google** auth.
+4. In the dashboard, enable **Email** auth (password sign-in). Magic links are only used for invite and password-reset flows via `/set-password`.
 5. Create private Storage buckets: `resume-uploads`, `generated-pdfs` (RLS per-user prefix — PR #9).
 
 ## Railway deploy
@@ -54,10 +54,10 @@ supabase db push
 5. Wait for DNS propagation and Railway to provision TLS (often 5–30 minutes; up to 48 hours in edge cases).
 6. In Railway **Variables**, set `NEXT_PUBLIC_SITE_URL=https://resumetrakr.com` and redeploy.
 7. In **Supabase** → **Authentication** → **URL Configuration**:
-   - **Site URL:** `https://resumetrakr.com`
-   - **Redirect URLs:** add `https://resumetrakr.com/**` and `https://resumetrakr.com/auth/callback`
-   - If magic links land on `https://resumetrakr.com/?code=...` instead of signing you in, the redirect URL list is missing or the link was sent from the Supabase dashboard (which uses Site URL). The app redirects `?code=` to `/auth/callback` automatically; still add the redirect URLs above for a clean flow.
-8. Smoke-test: home page, magic-link login, and `GET /api/health`.
+   - **Site URL:** `https://resumetrakr.com` (or your `APP_URL`)
+   - **Redirect URLs:** `https://resumetrakr.com/set-password`, `https://resumetrakr.com/login`, `https://resumetrakr.com/signup`
+8. Set Railway env vars: `SESSION_SECRET` (long random string), `APP_URL=https://resumetrakr.com`, plus Supabase keys from `.env.example`.
+9. Smoke-test: sign up, sign in (no email sent), protected routes, forgot password → set password → sign in.
 
 ## Environment variables
 

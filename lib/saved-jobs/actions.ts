@@ -7,7 +7,7 @@ import type {
   SavedJob,
   UpdateSavedJobInput,
 } from "@/lib/saved-jobs/types";
-import { createClient } from "@/lib/supabase/server";
+import { getAuthedDb } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
 function mapSavedJob(row: Record<string, unknown>): SavedJob {
@@ -28,16 +28,12 @@ function mapSavedJob(row: Record<string, unknown>): SavedJob {
 }
 
 export async function getSavedJobsList(): Promise<SavedJob[]> {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return [];
+  const { supabase, userId } = await getAuthedDb();
 
   const { data, error } = await supabase
     .from("saved_jobs")
     .select("*")
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .order("updated_at", { ascending: false });
 
   if (error) {
@@ -49,11 +45,12 @@ export async function getSavedJobsList(): Promise<SavedJob[]> {
 }
 
 export async function getSavedJob(id: string): Promise<SavedJob | null> {
-  const supabase = createClient();
+  const { supabase, userId } = await getAuthedDb();
   const { data, error } = await supabase
     .from("saved_jobs")
     .select("*")
     .eq("id", id)
+    .eq("user_id", userId)
     .maybeSingle();
 
   if (error || !data) return null;
@@ -63,11 +60,7 @@ export async function getSavedJob(id: string): Promise<SavedJob | null> {
 export async function createSavedJob(
   input: CreateSavedJobInput
 ): Promise<SavedJob> {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
+  const { supabase, userId } = await getAuthedDb();
 
   const role = input.role?.trim() ?? "";
   const company = input.company?.trim() ?? "";
@@ -78,7 +71,7 @@ export async function createSavedJob(
   const { data, error } = await supabase
     .from("saved_jobs")
     .insert({
-      user_id: user.id,
+      user_id: userId,
       role,
       company,
       job_desc: input.jobDesc?.trim() ?? "",
@@ -99,7 +92,7 @@ export async function updateSavedJob(
   id: string,
   input: UpdateSavedJobInput
 ): Promise<SavedJob> {
-  const supabase = createClient();
+  const { supabase, userId } = await getAuthedDb();
   const payload: Record<string, unknown> = {};
   if (input.role !== undefined) payload.role = input.role.trim();
   if (input.company !== undefined) payload.company = input.company.trim();
@@ -116,6 +109,7 @@ export async function updateSavedJob(
     .from("saved_jobs")
     .update(payload)
     .eq("id", id)
+    .eq("user_id", userId)
     .select("*")
     .single();
 
@@ -126,8 +120,12 @@ export async function updateSavedJob(
 }
 
 export async function deleteSavedJob(id: string): Promise<void> {
-  const supabase = createClient();
-  const { error } = await supabase.from("saved_jobs").delete().eq("id", id);
+  const { supabase, userId } = await getAuthedDb();
+  const { error } = await supabase
+    .from("saved_jobs")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", userId);
   if (error) throw new Error(error.message);
   revalidatePath("/applications");
 }

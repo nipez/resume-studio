@@ -2,7 +2,7 @@
 
 import type { JobDraft, QAItem } from "@/lib/job-draft/storage";
 import { EMPTY_JOB_DRAFT } from "@/lib/job-draft/storage";
-import { createClient } from "@/lib/supabase/server";
+import { getAuthedDb } from "@/lib/auth";
 
 export type WorkspaceDraft = {
   draft: JobDraft;
@@ -10,16 +10,12 @@ export type WorkspaceDraft = {
 };
 
 export async function loadWorkspaceDraft(): Promise<WorkspaceDraft | null> {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
+  const { supabase, userId } = await getAuthedDb();
 
   const { data } = await supabase
     .from("workspace_drafts")
     .select("*")
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .maybeSingle();
 
   if (!data) return null;
@@ -41,17 +37,13 @@ export async function loadWorkspaceDraft(): Promise<WorkspaceDraft | null> {
 // Upsert only the job-context columns; the partial payload leaves the qa column
 // untouched on conflict (PostgREST only updates the columns it is given).
 export async function saveJobDraft(draft: Partial<JobDraft>): Promise<void> {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return;
+  const { supabase, userId } = await getAuthedDb();
 
   const merged = { ...EMPTY_JOB_DRAFT, ...draft };
 
   await supabase.from("workspace_drafts").upsert(
     {
-      user_id: user.id,
+      user_id: userId,
       job_role: merged.jobRole,
       job_company: merged.jobCompany,
       job_desc: merged.jobDesc,
@@ -65,15 +57,11 @@ export async function saveJobDraft(draft: Partial<JobDraft>): Promise<void> {
 }
 
 export async function clearWorkspaceJobDraft(): Promise<void> {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return;
+  const { supabase, userId } = await getAuthedDb();
 
   await supabase.from("workspace_drafts").upsert(
     {
-      user_id: user.id,
+      user_id: userId,
       job_role: "",
       job_company: "",
       job_desc: "",
@@ -87,13 +75,9 @@ export async function clearWorkspaceJobDraft(): Promise<void> {
 }
 
 export async function saveQADraft(qa: QAItem[]): Promise<void> {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return;
+  const { supabase, userId } = await getAuthedDb();
 
   await supabase
     .from("workspace_drafts")
-    .upsert({ user_id: user.id, qa }, { onConflict: "user_id" });
+    .upsert({ user_id: userId, qa }, { onConflict: "user_id" });
 }

@@ -1,5 +1,6 @@
 "use server";
 
+import { getAuthedDb } from "@/lib/auth";
 import { isAdminUser } from "@/lib/auth/admin";
 import type {
   AdminSupportTicket,
@@ -8,7 +9,7 @@ import type {
   SupportTicket,
   SupportTicketStatus,
 } from "@/lib/support/types";
-import { createClient, createServiceClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
 function mapMessage(row: Record<string, unknown>): SupportMessage {
@@ -45,21 +46,13 @@ function mapTicket(
 }
 
 async function requireUserId() {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
-  return { supabase, userId: user.id };
+  return getAuthedDb();
 }
 
 async function requireAdminUser() {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!isAdminUser(user)) throw new Error("Not authorized");
-  return user!;
+  const authed = await getAuthedDb();
+  if (!isAdminUser({ email: authed.email })) throw new Error("Not authorized");
+  return { id: authed.userId, email: authed.email };
 }
 
 export async function createSupportTicket(input: {

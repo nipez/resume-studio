@@ -8,7 +8,8 @@ import type {
   AdminAIMonthlyPoint,
   AdminAIUserCostRow,
 } from "@/lib/admin/ai-usage-types";
-import { createClient, createServiceClient } from "@/lib/supabase/server";
+import { getAuthedDb } from "@/lib/auth";
+import { createServiceClient } from "@/lib/supabase/server";
 
 type UsageEventRow = {
   id: string;
@@ -47,11 +48,8 @@ function isMissingAiUsageTable(message: string): boolean {
 }
 
 async function requireAdmin() {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!isAdminUser(user)) throw new Error("Not authorized");
+  const authed = await getAuthedDb();
+  if (!isAdminUser({ email: authed.email })) throw new Error("Not authorized");
 }
 
 async function fetchAllUsageEvents(svc: ReturnType<typeof createServiceClient>) {

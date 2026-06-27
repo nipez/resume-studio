@@ -1,13 +1,10 @@
-import { createClient } from "@/lib/supabase/server";
+import { getAuthUser } from "@/lib/auth";
 import { resolveIsStudent } from "@/lib/profile/persona";
 import { resolveDisplayName } from "@/lib/profile/utils";
+import { createServiceClient } from "@/lib/supabase/server";
 
 export async function getSessionProfile() {
-  const supabase = createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
 
   if (!user) {
     return {
@@ -20,6 +17,8 @@ export async function getSessionProfile() {
       hasResume: false,
     };
   }
+
+  const supabase = createServiceClient();
 
   const [{ data: profile }, { count: resumeCount }] = await Promise.all([
     supabase
@@ -36,7 +35,7 @@ export async function getSessionProfile() {
 
   const displayName = resolveDisplayName({
     profileFullName: profile?.full_name,
-    metadataFullName: user.user_metadata?.full_name as string | undefined,
+    metadataFullName: undefined,
     email: user.email,
   });
 

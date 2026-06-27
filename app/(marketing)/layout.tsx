@@ -3,7 +3,7 @@ import { MarketingFooter } from "@/components/marketing/marketing-footer";
 import { MarketingHeader } from "@/components/marketing/marketing-header";
 import "@/components/marketing/shared/marketing-fonts.css";
 import "@/components/marketing/shared/marketing-mobile.css";
-import { createClient } from "@/lib/supabase/server";
+import { getAuthUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import type { Viewport } from "next";
 
@@ -18,10 +18,7 @@ export default async function MarketingLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
 
   if (user) {
     redirect("/dashboard");

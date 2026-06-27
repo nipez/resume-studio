@@ -5,7 +5,8 @@ import {
   type UserPersona,
   resolveIsStudent,
 } from "@/lib/profile/persona";
-import { createClient } from "@/lib/supabase/server";
+import { getAuthedDb, getAuthUser } from "@/lib/auth";
+import { createServiceClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
 export type StudentLevel = "high_school" | "college" | "other";
@@ -24,7 +25,7 @@ export type StudentSegment = {
 };
 
 async function loadProfileRow(userId: string) {
-  const supabase = createClient();
+  const supabase = createServiceClient();
   const { data, error } = await supabase
     .from("profiles")
     .select("persona, onboarding_persona_set, is_student, student_level")
@@ -36,11 +37,7 @@ async function loadProfileRow(userId: string) {
 }
 
 export async function getUserProfileContext(): Promise<UserProfileContext> {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const user = await getAuthUser();
   if (!user) {
     return {
       persona: null,
@@ -73,11 +70,7 @@ export async function getStudentSegment(): Promise<StudentSegment> {
 }
 
 export async function setFirstRunPersona(path: FirstRunPath): Promise<void> {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
+  const { supabase, userId } = await getAuthedDb();
 
   const persona: UserPersona = path === "student" ? "student" : "professional";
   const payload: Record<string, unknown> = {
@@ -93,7 +86,7 @@ export async function setFirstRunPersona(path: FirstRunPath): Promise<void> {
   const { error } = await supabase
     .from("profiles")
     .update(payload)
-    .eq("id", user.id);
+    .eq("id", userId);
 
   if (error) throw new Error(error.message);
 
@@ -106,11 +99,7 @@ export async function setStudentSegment(input: {
   isStudent: boolean;
   studentLevel?: StudentLevel | null;
 }): Promise<void> {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
+  const { supabase, userId } = await getAuthedDb();
 
   const payload: Record<string, unknown> = {
     is_student: input.isStudent,
@@ -129,7 +118,7 @@ export async function setStudentSegment(input: {
   const { error } = await supabase
     .from("profiles")
     .update(payload)
-    .eq("id", user.id);
+    .eq("id", userId);
 
   if (error) throw new Error(error.message);
   revalidatePath("/build");
@@ -137,11 +126,7 @@ export async function setStudentSegment(input: {
 }
 
 export async function updateProfileFullName(fullName: string): Promise<void> {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
+  const { supabase, userId } = await getAuthedDb();
 
   const trimmed = fullName.trim();
   if (!trimmed) {
@@ -154,7 +139,7 @@ export async function updateProfileFullName(fullName: string): Promise<void> {
   const { error } = await supabase
     .from("profiles")
     .update({ full_name: trimmed })
-    .eq("id", user.id);
+    .eq("id", userId);
 
   if (error) throw new Error(error.message);
 

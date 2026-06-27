@@ -1,5 +1,3 @@
-import type { User } from "@supabase/supabase-js";
-
 // Master/admin accounts are configurable via the ADMIN_EMAILS env var
 // (comma-separated). Falls back to the project owner so it works out of the box.
 const DEFAULT_ADMIN_EMAILS = ["nickperez@gmail.com"];
@@ -17,6 +15,6 @@ export function isAdminEmail(email: string | null | undefined): boolean {
   return getAdminEmails().includes(email.toLowerCase());
 }
 
-export function isAdminUser(user: Pick<User, "email"> | null | undefined): boolean {
+export function isAdminUser(user: { email?: string | null } | null | undefined): boolean {
   return isAdminEmail(user?.email);
 }

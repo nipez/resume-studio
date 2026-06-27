@@ -2,7 +2,7 @@
 
 import { normalizeResumeData } from "@/lib/resume/defaults";
 import type { ResumeData, TemplateStyle } from "@/lib/types/resume";
-import { createClient } from "@/lib/supabase/server";
+import { getAuthedDb } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
 export type GuidedDraft = {
@@ -14,16 +14,12 @@ export type GuidedDraft = {
 };
 
 export async function getGuidedDraft(): Promise<GuidedDraft | null> {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
+  const { supabase, userId } = await getAuthedDb();
 
   const { data, error } = await supabase
     .from("guided_drafts")
     .select("*")
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .maybeSingle();
 
   if (error || !data) return null;
@@ -38,15 +34,11 @@ export async function getGuidedDraft(): Promise<GuidedDraft | null> {
 }
 
 export async function saveGuidedDraft(draft: GuidedDraft) {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
+  const { supabase, userId } = await getAuthedDb();
 
   const { error } = await supabase.from("guided_drafts").upsert(
     {
-      user_id: user.id,
+      user_id: userId,
       step: draft.step,
       template_style: draft.templateStyle,
       make_default: draft.makeDefault,
@@ -60,13 +52,9 @@ export async function saveGuidedDraft(draft: GuidedDraft) {
 }
 
 export async function discardGuidedDraft() {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
+  const { supabase, userId } = await getAuthedDb();
 
-  await supabase.from("guided_drafts").delete().eq("user_id", user.id);
+  await supabase.from("guided_drafts").delete().eq("user_id", userId);
   revalidatePath("/library");
 }
 
@@ -76,16 +64,12 @@ export async function finishGuidedDraft(input: {
   makeDefault: boolean;
   data: ResumeData;
 }): Promise<{ id: string }> {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
+  const { supabase, userId } = await getAuthedDb();
 
   const { data: created, error } = await supabase
     .from("resume_versions")
     .insert({
-      user_id: user.id,
+      user_id: userId,
       name: input.name.trim() || "My Resume",
       template_style: input.templateStyle,
       tailored_for: null,
@@ -101,16 +85,16 @@ export async function finishGuidedDraft(input: {
   const { count } = await supabase
     .from("resume_versions")
     .select("*", { count: "exact", head: true })
-    .eq("user_id", user.id);
+    .eq("user_id", userId);
 
   if (input.makeDefault || count === 1) {
     await supabase
       .from("profiles")
       .update({ default_version_id: created.id })
-      .eq("id", user.id);
+      .eq("id", userId);
   }
 
-  await supabase.from("guided_drafts").delete().eq("user_id", user.id);
+  await supabase.from("guided_drafts").delete().eq("user_id", userId);
 
   revalidatePath("/library");
   return { id: created.id as string };

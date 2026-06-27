@@ -3,7 +3,8 @@
 import { createEmptyResumeData, normalizeResumeData } from "@/lib/resume/defaults";
 import type { ResumeVersion } from "@/lib/resume/db-types";
 import type { ResumeData, TemplateStyle } from "@/lib/types/resume";
-import { createClient } from "@/lib/supabase/server";
+import { getAuthedDb, getAuthUser } from "@/lib/auth";
+import { createServiceClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { resolveDisplayName } from "@/lib/profile/utils";
 
@@ -26,11 +27,7 @@ function isActiveVersion(version: Pick<ResumeVersion, "archived_at">) {
 }
 
 export async function getLibraryData() {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const user = await getAuthUser();
   if (!user) {
     return {
       versions: [],
@@ -41,6 +38,7 @@ export async function getLibraryData() {
     };
   }
 
+  const supabase = createServiceClient();
   const [{ data: profile }, { data: versions }] = await Promise.all([
     supabase
       .from("profiles")
@@ -73,14 +71,14 @@ export async function getLibraryData() {
     userEmail: user.email ?? "",
     userName: resolveDisplayName({
       profileFullName: profile?.full_name,
-      metadataFullName: user.user_metadata?.full_name as string | undefined,
+      metadataFullName: undefined,
       email: user.email,
     }),
   };
 }
 
 export async function getResumeVersion(id: string) {
-  const supabase = createClient();
+  const supabase = createServiceClient();
   const { data, error } = await supabase
     .from("resume_versions")
     .select("*")
@@ -92,29 +90,25 @@ export async function getResumeVersion(id: string) {
 }
 
 export async function createResumeVersion(copyFromId?: string) {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
+  const { supabase, userId, email } = await getAuthedDb();
 
   const { data: profile } = await supabase
     .from("profiles")
     .select("default_version_id, full_name")
-    .eq("id", user.id)
+    .eq("id", userId)
     .single();
 
   const sourceId = copyFromId ?? profile?.default_version_id ?? undefined;
 
   const userName = resolveDisplayName({
     profileFullName: profile?.full_name,
-    metadataFullName: user.user_metadata?.full_name as string | undefined,
-    email: user.email,
+    metadataFullName: undefined,
+    email,
   });
 
   let name = "Untitled Resume";
   let template_style: TemplateStyle = "twocol";
-  let data = createEmptyResumeData(userName, user.email ?? "");
+  let data = createEmptyResumeData(userName, email ?? "");
   let tailored_for = null;
 
   if (sourceId) {
@@ -134,7 +128,7 @@ export async function createResumeVersion(copyFromId?: string) {
   const { data: created, error } = await supabase
     .from("resume_versions")
     .insert({
-      user_id: user.id,
+      user_id: userId,
       name,
       template_style,
       tailored_for,
@@ -148,13 +142,13 @@ export async function createResumeVersion(copyFromId?: string) {
   const { count } = await supabase
     .from("resume_versions")
     .select("*", { count: "exact", head: true })
-    .eq("user_id", user.id);
+    .eq("user_id", userId);
 
   if (count === 1) {
     await supabase
       .from("profiles")
       .update({ default_version_id: created.id })
-      .eq("id", user.id);
+      .eq("id", userId);
   }
 
   revalidatePath("/library");
@@ -169,7 +163,7 @@ export async function updateResumeVersion(
     data?: ResumeData;
   }
 ) {
-  const supabase = createClient();
+  const supabase = createServiceClient();
   const payload: Record<string, unknown> = {};
   if (patch.name !== undefined) payload.name = patch.name;
   if (patch.template_style !== undefined)
@@ -191,16 +185,12 @@ export async function updateResumeVersion(
 }
 
 export async function deleteResumeVersion(id: string) {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
+  const { supabase, userId } = await getAuthedDb();
 
   const { data: rows } = await supabase
     .from("resume_versions")
     .select("id, archived_at")
-    .eq("user_id", user.id);
+    .eq("user_id", userId);
 
   const versions = (rows ?? []).map((row) => ({
     id: row.id as string,
@@ -220,7 +210,7 @@ export async function deleteResumeVersion(id: string) {
   const { data: profile } = await supabase
     .from("profiles")
     .select("default_version_id")
-    .eq("id", user.id)
+    .eq("id", userId)
     .single();
 
   const { error } = await supabase.from("resume_versions").delete().eq("id", id);
@@ -232,7 +222,7 @@ export async function deleteResumeVersion(id: string) {
       await supabase
         .from("profiles")
         .update({ default_version_id: remaining.id })
-        .eq("id", user.id);
+        .eq("id", userId);
     }
   }
 
@@ -240,16 +230,12 @@ export async function deleteResumeVersion(id: string) {
 }
 
 export async function archiveResumeVersion(id: string) {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
+  const { supabase, userId } = await getAuthedDb();
 
   const { data: rows } = await supabase
     .from("resume_versions")
     .select("id, archived_at")
-    .eq("user_id", user.id);
+    .eq("user_id", userId);
 
   const versions = (rows ?? []).map((row) => ({
     id: row.id as string,
@@ -267,7 +253,7 @@ export async function archiveResumeVersion(id: string) {
   const { data: profile } = await supabase
     .from("profiles")
     .select("default_version_id")
-    .eq("id", user.id)
+    .eq("id", userId)
     .single();
 
   const { error } = await supabase
@@ -283,7 +269,7 @@ export async function archiveResumeVersion(id: string) {
       await supabase
         .from("profiles")
         .update({ default_version_id: nextDefault.id })
-        .eq("id", user.id);
+        .eq("id", userId);
     }
   }
 
@@ -293,16 +279,13 @@ export async function archiveResumeVersion(id: string) {
 }
 
 export async function restoreResumeVersion(id: string) {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
+  const { supabase, userId } = await getAuthedDb();
 
   const { error } = await supabase
     .from("resume_versions")
     .update({ archived_at: null })
-    .eq("id", id);
+    .eq("id", id)
+    .eq("user_id", userId);
 
   if (error) throw new Error(error.message);
 
@@ -312,11 +295,7 @@ export async function restoreResumeVersion(id: string) {
 }
 
 export async function setDefaultResumeVersion(id: string) {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
+  const { supabase, userId } = await getAuthedDb();
 
   const version = await getResumeVersion(id);
   if (!version) throw new Error("Resume version not found");
@@ -327,23 +306,19 @@ export async function setDefaultResumeVersion(id: string) {
   const { error } = await supabase
     .from("profiles")
     .update({ default_version_id: id })
-    .eq("id", user.id);
+    .eq("id", userId);
 
   if (error) throw new Error(error.message);
   revalidatePath("/library");
 }
 
 export async function importResumeVersion(data: ResumeData) {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
+  const { supabase, userId } = await getAuthedDb();
 
   const { data: created, error } = await supabase
     .from("resume_versions")
     .insert({
-      user_id: user.id,
+      user_id: userId,
       name: "Master Resume",
       template_style: "twocol" as TemplateStyle,
       tailored_for: null,
@@ -357,7 +332,7 @@ export async function importResumeVersion(data: ResumeData) {
   await supabase
     .from("profiles")
     .update({ default_version_id: created.id })
-    .eq("id", user.id);
+    .eq("id", userId);
 
   revalidatePath("/library");
   return mapRow(created);
@@ -371,11 +346,7 @@ export async function backfillTailoredJobContext(
   if (!version?.tailored_for || version.tailored_for.jobDesc?.trim()) return;
   if (!patch.jobDesc?.trim()) return;
 
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return;
+  const { supabase, userId } = await getAuthedDb();
 
   const next = {
     ...version.tailored_for,
@@ -389,7 +360,7 @@ export async function backfillTailoredJobContext(
     .from("resume_versions")
     .update({ tailored_for: next })
     .eq("id", versionId)
-    .eq("user_id", user.id);
+    .eq("user_id", userId);
 
   revalidatePath("/cover");
   revalidatePath("/library");
@@ -405,11 +376,7 @@ export async function saveTailoredVersion(input: {
   depth: "light" | "deep";
   data: ResumeData;
 }) {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
+  const { supabase, userId } = await getAuthedDb();
 
   const base = await getResumeVersion(input.baseId);
   if (!base) throw new Error("Base version not found");
@@ -421,7 +388,7 @@ export async function saveTailoredVersion(input: {
   const { data: created, error } = await supabase
     .from("resume_versions")
     .insert({
-      user_id: user.id,
+      user_id: userId,
       name,
       template_style: base.template_style,
       tailored_for: {
@@ -450,7 +417,7 @@ export async function saveTailoredVersion(input: {
 
   await supabase.from("workspace_drafts").upsert(
     {
-      user_id: user.id,
+      user_id: userId,
       job_role: input.jobRole,
       job_company: input.jobCompany,
       job_desc: input.jobDesc?.trim() ?? "",
@@ -469,7 +436,7 @@ export async function saveTailoredVersion(input: {
         job_url: input.jobUrl?.trim() ?? "",
         context_notes: input.contextNotes?.trim() ?? "",
       })
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .ilike("company", input.jobCompany.trim());
   }
 

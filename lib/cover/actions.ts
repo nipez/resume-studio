@@ -1,7 +1,7 @@
 "use server";
 
 import type { CoverLetter, CoverLetterSaveResult } from "@/lib/cover/types";
-import { createClient } from "@/lib/supabase/server";
+import { getAuthedDb } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
 function mapRow(row: Record<string, unknown>): CoverLetter {
@@ -43,16 +43,12 @@ function friendlyDbError(message: string): string {
 }
 
 export async function listCoverLetters(): Promise<CoverLetter[]> {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return [];
+  const { supabase, userId } = await getAuthedDb();
 
   const { data, error } = await supabase
     .from("cover_letters")
     .select("*")
-    .eq("user_id", user.id)
+    .eq("user_id", userId)
     .order("updated_at", { ascending: false });
 
   if (error) return [];
@@ -67,11 +63,7 @@ export async function saveCoverLetter(input: {
   body: string;
   resumeVersionId?: string | null;
 }): Promise<CoverLetterSaveResult> {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Not authenticated. Sign in and try again." };
+  const { supabase, userId } = await getAuthedDb();
 
   const role = input.role?.trim() ?? "";
   const company = input.company?.trim() ?? "";
@@ -85,7 +77,7 @@ export async function saveCoverLetter(input: {
       .from("resume_versions")
       .select("id")
       .eq("id", resumeVersionId)
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .maybeSingle();
     if (!version) resumeVersionId = null;
   }
@@ -103,7 +95,7 @@ export async function saveCoverLetter(input: {
       .from("cover_letters")
       .update(payload)
       .eq("id", input.id)
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .select("*")
       .single();
 
@@ -117,7 +109,7 @@ export async function saveCoverLetter(input: {
   const { data, error } = await supabase
     .from("cover_letters")
     .insert({
-      user_id: user.id,
+      user_id: userId,
       ...payload,
     })
     .select("*")
@@ -133,17 +125,13 @@ export async function saveCoverLetter(input: {
 export async function deleteCoverLetter(
   id: string
 ): Promise<{ ok: true } | { ok: false; error: string }> {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Not authenticated." };
+  const { supabase, userId } = await getAuthedDb();
 
   const { error } = await supabase
     .from("cover_letters")
     .delete()
     .eq("id", id)
-    .eq("user_id", user.id);
+    .eq("user_id", userId);
 
   if (error) return { ok: false, error: friendlyDbError(error.message) };
   revalidatePath("/cover");
