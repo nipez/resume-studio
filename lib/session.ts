@@ -1,5 +1,3 @@
-import { createHmac, timingSafeEqual } from "crypto";
-
 export const APP_SESSION_COOKIE = "app_session";
 export const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7;
 
@@ -9,6 +7,11 @@ export type SessionPayload = {
   expiresAt: number;
 };
 
+const encoder = new TextEncoder();
+const decoder = new TextDecoder();
+
+let cachedKey: Promise<CryptoKey> | null = null;
+
 function sessionSecret(): string {
   const secret = process.env.SESSION_SECRET?.trim();
   if (!secret) {
@@ -17,33 +20,81 @@ function sessionSecret(): string {
   return secret;
 }
 
-function signPayload(encoded: string): string {
-  return createHmac("sha256", sessionSecret()).update(encoded).digest("base64url");
+function toBase64Url(bytes: Uint8Array): string {
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += 1) {
+    binary += String.fromCharCode(bytes[i]!);
+  }
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
-export function signSession(payload: SessionPayload): string {
-  const encoded = Buffer.from(JSON.stringify(payload), "utf8").toString("base64url");
-  return `${encoded}.${signPayload(encoded)}`;
+function fromBase64Url(value: string): Uint8Array {
+  const padded = value.replace(/-/g, "+").replace(/_/g, "/");
+  const pad =
+    padded.length % 4 === 0 ? "" : "=".repeat(4 - (padded.length % 4));
+  const binary = atob(padded + pad);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
 }
 
-export function readSession(value: string | undefined | null): SessionPayload | null {
+function getHmacKey(): Promise<CryptoKey> {
+  if (!cachedKey) {
+    cachedKey = crypto.subtle.importKey(
+      "raw",
+      encoder.encode(sessionSecret()),
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["sign", "verify"]
+    );
+  }
+  return cachedKey;
+}
+
+async function signPayload(encoded: string): Promise<string> {
+  const key = await getHmacKey();
+  const sig = await crypto.subtle.sign("HMAC", key, encoder.encode(encoded));
+  return toBase64Url(new Uint8Array(sig));
+}
+
+async function verifyPayload(
+  encoded: string,
+  signature: string
+): Promise<boolean> {
+  try {
+    const key = await getHmacKey();
+    const sigBytes = new Uint8Array(fromBase64Url(signature));
+    return crypto.subtle.verify(
+      "HMAC",
+      key,
+      sigBytes,
+      encoder.encode(encoded)
+    );
+  } catch {
+    return false;
+  }
+}
+
+export async function signSession(payload: SessionPayload): Promise<string> {
+  const encoded = toBase64Url(encoder.encode(JSON.stringify(payload)));
+  return `${encoded}.${await signPayload(encoded)}`;
+}
+
+export async function readSession(
+  value: string | undefined | null
+): Promise<SessionPayload | null> {
   if (!value) return null;
 
   const [encoded, signature] = value.split(".");
   if (!encoded || !signature) return null;
 
-  const expected = signPayload(encoded);
-  try {
-    const a = Buffer.from(signature, "utf8");
-    const b = Buffer.from(expected, "utf8");
-    if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
-  } catch {
-    return null;
-  }
+  if (!(await verifyPayload(encoded, signature))) return null;
 
   try {
     const payload = JSON.parse(
-      Buffer.from(encoded, "base64url").toString("utf8")
+      decoder.decode(fromBase64Url(encoded))
     ) as SessionPayload;
 
     if (

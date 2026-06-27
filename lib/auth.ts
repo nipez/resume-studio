@@ -19,7 +19,9 @@ export type AuthUser = {
   user_metadata?: Record<string, unknown>;
 };
 
-export function readSessionFromRequest(request: NextRequest): SessionPayload | null {
+export async function readSessionFromRequest(
+  request: NextRequest
+): Promise<SessionPayload | null> {
   return readSession(request.cookies.get(APP_SESSION_COOKIE)?.value);
 }
 
@@ -72,12 +74,12 @@ export async function requireAuthedDb() {
   };
 }
 
-export function attachSessionCookie(
+export async function attachSessionCookie(
   response: NextResponse,
   userId: string,
   email: string
-): NextResponse {
-  const token = signSession(createSessionPayload(userId, email));
+): Promise<NextResponse> {
+  const token = await signSession(createSessionPayload(userId, email));
   response.cookies.set(APP_SESSION_COOKIE, token, sessionCookieOptions());
   return response;
 }

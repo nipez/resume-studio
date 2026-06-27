@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     const auth = await signInWithPassword(email, password);
     const dest = safeNextPath(next);
     const response = NextResponse.redirect(new URL(dest, origin));
-    return attachSessionCookie(response, auth.userId, auth.email);
+    return await attachSessionCookie(response, auth.userId, auth.email);
   } catch {
     loginUrl.searchParams.set("error", "invalid");
     if (next) loginUrl.searchParams.set("next", next);

@@ -50,7 +50,7 @@ export async function middleware(request: NextRequest) {
     return applySecurityHeaders(request, NextResponse.next());
   }
 
-  const session = readSession(request.cookies.get(APP_SESSION_COOKIE)?.value);
+  const session = await readSession(request.cookies.get(APP_SESSION_COOKIE)?.value);
   const isPublic = isPublicPath(pathname);
 
   if (!session && !isPublic) {

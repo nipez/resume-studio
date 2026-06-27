@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     const userId = await setUserPassword(email, password);
     const dest = safeNextPath(next);
     const response = NextResponse.redirect(new URL(dest, origin));
-    return attachSessionCookie(response, userId, email.toLowerCase());
+    return await attachSessionCookie(response, userId, email.toLowerCase());
   } catch {
     signupUrl.searchParams.set("error", "failed");
     return NextResponse.redirect(signupUrl);

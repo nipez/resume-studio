@@ -52,7 +52,7 @@ export async function startViewingAsUser(userId: string): Promise<void> {
   );
   cookieStore.set(
     APP_SESSION_COOKIE,
-    signSession(createSessionPayload(userId, email)),
+    await signSession(createSessionPayload(userId, email)),
     sessionCookieOptions()
   );
 

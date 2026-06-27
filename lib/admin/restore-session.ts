@@ -37,7 +37,7 @@ export async function restoreAdminFromImpersonation(): Promise<string> {
 
   cookieStore.set(
     APP_SESSION_COOKIE,
-    signSession(createSessionPayload(adminUserId, adminEmail)),
+    await signSession(createSessionPayload(adminUserId, adminEmail)),
     sessionCookieOptions()
   );
   cookieStore.delete(IMPERSONATOR_COOKIE);

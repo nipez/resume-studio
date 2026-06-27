@@ -41,7 +41,7 @@ export async function startViewingAsUserRoute(
   const dashboard = new URL("/dashboard", origin);
   const failed = new URL("/admin?view_as_failed=1", origin);
 
-  const adminSession = readSessionFromRequest(request);
+  const adminSession = await readSessionFromRequest(request);
   if (!adminSession || !isAdminEmail(adminSession.email)) {
     return NextResponse.redirect(failed);
   }
@@ -57,7 +57,7 @@ export async function startViewingAsUserRoute(
   }
 
   let response = NextResponse.redirect(dashboard);
-  response = attachSessionCookie(response, userId, email);
+  response = await attachSessionCookie(response, userId, email);
   response.cookies.set(
     IMPERSONATOR_COOKIE,
     encodeImpersonator(adminSession.email),
@@ -93,7 +93,7 @@ export async function exitViewAsRoute(request: NextRequest): Promise<NextRespons
   }
 
   let response = NextResponse.redirect(adminUrl);
-  response = attachSessionCookie(response, adminUserId, adminEmail);
+  response = await attachSessionCookie(response, adminUserId, adminEmail);
   response.cookies.delete(IMPERSONATOR_COOKIE);
   return response;
 }
