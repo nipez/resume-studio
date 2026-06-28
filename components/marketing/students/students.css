@@ -55,9 +55,24 @@
   z-index: 1;
   display: grid;
   grid-template-columns: 1.02fr 0.98fr;
-  gap: 48px;
+  grid-template-areas:
+    "lead visual"
+    "body visual";
+  gap: 32px 48px;
   align-items: center;
   padding: 28px 0 48px;
+}
+
+.marketing-home.students-page .students-hero-lead {
+  grid-area: lead;
+}
+
+.marketing-home.students-page .students-hero-body {
+  grid-area: body;
+}
+
+.marketing-home.students-page .students-hero-visual {
+  grid-area: visual;
 }
 
 .marketing-home.students-page .students-hero h1 {
@@ -523,12 +538,16 @@
 @media (max-width: 1024px) {
   .marketing-home.students-page .students-hero-grid {
     grid-template-columns: 1fr;
-    gap: 32px;
+    grid-template-areas:
+      "lead"
+      "visual"
+      "body";
+    gap: 0;
   }
 
   .marketing-home.students-page .students-hero-visual {
-    min-height: 420px;
-    max-width: 420px;
+    min-height: 360px;
+    max-width: 360px;
     margin: 0 auto;
   }
 
@@ -574,11 +593,11 @@
   }
 
   .marketing-home.students-page .students-hero-visual {
-    min-height: 380px;
+    min-height: 340px;
   }
 
   .marketing-home.students-page .students-sticky-2 {
-    display: none;
+    display: block;
   }
 }
 

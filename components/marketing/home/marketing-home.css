@@ -50,20 +50,31 @@
 
 /* hero */
 .marketing-home .hero{position:relative;overflow:hidden;background:radial-gradient(80% 70% at 82% 18%,rgba(255,92,56,.08),transparent 60%),radial-gradient(60% 60% at 10% 90%,rgba(15,181,166,.06),transparent 60%),var(--cream);padding:0;}
-.marketing-home .hero-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:40px;align-items:center;padding:28px 0 56px;}
-.marketing-home .hero-copy{grid-column:1;grid-row:1;}
-.marketing-home .loop-wrap{grid-column:2;grid-row:1 / span 2;align-self:center;}
-.marketing-home .trust{grid-column:1;grid-row:2;}
+.marketing-home .hero-grid{
+  display:grid;
+  grid-template-columns:1.08fr .92fr;
+  grid-template-areas:
+    "lead loop"
+    "actions loop"
+    "trust loop";
+  gap:40px;
+  align-items:center;
+  padding:28px 0 56px;
+}
+.marketing-home .hero-lead{grid-area:lead;}
+.marketing-home .hero-actions{grid-area:actions;}
+.marketing-home .loop-wrap{grid-area:loop;align-self:center;}
+.marketing-home .trust{grid-area:trust;}
 .marketing-home .hero h1{font-size:clamp(44px,6.2vw,72px);line-height:.98;letter-spacing:-.038em;margin-top:16px;}
 .marketing-home .hero h1 .serif-i{color:var(--coral);}
 .marketing-home .hero-sub{font-size:19px;line-height:1.55;color:var(--muted);max-width:500px;margin-top:20px;}
-.marketing-home .hero-cta{display:flex;align-items:center;gap:16px;margin-top:28px;flex-wrap:wrap;}
+.marketing-home .hero-cta{display:flex;align-items:center;gap:16px;margin-top:0;flex-wrap:wrap;}
 .marketing-home .first-resume-callout{display:flex;align-items:center;justify-content:space-between;gap:18px;max-width:520px;margin-top:22px;padding:16px 18px;border:1px solid rgba(255,92,56,.2);border-radius:18px;background:rgba(255,255,255,.72);box-shadow:0 18px 42px -30px rgba(255,92,56,.55);}
 .marketing-home .first-resume-callout p{font-family:var(--font-marketing),system-ui,sans-serif;font-size:17px;font-weight:600;letter-spacing:-.02em;color:var(--ink);}
 .marketing-home .first-resume-callout span{display:block;margin-top:2px;font-size:14px;line-height:1.45;color:var(--muted);}
 .marketing-home .first-resume-callout a{flex-shrink:0;font-size:14px;font-weight:700;color:var(--coral);border-bottom:2px solid rgba(255,92,56,.28);padding-bottom:2px;white-space:nowrap;}
 .marketing-home .first-resume-callout a:hover{border-color:var(--coral);}
-.marketing-home .trust{display:flex;gap:26px;margin-top:32px;flex-wrap:wrap;}
+.marketing-home .trust{display:flex;gap:26px;margin-top:0;flex-wrap:wrap;}
 .marketing-home .trust-item{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);font-weight:500;}
 .marketing-home .check{display:flex;width:18px;height:18px;border-radius:50%;background:rgba(15,181,166,.14);color:var(--teal);align-items:center;justify-content:center;font-size:11px;flex-shrink:0;}
 
@@ -268,8 +279,8 @@
 }
 @media (max-width:860px){
 .marketing-home section:not(.hero):not(.aos-hero):not(.features-hero){padding:80px 0;}
-.marketing-home .hero-grid{grid-template-columns:1fr;gap:28px;padding:28px 0 48px;}
-.marketing-home .hero-copy,.marketing-home .loop-wrap,.marketing-home .trust{grid-column:auto;grid-row:auto;}
+.marketing-home .hero-grid{grid-template-columns:1fr;grid-template-areas:"lead" "loop" "actions" "trust";gap:28px;padding:28px 0 48px;}
+.marketing-home .hero-lead,.marketing-home .hero-actions,.marketing-home .loop-wrap,.marketing-home .trust{grid-area:auto;}
 .marketing-home .loop-wrap{height:360px;margin-top:8px;align-self:auto;}
 .marketing-home .loop{transform:scale(.88);}
 .marketing-home .hero-sub{max-width:none;font-size:17px;line-height:1.6;}
@@ -289,8 +300,9 @@
 @media (max-width:767px){
 .marketing-home .hero{background:var(--ink);color:#fff;}
 .marketing-home .hero-grid{display:flex;flex-direction:column;align-items:center;text-align:center;padding:36px 0 40px;gap:0;}
-.marketing-home .hero-copy,.marketing-home .loop-wrap,.marketing-home .trust{grid-column:auto;grid-row:auto;}
-.marketing-home .hero-copy{display:flex;flex-direction:column;align-items:center;width:100%;max-width:520px;}
+.marketing-home .hero-lead,.marketing-home .hero-actions,.marketing-home .loop-wrap,.marketing-home .trust{grid-column:auto;grid-row:auto;}
+.marketing-home .hero-lead{display:flex;flex-direction:column;align-items:center;width:100%;max-width:520px;}
+.marketing-home .hero-actions{display:flex;flex-direction:column;align-items:center;width:100%;max-width:360px;margin:0 auto;}
 .marketing-home .hero .eyebrow{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14);color:var(--coral-l);box-shadow:none;}
 .marketing-home .hero h1{font-size:clamp(2rem,8.5vw,2.625rem);line-height:1.12;letter-spacing:-.03em;margin-top:18px;color:#fff;}
 .marketing-home .hero h1 .serif-i{color:var(--coral-l);}
@@ -306,8 +318,9 @@
 .marketing-home .trust{flex-direction:column;align-items:flex-start;gap:12px;margin-top:28px;width:100%;max-width:360px;text-align:left;margin-left:auto;margin-right:auto;}
 .marketing-home .trust-item{font-size:14px;color:#c4bacd;}
 .marketing-home .hero .check{background:rgba(15,181,166,.22);color:#5eead4;}
-.marketing-home .loop-wrap{display:flex;width:100%;max-width:340px;height:300px;margin:36px auto 0;overflow:hidden;justify-content:center;align-items:center;flex-shrink:0;}
-.marketing-home .loop{transform:scale(.74);transform-origin:center center;}
+.marketing-home .loop-wrap{display:flex;width:100%;max-width:360px;height:340px;margin:28px auto 24px;overflow:visible;justify-content:center;align-items:center;flex-shrink:0;position:relative;}
+.marketing-home .loop-wrap::before{content:"";position:absolute;inset:-12px -20px;border-radius:50%;background:radial-gradient(circle,rgba(255,92,56,.22) 0%,rgba(15,181,166,.14) 42%,transparent 72%);pointer-events:none;z-index:0;}
+.marketing-home .loop{transform:scale(.82);transform-origin:center center;position:relative;z-index:1;}
 .marketing-home .loop-spin,.marketing-home .loop .node>div,.marketing-home .loop-core{animation:none !important;}
 .marketing-home .loop-ring{border-color:rgba(255,255,255,.18);}
 .marketing-home .loop .node>div{background:rgba(255,255,255,.96);}

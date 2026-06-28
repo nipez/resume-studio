@@ -61,7 +61,7 @@ export function MarketingHomePage() {
     <div className="marketing-home">
       <section className="hero">
         <div className="wrap hero-grid">
-          <div className="hero-copy">
+          <div className="hero-lead">
             <span className="eyebrow">The Application OS</span>
             <h1>
               One system for your <span className="serif-i">entire</span> job search.
@@ -69,21 +69,6 @@ export function MarketingHomePage() {
             <p className="hero-sub">
               {SITE_TAGLINE_PRIMARY} {SITE_TAGLINE_SECONDARY} Library, tailor, cover letters, Q&amp;A, tracking, and insights — connected in one workspace.
             </p>
-            <div className="hero-cta">
-              <Link href="/login" className="btn btn-coral">
-                Get started free
-              </Link>
-              <Link href="/application-os" className="link-underline">
-                See the application OS →
-              </Link>
-            </div>
-            <div className="first-resume-callout">
-              <div>
-                <p>Creating your first resume?</p>
-                <span>You&apos;re in the right place.</span>
-              </div>
-              <Link href={STUDENT_BUILD_HREF}>Get started →</Link>
-            </div>
           </div>
           <div className="loop-wrap">
             <div className="loop">
@@ -103,6 +88,23 @@ export function MarketingHomePage() {
                 <span className="big">6→1</span>
                 <span className="small">closed loop</span>
               </div>
+            </div>
+          </div>
+          <div className="hero-actions">
+            <div className="hero-cta">
+              <Link href="/login" className="btn btn-coral">
+                Get started free
+              </Link>
+              <Link href="/application-os" className="link-underline">
+                See the application OS →
+              </Link>
+            </div>
+            <div className="first-resume-callout">
+              <div>
+                <p>Creating your first resume?</p>
+                <span>You&apos;re in the right place.</span>
+              </div>
+              <Link href={STUDENT_BUILD_HREF}>Get started →</Link>
             </div>
           </div>
           <div className="trust">

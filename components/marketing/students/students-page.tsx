@@ -44,7 +44,7 @@ export function StudentsPage() {
           <span className="students-hero-blob students-hero-blob-2" />
         </div>
         <div className="wrap students-hero-grid">
-          <div className="students-hero-copy">
+          <div className="students-hero-lead">
             <span className="eyebrow">For students &amp; parents · Free in beta</span>
             <h1>
               Your first resume shouldn&apos;t start with a{" "}
@@ -56,6 +56,9 @@ export function StudentsPage() {
               letters for part-time jobs, camp counselor gigs, and summer
               internships.
             </p>
+          </div>
+          <StudentHeroVisual />
+          <div className="students-hero-body">
             <ul className="students-personas">
               {STUDENT_PERSONAS.map((persona) => (
                 <li key={persona}>{persona}</li>
@@ -87,7 +90,6 @@ export function StudentsPage() {
               </div>
             </div>
           </div>
-          <StudentHeroVisual />
         </div>
         <div className="snap-strip">
           <div className="wrap inner">
