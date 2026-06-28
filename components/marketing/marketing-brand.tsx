@@ -6,18 +6,20 @@ type MarketingBrandProps = {
   light?: boolean;
   href?: string;
   hideTagline?: boolean;
+  logoSize?: number;
 };
 
 export function MarketingBrand({
   light = false,
   href = "/",
   hideTagline = false,
+  logoSize = 44,
 }: MarketingBrandProps) {
   const content = (
     <>
       <Logo
-        size={34}
-        className="shrink-0 shadow-[0_6px_16px_-6px_rgba(15,181,166,0.45)]"
+        size={logoSize}
+        className="shrink-0 shadow-[0_8px_20px_-8px_rgba(15,181,166,0.5)]"
       />
       <span>
         <span
@@ -37,7 +39,7 @@ export function MarketingBrand({
   );
 
   return (
-    <Link href={href} className="flex items-center gap-[11px]">
+    <Link href={href} className="flex items-center gap-3">
       {content}
     </Link>
   );
