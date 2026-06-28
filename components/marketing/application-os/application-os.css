@@ -115,17 +115,7 @@
   background: rgba(255, 255, 255, 0.03);
 }
 .marketing-home .aos-window-bar .brand {
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-  background: var(--coral);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-marketing), sans-serif;
-  font-weight: 700;
-  font-size: 12px;
-  color: #fff;
+  flex-shrink: 0;
 }
 .marketing-home .aos-window-bar .ttl {
   font-size: 12.5px;

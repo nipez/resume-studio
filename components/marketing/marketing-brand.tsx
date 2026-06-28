@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Logo } from "@/components/brand/logo";
 import { SITE_NAME, SITE_TAGLINE } from "@/lib/marketing/content";
 
 type MarketingBrandProps = {
@@ -14,9 +15,10 @@ export function MarketingBrand({
 }: MarketingBrandProps) {
   const content = (
     <>
-      <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[10px] bg-[#ff5c38] font-display text-lg font-bold text-white shadow-[0_6px_16px_-6px_rgba(255,92,56,.7)]">
-        R
-      </span>
+      <Logo
+        size={34}
+        className="shrink-0 shadow-[0_6px_16px_-6px_rgba(15,181,166,0.45)]"
+      />
       <span>
         <span
           className={`block font-display text-[16.5px] font-semibold leading-none ${light ? "text-white" : "text-[#231a2e]"}`}

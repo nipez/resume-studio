@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Logo } from "@/components/brand/logo";
 import { PILOT_FINE_PRINT, PILOT_START_CTA, SITE_NAME } from "@/lib/marketing/content";
 import { Reveal } from "@/components/marketing/home/reveal-on-scroll";
 import "@/components/marketing/home/marketing-home.css";
@@ -85,7 +86,7 @@ export function ApplicationOsPage() {
           <div className="aos-mock-wrap">
             <div className="aos-window">
               <div className="aos-window-bar">
-                <span className="brand">R</span>
+                <Logo size={22} className="brand shrink-0" />
                 <span className="ttl">{SITE_NAME}</span>
                 <span className="tag">Application OS</span>
               </div>

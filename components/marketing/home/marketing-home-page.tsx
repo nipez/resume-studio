@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Logo } from "@/components/brand/logo";
 import {
   APPLICATION_OS_LOOP,
   FRAGMENTED_STACK,
@@ -141,7 +142,7 @@ export function MarketingHomePage() {
             </p>
           </Reveal>
           <Reveal className="replace">
-            <span className="rlogo">R</span>
+            <Logo size={44} className="rlogo shrink-0" />
             <div>
               <b>{SITE_NAME} replaces the stack.</b>
               <span>

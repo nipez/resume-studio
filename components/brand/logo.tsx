@@ -7,13 +7,14 @@ type LogoProps = SVGProps<SVGSVGElement> & {
 };
 
 export function Logo({ size = 36, className, ...props }: LogoProps) {
-  const gradientId = useId();
+  const glowId = useId();
+  const shadowId = useId();
 
   return (
     <svg
       width={size}
       height={size}
-      viewBox="0 0 36 36"
+      viewBox="0 0 40 44"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
@@ -21,37 +22,58 @@ export function Logo({ size = 36, className, ...props }: LogoProps) {
       {...props}
     >
       <defs>
-        <linearGradient
-          id={gradientId}
-          x1="6"
-          y1="4"
-          x2="30"
-          y2="32"
-          gradientUnits="userSpaceOnUse"
+        <filter
+          id={glowId}
+          x="-40%"
+          y="-40%"
+          width="180%"
+          height="180%"
+          colorInterpolationFilters="sRGB"
         >
-          <stop stopColor="#2F6BFF" />
-          <stop offset="1" stopColor="#7A53FF" />
-        </linearGradient>
+          <feGaussianBlur stdDeviation="2.2" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+        <filter
+          id={shadowId}
+          x="-20%"
+          y="-10%"
+          width="140%"
+          height="140%"
+          colorInterpolationFilters="sRGB"
+        >
+          <feDropShadow dx="0" dy="2" stdDeviation="2" floodColor="#231a2e" floodOpacity="0.18" />
+        </filter>
       </defs>
-      <rect width="36" height="36" rx="10" fill={`url(#${gradientId})`} />
-      {/* R stem + bowl */}
-      <path
-        d="M11.25 10.5h6.75c3.45 0 5.85 2.05 5.85 5.05 0 2.55-1.35 4.35-3.6 4.95l3.75 7.5h-3.75l-3.45-6.9h-3.75v6.9h-3.75V10.5z"
-        fill="white"
+
+      <rect
+        x="10"
+        y="12"
+        width="27"
+        height="31"
+        rx="7"
+        fill="#0fb5a6"
+        filter={`url(#${glowId})`}
       />
-      <path
-        d="M14.25 13.5h3.45c1.65 0 2.7 1 2.7 2.55s-1.05 2.55-2.7 2.55h-3.45V13.5z"
-        fill={`url(#${gradientId})`}
+      <rect x="5.5" y="8" width="27" height="31" rx="7" fill="#2f2640" />
+      <rect
+        x="1"
+        y="4"
+        width="27"
+        height="31"
+        rx="7"
+        fill="#ffffff"
+        stroke="rgba(35,26,46,0.08)"
+        strokeWidth="0.75"
+        filter={`url(#${shadowId})`}
       />
-      {/* Loop arc — six-module apply cycle motif */}
+      <rect x="5.5" y="8.5" width="5.5" height="5.5" rx="1.4" fill="#ff5c38" />
       <path
-        d="M22.5 25.5c2.4 1.35 5.1 0.45 5.85-1.95"
-        stroke="white"
-        strokeWidth="1.75"
-        strokeLinecap="round"
-        opacity="0.9"
+        d="M9.25 15.25h5.65c2.45 0 3.95 1.25 3.95 3.05c0 1.45-0.85 2.45-2.25 2.75l2.35 4.95h-2.35l-2.15-4.55H11.5v4.55H9.25V15.25zm2.25 2.1v3.05h3.05c1.15 0 1.85-0.55 1.85-1.5c0-0.95-0.7-1.55-1.85-1.55H11.5z"
+        fill="#231a2e"
       />
-      <circle cx="27.75" cy="22.5" r="1.15" fill="white" opacity="0.75" />
     </svg>
   );
 }

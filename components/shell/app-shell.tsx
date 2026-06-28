@@ -95,7 +95,7 @@ export function AppShell({
         <div className="flex items-center gap-2.5 px-2 pb-4">
           <Logo
             size={34}
-            className="shrink-0 shadow-[0_4px_14px_rgba(47,107,255,0.4)]"
+            className="shrink-0 shadow-[0_6px_16px_-6px_rgba(15,181,166,0.45)]"
           />
           <div className="min-w-0">
             <div className="truncate font-display text-[15px] font-semibold tracking-[-0.01em] text-white">
