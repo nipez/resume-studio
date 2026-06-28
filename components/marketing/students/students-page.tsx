@@ -50,11 +50,15 @@ export function StudentsPage() {
               Your first resume shouldn&apos;t start with a{" "}
               <span className="serif-i">blank page</span>
             </h1>
-            <p className="students-hero-sub">
+            <p className="students-hero-sub students-hero-sub-full">
               Honor society. Varsity captain. Food bank shifts. {SITE_NAME} turns
               what you&apos;ve actually done into a real resume — plus cover
               letters for part-time jobs, camp counselor gigs, and summer
               internships.
+            </p>
+            <p className="students-hero-sub students-hero-sub-mobile">
+              Turn clubs, sports, and volunteering into a real resume — plus cover
+              letters for first jobs and internships.
             </p>
           </div>
           <StudentHeroVisual />

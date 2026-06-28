@@ -94,6 +94,10 @@
   margin-top: 20px;
 }
 
+.marketing-home.students-page .students-hero-sub-mobile {
+  display: none;
+}
+
 .marketing-home.students-page .students-personas {
   list-style: none;
   padding: 0;

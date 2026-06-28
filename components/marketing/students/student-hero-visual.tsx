@@ -51,7 +51,7 @@ export function StudentHeroVisual() {
         </div>
       </div>
 
-      <div className="students-hero-card">
+      <div className="students-hero-card students-hero-card-desktop">
         <div className="students-plan-kicker">Limited-time beta offer</div>
         <div className="students-plan-price">
           Free<span> · in beta</span>

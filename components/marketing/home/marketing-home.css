@@ -68,6 +68,7 @@
 .marketing-home .hero h1{font-size:clamp(44px,6.2vw,72px);line-height:.98;letter-spacing:-.038em;margin-top:16px;}
 .marketing-home .hero h1 .serif-i{color:var(--coral);}
 .marketing-home .hero-sub{font-size:19px;line-height:1.55;color:var(--muted);max-width:500px;margin-top:20px;}
+.marketing-home .hero-sub-mobile{display:none;}
 .marketing-home .hero-cta{display:flex;align-items:center;gap:16px;margin-top:0;flex-wrap:wrap;}
 .marketing-home .first-resume-callout{display:flex;align-items:center;justify-content:space-between;gap:18px;max-width:520px;margin-top:22px;padding:16px 18px;border:1px solid rgba(255,92,56,.2);border-radius:18px;background:rgba(255,255,255,.72);box-shadow:0 18px 42px -30px rgba(255,92,56,.55);}
 .marketing-home .first-resume-callout p{font-family:var(--font-marketing),system-ui,sans-serif;font-size:17px;font-weight:600;letter-spacing:-.02em;color:var(--ink);}
@@ -298,29 +299,33 @@
 
 /* Mobile SaaS hero — HubSpot-style centered layout + diagram */
 @media (max-width:767px){
-.marketing-home .hero{background:var(--ink);color:#fff;}
-.marketing-home .hero-grid{display:flex;flex-direction:column;align-items:center;text-align:center;padding:36px 0 40px;gap:0;}
+.marketing-home .hero{background:var(--ink);color:#fff;overflow:visible;}
+.marketing-home .hero-sub-full,.marketing-home.students-page .students-hero-sub-full{display:none;}
+.marketing-home .hero-sub-mobile,.marketing-home.students-page .students-hero-sub-mobile{display:block;}
+.marketing-home .hero-grid{display:flex;flex-direction:column;align-items:center;text-align:center;padding:28px 0 36px;gap:0;}
 .marketing-home .hero-lead,.marketing-home .hero-actions,.marketing-home .loop-wrap,.marketing-home .trust{grid-column:auto;grid-row:auto;}
-.marketing-home .hero-lead{display:flex;flex-direction:column;align-items:center;width:100%;max-width:520px;}
-.marketing-home .hero-actions{display:flex;flex-direction:column;align-items:center;width:100%;max-width:360px;margin:0 auto;}
+.marketing-home .hero-lead{order:1;display:flex;flex-direction:column;align-items:center;width:100%;max-width:520px;}
+.marketing-home .hero-actions{order:2;display:flex;flex-direction:column;align-items:center;width:100%;max-width:360px;margin:0 auto;}
+.marketing-home .loop-wrap{order:3;}
+.marketing-home .trust{order:4;}
 .marketing-home .hero .eyebrow{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14);color:var(--coral-l);box-shadow:none;}
-.marketing-home .hero h1{font-size:clamp(2rem,8.5vw,2.625rem);line-height:1.12;letter-spacing:-.03em;margin-top:18px;color:#fff;}
+.marketing-home .hero h1{font-size:clamp(2rem,8.5vw,2.625rem);line-height:1.12;letter-spacing:-.03em;margin-top:14px;color:#fff;}
 .marketing-home .hero h1 .serif-i{color:var(--coral-l);}
-.marketing-home .hero-sub{font-size:1.0625rem;line-height:1.65;color:#b8aec2;margin-top:18px;max-width:36ch;}
-.marketing-home .hero-cta{display:flex;flex-direction:column;align-items:stretch;width:100%;max-width:360px;margin:28px auto 0;gap:12px;}
+.marketing-home .hero-sub{font-size:1.0625rem;line-height:1.65;color:#b8aec2;margin-top:14px;max-width:36ch;}
+.marketing-home .hero-cta{display:flex;flex-direction:column;align-items:stretch;width:100%;max-width:360px;margin:18px auto 0;gap:12px;}
 .marketing-home .hero .btn-coral{width:100%;font-size:1rem;padding:16px 24px;border-radius:13px;box-shadow:0 14px 30px -10px rgba(255,92,56,.55);}
 .marketing-home .hero .link-underline{display:flex;width:100%;align-items:center;justify-content:center;padding:14px 20px;border:2px solid rgba(255,255,255,.38);border-radius:13px;color:#fff;font-size:1rem;white-space:normal;line-height:1.35;box-sizing:border-box;}
 .marketing-home .hero .link-underline:hover{border-color:rgba(255,255,255,.65);color:#fff;}
-.marketing-home .first-resume-callout{flex-direction:column;align-items:flex-start;width:100%;max-width:360px;margin-top:16px;text-align:left;background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.14);box-shadow:none;}
+.marketing-home .first-resume-callout{flex-direction:column;align-items:flex-start;width:100%;max-width:360px;margin-top:12px;text-align:left;background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.14);box-shadow:none;}
 .marketing-home .first-resume-callout p{color:#fff;}
 .marketing-home .first-resume-callout span{color:#c4bacd;}
 .marketing-home .first-resume-callout a{color:var(--coral-l);border-color:rgba(255,138,92,.42);}
-.marketing-home .trust{flex-direction:column;align-items:flex-start;gap:12px;margin-top:28px;width:100%;max-width:360px;text-align:left;margin-left:auto;margin-right:auto;}
+.marketing-home .trust{flex-direction:column;align-items:flex-start;gap:12px;margin-top:20px;width:100%;max-width:360px;text-align:left;margin-left:auto;margin-right:auto;}
 .marketing-home .trust-item{font-size:14px;color:#c4bacd;}
 .marketing-home .hero .check{background:rgba(15,181,166,.22);color:#5eead4;}
-.marketing-home .loop-wrap{display:flex;width:100%;max-width:360px;height:340px;margin:28px auto 24px;overflow:visible;justify-content:center;align-items:center;flex-shrink:0;position:relative;}
-.marketing-home .loop-wrap::before{content:"";position:absolute;inset:-12px -20px;border-radius:50%;background:radial-gradient(circle,rgba(255,92,56,.22) 0%,rgba(15,181,166,.14) 42%,transparent 72%);pointer-events:none;z-index:0;}
-.marketing-home .loop{transform:scale(.82);transform-origin:center center;position:relative;z-index:1;}
+.marketing-home .loop-wrap{display:flex;width:100%;max-width:320px;height:252px;margin:8px auto 0;overflow:visible;justify-content:center;align-items:center;flex-shrink:0;position:relative;}
+.marketing-home .loop-wrap::before{content:"";position:absolute;inset:-8px -16px;border-radius:50%;background:radial-gradient(circle,rgba(255,92,56,.22) 0%,rgba(15,181,166,.14) 42%,transparent 72%);pointer-events:none;z-index:0;}
+.marketing-home .loop{transform:scale(.68);transform-origin:center center;position:relative;z-index:1;}
 .marketing-home .loop-spin,.marketing-home .loop .node>div,.marketing-home .loop-core{animation:none !important;}
 .marketing-home .loop-ring{border-color:rgba(255,255,255,.18);}
 .marketing-home .loop .node>div{background:rgba(255,255,255,.96);}

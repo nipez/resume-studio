@@ -66,8 +66,11 @@ export function MarketingHomePage() {
             <h1>
               One system for your <span className="serif-i">entire</span> job search.
             </h1>
-            <p className="hero-sub">
+            <p className="hero-sub hero-sub-full">
               {SITE_TAGLINE_PRIMARY} {SITE_TAGLINE_SECONDARY} Library, tailor, cover letters, Q&amp;A, tracking, and insights — connected in one workspace.
+            </p>
+            <p className="hero-sub hero-sub-mobile">
+              {SITE_TAGLINE_PRIMARY} Six modules — library, tailor, cover letters, Q&amp;A, tracking, and insights — in one workspace.
             </p>
           </div>
           <div className="loop-wrap">
