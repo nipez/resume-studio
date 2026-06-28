@@ -186,10 +186,16 @@
   }
 
   /* ── Students hero card + personas ── */
-  .marketing-home.students-page .students-hero-card {
+  .marketing-home.students-page .students-hero-visual {
     width: 100%;
-    max-width: 360px;
-    margin: 24px auto 0;
+    max-width: 420px;
+    margin: 8px auto 0;
+  }
+
+  .marketing-home.students-page .students-hero-card {
+    width: min(100%, 220px);
+    margin-left: auto;
+    margin-right: 0;
     text-align: left;
   }
 
@@ -197,10 +203,21 @@
     justify-content: center;
   }
 
-  .marketing-home.students-page .students-beta {
+  .marketing-home.students-page .students-trust {
+    justify-content: center;
+  }
+
+  .marketing-home.students-page .students-hero-copy {
     text-align: center;
+  }
+
+  .marketing-home.students-page .students-hero-sub {
     margin-left: auto;
     margin-right: auto;
+  }
+
+  .marketing-home.students-page .students-hero-cta {
+    justify-content: center;
   }
 
   .marketing-home.students-page .students-audience-card .btn {

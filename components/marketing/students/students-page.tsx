@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { Reveal } from "@/components/marketing/home/reveal-on-scroll";
+import { StudentHeroVisual } from "@/components/marketing/students/student-hero-visual";
 import { StudentTemplateGallery } from "@/components/marketing/students/student-template-gallery";
 import { MarketingFaqAccordion } from "@/components/marketing/shared/marketing-faq-accordion";
 import { MarketingPageCta } from "@/components/marketing/shared/marketing-page-cta";
 import {
-  PRICING_PLANS,
   SITE_NAME,
   STUDENT_COVER_LETTER_SCENARIOS,
   STUDENT_FAQ_ITEMS,
@@ -36,13 +36,15 @@ const PARENT_POINTS = [
 ];
 
 export function StudentsPage() {
-  const studentPlan = PRICING_PLANS.find((plan) => plan.id === "student")!;
-
   return (
     <div className="marketing-home students-page">
       <section className="students-hero">
+        <div className="students-hero-bg" aria-hidden>
+          <span className="students-hero-blob students-hero-blob-1" />
+          <span className="students-hero-blob students-hero-blob-2" />
+        </div>
         <div className="wrap students-hero-grid">
-          <div>
+          <div className="students-hero-copy">
             <span className="eyebrow">For students &amp; parents · Free in beta</span>
             <h1>
               Your first resume shouldn&apos;t start with a{" "}
@@ -70,25 +72,31 @@ export function StudentsPage() {
                 See what&apos;s included
               </Link>
             </div>
-            <p className="students-beta">
-              🔥 Free for students while we&apos;re in beta — hurry, limited-time
-              offer.
-            </p>
-          </div>
-          <div className="students-hero-card">
-            <div className="students-plan-kicker">Limited-time beta offer</div>
-            <div className="students-plan-price">
-              Free<span> · in beta</span>
+            <div className="students-trust">
+              <div className="students-trust-item">
+                <span className="check">✓</span>
+                Guided, plain-language steps
+              </div>
+              <div className="students-trust-item">
+                <span className="check">✓</span>
+                PDF export in minutes
+              </div>
+              <div className="students-trust-item">
+                <span className="check">✓</span>
+                Free while we&apos;re in beta
+              </div>
             </div>
-            <p>
-              Currently free for students while we&apos;re in beta — hurry, it
-              won&apos;t last. {studentPlan.description}
-            </p>
-            <ul>
-              {studentPlan.features.map((feature) => (
-                <li key={feature}>{feature}</li>
-              ))}
-            </ul>
+          </div>
+          <StudentHeroVisual />
+        </div>
+        <div className="snap-strip">
+          <div className="wrap inner">
+            <span className="snap-saved">Sticky notes → resume</span>
+            <span className="sep">·</span>
+            <span>
+              Turn clubs, sports, volunteering, and part-time jobs into bullets
+              employers actually read.
+            </span>
           </div>
         </div>
       </section>
