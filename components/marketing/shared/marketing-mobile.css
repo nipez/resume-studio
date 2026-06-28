@@ -54,7 +54,7 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding: 36px 0 40px;
+    padding: 12px 0 28px;
     gap: 0;
   }
 
@@ -191,26 +191,34 @@
   }
 
   .marketing-home.students-page .students-hero-grid {
-    padding: 28px 0 32px;
+    padding: 12px 0 28px;
+  }
+
+  .marketing-home.students-page .students-hero-lead {
+    text-align: center;
+  }
+
+  .marketing-home.students-page .students-hero .eyebrow {
+    margin-top: 0;
   }
 
   .marketing-home.students-page .students-hero h1 {
-    margin-top: 14px;
+    margin-top: 10px;
   }
 
   .marketing-home.students-page .students-hero-sub {
-    margin-top: 14px;
-    font-size: 1.0625rem;
-    line-height: 1.6;
+    margin-top: 10px;
+    font-size: 1rem;
+    line-height: 1.55;
   }
 
   /* ── Students hero visual — compact, fully visible ── */
   .marketing-home.students-page .students-hero-visual {
     width: 100%;
-    max-width: 320px;
+    max-width: 300px;
     min-height: 0;
-    height: 230px;
-    margin: 18px auto 20px;
+    height: 220px;
+    margin: 14px auto 18px;
     padding: 0;
     position: relative;
     isolation: isolate;
@@ -239,8 +247,8 @@
   }
 
   .marketing-home.students-page .students-resume-stack {
-    width: min(100%, 210px);
-    top: 50%;
+    width: min(100%, 200px);
+    top: 56%;
   }
 
   .marketing-home.students-page .students-resume-mock {
@@ -248,7 +256,7 @@
   }
 
   .marketing-home.students-page .students-resume-mock .paper {
-    transform: rotate(-2deg) scale(0.92);
+    transform: rotate(-2deg) scale(0.9);
     transform-origin: center top;
     box-shadow:
       0 22px 48px -18px rgba(0, 0, 0, 0.45),
@@ -261,28 +269,31 @@
   }
 
   .marketing-home.students-page .students-sticky {
-    max-width: 130px;
-    padding: 8px 10px;
-    font-size: 10px;
+    max-width: 118px;
+    padding: 7px 9px;
+    font-size: 9.5px;
+    line-height: 1.35;
     animation: none !important;
   }
 
   .marketing-home.students-page .students-sticky-label {
-    font-size: 8px;
+    font-size: 7px;
     margin-bottom: 2px;
   }
 
   .marketing-home.students-page .students-sticky-1 {
-    top: 6px;
-    left: 0;
-    transform: rotate(-6deg);
+    top: auto;
+    bottom: 22%;
+    left: -10px;
+    transform: rotate(-8deg);
   }
 
   .marketing-home.students-page .students-sticky-2 {
-    top: 8px;
-    right: 0;
+    top: auto;
+    bottom: 44%;
+    right: -10px;
     display: block;
-    transform: rotate(5deg);
+    transform: rotate(6deg);
   }
 
   .marketing-home.students-page .students-hero-body {

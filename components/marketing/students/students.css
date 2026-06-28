@@ -569,15 +569,6 @@
     grid-template-columns: 1fr;
   }
 
-  .marketing-home.students-page .students-sticky {
-    max-width: 160px;
-    font-size: 11px;
-  }
-
-  .marketing-home.students-page .students-sticky-1 {
-    left: 4px;
-  }
-
   .marketing-home.students-page .students-hero-card {
     width: min(100%, 220px);
     right: 4px;
@@ -595,13 +586,65 @@
     flex-direction: column;
     gap: 12px;
   }
+}
+
+/* Mobile hero — must live here (loads after marketing-mobile.css) */
+@media (max-width: 767px) {
+  .marketing-home.students-page .students-hero-grid {
+    padding: 8px 0 24px;
+  }
+
+  .marketing-home.students-page .students-hero .eyebrow {
+    margin-top: 0;
+  }
+
+  .marketing-home.students-page .students-hero h1 {
+    margin-top: 8px;
+  }
+
+  .marketing-home.students-page .students-hero-sub {
+    margin-top: 8px;
+  }
 
   .marketing-home.students-page .students-hero-visual {
-    min-height: 340px;
+    min-height: 0;
+    max-width: 300px;
+    height: 210px;
+    margin: 12px auto 16px;
+  }
+
+  .marketing-home.students-page .students-resume-stack {
+    width: min(100%, 196px);
+    top: 58%;
+  }
+
+  .marketing-home.students-page .students-sticky {
+    max-width: 112px;
+    padding: 6px 8px;
+    font-size: 9px;
+    line-height: 1.35;
+    animation: none !important;
+  }
+
+  .marketing-home.students-page .students-sticky-label {
+    font-size: 7px;
+    margin-bottom: 2px;
+  }
+
+  /* Keep stickies off the name — flank lower on the resume */
+  .marketing-home.students-page .students-sticky-1 {
+    top: auto;
+    bottom: 22%;
+    left: -10px;
+    transform: rotate(-8deg);
   }
 
   .marketing-home.students-page .students-sticky-2 {
+    top: auto;
+    bottom: 44%;
+    right: -10px;
     display: block;
+    transform: rotate(6deg);
   }
 }
 
