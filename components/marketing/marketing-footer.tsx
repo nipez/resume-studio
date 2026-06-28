@@ -64,7 +64,21 @@ export function MarketingFooter() {
         </div>
 
         <div className="flex flex-col items-start justify-between gap-2.5 pt-7 text-[13.5px] text-[#7a7184] sm:flex-row sm:items-center">
-          <span>© {new Date().getFullYear()} {SITE_NAME}. All rights reserved.</span>
+          <div className="flex flex-col gap-1">
+            <span>© {new Date().getFullYear()} {SITE_NAME}. All rights reserved.</span>
+            <span>
+              A{" "}
+              <Link
+                href="https://solutionstud.io/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#c4bacd] transition hover:text-white"
+              >
+                Solution Studio
+              </Link>{" "}
+              product
+            </span>
+          </div>
           <div className="flex flex-wrap items-center gap-4">
             <Link href="/privacy" className="transition hover:text-white">
               Privacy
