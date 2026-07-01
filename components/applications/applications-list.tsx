@@ -22,6 +22,7 @@ import {
   formatDay,
   nextOpenEvent,
 } from "@/lib/applications/utils";
+import { nextActionableRecommendation } from "@/lib/applications/follow-up-recommendations";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
@@ -158,6 +159,8 @@ function ApplicationsTable({
       {applications.map((app) => {
         const tags = applicationTags(app);
         const nextEv = nextOpenEvent(app.events ?? []);
+        const suggested =
+          !archived ? nextActionableRecommendation(app) : null;
         const { primary, secondary } = applicationListHeading(app);
 
         return (
@@ -186,6 +189,10 @@ function ApplicationsTable({
               {nextEv && !archived ? (
                 <div className="mt-1.5 inline-flex items-center gap-1 rounded-md border border-[#E8ECF1] bg-[#F5F7FA] px-2 py-[3px] text-[11px] font-semibold text-muted">
                   📅 {appEventLabel(nextEv.type)} · {formatDay(nextEv.date)}
+                </div>
+              ) : suggested ? (
+                <div className="mt-1.5 inline-flex items-center gap-1 rounded-md border border-[#D9E4FF] bg-[#F0F5FF] px-2 py-[3px] text-[11px] font-semibold text-[#2456D6]">
+                  ✦ Suggested: {suggested.title}
                 </div>
               ) : null}
             </Link>

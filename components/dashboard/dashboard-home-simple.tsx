@@ -1,5 +1,6 @@
 "use client";
 
+import { SuggestedFollowUpsSection } from "@/components/applications/suggested-follow-ups-section";
 import {
   type DashboardHomeData,
   buildHref,
@@ -22,6 +23,7 @@ export function DashboardHomeSimple({ data }: { data: DashboardHomeData }) {
     primaryVersionId,
     stats,
     upcoming,
+    suggestedFollowUps,
   } = data;
 
   const buildLink = buildHref(isStudent);
@@ -205,6 +207,12 @@ export function DashboardHomeSimple({ data }: { data: DashboardHomeData }) {
         {upcoming.length > 0 ? (
           <div className="mt-5">
             <UpcomingSection upcoming={upcoming} />
+          </div>
+        ) : null}
+
+        {suggestedFollowUps.length > 0 ? (
+          <div className="mt-5">
+            <SuggestedFollowUpsSection items={suggestedFollowUps} compact />
           </div>
         ) : null}
       </div>

@@ -4,6 +4,7 @@ import {
   getCompanyApplicationHistory,
 } from "@/lib/applications/actions";
 import { listCoverLetters } from "@/lib/cover/actions";
+import { getUserProfileContext } from "@/lib/profile/actions";
 import { getLibraryData } from "@/lib/resume/actions";
 import { notFound } from "next/navigation";
 
@@ -21,10 +22,11 @@ export default async function ApplicationDetailPage({ params }: PageProps) {
       notFound();
     }
 
-    const [{ versions }, companyHistory, savedCoverLetters] = await Promise.all([
+    const [{ versions }, companyHistory, savedCoverLetters, profile] = await Promise.all([
       getLibraryData(),
       getCompanyApplicationHistory(application.company, application.id),
       listCoverLetters(),
+      getUserProfileContext(),
     ]);
 
     return (
@@ -33,6 +35,7 @@ export default async function ApplicationDetailPage({ params }: PageProps) {
         resumeVersions={versions}
         savedCoverLetters={savedCoverLetters}
         companyHistory={companyHistory}
+        isStudent={profile.isStudent}
       />
     );
   } catch (error) {

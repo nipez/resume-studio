@@ -1,4 +1,5 @@
 import type { InsightsData } from "@/lib/applications/insights";
+import { SuggestedFollowUpsSection } from "@/components/applications/suggested-follow-ups-section";
 import { appEventLabel, appStatusMeta, formatDay } from "@/lib/applications/utils";
 import Link from "next/link";
 
@@ -212,6 +213,12 @@ export function InsightsDashboard({ data }: { data: InsightsData }) {
                 </div>
               </section>
             </div>
+
+            {data.suggestedFollowUps.length > 0 ? (
+              <div className="mt-5">
+                <SuggestedFollowUpsSection items={data.suggestedFollowUps} />
+              </div>
+            ) : null}
 
             <section className="mt-5 overflow-hidden rounded-2xl border border-border bg-white">
               <div className="border-b border-[#EEF0F3] px-6 py-4">

@@ -5,6 +5,10 @@ import {
   computeApplicationStats,
   todayISO,
 } from "@/lib/applications/utils";
+import {
+  computeSuggestedFollowUps,
+  type SuggestedFollowUp,
+} from "@/lib/applications/follow-up-recommendations";
 
 export type FunnelStage = {
   key: string;
@@ -34,6 +38,8 @@ export type UpcomingEvent = {
   overdue: boolean;
 };
 
+export type { SuggestedFollowUp } from "@/lib/applications/follow-up-recommendations";
+
 export type InsightsData = {
   stats: ReturnType<typeof computeApplicationStats>;
   interviewRate: number;
@@ -42,6 +48,7 @@ export type InsightsData = {
   statusCounts: { status: ApplicationStatus; count: number }[];
   versions: VersionPerformance[];
   upcoming: UpcomingEvent[];
+  suggestedFollowUps: SuggestedFollowUp[];
   hasData: boolean;
 };
 
@@ -141,6 +148,8 @@ export function computeInsights(apps: Application[]): InsightsData {
   }
   upcoming.sort((a, b) => a.date.localeCompare(b.date));
 
+  const suggestedFollowUps = computeSuggestedFollowUps(apps, today);
+
   return {
     stats,
     interviewRate: pct(interviewed),
@@ -149,6 +158,7 @@ export function computeInsights(apps: Application[]): InsightsData {
     statusCounts,
     versions,
     upcoming: upcoming.slice(0, 8),
+    suggestedFollowUps: suggestedFollowUps.slice(0, 8),
     hasData: total > 0,
   };
 }

@@ -16,8 +16,8 @@ const STUDENT_STEPS = [
   },
   {
     n: "3",
-    title: "Track what you send",
-    body: "Log each application so you know what worked and what to follow up on.",
+    title: "Track & follow up",
+    body: "Log each application — we'll suggest thank-you notes and follow-up dates so you stand out.",
     href: "/applications",
   },
 ] as const;

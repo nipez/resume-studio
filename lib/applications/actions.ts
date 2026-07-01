@@ -13,6 +13,11 @@ import type {
   ResumeSnapshot,
   StatusHistoryEntry,
 } from "@/lib/applications/types";
+import type { FollowUpKind } from "@/lib/applications/follow-up-types";
+import {
+  recommendationMarker,
+  type FollowUpRecommendation,
+} from "@/lib/applications/follow-up-recommendations";
 import { normalizeResumeSnapshot, parseJobFromVersionName } from "@/lib/applications/utils";
 import {
   isMissingApplicationColumnError,
@@ -72,6 +77,10 @@ function mapApplication(
       : null,
     notes: String(row.notes ?? ""),
     application_type: (row.application_type as Application["application_type"]) ?? null,
+    decision_by: row.decision_by ? String(row.decision_by) : null,
+    follow_up_dismissed: Array.isArray(row.follow_up_dismissed)
+      ? (row.follow_up_dismissed as FollowUpKind[])
+      : [],
     archived_at: row.archived_at ? String(row.archived_at) : null,
     created_at: row.created_at as string,
     events,
@@ -327,6 +336,7 @@ export async function updateApplicationMeta(
     job_url?: string;
     notes?: string;
     applied_at?: string;
+    decision_by?: string | null;
   }
 ) {
   const payload: Record<string, unknown> = {};
@@ -336,6 +346,9 @@ export async function updateApplicationMeta(
   if (patch.job_url !== undefined) payload.job_url = patch.job_url;
   if (patch.notes !== undefined) payload.notes = patch.notes;
   if (patch.applied_at !== undefined) payload.applied_at = patch.applied_at;
+  if (patch.decision_by !== undefined) {
+    payload.decision_by = patch.decision_by?.trim() || null;
+  }
 
   const { error } = await updateApplicationRow(id, payload);
 
@@ -531,7 +544,12 @@ export async function deleteApplication(id: string) {
 
 export async function addApplicationEvent(
   applicationId: string,
-  type: EventType
+  type: EventType,
+  options?: {
+    date?: string;
+    title?: string;
+    notes?: string;
+  }
 ) {
   const { supabase, userId } = await getAuthedDb();
 
@@ -542,7 +560,7 @@ export async function addApplicationEvent(
   };
 
   const today = new Date();
-  const date = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+  const defaultDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
   const { data, error } = await supabase
     .from("application_events")
@@ -550,10 +568,10 @@ export async function addApplicationEvent(
       application_id: applicationId,
       user_id: userId,
       type,
-      title: labels[type],
-      date,
+      title: options?.title ?? labels[type],
+      date: options?.date ?? defaultDate,
       time: "",
-      notes: "",
+      notes: options?.notes ?? "",
       done: false,
     })
     .select("*")
@@ -563,7 +581,52 @@ export async function addApplicationEvent(
 
   revalidatePath(`/applications/${applicationId}`);
   revalidatePath("/applications");
+  revalidatePath("/insights");
+  revalidatePath("/dashboard");
   return mapEvent(data);
+}
+
+export async function addFollowUpFromRecommendation(
+  applicationId: string,
+  recommendation: Pick<
+    FollowUpRecommendation,
+    "id" | "eventType" | "title" | "suggestedDate" | "emailTemplate"
+  >
+) {
+  const notes = [
+    recommendationMarker(recommendation.id),
+    recommendation.emailTemplate?.trim() ?? "",
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+
+  return addApplicationEvent(applicationId, recommendation.eventType, {
+    date: recommendation.suggestedDate,
+    title: recommendation.title,
+    notes,
+  });
+}
+
+export async function dismissFollowUpRecommendation(
+  applicationId: string,
+  recommendationId: FollowUpKind
+) {
+  const app = await getApplication(applicationId);
+  if (!app) throw new Error("Application not found");
+
+  const dismissed = new Set(app.follow_up_dismissed ?? []);
+  dismissed.add(recommendationId);
+
+  const { error } = await updateApplicationRow(applicationId, {
+    follow_up_dismissed: Array.from(dismissed),
+  });
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/applications/${applicationId}`);
+  revalidatePath("/applications");
+  revalidatePath("/insights");
+  revalidatePath("/dashboard");
 }
 
 export async function updateApplicationEvent(
@@ -592,6 +655,8 @@ export async function updateApplicationEvent(
 
   revalidatePath(`/applications/${applicationId}`);
   revalidatePath("/applications");
+  revalidatePath("/insights");
+  revalidatePath("/dashboard");
 }
 
 export async function deleteApplicationEvent(

@@ -20,6 +20,7 @@ import {
   updateApplicationPrep,
   updateApplicationStatus,
 } from "@/lib/applications/actions";
+import { computeFollowUpRecommendations } from "@/lib/applications/follow-up-recommendations";
 import {
   appStatusMeta,
   applicationDetailTitle,
@@ -37,7 +38,8 @@ import {
 import { buildResumeHTML } from "@/lib/resume/build-resume-html";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
+import type { FollowUpKind } from "@/lib/applications/follow-up-types";
 
 type ApplicationDetailViewProps = {
   application: Application;
@@ -47,6 +49,7 @@ type ApplicationDetailViewProps = {
     Application,
     "id" | "role" | "company" | "applied_at" | "status"
   >[];
+  isStudent?: boolean;
 };
 
 const DETAIL_TABS: { id: DetailTab; label: string; hint: string }[] = [
@@ -60,6 +63,7 @@ export function ApplicationDetailView({
   resumeVersions,
   savedCoverLetters,
   companyHistory,
+  isStudent = false,
 }: ApplicationDetailViewProps) {
   const router = useRouter();
   const [app, setApp] = useState(initial);
@@ -76,6 +80,10 @@ export function ApplicationDetailView({
   const [previewOpen, setPreviewOpen] = useState(false);
   const [mockMode, setMockMode] = useState(false);
   const [tab, setTab] = useState<DetailTab>("overview");
+
+  useEffect(() => {
+    setApp(initial);
+  }, [initial]);
 
   const statusMeta = appStatusMeta(app.status);
   const title = applicationDetailTitle(app);
@@ -99,6 +107,17 @@ export function ApplicationDetailView({
       ),
     [app.events]
   );
+
+  const followUpRecommendations = useMemo(
+    () => computeFollowUpRecommendations(app),
+    [app]
+  );
+
+  function handleFollowUpDismissed(recommendationId: FollowUpKind) {
+    patchLocal({
+      follow_up_dismissed: [...(app.follow_up_dismissed ?? []), recommendationId],
+    });
+  }
 
   function patchLocal(patch: Partial<Application>) {
     setApp((prev) => ({ ...prev, ...patch }));
@@ -520,6 +539,10 @@ export function ApplicationDetailView({
           handleFindContacts={handleFindContacts}
           startTransition={startTransition}
           router={router}
+          followUpRecommendations={followUpRecommendations}
+          showFollowUpLesson={isStudent}
+          onFollowUpEventAdded={() => undefined}
+          onFollowUpDismissed={handleFollowUpDismissed}
         />
       </div>
 

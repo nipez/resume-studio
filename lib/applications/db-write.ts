@@ -5,6 +5,8 @@ const OPTIONAL_APPLICATION_COLUMNS = [
   "interview_transcript",
   "interview_debrief",
   "archived_at",
+  "decision_by",
+  "follow_up_dismissed",
 ] as const;
 
 export function isMissingApplicationColumnError(

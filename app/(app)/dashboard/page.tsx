@@ -37,6 +37,7 @@ export default async function DashboardPage() {
         offers: insights.stats.offerCount,
       }}
       upcoming={insights.upcoming.slice(0, 3)}
+      suggestedFollowUps={insights.suggestedFollowUps.slice(0, 3)}
     />
   );
 }

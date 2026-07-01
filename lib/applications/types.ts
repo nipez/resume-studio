@@ -1,3 +1,4 @@
+import type { FollowUpKind } from "@/lib/applications/follow-up-types";
 import type { ResumeData, TemplateStyle } from "@/lib/types/resume";
 
 export type ApplicationStatus =
@@ -93,6 +94,8 @@ export type Application = {
   hiring_contacts: HiringContact[] | null;
   notes: string;
   application_type: ApplicationType | null;
+  decision_by: string | null;
+  follow_up_dismissed: FollowUpKind[];
   archived_at: string | null;
   created_at: string;
   events?: ApplicationEvent[];

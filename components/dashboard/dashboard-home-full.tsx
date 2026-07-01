@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SuggestedFollowUpsSection } from "@/components/applications/suggested-follow-ups-section";
 import {
   type DashboardHomeData,
   MODULES,
@@ -18,6 +19,7 @@ export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
     primaryVersionId,
     stats,
     upcoming,
+    suggestedFollowUps,
   } = data;
 
   const buildLink = buildHref(isStudent);
@@ -231,6 +233,7 @@ export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
             </section>
 
             <UpcomingSection upcoming={upcoming} />
+            <SuggestedFollowUpsSection items={suggestedFollowUps} compact />
           </div>
         </div>
 

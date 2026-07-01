@@ -8,6 +8,7 @@ import {
   SITE_NAME,
   STUDENT_COVER_LETTER_SCENARIOS,
   STUDENT_FAQ_ITEMS,
+  STUDENT_FOLLOW_UP_LESSON,
   STUDENT_HIGHLIGHTS,
   STUDENT_PERSONAS,
   STUDENT_RESUME_SECTIONS,
@@ -255,6 +256,26 @@ export function StudentsPage() {
                 <h3>{item.role}</h3>
                 <p className="students-cover-example">{item.example}</p>
                 <p>{item.tip}</p>
+              </div>
+            ))}
+          </Reveal>
+        </div>
+      </section>
+
+      <section className="why">
+        <div className="wrap">
+          <Reveal className="sec-head" style={{ maxWidth: 680 }}>
+            <span className="eyebrow" style={{ background: "var(--cream)" }}>
+              {STUDENT_FOLLOW_UP_LESSON.eyebrow}
+            </span>
+            <h2>{STUDENT_FOLLOW_UP_LESSON.title}</h2>
+            <p>{STUDENT_FOLLOW_UP_LESSON.intro}</p>
+          </Reveal>
+          <Reveal className="mgrid students-cover-grid">
+            {STUDENT_FOLLOW_UP_LESSON.steps.map((step) => (
+              <div key={step.title} className="mcard">
+                <h3>{step.title}</h3>
+                <p>{step.body}</p>
               </div>
             ))}
           </Reveal>

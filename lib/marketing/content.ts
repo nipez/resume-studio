@@ -461,6 +461,27 @@ export const STUDENT_TESTIMONIALS = [
   },
 ] as const;
 
+export const STUDENT_FOLLOW_UP_LESSON = {
+  eyebrow: "Professional habit",
+  title: "The follow-up most people skip",
+  intro:
+    "Most students apply and wait. A short thank-you or check-in shows you're serious — without being annoying. ResumeTrakr tracks when you applied and suggests when to reach out.",
+  steps: [
+    {
+      title: "After you apply",
+      body: "Wait about a week, then send one polite follow-up. Part-time and local jobs often move faster — we suggest ~5 business days for those.",
+    },
+    {
+      title: "After an interview",
+      body: "Send a thank-you within 24 hours. Reference something specific you discussed. Most candidates don't — it's an easy way to stand out.",
+    },
+    {
+      title: "One more nudge is fine",
+      body: "A second follow-up a week later is professional. Three total touches is enough — then move on and keep applying elsewhere.",
+    },
+  ],
+} as const;
+
 export const STUDENT_FAQ_ITEMS = [
   {
     question: "I've never had a job. Can I still make a resume?",

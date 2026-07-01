@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { SuggestedFollowUp } from "@/lib/applications/insights";
 import { appEventLabel, formatDay } from "@/lib/applications/utils";
 
 export type DashboardStat = { label: string; value: string };
@@ -24,6 +25,7 @@ export type DashboardHomeData = {
   primaryVersionId: string | null;
   stats: { respRate: number; interviewRate: number; offers: number };
   upcoming: DashboardUpcoming[];
+  suggestedFollowUps: SuggestedFollowUp[];
 };
 
 export const DASHBOARD_VIEW_STORAGE_KEY = "resumetrakr-dashboard-view";

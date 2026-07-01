@@ -2,9 +2,12 @@
 
 import { ApplicationAnswersEditor } from "@/components/applications/application-answers-editor";
 import { CoverLetterControls } from "@/components/applications/cover-letter-controls";
+import { FollowUpRecommendationsPanel } from "@/components/applications/follow-up-recommendations-panel";
 import { DetailSection } from "@/components/applications/detail-section";
 import { ReplaceResumeControls } from "@/components/applications/replace-resume-controls";
 import { Spinner } from "@/components/ui/spinner";
+import type { FollowUpRecommendation } from "@/lib/applications/follow-up-recommendations";
+import type { FollowUpKind } from "@/lib/applications/follow-up-types";
 import type { Application, ApplicationAnswer, ApplicationStatus } from "@/lib/applications/types";
 import {
   APPLICATION_STATUSES,
@@ -68,6 +71,10 @@ type ApplicationDetailPanelsProps = {
   handleFindContacts: () => void;
   startTransition: TransitionStartFunction;
   router: AppRouterInstance;
+  followUpRecommendations: FollowUpRecommendation[];
+  showFollowUpLesson?: boolean;
+  onFollowUpEventAdded?: (recommendationId: FollowUpKind) => void;
+  onFollowUpDismissed: (recommendationId: FollowUpKind) => void;
 };
 
 export function ApplicationDetailPanels({
@@ -106,6 +113,10 @@ export function ApplicationDetailPanels({
   handleFindContacts,
   startTransition,
   router,
+  followUpRecommendations,
+  showFollowUpLesson = false,
+  onFollowUpEventAdded,
+  onFollowUpDismissed,
 }: ApplicationDetailPanelsProps) {
   if (tab === "overview") {
     return (
@@ -172,6 +183,23 @@ export function ApplicationDetailPanels({
                 className="max-w-[220px] rounded-[9px] border border-[#DFE3E8] px-2.5 py-2 text-[13.5px] text-ink focus:border-accent"
               />
             </label>
+            <label className="flex flex-col gap-[5px] text-xs font-semibold text-muted sm:col-span-2">
+              Expected decision date{" "}
+              <span className="font-normal text-[#9AA3AF]">(optional)</span>
+              <input
+                type="date"
+                value={app.decision_by ?? ""}
+                onChange={(e) => {
+                  const value = e.target.value || null;
+                  patchLocal({ decision_by: value });
+                  startTransition(async () => {
+                    await updateApplicationMeta(app.id, { decision_by: value });
+                    router.refresh();
+                  });
+                }}
+                className="max-w-[220px] rounded-[9px] border border-[#DFE3E8] px-2.5 py-2 text-[13.5px] text-ink focus:border-accent"
+              />
+            </label>
           </div>
           <p className="mt-2 text-[11.5px] text-[#9AA3AF]">Saves automatically</p>
         </DetailSection>
@@ -211,6 +239,15 @@ export function ApplicationDetailPanels({
             </>
           }
         >
+          <FollowUpRecommendationsPanel
+            applicationId={app.id}
+            recommendations={followUpRecommendations}
+            showLesson={showFollowUpLesson}
+            startTransition={startTransition}
+            router={router}
+            onEventAdded={onFollowUpEventAdded}
+            onDismissed={onFollowUpDismissed}
+          />
           {sortedEvents && sortedEvents.length > 0 ? (
             <div className="flex flex-col gap-2">
               {sortedEvents.map((e) => {
