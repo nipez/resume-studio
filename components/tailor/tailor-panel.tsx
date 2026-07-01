@@ -19,6 +19,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { useJobDraft } from "@/lib/job-draft/use-job-draft";
 import { buildResumeHTML } from "@/lib/resume/build-resume-html";
 import { openPrintHtml } from "@/lib/resume/build-cover-html";
+import { parseJsonResponse } from "@/lib/api/parse-response";
 import { saveTailoredVersion } from "@/lib/resume/actions";
 import { saveJobDraft } from "@/lib/job-draft/actions";
 import { updateSavedJob } from "@/lib/saved-jobs/actions";
@@ -210,8 +211,14 @@ export function TailorPanel({
           contextNotes: draft.contextNotes,
         }),
       });
-      const j = await res.json();
+      const j = await parseJsonResponse<{
+        error?: string;
+        data?: ResumeData;
+        matchNotes?: string;
+        mock?: boolean;
+      }>(res);
       if (!res.ok) throw new Error(j.error || "Tailoring failed");
+      if (!j.data) throw new Error("Tailoring returned no resume data.");
 
       const notes =
         j.matchNotes ||

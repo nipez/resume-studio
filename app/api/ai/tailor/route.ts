@@ -8,9 +8,15 @@ import {
   tailorLightPrompt,
   tailorMetaPrompt,
 } from "@/lib/ai/prompts";
+import type { AICompletionOptions } from "@/lib/ai/mock";
 import type { ResumeData } from "@/lib/types/resume";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+/** Allow long deep-tailor runs (multiple AI batches). */
+export const maxDuration = 300;
 
 const bodySchema = z.object({
   jobRole: z.string(),
@@ -30,8 +36,62 @@ type TailorMeta = {
 
 type TailorRole = { i: number; blurb?: string; bullets?: string[] };
 
+const DEEP_ROLE_BATCH = 4;
+
 function norm(s: string) {
   return String(s || "").toLowerCase();
+}
+
+function applyTailorRoles(
+  exp: ResumeData["experience"],
+  roles: TailorRole[] | undefined
+) {
+  if (!roles?.length) return;
+  roles.forEach((r) => {
+    const i = Number(r?.i);
+    if (!isNaN(i) && exp[i]) {
+      if (typeof r.blurb === "string" && r.blurb.trim()) {
+        exp[i].blurb = r.blurb.trim();
+      }
+      if (Array.isArray(r.bullets) && r.bullets.length) {
+        exp[i].bullets = r.bullets;
+      }
+    }
+  });
+}
+
+async function tailorDeepRoleBatch(
+  auth: Exclude<Awaited<ReturnType<typeof requireAIUser>>, { error: string }>,
+  input: {
+    jobRole: string;
+    jobCompany: string;
+    jobDesc: string;
+    data: ResumeData;
+    contextNotes: string;
+    roles: {
+      index: number;
+      company: string;
+      title: string;
+      dates: string;
+      bullets: string[];
+    }[];
+  },
+  options: AICompletionOptions
+): Promise<TailorRole[]> {
+  const { userName, positioning } = auth;
+  const rp = tailorDeepRolesPrompt(
+    positioning,
+    userName,
+    input.jobRole,
+    input.jobCompany,
+    input.jobDesc,
+    input.data,
+    input.roles,
+    input.contextNotes
+  );
+  const { text } = await completeWithFallback(rp, options);
+  const part = extractJSON<{ roles?: TailorRole[] }>(text);
+  return part?.roles ?? [];
 }
 
 export async function POST(request: Request) {
@@ -89,45 +149,47 @@ export async function POST(request: Request) {
 
     if (depth === "deep") {
       const exp = tailored.experience;
-      const BATCH = 3;
-      for (let start = 0; start < exp.length; start += BATCH) {
-        const slice = exp.slice(start, start + BATCH);
-        const roles = slice.map((e, k) => ({
-          index: start + k,
-          company: e.company,
-          title: e.title,
-          dates: e.dates,
-          bullets: e.bullets,
-        }));
-        const rp = tailorDeepRolesPrompt(
-          positioning,
-          userName,
-          jobRole,
-          jobCompany,
-          jobDesc,
-          data,
-          roles,
-          contextNotes
-        );
-        const { text } = await completeWithFallback(
-          rp,
-          aiCallOptions(auth, "tailor_role_batch")
-        );
-        const part = extractJSON<{ roles?: TailorRole[] }>(text);
-        if (part?.roles) {
-          part.roles.forEach((r) => {
-            const i = Number(r?.i);
-            if (!isNaN(i) && exp[i]) {
-              if (typeof r.blurb === "string" && r.blurb.trim()) {
-                exp[i].blurb = r.blurb.trim();
-              }
-              if (Array.isArray(r.bullets) && r.bullets.length) {
-                exp[i].bullets = r.bullets;
-              }
-            }
-          });
-        }
+      const batchInputs: {
+        roles: {
+          index: number;
+          company: string;
+          title: string;
+          dates: string;
+          bullets: string[];
+        }[];
+      }[] = [];
+
+      for (let start = 0; start < exp.length; start += DEEP_ROLE_BATCH) {
+        const slice = exp.slice(start, start + DEEP_ROLE_BATCH);
+        batchInputs.push({
+          roles: slice.map((e, k) => ({
+            index: start + k,
+            company: e.company,
+            title: e.title,
+            dates: e.dates,
+            bullets: e.bullets,
+          })),
+        });
       }
+
+      const batchResults = await Promise.all(
+        batchInputs.map((batch) =>
+          tailorDeepRoleBatch(
+            auth,
+            {
+              jobRole,
+              jobCompany,
+              jobDesc,
+              data,
+              contextNotes,
+              roles: batch.roles,
+            },
+            aiCallOptions(auth, "tailor_role_batch")
+          )
+        )
+      );
+
+      batchResults.forEach((roles) => applyTailorRoles(exp, roles));
     } else {
       const lp = tailorLightPrompt(
         positioning,
