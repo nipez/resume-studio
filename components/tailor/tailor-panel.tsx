@@ -328,7 +328,7 @@ export function TailorPanel({
                   </p>
                 )}
                 {saveStatus === "saved" && resultId ? (
-                  <div className="mt-2.5 flex flex-wrap gap-3 text-[13px] font-semibold">
+                  <div className="mt-2.5 flex flex-wrap items-center gap-3 text-[13px] font-semibold">
                     <Link
                       href={`/editor/${resultId}`}
                       className="text-[#2456D6] hover:underline"
@@ -338,8 +338,25 @@ export function TailorPanel({
                     <Link href="/library" className="text-[#2456D6] hover:underline">
                       View in library
                     </Link>
+                    <button
+                      type="button"
+                      onClick={handleExport}
+                      className="cursor-pointer rounded-[8px] border border-[#B8E6C8] bg-white px-3 py-1.5 text-[12.5px] font-semibold text-[#1B5E36] hover:border-[#8FD4A8] hover:bg-[#F7FDF9]"
+                    >
+                      ↓ Export PDF
+                    </button>
                   </div>
-                ) : null}
+                ) : (
+                  <div className="mt-2.5">
+                    <button
+                      type="button"
+                      onClick={handleExport}
+                      className="cursor-pointer rounded-[8px] border border-[#B8E6C8] bg-white px-3 py-1.5 text-[12.5px] font-semibold text-[#1B5E36] hover:border-[#8FD4A8] hover:bg-[#F7FDF9]"
+                    >
+                      ↓ Export PDF
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
             <button
@@ -369,6 +386,19 @@ export function TailorPanel({
                 </button>
               </div>
             ) : null}
+
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="text-[12.5px] font-semibold text-[#5A6573]">
+                Tailored resume preview
+              </div>
+              <button
+                type="button"
+                onClick={handleExport}
+                className="inline-flex items-center gap-1.5 rounded-[10px] bg-accent px-4 py-2.5 text-[13px] font-semibold text-white shadow-[0_4px_12px_rgba(47,107,255,0.3)] transition-colors hover:bg-[#1E54E6]"
+              >
+                ↓ Export PDF
+              </button>
+            </div>
 
             <div className="h-[min(820px,calc(100vh-220px))] min-h-[480px] overflow-hidden rounded-2xl bg-[#EAECEF] p-4">
               <div className="h-full overflow-hidden rounded-[5px] bg-white shadow-[0_4px_20px_rgba(15,17,22,0.1)]">
@@ -400,13 +430,6 @@ export function TailorPanel({
                 ✦ Why this fits
               </div>
               <p className="text-[13.4px] leading-[1.6] text-[#C7CDD6]">{matchNotes}</p>
-              <button
-                type="button"
-                onClick={handleExport}
-                className="mt-4 rounded-[9px] bg-white/10 px-[15px] py-2 text-[13px] font-semibold text-white hover:bg-white/[0.18]"
-              >
-                ↓ Export PDF
-              </button>
             </div>
 
             {saveStatus === "saved" && resultId ? (
