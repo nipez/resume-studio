@@ -5,7 +5,7 @@ import { getUserProfileContext } from "@/lib/profile/actions";
 import { getLibraryData } from "@/lib/resume/actions";
 
 export default async function ApplicationsPage() {
-  const [{ applications, archivedApplications }, savedJobs, { defaultVersionId, versions }, profile] =
+  const [{ applications, archivedApplications, versionCounts }, savedJobs, { defaultVersionId, versions }, profile] =
     await Promise.all([
       getApplicationsList(),
       getSavedJobsList(),
@@ -20,6 +20,8 @@ export default async function ApplicationsPage() {
       applications={applications}
       archivedApplications={archivedApplications}
       savedJobs={savedJobs}
+      versions={versions}
+      versionCounts={versionCounts}
       defaultVersionId={defaultVersionId}
       defaultVersionName={defaultVersion?.name ?? null}
       defaultVersionRole={defaultVersion?.tailored_for?.role ?? ""}

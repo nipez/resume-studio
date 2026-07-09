@@ -1,9 +1,11 @@
 "use client";
 
+import { ApplyToNewJobButton } from "@/components/applications/apply-to-new-job-button";
 import { LogApplicationButton } from "@/components/applications/log-application-button";
 import { SaveJobButton } from "@/components/applications/save-job-button";
 import { SavedJobsSection } from "@/components/applications/saved-jobs-section";
 import type { Application, ApplicationStatus } from "@/lib/applications/types";
+import type { ResumeVersion } from "@/lib/resume/db-types";
 import type { SavedJob } from "@/lib/saved-jobs/types";
 import {
   archiveApplication,
@@ -31,6 +33,8 @@ type ApplicationsListProps = {
   applications: Application[];
   archivedApplications: Application[];
   savedJobs: SavedJob[];
+  versions: ResumeVersion[];
+  versionCounts: Record<string, number>;
   defaultVersionId: string | null;
   defaultVersionName?: string | null;
   defaultVersionRole?: string;
@@ -142,7 +146,7 @@ function ApplicationsTable({
         <div className="mt-1.5 text-[13px]">
           {archived
             ? "Archive old or rejected applications to keep your active list focused — snapshots are preserved."
-            : "Hit “Log application” and enter the role and company — we’ll snapshot the resume, cover letter, and Q&A you used."}
+            : "Hit “Apply to new job” to copy a resume and tailor it, or “Log application” if you already sent one."}
         </div>
       </div>
     );
@@ -255,6 +259,8 @@ export function ApplicationsList({
   applications,
   archivedApplications,
   savedJobs,
+  versions,
+  versionCounts,
   defaultVersionId,
   defaultVersionName,
   defaultVersionRole = "",
@@ -320,6 +326,14 @@ export function ApplicationsList({
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <SaveJobButton />
+            {versions.length > 0 ? (
+              <ApplyToNewJobButton
+                versions={versions}
+                versionCounts={versionCounts}
+                defaultVersionId={defaultVersionId}
+                isStudent={isStudent}
+              />
+            ) : null}
             {defaultVersionId ? (
               <LogApplicationButton
                 versionId={defaultVersionId}
@@ -327,11 +341,12 @@ export function ApplicationsList({
                 initialRole={defaultVersionRole}
                 initialCompany={defaultVersionCompany}
                 isStudent={isStudent}
+                className="inline-flex items-center gap-1.5 rounded-[11px] border border-[#D6E4FF] bg-white px-[17px] py-[11px] text-[13.5px] font-semibold text-[#2456D6] transition-colors hover:border-accent hover:bg-[#F5F8FF]"
               />
             ) : (
               <Link
                 href="/library"
-                className="inline-flex items-center gap-1.5 rounded-[11px] bg-accent px-[17px] py-[11px] text-[13.5px] font-semibold text-white shadow-[0_4px_14px_rgba(47,107,255,0.32)] transition-colors hover:bg-accent-dark"
+                className="inline-flex items-center gap-1.5 rounded-[11px] border border-[#D6E4FF] bg-[#F5F8FF] px-[17px] py-[11px] text-[13.5px] font-semibold text-[#2456D6] transition-colors hover:border-accent hover:bg-[#EAF1FF]"
               >
                 + Create a resume first
               </Link>
