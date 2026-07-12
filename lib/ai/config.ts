@@ -13,7 +13,8 @@ export type AIAction =
   | "resume_assist"
   | "parse_resume"
   | "apply_resume_context"
-  | "job_parse";
+  | "job_parse"
+  | "job_discovery";
 
 export type ModelTier = "fast" | "quality";
 

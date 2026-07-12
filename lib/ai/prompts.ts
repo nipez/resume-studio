@@ -514,3 +514,45 @@ export function hiringContactsPrompt(
     'Return ONLY valid minified JSON: {"contacts":[{"name":"...","title":"...","rationale":"...","confidence":"high"|"medium"|"low"}]}'
   );
 }
+
+export function jobDiscoveryPrompt(criteria: {
+  roleTitles: string;
+  location: string;
+  industry: string;
+  companySize: string;
+  keywords: string;
+  territoryNotes: string;
+  mustHave: string;
+  exclude: string;
+}): string {
+  return (
+    "You help job seekers plan a TARGETED JOB SEARCH — not scrape LinkedIn or Indeed.\n" +
+    "The user will research companies and roles themselves using your plan.\n\n" +
+    "SEARCH CRITERIA:\n" +
+    "Role titles: " +
+    (criteria.roleTitles.trim() || "(not specified)") +
+    "\nLocation / territory: " +
+    (criteria.location.trim() || "(not specified)") +
+    "\nIndustry / vertical: " +
+    (criteria.industry.trim() || "(not specified)") +
+    "\nCompany size: " +
+    (criteria.companySize.trim() || "(not specified)") +
+    "\nKeywords / solutions: " +
+    (criteria.keywords.trim() || "(not specified)") +
+    "\nTerritory / competitive notes: " +
+    (criteria.territoryNotes.trim() || "(not specified)") +
+    "\nMust have: " +
+    (criteria.mustHave.trim() || "(not specified)") +
+    "\nExclude: " +
+    (criteria.exclude.trim() || "(not specified)") +
+    "\n\n" +
+    "Produce a practical research plan:\n" +
+    "1. summary — 2-3 sentences on the search strategy\n" +
+    "2. linkedinQueries — 3-5 copy-paste Boolean search strings for LinkedIn (people + jobs). Do NOT claim you looked anyone up.\n" +
+    "3. searchTips — 3-5 actionable tips (career pages, HRMS patterns, industry lists, etc.)\n" +
+    "4. targets — 6-10 plausible company+role combinations that FIT the criteria. Use real company names when confident; otherwise describe archetypes clearly (e.g. 'Mid-market HRIS vendor — example: Rippling-class').\n" +
+    "   For each target include: company, role, rationale, researchSteps (2-4 bullets), linkedinSearch (one query string), careersHint (how to find their careers page), priority (high|medium|low).\n\n" +
+    "Do NOT invent job URLs, employee names, or claim live data. This is strategic planning only.\n\n" +
+    'Return ONLY valid minified JSON: {"summary":"...","linkedinQueries":["..."],"searchTips":["..."],"targets":[{"company":"...","role":"...","rationale":"...","researchSteps":["..."],"linkedinSearch":"...","careersHint":"...","priority":"high"|"medium"|"low"}]}'
+  );
+}

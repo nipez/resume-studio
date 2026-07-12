@@ -15,6 +15,7 @@ const PROFESSIONAL_NAV: NavGroup[] = [
   {
     label: "Prepare",
     items: [
+      { href: "/discover", label: "Job discovery", icon: "search" },
       { href: "/library", label: "Resume library", icon: "library" },
       { href: "/tailor?new=1", label: "Tailor to a job", icon: "target" },
       { href: "/cover", label: "Cover letter", icon: "mail" },
@@ -62,6 +63,7 @@ export function buildStudentNavGroups(hasResume: boolean): NavGroup[] {
     {
       label: "More",
       items: [
+        { href: "/discover", label: "Job discovery", icon: "search" },
         { href: "/build?mode=student", label: "Edit in builder", icon: "library" },
         { href: "/cover", label: "Cover letter", icon: "mail" },
         { href: "/questions", label: "Application Q&A", icon: "chat" },
@@ -107,6 +109,9 @@ export function isNavItemActive(pathname: string, href: string): boolean {
   }
   if (path === "/questions") {
     return pathname === "/questions" || pathname.startsWith("/questions/");
+  }
+  if (path === "/discover") {
+    return pathname === "/discover" || pathname.startsWith("/discover/");
   }
   return pathname === path || pathname.startsWith(`${path}/`);
 }

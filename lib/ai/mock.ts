@@ -314,6 +314,54 @@ export function mockComplete(prompt: string): string {
     );
   }
 
+  if (prompt.includes("TARGETED JOB SEARCH")) {
+    return JSON.stringify({
+      summary:
+        "Demo discovery plan — configure ANTHROPIC_API_KEY for tailored company targets. Start with career pages and LinkedIn searches to validate open roles and territory coverage.",
+      linkedinQueries: [
+        '("Account Executive" OR "Regional Sales Manager") AND "Western Canada"',
+        '("HRIS" OR "HCM") AND ("hiring" OR "open roles") AND Canada',
+        'company employees ("Account Executive") AND ("Calgary" OR "Vancouver" OR "Edmonton")',
+      ],
+      searchTips: [
+        "Check each target's careers page for AE or territory sales titles before saving to your queue.",
+        "Search LinkedIn for existing reps in the region — gaps suggest greenfield territory.",
+        "Look for recent funding or expansion news as a signal of open headcount.",
+      ],
+      targets: [
+        {
+          company: "Demo SaaS Co",
+          role: "Account Executive — Western Canada",
+          rationale:
+            "Mid-market B2B SaaS with Canadian expansion; demo placeholder for territory AE search.",
+          researchSteps: [
+            "Search careers page for Western Canada or remote-CAN AE roles",
+            "Check LinkedIn for current AE headcount in BC/AB",
+            "Note product fit against your target vertical",
+          ],
+          linkedinSearch:
+            '"Demo SaaS Co" ("Account Executive" OR "Sales") ("Calgary" OR "Vancouver")',
+          careersHint: "demo-saas.com/careers or Greenhouse board",
+          priority: "high",
+        },
+        {
+          company: "Example HR platform",
+          role: "Enterprise AE",
+          rationale: "HRIS vendors often hire regional AEs when opening new territories.",
+          researchSteps: [
+            "Find open AE postings on their ATS",
+            "Map existing reps on LinkedIn in Western Canada",
+            "Save the JD when you find a live posting",
+          ],
+          linkedinSearch:
+            '"Example HR platform" "Account Executive" Canada',
+          careersHint: "Search company name + careers on Google",
+          priority: "medium",
+        },
+      ],
+    });
+  }
+
   return "Demo AI response — configure ANTHROPIC_API_KEY for real generation.";
 }
 

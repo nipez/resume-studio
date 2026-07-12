@@ -81,6 +81,15 @@ export function HomeIcon(props: IconProps) {
   );
 }
 
+export function SearchIcon(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <circle cx="11" cy="11" r="7" />
+      <path d="M20 20l-4-4" />
+    </svg>
+  );
+}
+
 export type NavIconName =
   | "home"
   | "library"
@@ -88,7 +97,8 @@ export type NavIconName =
   | "mail"
   | "chat"
   | "briefcase"
-  | "chart";
+  | "chart"
+  | "search";
 
 export function NavIcon({
   name,
@@ -109,5 +119,7 @@ export function NavIcon({
       return <BriefcaseIcon {...props} />;
     case "chart":
       return <ChartIcon {...props} />;
+    case "search":
+      return <SearchIcon {...props} />;
   }
 }

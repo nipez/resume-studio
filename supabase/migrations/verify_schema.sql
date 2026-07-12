@@ -12,6 +12,7 @@ with checks as (
   union all select 'table: cover_letters', to_regclass('public.cover_letters') is not null
   union all select 'table: workspace_drafts', to_regclass('public.workspace_drafts') is not null
   union all select 'table: saved_jobs', to_regclass('public.saved_jobs') is not null
+  union all select 'table: job_search_profiles', to_regclass('public.job_search_profiles') is not null
   union all select 'table: demo_users', to_regclass('public.demo_users') is not null
 
   union all select 'table: support_tickets', to_regclass('public.support_tickets') is not null
@@ -70,6 +71,7 @@ order by ok asc, check_name asc;
 --   resume_versions.archived_at    → 0009_resume_archive.sql
 --   applications.archived_at       → 0015_application_archive.sql
 --   table: saved_jobs              → 0010_saved_jobs.sql
+--   table: job_search_profiles     → 0018_job_discovery.sql
 --   profiles.plan_tier             → 0011_ai_usage.sql
 --   profiles.persona             → 0012_student_persona.sql
 --   table: ai_usage_*              → 0011_ai_usage.sql

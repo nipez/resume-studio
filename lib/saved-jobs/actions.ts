@@ -85,6 +85,7 @@ export async function createSavedJob(
   if (error || !data) throw new Error(error?.message ?? "Failed to save job");
 
   revalidatePath("/applications");
+  revalidatePath("/discover");
   return mapSavedJob(data);
 }
 
@@ -116,6 +117,7 @@ export async function updateSavedJob(
   if (error || !data) throw new Error(error?.message ?? "Failed to update job");
 
   revalidatePath("/applications");
+  revalidatePath("/discover");
   return mapSavedJob(data);
 }
 
@@ -128,6 +130,7 @@ export async function deleteSavedJob(id: string): Promise<void> {
     .eq("user_id", userId);
   if (error) throw new Error(error.message);
   revalidatePath("/applications");
+  revalidatePath("/discover");
 }
 
 function savedJobToDraft(job: SavedJob): JobDraft {

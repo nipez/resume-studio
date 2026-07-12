@@ -51,6 +51,7 @@ const PRO_AI_ACTIONS = [
   "parse_resume",
   "apply_resume_context",
   "job_parse",
+  "job_discovery",
 ];
 
 const WORKSPACE_CORE = [
