@@ -194,6 +194,38 @@ export function applicationListHeading(app: Application): {
   return { primary: "Untitled application", secondary: null };
 }
 
+/** Client-side filter for the applications list search box. */
+export function filterApplicationsBySearch(
+  applications: Application[],
+  query: string
+): Application[] {
+  const q = query.trim().toLowerCase();
+  if (!q) return applications;
+
+  return applications.filter((app) => {
+    const statusLabel =
+      APPLICATION_STATUSES.find((s) => s.id === app.status)?.label ?? app.status;
+    const typeLabel = applicationTypeLabel(app.application_type) ?? "";
+    const haystack = [
+      app.role,
+      app.company,
+      app.job_desc,
+      app.job_url,
+      app.resume_version_name,
+      app.notes,
+      statusLabel,
+      typeLabel,
+      app.resume_snapshot?.name,
+      ...applicationTags(app),
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+
+    return haystack.includes(q);
+  });
+}
+
 export function applicationDetailTitle(app: Application): string {
   const role = app.role?.trim() ?? "";
   const company = app.company?.trim() ?? "";

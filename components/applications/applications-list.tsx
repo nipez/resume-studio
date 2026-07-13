@@ -20,6 +20,7 @@ import {
   applicationListHeading,
   applicationTags,
   computeApplicationStats,
+  filterApplicationsBySearch,
   formatAppDate,
   formatDay,
   nextOpenEvent,
@@ -29,7 +30,7 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Toast } from "@/components/ui/toast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 
 type ApplicationsListProps = {
   applications: Application[];
@@ -142,6 +143,7 @@ function ApplicationsTable({
   onDelete,
   onStatusResult,
   emptyActions,
+  searchQuery = "",
 }: {
   applications: Application[];
   archived: boolean;
@@ -151,22 +153,30 @@ function ApplicationsTable({
   onDelete: (id: string) => void;
   onStatusResult?: (message: string, isError: boolean) => void;
   emptyActions?: React.ReactNode;
+  searchQuery?: string;
 }) {
   if (applications.length === 0) {
+    const searching = searchQuery.trim().length > 0;
     return (
       <div className="rounded-2xl border border-dashed border-[#D2D7DE] bg-[#FBFBFC] px-7 py-12 text-center text-[#8A92A0]">
-        <div className="mb-2.5 text-[32px] opacity-55">{archived ? "📦" : "✓"}</div>
+        <div className="mb-2.5 text-[32px] opacity-55">
+          {searching ? "🔍" : archived ? "📦" : "✓"}
+        </div>
         <div className="font-display text-[15px] font-semibold text-muted">
-          {archived
-            ? "No archived applications"
-            : "No applications tracked yet"}
+          {searching
+            ? "No applications match your search"
+            : archived
+              ? "No archived applications"
+              : "No applications tracked yet"}
         </div>
         <div className="mt-1.5 text-[13px]">
-          {archived
-            ? "Archive old or rejected applications to keep your active list focused — snapshots are preserved."
-            : "Hit “Apply to new job” to copy a resume and tailor it, or “Log application” if you already sent one."}
+          {searching
+            ? `Nothing matched “${searchQuery.trim()}” in ${archived ? "archived" : "active"} applications. Try role, company, or resume name.`
+            : archived
+              ? "Archive old or rejected applications to keep your active list focused — snapshots are preserved."
+              : "Hit “Apply to new job” to copy a resume and tailor it, or “Log application” if you already sent one."}
         </div>
-        {!archived && emptyActions ? (
+        {!archived && !searching && emptyActions ? (
           <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
             {emptyActions}
           </div>
@@ -300,9 +310,15 @@ export function ApplicationsList({
     { kind: "archive" | "delete"; id: string } | null
   >(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const stats = computeApplicationStats(applications);
-  const visibleApplications =
+  const tabApplications =
     tab === "active" ? applications : archivedApplications;
+  const visibleApplications = useMemo(
+    () => filterApplicationsBySearch(tabApplications, searchQuery),
+    [tabApplications, searchQuery]
+  );
+  const isSearching = searchQuery.trim().length > 0;
 
   function handleStatusResult(message: string, isError: boolean) {
     setToast(isError ? `⚠ ${message}` : message);
@@ -397,42 +413,86 @@ export function ApplicationsList({
           </h2>
         </div>
 
-        <div className="mb-4 flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setTab("active")}
-            className={`cursor-pointer rounded-[10px] border px-3.5 py-2 text-[13px] font-semibold transition-colors ${
-              tab === "active"
-                ? "border-accent/30 bg-white text-accent shadow-[0_2px_10px_rgba(36,86,214,0.08)]"
-                : "border-transparent bg-[#ECEEF1]/70 text-[#5A6573] hover:border-[#E2E5EA] hover:bg-white"
-            }`}
-          >
-            Active
-            {applications.length > 0 ? (
-              <span className="ml-1.5 text-[12px] font-bold opacity-80">
-                {applications.length}
-              </span>
-            ) : null}
-          </button>
-          <button
-            type="button"
-            onClick={() => setTab("archived")}
-            className={`cursor-pointer rounded-[10px] border px-3.5 py-2 text-[13px] font-semibold transition-colors ${
-              tab === "archived"
-                ? "border-accent/30 bg-white text-accent shadow-[0_2px_10px_rgba(36,86,214,0.08)]"
-                : "border-transparent bg-[#ECEEF1]/70 text-[#5A6573] hover:border-[#E2E5EA] hover:bg-white"
-            }`}
-          >
-            Archived
-            {archivedApplications.length > 0 ? (
-              <span className="ml-1.5 text-[12px] font-bold opacity-80">
-                {archivedApplications.length}
-              </span>
-            ) : null}
-          </button>
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setTab("active")}
+              className={`cursor-pointer rounded-[10px] border px-3.5 py-2 text-[13px] font-semibold transition-colors ${
+                tab === "active"
+                  ? "border-accent/30 bg-white text-accent shadow-[0_2px_10px_rgba(36,86,214,0.08)]"
+                  : "border-transparent bg-[#ECEEF1]/70 text-[#5A6573] hover:border-[#E2E5EA] hover:bg-white"
+              }`}
+            >
+              Active
+              {applications.length > 0 ? (
+                <span className="ml-1.5 text-[12px] font-bold opacity-80">
+                  {applications.length}
+                </span>
+              ) : null}
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab("archived")}
+              className={`cursor-pointer rounded-[10px] border px-3.5 py-2 text-[13px] font-semibold transition-colors ${
+                tab === "archived"
+                  ? "border-accent/30 bg-white text-accent shadow-[0_2px_10px_rgba(36,86,214,0.08)]"
+                  : "border-transparent bg-[#ECEEF1]/70 text-[#5A6573] hover:border-[#E2E5EA] hover:bg-white"
+              }`}
+            >
+              Archived
+              {archivedApplications.length > 0 ? (
+                <span className="ml-1.5 text-[12px] font-bold opacity-80">
+                  {archivedApplications.length}
+                </span>
+              ) : null}
+            </button>
+          </div>
+          {(tabApplications.length > 0 || isSearching) ? (
+            <div className="relative min-w-[220px] flex-1 sm:max-w-[320px]">
+              <input
+                type="search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search role, company, resume…"
+                aria-label="Search applications"
+                className="w-full rounded-[10px] border border-[#DFE3E8] bg-white py-2 pl-9 pr-8 text-[13px] text-ink placeholder:text-[#9AA3AF] focus:border-accent focus:outline-none"
+              />
+              <svg
+                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9AA3AF]"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                aria-hidden
+              >
+                <circle cx="11" cy="11" r="7" />
+                <path d="M20 20l-3.5-3.5" />
+              </svg>
+              {isSearching ? (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  aria-label="Clear search"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer rounded-md px-1.5 py-0.5 text-[12px] font-semibold text-[#8A92A0] hover:bg-[#F2F3F5] hover:text-ink"
+                >
+                  ✕
+                </button>
+              ) : null}
+            </div>
+          ) : null}
         </div>
 
-        {tab === "active" ? (
+        {isSearching ? (
+          <p className="mb-4 text-[12.5px] text-muted">
+            {visibleApplications.length === 0
+              ? `No matches in ${tab === "archived" ? "archived" : "active"} applications`
+              : `${visibleApplications.length} of ${tabApplications.length} ${tab === "archived" ? "archived" : "active"} application${visibleApplications.length === 1 ? "" : "s"}`}
+          </p>
+        ) : null}
+
+        {tab === "active" && !isSearching ? (
           <div className="mb-6 flex flex-wrap gap-3">
             <StatCard label="Total" value={String(stats.total)} />
             <StatCard
@@ -462,6 +522,7 @@ export function ApplicationsList({
           applications={visibleApplications}
           archived={tab === "archived"}
           pending={pending}
+          searchQuery={searchQuery}
           onArchive={(id) => setConfirmAction({ kind: "archive", id })}
           onRestore={handleRestore}
           onDelete={(id) => setConfirmAction({ kind: "delete", id })}
