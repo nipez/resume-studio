@@ -88,7 +88,7 @@ export function TailorPanel({
   );
   const [resultTemplate, setResultTemplate] = useState<
     "classic" | "twocol" | "editorial"
-  >(initialResultVersion?.template_style ?? "twocol");
+  >(initialResultVersion?.template_style ?? "classic");
   const [pendingSave, setPendingSave] = useState<{
     data: ResumeData;
     template: "classic" | "twocol" | "editorial";
@@ -227,12 +227,14 @@ export function TailorPanel({
       setMatchNotes(notes);
 
       try {
-        await persistTailoredVersion(j.data, base.template_style, notes);
+        // Result renders in the ATS-friendly Classic template regardless of
+        // the base version's layout — switchable later in the editor.
+        await persistTailoredVersion(j.data, "classic", notes);
       } catch (saveErr) {
         setResultData(j.data);
-        setResultTemplate(base.template_style);
+        setResultTemplate("classic");
         setPhase("result");
-        setPendingSave({ data: j.data, template: base.template_style, notes });
+        setPendingSave({ data: j.data, template: "classic", notes });
         setSaveStatus("error");
         setError(
           saveErr instanceof Error
@@ -388,8 +390,15 @@ export function TailorPanel({
             ) : null}
 
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="text-[12.5px] font-semibold text-[#5A6573]">
-                Tailored resume preview
+              <div>
+                <div className="text-[12.5px] font-semibold text-[#5A6573]">
+                  Tailored resume preview
+                </div>
+                {resultTemplate === "classic" ? (
+                  <div className="mt-0.5 text-[11.5px] text-[#8A92A0]">
+                    ATS-friendly Classic layout — switch templates in the editor.
+                  </div>
+                ) : null}
               </div>
               <button
                 type="button"

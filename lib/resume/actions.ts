@@ -390,7 +390,9 @@ export async function saveTailoredVersion(input: {
     .insert({
       user_id: userId,
       name,
-      template_style: base.template_style,
+      // Tailored output defaults to the ATS-friendly Classic template —
+      // recruiters' parsers read it reliably; users can switch in the editor.
+      template_style: "classic",
       tailored_for: {
         role: input.jobRole,
         company: input.jobCompany,
