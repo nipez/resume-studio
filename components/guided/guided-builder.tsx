@@ -2,6 +2,7 @@
 
 import { ScaledResumePreview } from "@/components/resume/resume-preview";
 import { ResumeContextNotesField } from "@/components/shared/resume-context-notes-field";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
   discardGuidedDraft,
   finishGuidedDraft,
@@ -100,6 +101,7 @@ export function GuidedBuilder({
   );
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved">("idle");
   const [creating, setCreating] = useState(false);
+  const [discardOpen, setDiscardOpen] = useState(false);
 
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const latest = useRef({ step, templateStyle, makeDefault, contextNotes, data });
@@ -214,8 +216,12 @@ export function GuidedBuilder({
     }
   }
 
-  async function handleDiscard() {
-    if (!confirm("Discard this guided draft? Your progress will be lost.")) return;
+  function handleDiscard() {
+    setDiscardOpen(true);
+  }
+
+  async function handleDiscardConfirmed() {
+    setDiscardOpen(false);
     await discardGuidedDraft();
     router.push("/library");
   }
@@ -758,6 +764,16 @@ export function GuidedBuilder({
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={discardOpen}
+        title="Discard this guided draft?"
+        description="Your progress in the builder will be lost. Resumes already in your library are not affected."
+        confirmLabel="Discard draft"
+        danger
+        onConfirm={handleDiscardConfirmed}
+        onCancel={() => setDiscardOpen(false)}
+      />
     </div>
   );
 }

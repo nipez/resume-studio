@@ -10,11 +10,15 @@ import {
   supportStatusTone,
 } from "@/lib/support/constants";
 import type { AdminSupportTicket } from "@/lib/support/types";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { Toast } from "@/components/ui/toast";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 
 type AdminSupportTabProps = {
   tickets: AdminSupportTicket[];
+  /** Start view-as for the ticket's user (from the parent admin panel). */
+  onViewAsUser?: (userId: string) => void;
 };
 
 function formatWhen(iso: string) {
@@ -30,18 +34,35 @@ function formatWhen(iso: string) {
   }
 }
 
-export function AdminSupportTab({ tickets }: AdminSupportTabProps) {
+export function AdminSupportTab({ tickets, onViewAsUser }: AdminSupportTabProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [filter, setFilter] = useState<"open" | "all">("open");
+  const [filter, setFilter] = useState<"open" | "replied" | "all">("open");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [reply, setReply] = useState("");
   const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
+  const [toast, setToast] = useState<string | null>(null);
+  const [closeTicketId, setCloseTicketId] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
-    if (filter === "all") return tickets;
-    return tickets.filter((t) => t.status === "open");
-  }, [tickets, filter]);
+    let rows = tickets;
+    if (filter === "open") {
+      rows = rows.filter((t) => t.status === "open");
+    } else if (filter === "replied") {
+      rows = rows.filter((t) => t.status === "replied");
+    }
+    const q = search.trim().toLowerCase();
+    if (q) {
+      rows = rows.filter(
+        (t) =>
+          t.userEmail.toLowerCase().includes(q) ||
+          (t.userName?.toLowerCase().includes(q) ?? false) ||
+          t.message.toLowerCase().includes(q)
+      );
+    }
+    return rows;
+  }, [tickets, filter, search]);
 
   const selected =
     filtered.find((t) => t.id === selectedId) ??
@@ -55,6 +76,7 @@ export function AdminSupportTab({ tickets }: AdminSupportTabProps) {
       try {
         await replyToSupportTicket(selected.id, reply);
         setReply("");
+        setToast("Reply sent — user sees it in Messages");
         router.refresh();
       } catch (e) {
         setError(e instanceof Error ? e.message : "Failed to send reply");
@@ -62,13 +84,17 @@ export function AdminSupportTab({ tickets }: AdminSupportTabProps) {
     });
   }
 
-  function handleClose(ticketId: string) {
-    if (!confirm("Close this ticket?")) return;
+  function handleCloseConfirmed() {
+    const ticketId = closeTicketId;
+    if (!ticketId) return;
     startTransition(async () => {
       try {
         await closeSupportTicket(ticketId);
+        setCloseTicketId(null);
+        setToast("Ticket closed");
         router.refresh();
       } catch (e) {
+        setCloseTicketId(null);
         setError(e instanceof Error ? e.message : "Failed to close ticket");
       }
     });
@@ -85,9 +111,21 @@ export function AdminSupportTab({ tickets }: AdminSupportTabProps) {
             Reply to student and user help requests — they&apos;ll see it in Messages.
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search email, name, or message…"
+            className="min-w-[200px] rounded-[10px] border border-[#DFE3E8] px-3 py-1.5 text-[12.5px] focus:border-accent focus:outline-none"
+          />
           <FilterChip active={filter === "open"} onClick={() => setFilter("open")}>
-            Open ({tickets.filter((t) => t.status === "open").length})
+            Needs reply ({tickets.filter((t) => t.status === "open").length})
+          </FilterChip>
+          <FilterChip
+            active={filter === "replied"}
+            onClick={() => setFilter("replied")}
+          >
+            Waiting on user ({tickets.filter((t) => t.status === "replied").length})
           </FilterChip>
           <FilterChip active={filter === "all"} onClick={() => setFilter("all")}>
             All ({tickets.length})
@@ -103,7 +141,13 @@ export function AdminSupportTab({ tickets }: AdminSupportTabProps) {
 
       {filtered.length === 0 ? (
         <div className="px-6 py-12 text-center text-[13.5px] text-muted">
-          No {filter === "open" ? "open " : ""}support tickets yet.
+          {search.trim()
+            ? "No tickets match your search."
+            : filter === "open"
+              ? "No tickets need a reply — you're caught up."
+              : filter === "replied"
+                ? "No tickets waiting on a user response."
+                : "No support tickets yet."}
         </div>
       ) : (
         <div className="grid lg:grid-cols-[300px_1fr]">
@@ -161,16 +205,29 @@ export function AdminSupportTab({ tickets }: AdminSupportTabProps) {
                       {formatWhen(selected.created_at)}
                     </p>
                   </div>
-                  {selected.status !== "closed" ? (
-                    <button
-                      type="button"
-                      disabled={pending}
-                      onClick={() => handleClose(selected.id)}
-                      className="cursor-pointer rounded-lg border border-[#E0E3E8] bg-white px-3 py-1.5 text-[12px] font-semibold text-[#5A6573] hover:border-[#C8CED6] disabled:opacity-60"
-                    >
-                      Close ticket
-                    </button>
-                  ) : null}
+                  <div className="flex flex-wrap gap-2">
+                    {onViewAsUser ? (
+                      <button
+                        type="button"
+                        disabled={pending}
+                        onClick={() => onViewAsUser(selected.user_id)}
+                        title="Open the product as this user to reproduce their issue"
+                        className="cursor-pointer rounded-lg bg-sidebar px-3 py-1.5 text-[12px] font-semibold text-white transition-colors hover:bg-[#272b33] disabled:opacity-60"
+                      >
+                        View as user
+                      </button>
+                    ) : null}
+                    {selected.status !== "closed" ? (
+                      <button
+                        type="button"
+                        disabled={pending}
+                        onClick={() => setCloseTicketId(selected.id)}
+                        className="cursor-pointer rounded-lg border border-[#E0E3E8] bg-white px-3 py-1.5 text-[12px] font-semibold text-[#5A6573] hover:border-[#C8CED6] disabled:opacity-60"
+                      >
+                        Close ticket
+                      </button>
+                    ) : null}
+                  </div>
                 </div>
 
                 <div className="mb-5 max-h-[280px] space-y-3 overflow-auto">
@@ -232,6 +289,17 @@ export function AdminSupportTab({ tickets }: AdminSupportTabProps) {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={closeTicketId !== null}
+        title="Close this ticket?"
+        description="The user can still see the conversation in Messages, but the thread is marked resolved."
+        confirmLabel="Close ticket"
+        pending={pending}
+        onConfirm={handleCloseConfirmed}
+        onCancel={() => setCloseTicketId(null)}
+      />
+      {toast ? <Toast message={toast} onDone={() => setToast(null)} /> : null}
     </div>
   );
 }

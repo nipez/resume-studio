@@ -1,6 +1,7 @@
 "use client";
 
 import { Spinner } from "@/components/ui/spinner";
+import { useEscapeKey } from "@/components/ui/confirm-dialog";
 import { clearWorkspaceJobDraft } from "@/lib/job-draft/actions";
 import { clearJobDraftLocal } from "@/lib/job-draft/storage";
 import { createResumeVersion } from "@/lib/resume/actions";
@@ -31,6 +32,8 @@ export function ApplyToNewJobModal({
   const [pending, startTransition] = useTransition();
   const [selectedId, setSelectedId] = useState<string>("");
   const [error, setError] = useState("");
+
+  useEscapeKey(open && !pending, onClose);
 
   const sortedVersions = useMemo(() => {
     return [...versions].sort((a, b) => {
@@ -85,6 +88,8 @@ export function ApplyToNewJobModal({
       onClick={handleClose}
     >
       <div
+        role="dialog"
+        aria-modal="true"
         className="max-h-[90vh] w-[620px] max-w-full animate-[fadeUp_0.25s_ease_both] overflow-auto rounded-[18px] bg-white p-7 shadow-[0_24px_70px_rgba(0,0,0,0.4)]"
         onClick={(e) => e.stopPropagation()}
       >

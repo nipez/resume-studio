@@ -10,6 +10,8 @@ import { JobDescParseButton } from "@/components/shared/job-desc-parse-button";
 import { JobUrlImport } from "@/components/shared/job-url-import";
 import { ResumeContextNotesField } from "@/components/shared/resume-context-notes-field";
 import { Spinner } from "@/components/ui/spinner";
+import { Toast } from "@/components/ui/toast";
+import { useEscapeKey } from "@/components/ui/confirm-dialog";
 import { createSavedJob, updateSavedJob } from "@/lib/saved-jobs/actions";
 import type { SavedJob } from "@/lib/saved-jobs/types";
 import { useRouter } from "next/navigation";
@@ -41,7 +43,10 @@ export function SaveJobModal({ open, onClose, job = null }: SaveJobModalProps) {
   const [contextNotes, setContextNotes] = useState("");
   const [notes, setNotes] = useState("");
   const [error, setError] = useState("");
+  const [toast, setToast] = useState<string | null>(null);
   const isEdit = Boolean(job);
+
+  useEscapeKey(open && !pending, onClose);
 
   useEffect(() => {
     if (!open) return;
@@ -63,7 +68,9 @@ export function SaveJobModal({ open, onClose, job = null }: SaveJobModalProps) {
     }
   }, [open, job]);
 
-  if (!open) return null;
+  if (!open) {
+    return toast ? <Toast message={toast} onDone={() => setToast(null)} /> : null;
+  }
 
   function handleClose() {
     if (pending) return;
@@ -93,6 +100,7 @@ export function SaveJobModal({ open, onClose, job = null }: SaveJobModalProps) {
             notes,
           });
         }
+        setToast(job ? "Saved job updated" : "Job saved to your queue");
         onClose();
         router.refresh();
       } catch (e) {
@@ -107,12 +115,28 @@ export function SaveJobModal({ open, onClose, job = null }: SaveJobModalProps) {
       onClick={handleClose}
     >
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="save-job-modal-title"
         className="max-h-[90vh] w-full max-w-[520px] overflow-auto rounded-2xl border border-[#E6E8EC] bg-white p-6 shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="font-display text-[20px] font-semibold text-ink">
-          {isEdit ? "Edit saved job" : "Save job to apply to"}
-        </h2>
+        <div className="flex items-start justify-between gap-4">
+          <h2
+            id="save-job-modal-title"
+            className="font-display text-[20px] font-semibold text-ink"
+          >
+            {isEdit ? "Edit saved job" : "Save job to apply to"}
+          </h2>
+          <button
+            type="button"
+            onClick={handleClose}
+            aria-label="Close"
+            className="flex h-[32px] w-[32px] flex-none cursor-pointer items-center justify-center rounded-[9px] bg-[#F2F3F5] text-[15px] text-[#5a6573] hover:bg-[#E6E8EC]"
+          >
+            ✕
+          </button>
+        </div>
         <p className="mt-1.5 text-[13px] leading-relaxed text-muted">
           {isEdit
             ? "Update the posting link, description, or notes — your tailor progress is kept."

@@ -10,7 +10,7 @@ import { SITE_NAME } from "@/lib/marketing/content";
 import { buildNavGroups, isNavItemActive } from "@/lib/shell/nav-config";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const EXIT_VIEW_AS_HREF = "/api/admin/exit-view-as";
 
@@ -84,14 +84,40 @@ export function AppShell({
   supportUnreadCount = 0,
 }: AppShellProps) {
   const pathname = usePathname();
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const navGroups = useMemo(
     () => buildNavGroups({ isStudent, hasResume }),
     [isStudent, hasResume]
   );
 
+  // Close the drawer whenever navigation happens.
+  useEffect(() => {
+    setMobileNavOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!mobileNavOpen) return;
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") setMobileNavOpen(false);
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [mobileNavOpen]);
+
   return (
     <div className="appshell flex h-screen w-screen overflow-hidden bg-page text-ink">
-      <aside className="flex w-[248px] flex-none flex-col border-r border-white/[0.06] bg-sidebar px-3 py-4 text-sidebar-muted">
+      {mobileNavOpen ? (
+        <div
+          className="fixed inset-0 z-[340] bg-black/50 md:hidden"
+          aria-hidden
+          onClick={() => setMobileNavOpen(false)}
+        />
+      ) : null}
+      <aside
+        className={`${
+          mobileNavOpen ? "translate-x-0" : "-translate-x-full"
+        } fixed inset-y-0 left-0 z-[350] flex w-[248px] flex-none flex-col border-r border-white/[0.06] bg-sidebar px-3 py-4 text-sidebar-muted transition-transform duration-200 md:static md:translate-x-0 md:transition-none`}
+      >
         <div className="flex items-center gap-2.5 px-2 pb-4">
           <Logo
             size={34}
@@ -189,17 +215,37 @@ export function AppShell({
         {impersonatingLabel ? (
           <ImpersonationBanner label={impersonatingLabel} />
         ) : null}
-        <div className="flex flex-none items-center justify-end gap-3 border-b border-[#ECEEF1] bg-white px-4 py-2.5 sm:px-6">
-          {impersonatingLabel ? (
-            <a
-              href={EXIT_VIEW_AS_HREF}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#FFB86A]/45 bg-[#FFF8F0] px-3 py-1.5 text-[12.5px] font-bold text-[#231a2e] transition-colors hover:bg-[#FFE8CC]"
+        <div className="flex flex-none items-center justify-between gap-3 border-b border-[#ECEEF1] bg-white px-4 py-2.5 sm:px-6 md:justify-end">
+          <button
+            type="button"
+            onClick={() => setMobileNavOpen(true)}
+            aria-label="Open navigation menu"
+            className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-[9px] border border-[#E2E5EA] bg-white text-ink hover:bg-[#F4F5F7] md:hidden"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
             >
-              <span aria-hidden>←</span>
-              Super admin
-            </a>
-          ) : null}
-          <SupportInboxButton unreadCount={supportUnreadCount} />
+              <path d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <div className="flex items-center gap-3">
+            {impersonatingLabel ? (
+              <a
+                href={EXIT_VIEW_AS_HREF}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-[#FFB86A]/45 bg-[#FFF8F0] px-3 py-1.5 text-[12.5px] font-bold text-[#231a2e] transition-colors hover:bg-[#FFE8CC]"
+              >
+                <span aria-hidden>←</span>
+                Super admin
+              </a>
+            ) : null}
+            <SupportInboxButton unreadCount={supportUnreadCount} />
+          </div>
         </div>
         <div className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           {children}

@@ -442,7 +442,7 @@ export function TailorPanel({
                   Job details carry over and this tailored resume is already saved.
                 </p>
                 <Link
-                  href={`/cover?v=${resultId}`}
+                  href={`/cover?v=${resultId}${savedJobId ? `&job=${savedJobId}` : ""}`}
                   className="mt-3 inline-flex w-full justify-center rounded-[9px] bg-accent px-4 py-2.5 text-[13px] font-semibold text-white hover:bg-[#1E54E6]"
                 >
                   Continue to cover letter →

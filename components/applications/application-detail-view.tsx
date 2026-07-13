@@ -28,6 +28,7 @@ import {
   formatAppDate,
 } from "@/lib/applications/utils";
 import { mockBannerClass } from "@/components/shared/job-fields";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import type { CoverLetter } from "@/lib/cover/types";
 import type { ResumeVersion } from "@/lib/resume/db-types";
 import { templateLabel } from "@/lib/resume/build-resume-html";
@@ -79,6 +80,7 @@ export function ApplicationDetailView({
   const [contactsError, setContactsError] = useState("");
   const [previewOpen, setPreviewOpen] = useState(false);
   const [mockMode, setMockMode] = useState(false);
+  const [confirmKind, setConfirmKind] = useState<"archive" | "delete" | null>(null);
   const [tab, setTab] = useState<DetailTab>("overview");
 
   useEffect(() => {
@@ -140,18 +142,7 @@ export function ApplicationDetailView({
   }
 
   function handleArchive() {
-    if (
-      !confirm(
-        "Archive this application? It moves out of your active list and insights — the snapshot is preserved."
-      )
-    ) {
-      return;
-    }
-    startTransition(async () => {
-      await archiveApplication(app.id);
-      patchLocal({ archived_at: new Date().toISOString() });
-      router.refresh();
-    });
+    setConfirmKind("archive");
   }
 
   function handleRestore() {
@@ -163,18 +154,23 @@ export function ApplicationDetailView({
   }
 
   function handleDelete() {
-    if (
-      !confirm(
-        app.archived_at
-          ? "Delete this archived application permanently? The snapshot cannot be recovered."
-          : "Delete this application and its snapshot? This cannot be undone."
-      )
-    ) {
-      return;
-    }
+    setConfirmKind("delete");
+  }
+
+  function handleConfirmedAction() {
+    const kind = confirmKind;
+    if (!kind) return;
     startTransition(async () => {
-      await deleteApplication(app.id);
-      router.push("/applications");
+      if (kind === "archive") {
+        await archiveApplication(app.id);
+        patchLocal({ archived_at: new Date().toISOString() });
+        setConfirmKind(null);
+        router.refresh();
+      } else {
+        await deleteApplication(app.id);
+        setConfirmKind(null);
+        router.push("/applications");
+      }
     });
   }
 
@@ -552,6 +548,27 @@ export function ApplicationDetailView({
         title={`${app.resume_version_name ?? "Resume"} · ${templateLabel(app.resume_snapshot.template_style)}`}
         html={snapHtml}
         onExport={exportResume}
+      />
+
+      <ConfirmDialog
+        open={confirmKind !== null}
+        title={
+          confirmKind === "delete"
+            ? "Delete this application?"
+            : "Archive this application?"
+        }
+        description={
+          confirmKind === "delete"
+            ? app.archived_at
+              ? "This archived application and its snapshot are permanently deleted. This cannot be undone."
+              : "This application and its snapshot are permanently deleted. This cannot be undone."
+            : "It moves out of your active list and insights — the snapshot is preserved and you can restore it anytime."
+        }
+        confirmLabel={confirmKind === "delete" ? "Delete" : "Archive"}
+        danger={confirmKind === "delete"}
+        pending={pending}
+        onConfirm={handleConfirmedAction}
+        onCancel={() => setConfirmKind(null)}
       />
     </div>
   );

@@ -2,6 +2,7 @@
 
 import { EditableVersionName } from "@/components/library/editable-version-name";
 import { LogApplicationButton } from "@/components/applications/log-application-button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
   archiveResumeVersion,
   createResumeVersion,
@@ -33,6 +34,7 @@ export function VersionCard({
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [confirmKind, setConfirmKind] = useState<"archive" | "delete" | null>(null);
   const meta = versionCardMeta(version);
 
   function run(action: () => Promise<void>) {
@@ -160,18 +162,7 @@ export function VersionCard({
           <button
             type="button"
             disabled={pending}
-            onClick={() => {
-              if (
-                !confirm(
-                  "Archive this resume? It will move out of Tailor and Cover pickers. Logged applications keep their snapshot."
-                )
-              ) {
-                return;
-              }
-              run(async () => {
-                await archiveResumeVersion(version.id);
-              });
-            }}
+            onClick={() => setConfirmKind("archive")}
             className="rounded-[9px] border border-[#E2E5EA] bg-[#FAFBFC] px-3 py-2 text-[12.5px] font-semibold text-[#5A6573] transition-colors hover:border-[#CFD5DD] hover:text-ink disabled:opacity-50"
           >
             Archive
@@ -181,13 +172,7 @@ export function VersionCard({
           <button
             type="button"
             disabled={pending}
-            onClick={() => {
-              if (!confirm("Delete this archived resume permanently? This cannot be undone."))
-                return;
-              run(async () => {
-                await deleteResumeVersion(version.id);
-              });
-            }}
+            onClick={() => setConfirmKind("delete")}
             className="rounded-[9px] border border-[#F2D2D2] bg-[#FFF4F4] px-3 py-2 text-[12.5px] font-semibold text-[#B23B3B] transition-colors hover:bg-[#FCECEC] disabled:opacity-50"
           >
             Delete
@@ -242,6 +227,37 @@ export function VersionCard({
 
       <div className="mt-2 text-[11px] text-[#9AA3AF]">{meta.updated}</div>
       {error && <p className="mt-2 text-xs text-[#B23B3B]">{error}</p>}
+
+      <ConfirmDialog
+        open={confirmKind !== null}
+        title={
+          confirmKind === "delete"
+            ? "Delete this resume permanently?"
+            : "Archive this resume?"
+        }
+        description={
+          confirmKind === "delete"
+            ? "This archived resume will be permanently deleted. Logged applications keep their snapshots. This cannot be undone."
+            : "It moves out of the Tailor and Cover pickers. Logged applications keep their snapshot — you can restore it anytime."
+        }
+        confirmLabel={confirmKind === "delete" ? "Delete" : "Archive"}
+        danger={confirmKind === "delete"}
+        pending={pending}
+        onConfirm={() => {
+          const kind = confirmKind;
+          setConfirmKind(null);
+          if (kind === "archive") {
+            run(async () => {
+              await archiveResumeVersion(version.id);
+            });
+          } else if (kind === "delete") {
+            run(async () => {
+              await deleteResumeVersion(version.id);
+            });
+          }
+        }}
+        onCancel={() => setConfirmKind(null)}
+      />
     </div>
   );
 }

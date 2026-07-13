@@ -6,7 +6,7 @@ type PlaceholderPageProps = {
 export function PlaceholderPage({ title, description }: PlaceholderPageProps) {
   return (
     <div className="scroll flex-1 overflow-auto">
-      <div className="mx-auto max-w-[1120px] px-12 pb-16 pt-[42px]">
+      <div className="mx-auto max-w-[1120px] px-5 pb-16 sm:px-8 lg:px-12 pt-[42px]">
         <h1 className="font-display text-[30px] font-semibold tracking-[-0.025em] text-ink">
           {title}
         </h1>

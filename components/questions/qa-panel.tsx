@@ -30,6 +30,7 @@ export function QAPanel({ versions, defaultVersionId }: QAPanelProps) {
   const [mockMode, setMockMode] = useState(false);
   const [busyIds, setBusyIds] = useState<Set<string>>(new Set());
   const [toast, setToast] = useState<string | null>(null);
+  const [answerError, setAnswerError] = useState("");
 
   const base = versions.find((v) => v.id === baseId) ?? versions[0];
   const anyBusy = busyIds.size > 0;
@@ -41,6 +42,7 @@ export function QAPanel({ versions, defaultVersionId }: QAPanelProps) {
   async function answerOne(id: string) {
     const item = items.find((q) => q.id === id);
     if (!item?.q.trim() || !base) return;
+    setAnswerError("");
     setBusyIds((s) => new Set(s).add(id));
     updateItem(id, { a: item.a });
     try {
@@ -60,9 +62,9 @@ export function QAPanel({ versions, defaultVersionId }: QAPanelProps) {
       setMockMode(Boolean(j.mock));
       updateItem(id, { a: j.answer });
     } catch (err) {
-      updateItem(id, {
-        a: err instanceof Error ? err.message : "Something went wrong.",
-      });
+      setAnswerError(
+        err instanceof Error ? err.message : "Something went wrong — try again."
+      );
     } finally {
       setBusyIds((s) => {
         const n = new Set(s);
@@ -105,6 +107,11 @@ export function QAPanel({ versions, defaultVersionId }: QAPanelProps) {
       {mockMode ? (
         <div className={`${mockBannerClass} mb-4`}>
           Demo mode — add ANTHROPIC_API_KEY for answers in your voice.
+        </div>
+      ) : null}
+      {answerError ? (
+        <div className="mb-4 rounded-[10px] border border-[#F2D2D2] bg-[#FCECEC] px-3.5 py-2.5 text-[13px] text-[#B23B3B]">
+          {answerError}
         </div>
       ) : null}
       <div className="mb-[18px] space-y-3.5 rounded-[14px] border border-[#E6E8EC] bg-white px-[18px] py-4">

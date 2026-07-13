@@ -19,7 +19,9 @@ import {
   isActiveUser,
   relativeLastSeen,
 } from "@/lib/admin/types";
-import { useRouter } from "next/navigation";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { Toast } from "@/components/ui/toast";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 
 type AdminPanelProps = {
@@ -31,9 +33,17 @@ type AdminPanelProps = {
   openSupportCount: number;
   aiUsage: AdminAIUsageDashboard;
   aiEnforcePlanTiers?: boolean;
+  supportLoadFailed?: boolean;
+  aiLoadFailed?: boolean;
 };
 
 type Tab = "users" | "demos" | "support" | "ai" | "plans";
+
+const TAB_IDS: Tab[] = ["users", "demos", "support", "ai", "plans"];
+
+function parseTab(value: string | null): Tab {
+  return TAB_IDS.includes(value as Tab) ? (value as Tab) : "users";
+}
 type PersonaFilter = "all" | "student" | "professional" | "none";
 type SortKey =
   | "lastSignIn"
@@ -54,19 +64,44 @@ export function AdminPanel({
   openSupportCount,
   aiUsage,
   aiEnforcePlanTiers = false,
+  supportLoadFailed = false,
+  aiLoadFailed = false,
 }: AdminPanelProps) {
   const router = useRouter();
-  const [tab, setTab] = useState<Tab>("users");
+  const searchParams = useSearchParams();
+  const [tab, setTab] = useState<Tab>(() => parseTab(searchParams.get("tab")));
+  const [viewAsFailedDismissed, setViewAsFailedDismissed] = useState(false);
   const [pending, startTransition] = useTransition();
   const [label, setLabel] = useState("");
   const [demoPlanTier, setDemoPlanTier] = useState<BillingPlanId>("pro");
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [toast, setToast] = useState<string | null>(null);
+  const [confirmAction, setConfirmAction] = useState<
+    { kind: "resetPersona" | "deleteDemo"; id: string } | null
+  >(null);
   const [query, setQuery] = useState("");
   const [personaFilter, setPersonaFilter] = useState<PersonaFilter>("all");
   const [sortKey, setSortKey] = useState<SortKey>("lastSignIn");
   const [sortAsc, setSortAsc] = useState(false);
   const [page, setPage] = useState(0);
+
+  const viewAsFailed =
+    searchParams.get("view_as_failed") === "1" && !viewAsFailedDismissed;
+
+  function switchTab(next: Tab) {
+    setTab(next);
+    setError("");
+    const params = new URLSearchParams(searchParams.toString());
+    if (next === "users") {
+      params.delete("tab");
+    } else {
+      params.set("tab", next);
+    }
+    params.delete("view_as_failed");
+    const qs = params.toString();
+    router.replace(qs ? `/admin?${qs}` : "/admin", { scroll: false });
+  }
 
   const filteredUsers = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -148,21 +183,30 @@ export function AdminPanel({
     window.location.href = `/api/admin/view-as?userId=${encodeURIComponent(userId)}`;
   }
 
-  function handleResetPersona(userId: string) {
-    if (
-      !confirm(
-        "Reset this user's persona? They'll see the first-run path picker again on Home."
-      )
-    ) {
-      return;
-    }
-    setBusyId(userId);
+  function handleConfirmAction() {
+    const action = confirmAction;
+    if (!action) return;
+    setBusyId(action.id);
     startTransition(async () => {
       try {
-        await resetUserPersona(userId);
+        if (action.kind === "resetPersona") {
+          await resetUserPersona(action.id);
+          setToast("Persona reset — user sees the first-run picker again");
+        } else {
+          await deleteDemoUser(action.id);
+          setToast("Demo persona deleted");
+        }
+        setConfirmAction(null);
         router.refresh();
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Failed to reset persona");
+        setConfirmAction(null);
+        setError(
+          e instanceof Error
+            ? e.message
+            : action.kind === "resetPersona"
+              ? "Failed to reset persona"
+              : "Failed to delete"
+        );
       } finally {
         setBusyId(null);
       }
@@ -178,6 +222,7 @@ export function AdminPanel({
           planTier: demoPlanTier,
         });
         setLabel("");
+        setToast("Demo persona created — use View as to walk through it");
         router.refresh();
       } catch (e) {
         setError(e instanceof Error ? e.message : "Failed to create");
@@ -191,24 +236,9 @@ export function AdminPanel({
     window.location.href = `/api/admin/view-as?userId=${encodeURIComponent(id)}`;
   }
 
-  function handleDeleteDemo(id: string) {
-    if (!confirm("Delete this demo user and all their data?")) return;
-    setBusyId(id);
-    startTransition(async () => {
-      try {
-        await deleteDemoUser(id);
-        router.refresh();
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "Failed to delete");
-      } finally {
-        setBusyId(null);
-      }
-    });
-  }
-
   return (
     <div className="scroll flex-1 overflow-auto">
-      <div className="mx-auto max-w-[1100px] px-12 pb-16 pt-[42px]">
+      <div className="mx-auto max-w-[1100px] px-5 pb-16 sm:px-8 lg:px-12 pt-[42px]">
         <h1 className="font-display text-[28px] font-semibold tracking-[-0.025em] text-ink">
           Super admin
         </h1>
@@ -257,20 +287,46 @@ export function AdminPanel({
           </div>
         ) : null}
 
-        <div className="mt-6 flex gap-1 rounded-xl border border-[#E4E7EC] bg-[#FAFBFC] p-1">
-          <TabButton active={tab === "users"} onClick={() => setTab("users")}>
+        {viewAsFailed ? (
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#F2D2D2] bg-[#FCECEC] px-4 py-3">
+            <p className="text-[13px] font-semibold text-[#B23B3B]">
+              Couldn&apos;t start View as — the user may be an admin account, your own
+              account, or no longer exists.
+            </p>
+            <button
+              type="button"
+              onClick={() => setViewAsFailedDismissed(true)}
+              className="cursor-pointer rounded-lg border border-[#E0A0A0] bg-white px-3 py-1.5 text-[12px] font-semibold text-[#B23B3B] hover:bg-[#FFF6F6]"
+            >
+              Dismiss
+            </button>
+          </div>
+        ) : null}
+
+        {supportLoadFailed || aiLoadFailed ? (
+          <div className="mt-5 rounded-xl border border-[#F6E3B4] bg-[#FFF9EA] px-4 py-3 text-[13px] font-semibold text-[#9A5B00]">
+            {supportLoadFailed && aiLoadFailed
+              ? "Support tickets and AI usage failed to load — the data below may be incomplete. Refresh to retry."
+              : supportLoadFailed
+                ? "Support tickets failed to load — the inbox may be incomplete. Refresh to retry."
+                : "AI usage data failed to load — cost stats may be incomplete. Refresh to retry."}
+          </div>
+        ) : null}
+
+        <div className="mt-6 flex gap-1 overflow-x-auto rounded-xl border border-[#E4E7EC] bg-[#FAFBFC] p-1">
+          <TabButton active={tab === "users"} onClick={() => switchTab("users")}>
             All users ({users.length})
           </TabButton>
-          <TabButton active={tab === "demos"} onClick={() => setTab("demos")}>
+          <TabButton active={tab === "demos"} onClick={() => switchTab("demos")}>
             Demo personas ({demoUsers.length})
           </TabButton>
-          <TabButton active={tab === "support"} onClick={() => setTab("support")}>
+          <TabButton active={tab === "support"} onClick={() => switchTab("support")}>
             Support{openSupportCount > 0 ? ` (${openSupportCount})` : ""}
           </TabButton>
-          <TabButton active={tab === "ai"} onClick={() => setTab("ai")}>
+          <TabButton active={tab === "ai"} onClick={() => switchTab("ai")}>
             AI costs
           </TabButton>
-          <TabButton active={tab === "plans"} onClick={() => setTab("plans")}>
+          <TabButton active={tab === "plans"} onClick={() => switchTab("plans")}>
             Plans
           </TabButton>
         </div>
@@ -374,9 +430,11 @@ export function AdminPanel({
                 <UserRow
                   key={u.id}
                   user={u}
-                  busy={pending && busyId === u.id}
+                  busy={busyId === u.id}
                   onViewAs={() => handleViewAs(u.id)}
-                  onResetPersona={() => handleResetPersona(u.id)}
+                  onResetPersona={() =>
+                    setConfirmAction({ kind: "resetPersona", id: u.id })
+                  }
                 />
               ))
             )}
@@ -408,7 +466,7 @@ export function AdminPanel({
             ) : null}
           </div>
         ) : tab === "support" ? (
-          <AdminSupportTab tickets={supportTickets} />
+          <AdminSupportTab tickets={supportTickets} onViewAsUser={handleViewAs} />
         ) : tab === "ai" ? (
           <AdminAIUsageTab data={aiUsage} />
         ) : tab === "plans" ? (
@@ -521,10 +579,13 @@ export function AdminPanel({
                       <button
                         type="button"
                         disabled={pending}
-                        onClick={() => handleDeleteDemo(u.id)}
-                        className="cursor-pointer rounded-lg border border-[#E0E3E8] bg-white px-2.5 py-[7px] text-xs text-[#B23B3B] transition-colors hover:border-[#E0A0A0] hover:bg-[#FFF6F6] disabled:opacity-60"
+                        onClick={() =>
+                          setConfirmAction({ kind: "deleteDemo", id: u.id })
+                        }
+                        aria-label={`Delete demo persona ${u.label}`}
+                        className="cursor-pointer rounded-lg border border-[#E0E3E8] bg-white px-2.5 py-[7px] text-xs font-semibold text-[#B23B3B] transition-colors hover:border-[#E0A0A0] hover:bg-[#FFF6F6] disabled:opacity-60"
                       >
-                        ✕
+                        Delete
                       </button>
                     </div>
                   </div>
@@ -534,6 +595,26 @@ export function AdminPanel({
           </>
         )}
       </div>
+
+      <ConfirmDialog
+        open={confirmAction !== null}
+        title={
+          confirmAction?.kind === "deleteDemo"
+            ? "Delete this demo persona?"
+            : "Reset this user's persona?"
+        }
+        description={
+          confirmAction?.kind === "deleteDemo"
+            ? "The demo user and all their data (resumes, applications, letters) are permanently deleted."
+            : "They'll see the first-run path picker again on Home. Their resumes and applications are untouched."
+        }
+        confirmLabel={confirmAction?.kind === "deleteDemo" ? "Delete" : "Reset persona"}
+        danger={confirmAction?.kind === "deleteDemo"}
+        pending={pending}
+        onConfirm={handleConfirmAction}
+        onCancel={() => setConfirmAction(null)}
+      />
+      {toast ? <Toast message={toast} onDone={() => setToast(null)} /> : null}
     </div>
   );
 }

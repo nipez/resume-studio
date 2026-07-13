@@ -12,7 +12,7 @@ export default async function DiscoverPage() {
 
   return (
     <div className="scroll flex-1 overflow-auto">
-      <div className="mx-auto max-w-[1080px] px-12 pb-16 pt-[42px]">
+      <div className="mx-auto max-w-[1080px] px-5 pb-16 sm:px-8 lg:px-12 pt-[42px]">
         <h1 className="font-display text-[28px] font-semibold tracking-[-0.02em] text-ink">
           Job discovery
         </h1>

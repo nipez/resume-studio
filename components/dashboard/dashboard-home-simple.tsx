@@ -94,7 +94,7 @@ export function DashboardHomeSimple({ data }: { data: DashboardHomeData }) {
 
   return (
     <div className="scroll flex-1 overflow-auto">
-      <div className="mx-auto max-w-[720px] px-12 pb-16 pt-[42px]">
+      <div className="mx-auto max-w-[720px] px-5 pb-16 sm:px-8 lg:px-12 pt-[42px]">
         <div className="mb-8">
           {isStudent && onboardingPersonaSet ? (
             <span className="mb-2 inline-flex rounded-full bg-[#EEF3FF] px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-accent">

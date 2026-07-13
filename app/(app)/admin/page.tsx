@@ -32,15 +32,20 @@ export default async function AdminPage() {
     listDemoUsers(),
   ]);
 
+  let supportLoadFailed = false;
   const [supportResult, aiUsage] = await Promise.all([
     Promise.all([
-      listAdminSupportTickets().catch(() => [] as Awaited<ReturnType<typeof listAdminSupportTickets>>),
+      listAdminSupportTickets().catch(() => {
+        supportLoadFailed = true;
+        return [] as Awaited<ReturnType<typeof listAdminSupportTickets>>;
+      }),
       getAdminOpenSupportCount().catch(() => 0),
     ]),
     getAdminAIUsageDashboard().catch(() => null),
   ]);
 
   const [supportTickets, openSupportCount] = supportResult;
+  const aiLoadFailed = aiUsage === null;
   const aiUsageData =
     aiUsage ?? {
       available: false,
@@ -67,6 +72,8 @@ export default async function AdminPage() {
       openSupportCount={openSupportCount}
       aiUsage={aiUsageData}
       aiEnforcePlanTiers={AI_ENFORCE_PLAN_TIERS}
+      supportLoadFailed={supportLoadFailed}
+      aiLoadFailed={aiLoadFailed}
     />
   );
 }

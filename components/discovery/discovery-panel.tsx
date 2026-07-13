@@ -1,7 +1,9 @@
 "use client";
 
 import { DiscoveryTargetCard } from "@/components/discovery/discovery-target-card";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Spinner } from "@/components/ui/spinner";
+import { Toast } from "@/components/ui/toast";
 import { parseJsonResponse } from "@/lib/api/parse-response";
 import {
   deleteJobSearchProfile,
@@ -71,6 +73,8 @@ export function DiscoveryPanel({ profiles, isStudent = false }: DiscoveryPanelPr
   const [copiedQuery, setCopiedQuery] = useState<number | null>(null);
   const [generating, setGenerating] = useState(false);
   const [profilePending, startProfileTransition] = useTransition();
+  const [deleteProfileId, setDeleteProfileId] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
     if (profiles.length > 0 && !activeProfileId) {
@@ -134,6 +138,7 @@ export function DiscoveryPanel({ profiles, isStudent = false }: DiscoveryPanelPr
           criteria,
         });
         setActiveProfileId(profile.id);
+        setToast("Search profile saved");
         router.refresh();
       } catch (e) {
         setError(e instanceof Error ? e.message : "Failed to save profile");
@@ -141,8 +146,9 @@ export function DiscoveryPanel({ profiles, isStudent = false }: DiscoveryPanelPr
     });
   }
 
-  function handleDeleteProfile(id: string) {
-    if (!confirm("Delete this saved search profile?")) return;
+  function handleDeleteProfileConfirmed() {
+    const id = deleteProfileId;
+    if (!id) return;
     startProfileTransition(async () => {
       try {
         await deleteJobSearchProfile(id);
@@ -151,8 +157,11 @@ export function DiscoveryPanel({ profiles, isStudent = false }: DiscoveryPanelPr
           setCriteria(EMPTY_DISCOVERY_CRITERIA);
           setResult(null);
         }
+        setDeleteProfileId(null);
+        setToast("Search profile deleted");
         router.refresh();
       } catch (e) {
+        setDeleteProfileId(null);
         setError(e instanceof Error ? e.message : "Failed to delete profile");
       }
     });
@@ -181,7 +190,11 @@ export function DiscoveryPanel({ profiles, isStudent = false }: DiscoveryPanelPr
         </p>
         {isStudent ? (
           <p className="mt-2 text-[12.5px] text-[#8A92A0]">
-            Job Discovery uses Pro AI — upgrade for full target planning.
+            Job Discovery uses Pro AI —{" "}
+            <Link href="/pricing" className="font-semibold text-accent hover:underline">
+              see Pro plans
+            </Link>{" "}
+            for full target planning.
           </p>
         ) : null}
       </div>
@@ -204,7 +217,7 @@ export function DiscoveryPanel({ profiles, isStudent = false }: DiscoveryPanelPr
               <button
                 type="button"
                 disabled={profilePending}
-                onClick={() => handleDeleteProfile(profile.id)}
+                onClick={() => setDeleteProfileId(profile.id)}
                 className="cursor-pointer rounded-full px-1.5 text-[11px] text-[#9AA3AF] hover:text-[#B23B3B]"
                 aria-label={`Delete ${profile.name}`}
               >
@@ -405,6 +418,18 @@ export function DiscoveryPanel({ profiles, isStudent = false }: DiscoveryPanelPr
           ) : null}
         </section>
       </div>
+
+      <ConfirmDialog
+        open={deleteProfileId !== null}
+        title="Delete this search profile?"
+        description="The saved criteria are removed — jobs already saved to your queue are not affected."
+        confirmLabel="Delete"
+        danger
+        pending={profilePending}
+        onConfirm={handleDeleteProfileConfirmed}
+        onCancel={() => setDeleteProfileId(null)}
+      />
+      {toast ? <Toast message={toast} onDone={() => setToast(null)} /> : null}
     </div>
   );
 }

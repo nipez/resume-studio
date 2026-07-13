@@ -2,6 +2,9 @@
 
 import { LogApplicationButton } from "@/components/applications/log-application-button";
 import { SaveJobModal } from "@/components/applications/save-job-modal";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { Spinner } from "@/components/ui/spinner";
+import { Toast } from "@/components/ui/toast";
 import { activateSavedJobForPrep, deleteSavedJob } from "@/lib/saved-jobs/actions";
 import type { SavedJob } from "@/lib/saved-jobs/types";
 import { writeJobDraft } from "@/lib/job-draft/storage";
@@ -41,8 +44,12 @@ export function SavedJobsSection({
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [editingJob, setEditingJob] = useState<SavedJob | null>(null);
+  const [busyAction, setBusyAction] = useState<string | null>(null);
+  const [removeJobId, setRemoveJobId] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
 
   function startPrep(jobId: string, href: string) {
+    setBusyAction(`${jobId}:${href}`);
     startTransition(async () => {
       const draft = await activateSavedJobForPrep(jobId);
       if (draft) writeJobDraft(draft);
@@ -50,11 +57,20 @@ export function SavedJobsSection({
     });
   }
 
-  function handleRemove(jobId: string) {
-    if (!confirm("Remove this job from your queue?")) return;
+  function handleRemoveConfirmed() {
+    if (!removeJobId) return;
     startTransition(async () => {
-      await deleteSavedJob(jobId);
-      router.refresh();
+      try {
+        await deleteSavedJob(removeJobId);
+        setRemoveJobId(null);
+        setToast("Job removed from your queue");
+        router.refresh();
+      } catch (err) {
+        setRemoveJobId(null);
+        setToast(
+          `⚠ ${err instanceof Error ? err.message : "Failed to remove job"}`
+        );
+      }
     });
   }
 
@@ -168,30 +184,40 @@ export function SavedJobsSection({
               </div>
 
               <div className="mt-3 flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  disabled={pending}
-                  onClick={() => startPrep(job.id, `/tailor?job=${job.id}${versionQuery}`)}
-                  className="cursor-pointer rounded-[9px] border border-[#D6E4FF] bg-[#F5F8FF] px-3 py-2 text-[12.5px] font-semibold text-[#2456D6] hover:bg-[#EAF1FF] disabled:opacity-50"
-                >
-                  Tailor resume
-                </button>
-                <button
-                  type="button"
-                  disabled={pending}
-                  onClick={() => startPrep(job.id, `/cover?job=${job.id}${versionQuery}`)}
-                  className="cursor-pointer rounded-[9px] border border-[#E2E5EA] bg-[#FAFBFC] px-3 py-2 text-[12.5px] font-semibold text-[#3a4350] hover:bg-[#F2F3F5] disabled:opacity-50"
-                >
-                  Cover letter
-                </button>
-                <button
-                  type="button"
-                  disabled={pending}
-                  onClick={() => startPrep(job.id, `/questions?job=${job.id}`)}
-                  className="cursor-pointer rounded-[9px] border border-[#E2E5EA] bg-[#FAFBFC] px-3 py-2 text-[12.5px] font-semibold text-[#3a4350] hover:bg-[#F2F3F5] disabled:opacity-50"
-                >
-                  Q&amp;A
-                </button>
+                {(
+                  [
+                    {
+                      label: "Tailor resume",
+                      href: `/tailor?job=${job.id}${versionQuery}`,
+                      cls: "border-[#D6E4FF] bg-[#F5F8FF] text-[#2456D6] hover:bg-[#EAF1FF]",
+                    },
+                    {
+                      label: "Cover letter",
+                      href: `/cover?job=${job.id}${versionQuery}`,
+                      cls: "border-[#E2E5EA] bg-[#FAFBFC] text-[#3a4350] hover:bg-[#F2F3F5]",
+                    },
+                    {
+                      label: "Q&A",
+                      href: `/questions?job=${job.id}`,
+                      cls: "border-[#E2E5EA] bg-[#FAFBFC] text-[#3a4350] hover:bg-[#F2F3F5]",
+                    },
+                  ] as const
+                ).map((action) => {
+                  const isBusy =
+                    pending && busyAction === `${job.id}:${action.href}`;
+                  return (
+                    <button
+                      key={action.label}
+                      type="button"
+                      disabled={pending}
+                      onClick={() => startPrep(job.id, action.href)}
+                      className={`inline-flex cursor-pointer items-center gap-1.5 rounded-[9px] border px-3 py-2 text-[12.5px] font-semibold disabled:opacity-50 ${action.cls}`}
+                    >
+                      {isBusy ? <Spinner className="h-3 w-3" /> : null}
+                      {isBusy ? "Opening…" : action.label}
+                    </button>
+                  );
+                })}
               </div>
 
               <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-[#F0F1F4] pt-3">
@@ -218,7 +244,7 @@ export function SavedJobsSection({
                 <button
                   type="button"
                   disabled={pending}
-                  onClick={() => handleRemove(job.id)}
+                  onClick={() => setRemoveJobId(job.id)}
                   className="ml-auto cursor-pointer border-none bg-transparent p-0 text-[12px] font-semibold text-[#B23B3B] hover:underline disabled:opacity-50"
                 >
                   Remove
@@ -235,6 +261,17 @@ export function SavedJobsSection({
         job={editingJob}
         onClose={() => setEditingJob(null)}
       />
+      <ConfirmDialog
+        open={removeJobId !== null}
+        title="Remove this saved job?"
+        description="It comes off your queue — any tailored resume or cover letter stays in your library."
+        confirmLabel="Remove"
+        danger
+        pending={pending}
+        onConfirm={handleRemoveConfirmed}
+        onCancel={() => setRemoveJobId(null)}
+      />
+      {toast ? <Toast message={toast} onDone={() => setToast(null)} /> : null}
     </>
   );
 }

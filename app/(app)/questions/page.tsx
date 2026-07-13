@@ -12,7 +12,7 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
 
   return (
     <div className="scroll flex-1 overflow-auto">
-      <div className="mx-auto max-w-[920px] px-11 pb-16 pt-10">
+      <div className="mx-auto max-w-[920px] px-5 pb-16 sm:px-8 lg:px-11 pt-10">
         <h1 className="font-display text-[28px] font-semibold tracking-[-0.025em] text-ink">
           Application Q&amp;A
         </h1>

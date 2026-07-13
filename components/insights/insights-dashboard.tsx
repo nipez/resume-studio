@@ -46,7 +46,7 @@ function KpiCard({
 export function InsightsDashboard({ data }: { data: InsightsData }) {
   return (
     <div className="scroll flex-1 overflow-auto">
-      <div className="mx-auto max-w-[1080px] px-12 pb-16 pt-[42px]">
+      <div className="mx-auto max-w-[1080px] px-5 pb-16 sm:px-8 lg:px-12 pt-[42px]">
         <div className="mb-[26px]">
           <h1 className="font-display text-[28px] font-semibold tracking-[-0.025em] text-ink">
             Insights
@@ -230,6 +230,8 @@ export function InsightsDashboard({ data }: { data: InsightsData }) {
                   interviews.
                 </p>
               </div>
+              <div className="overflow-x-auto">
+              <div className="min-w-[640px]">
               <div className="grid grid-cols-[1fr_70px_90px_90px_70px_90px] gap-3 border-b border-[#EEF0F3] bg-[#FAFBFC] px-6 py-2.5 text-[11px] font-bold uppercase tracking-[0.06em] text-[#8A92A0]">
                 <div>Version</div>
                 <div className="text-right">Sent</div>
@@ -261,6 +263,8 @@ export function InsightsDashboard({ data }: { data: InsightsData }) {
                   </div>
                 </div>
               ))}
+              </div>
+              </div>
             </section>
           </>
         )}

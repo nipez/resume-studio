@@ -25,6 +25,8 @@ import {
   nextOpenEvent,
 } from "@/lib/applications/utils";
 import { nextActionableRecommendation } from "@/lib/applications/follow-up-recommendations";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { Toast } from "@/components/ui/toast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
@@ -83,10 +85,12 @@ function StatusSelect({
   status,
   applicationId,
   disabled,
+  onResult,
 }: {
   status: ApplicationStatus;
   applicationId: string;
   disabled?: boolean;
+  onResult?: (message: string, isError: boolean) => void;
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -98,9 +102,19 @@ function StatusSelect({
       disabled={disabled || pending}
       onChange={(e) => {
         const next = e.target.value as ApplicationStatus;
+        const nextLabel =
+          APPLICATION_STATUSES.find((o) => o.id === next)?.label ?? next;
         startTransition(async () => {
-          await updateApplicationStatus(applicationId, next);
-          router.refresh();
+          try {
+            await updateApplicationStatus(applicationId, next);
+            onResult?.(`Status updated to ${nextLabel}`, false);
+            router.refresh();
+          } catch (err) {
+            onResult?.(
+              err instanceof Error ? err.message : "Failed to update status",
+              true
+            );
+          }
         });
       }}
       className="cursor-pointer rounded-lg border px-[11px] py-[7px] text-[12.5px] font-bold disabled:opacity-60"
@@ -126,6 +140,8 @@ function ApplicationsTable({
   onArchive,
   onRestore,
   onDelete,
+  onStatusResult,
+  emptyActions,
 }: {
   applications: Application[];
   archived: boolean;
@@ -133,6 +149,8 @@ function ApplicationsTable({
   onArchive: (id: string) => void;
   onRestore: (id: string) => void;
   onDelete: (id: string) => void;
+  onStatusResult?: (message: string, isError: boolean) => void;
+  emptyActions?: React.ReactNode;
 }) {
   if (applications.length === 0) {
     return (
@@ -148,12 +166,18 @@ function ApplicationsTable({
             ? "Archive old or rejected applications to keep your active list focused — snapshots are preserved."
             : "Hit “Apply to new job” to copy a resume and tailor it, or “Log application” if you already sent one."}
         </div>
+        {!archived && emptyActions ? (
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+            {emptyActions}
+          </div>
+        ) : null}
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-border bg-white">
+    <div className="overflow-x-auto rounded-2xl border border-border bg-white">
+      <div className="min-w-[680px]">
       <div className="grid grid-cols-[1fr_120px_150px_minmax(140px,1fr)] gap-3.5 border-b border-[#EEF0F3] bg-[#FAFBFC] px-[22px] py-[13px] text-[11px] font-bold uppercase tracking-[0.06em] text-[#8A92A0]">
         <div>Role / Company</div>
         <div>Applied</div>
@@ -208,6 +232,7 @@ function ApplicationsTable({
                 status={app.status}
                 applicationId={app.id}
                 disabled={pending}
+                onResult={onStatusResult}
               />
             </div>
             <div className="flex flex-wrap justify-end gap-[7px]">
@@ -251,6 +276,7 @@ function ApplicationsTable({
           </div>
         );
       })}
+      </div>
     </div>
   );
 }
@@ -270,21 +296,38 @@ export function ApplicationsList({
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [tab, setTab] = useState<"active" | "archived">("active");
+  const [confirmAction, setConfirmAction] = useState<
+    { kind: "archive" | "delete"; id: string } | null
+  >(null);
+  const [toast, setToast] = useState<string | null>(null);
   const stats = computeApplicationStats(applications);
   const visibleApplications =
     tab === "active" ? applications : archivedApplications;
 
-  function handleArchive(id: string) {
-    if (
-      !confirm(
-        "Archive this application? It moves out of your active list and insights — the snapshot is preserved."
-      )
-    ) {
-      return;
-    }
+  function handleStatusResult(message: string, isError: boolean) {
+    setToast(isError ? `⚠ ${message}` : message);
+  }
+
+  function handleConfirm() {
+    const action = confirmAction;
+    if (!action) return;
     startTransition(async () => {
-      await archiveApplication(id);
-      router.refresh();
+      try {
+        if (action.kind === "archive") {
+          await archiveApplication(action.id);
+          setToast("Application archived — snapshot preserved");
+        } else {
+          await deleteApplication(action.id);
+          setToast("Application deleted");
+        }
+        setConfirmAction(null);
+        router.refresh();
+      } catch (err) {
+        setConfirmAction(null);
+        setToast(
+          `⚠ ${err instanceof Error ? err.message : "Something went wrong"}`
+        );
+      }
     });
   }
 
@@ -292,27 +335,14 @@ export function ApplicationsList({
     startTransition(async () => {
       await restoreApplication(id);
       setTab("active");
-      router.refresh();
-    });
-  }
-
-  function handleDelete(id: string) {
-    if (
-      !confirm(
-        "Delete this archived application permanently? The snapshot cannot be recovered."
-      )
-    ) {
-      return;
-    }
-    startTransition(async () => {
-      await deleteApplication(id);
+      setToast("Application restored to your active list");
       router.refresh();
     });
   }
 
   return (
     <div className="scroll flex-1 overflow-auto">
-      <div className="mx-auto max-w-[1080px] px-12 pb-16 pt-[42px]">
+      <div className="mx-auto max-w-[1080px] px-5 pb-16 sm:px-8 lg:px-12 pt-[42px]">
         <div className="mb-[26px] flex flex-wrap items-end justify-between gap-6">
           <div>
             <h1 className="font-display text-[28px] font-semibold tracking-[-0.025em] text-ink">
@@ -432,11 +462,61 @@ export function ApplicationsList({
           applications={visibleApplications}
           archived={tab === "archived"}
           pending={pending}
-          onArchive={handleArchive}
+          onArchive={(id) => setConfirmAction({ kind: "archive", id })}
           onRestore={handleRestore}
-          onDelete={handleDelete}
+          onDelete={(id) => setConfirmAction({ kind: "delete", id })}
+          onStatusResult={handleStatusResult}
+          emptyActions={
+            <>
+              {versions.length > 0 ? (
+                <ApplyToNewJobButton
+                  versions={versions}
+                  versionCounts={versionCounts}
+                  defaultVersionId={defaultVersionId}
+                  isStudent={isStudent}
+                />
+              ) : (
+                <Link
+                  href="/build"
+                  className="inline-flex items-center gap-1.5 rounded-[11px] bg-accent px-[17px] py-[11px] text-[13.5px] font-semibold text-white transition-colors hover:bg-[#1E54E6]"
+                >
+                  Build your resume first
+                </Link>
+              )}
+              {defaultVersionId ? (
+                <LogApplicationButton
+                  versionId={defaultVersionId}
+                  resumeVersionName={defaultVersionName ?? "Resume"}
+                  initialRole={defaultVersionRole}
+                  initialCompany={defaultVersionCompany}
+                  isStudent={isStudent}
+                  className="inline-flex items-center gap-1.5 rounded-[11px] border border-[#D6E4FF] bg-white px-[17px] py-[11px] text-[13.5px] font-semibold text-[#2456D6] transition-colors hover:border-accent hover:bg-[#F5F8FF]"
+                />
+              ) : null}
+            </>
+          }
         />
       </div>
+
+      <ConfirmDialog
+        open={confirmAction !== null}
+        title={
+          confirmAction?.kind === "delete"
+            ? "Delete permanently?"
+            : "Archive this application?"
+        }
+        description={
+          confirmAction?.kind === "delete"
+            ? "This archived application and its snapshot will be permanently deleted. This cannot be undone."
+            : "It moves out of your active list and insights — the snapshot is preserved and you can restore it anytime."
+        }
+        confirmLabel={confirmAction?.kind === "delete" ? "Delete" : "Archive"}
+        danger={confirmAction?.kind === "delete"}
+        pending={pending}
+        onConfirm={handleConfirm}
+        onCancel={() => setConfirmAction(null)}
+      />
+      {toast ? <Toast message={toast} onDone={() => setToast(null)} /> : null}
     </div>
   );
 }

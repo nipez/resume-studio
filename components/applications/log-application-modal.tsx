@@ -8,6 +8,7 @@ import {
 } from "@/components/shared/job-fields";
 import { Toast } from "@/components/ui/toast";
 import { Spinner } from "@/components/ui/spinner";
+import { useEscapeKey } from "@/components/ui/confirm-dialog";
 import { logApplication } from "@/lib/applications/actions";
 import type { ApplicationType } from "@/lib/applications/types";
 import {
@@ -80,6 +81,8 @@ export function LogApplicationModal({
   );
   const [error, setError] = useState("");
   const [toast, setToast] = useState<string | null>(null);
+
+  useEscapeKey(open && !pending, onClose);
 
   useEffect(() => {
     if (!open) return;
@@ -160,6 +163,8 @@ export function LogApplicationModal({
         onClick={handleClose}
       >
         <div
+          role="dialog"
+          aria-modal="true"
           className="max-h-[90vh] w-[560px] max-w-full animate-[fadeUp_0.25s_ease_both] overflow-auto rounded-[18px] bg-white p-7 shadow-[0_24px_70px_rgba(0,0,0,0.4)]"
           onClick={(e) => e.stopPropagation()}
         >

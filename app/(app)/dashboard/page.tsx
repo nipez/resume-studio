@@ -1,4 +1,5 @@
 import { DashboardHome } from "@/components/dashboard/dashboard-home";
+import { ExitViewAsFailedNotice } from "@/components/admin/exit-view-as-failed-notice";
 import { getApplicationsList } from "@/lib/applications/actions";
 import { computeInsights } from "@/lib/applications/insights";
 import { getUserProfileContext } from "@/lib/profile/actions";
@@ -22,22 +23,25 @@ export default async function DashboardPage() {
   const firstName = resolveFirstName(library.userName);
 
   return (
-    <DashboardHome
-      firstName={firstName}
-      persona={profile.persona}
-      onboardingPersonaSet={profile.onboardingPersonaSet}
-      isStudent={profile.isStudent}
-      versionsCount={versions.length}
-      applicationsCount={insights.stats.total}
-      hasTailored={hasTailored}
-      primaryVersionId={primaryVersionId}
-      stats={{
-        respRate: insights.stats.respRate,
-        interviewRate: insights.interviewRate,
-        offers: insights.stats.offerCount,
-      }}
-      upcoming={insights.upcoming.slice(0, 3)}
-      suggestedFollowUps={insights.suggestedFollowUps.slice(0, 3)}
-    />
+    <>
+      <ExitViewAsFailedNotice />
+      <DashboardHome
+        firstName={firstName}
+        persona={profile.persona}
+        onboardingPersonaSet={profile.onboardingPersonaSet}
+        isStudent={profile.isStudent}
+        versionsCount={versions.length}
+        applicationsCount={insights.stats.total}
+        hasTailored={hasTailored}
+        primaryVersionId={primaryVersionId}
+        stats={{
+          respRate: insights.stats.respRate,
+          interviewRate: insights.interviewRate,
+          offers: insights.stats.offerCount,
+        }}
+        upcoming={insights.upcoming.slice(0, 3)}
+        suggestedFollowUps={insights.suggestedFollowUps.slice(0, 3)}
+      />
+    </>
   );
 }

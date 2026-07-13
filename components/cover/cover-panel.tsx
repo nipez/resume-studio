@@ -14,6 +14,7 @@ import { JobDescParseButton } from "@/components/shared/job-desc-parse-button";
 import { JobUrlImport } from "@/components/shared/job-url-import";
 import { PrepFlowStepper } from "@/components/shared/prep-flow-stepper";
 import { ResumeContextNotesField } from "@/components/shared/resume-context-notes-field";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Spinner } from "@/components/ui/spinner";
 import { Toast } from "@/components/ui/toast";
 import {
@@ -73,6 +74,7 @@ export function CoverPanel({
   const [letters, setLetters] = useState<CoverLetter[]>(savedLetters);
   const [currentLetterId, setCurrentLetterId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [deleteLetterId, setDeleteLetterId] = useState<string | null>(null);
 
   const base = versions.find((v) => v.id === baseId) ?? versions[0];
 
@@ -205,7 +207,7 @@ export function CoverPanel({
         setError(result.error);
         return;
       }
-      setToast("Deleted");
+      setToast("Cover letter deleted");
     } catch {
       setLetters(prev);
       setError("Couldn't delete. Try again.");
@@ -384,7 +386,7 @@ export function CoverPanel({
                       </button>
                       <button
                         type="button"
-                        onClick={() => removeLetter(letter.id)}
+                        onClick={() => setDeleteLetterId(letter.id)}
                         aria-label="Delete cover letter"
                         className="shrink-0 rounded-md px-1.5 py-1 text-[13px] text-[#9aa3af] hover:bg-[#F2F3F5] hover:text-[#e5484d]"
                       >
@@ -447,6 +449,19 @@ export function CoverPanel({
           />
         </div>
       </div>
+      <ConfirmDialog
+        open={deleteLetterId !== null}
+        title="Delete this cover letter?"
+        description="It's removed from your saved letters. Letters attached to logged applications keep their snapshot."
+        confirmLabel="Delete"
+        danger
+        onConfirm={() => {
+          const id = deleteLetterId;
+          setDeleteLetterId(null);
+          if (id) void removeLetter(id);
+        }}
+        onCancel={() => setDeleteLetterId(null)}
+      />
       {toast ? <Toast message={toast} onDone={() => setToast(null)} /> : null}
     </>
   );
