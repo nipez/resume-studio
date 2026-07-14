@@ -5,6 +5,7 @@ import {
   JobCompanyField,
   JobDescField,
   JobRoleField,
+  JobUrlField,
   VersionSelect,
   errorBoxClass,
   mockBannerClass,
@@ -416,6 +417,20 @@ export function TailorPanel({
                 {draft.jobRole || "Role"}
                 {draft.jobCompany ? ` at ${draft.jobCompany}` : ""}
               </div>
+              {draft.jobUrl.trim() ? (
+                <a
+                  href={
+                    /^https?:\/\//i.test(draft.jobUrl.trim())
+                      ? draft.jobUrl.trim()
+                      : `https://${draft.jobUrl.trim()}`
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-1.5 inline-block truncate text-[12.5px] font-semibold text-[#2456D6] hover:underline"
+                >
+                  Open posting →
+                </a>
+              ) : null}
               <button
                 type="button"
                 onClick={() => setPhase("input")}
@@ -521,6 +536,10 @@ export function TailorPanel({
                     })
                   }
                   className="mt-2"
+                />
+                <JobUrlField
+                  value={draft.jobUrl}
+                  onChange={(v) => update({ jobUrl: v })}
                 />
                 <ResumeContextNotesField
                   className="mt-4"

@@ -107,6 +107,39 @@ export function JobDescField({
   );
 }
 
+/** Optional posting link saved for later reference — does not import or scrape. */
+export function JobUrlField({
+  value,
+  onChange,
+  className = "mt-3.5",
+  hint = "Saved for later — e.g. when you pasted the description from Indeed or LinkedIn. Not used to fetch the posting.",
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  className?: string;
+  hint?: string;
+}) {
+  return (
+    <label
+      className={`flex flex-col gap-1.5 text-[12.5px] font-semibold text-[#5A6573] ${className}`}
+    >
+      Job posting URL (optional)
+      <input
+        type="url"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="https://company.com/careers/role"
+        className={fieldClass}
+      />
+      {hint ? (
+        <span className="text-[11.5px] font-normal leading-snug text-[#8A92A0]">
+          {hint}
+        </span>
+      ) : null}
+    </label>
+  );
+}
+
 export const primaryBtnClass =
   "mt-4 inline-flex w-full items-center justify-center gap-2 rounded-[11px] bg-accent px-[18px] py-3 text-[13.5px] font-semibold text-white shadow-[0_4px_14px_rgba(47,107,255,0.32)] transition-colors hover:bg-[#1E54E6] disabled:cursor-not-allowed disabled:opacity-60";
 
