@@ -1,6 +1,7 @@
 "use client";
 
 import { ResumePreview } from "@/components/resume/resume-preview";
+import { EditableVersionName } from "@/components/library/editable-version-name";
 import {
   JobCompanyField,
   JobDescField,
@@ -89,7 +90,7 @@ export function TailorPanel({
   );
   const [resultTemplate, setResultTemplate] = useState<
     "classic" | "twocol" | "editorial"
-  >(initialResultVersion?.template_style ?? "twocol");
+  >(initialResultVersion?.template_style ?? "classic");
   const [pendingSave, setPendingSave] = useState<{
     data: ResumeData;
     template: "classic" | "twocol" | "editorial";
@@ -228,12 +229,13 @@ export function TailorPanel({
       setMatchNotes(notes);
 
       try {
-        await persistTailoredVersion(j.data, base.template_style, notes);
+        // ATS-friendly Classic by default — switchable later in the editor.
+        await persistTailoredVersion(j.data, "classic", notes);
       } catch (saveErr) {
         setResultData(j.data);
-        setResultTemplate(base.template_style);
+        setResultTemplate("classic");
         setPhase("result");
-        setPendingSave({ data: j.data, template: base.template_style, notes });
+        setPendingSave({ data: j.data, template: "classic", notes });
         setSaveStatus("error");
         setError(
           saveErr instanceof Error
@@ -316,39 +318,45 @@ export function TailorPanel({
                     ? "Step 2 — Saved to your library"
                     : "Step 2 — Review your tailored resume"}
                 </div>
-                {savedName && saveStatus === "saved" ? (
-                  <p className="mt-1 text-[13px] leading-[1.5] text-[#3D6B4F]">
-                    <strong>{savedName}</strong> is in your library for{" "}
-                    {draft.jobRole || "this role"}
-                    {draft.jobCompany ? ` at ${draft.jobCompany}` : ""}. Your
-                    original resume is unchanged.
-                  </p>
-                ) : (
-                  <p className="mt-1 text-[13px] leading-[1.5] text-[#3D6B4F]">
-                    Review the preview below. Save to your library before continuing.
-                  </p>
-                )}
                 {saveStatus === "saved" && resultId ? (
-                  <div className="mt-2.5 flex flex-wrap items-center gap-3 text-[13px] font-semibold">
-                    <Link
-                      href={`/editor/${resultId}`}
-                      className="text-[#2456D6] hover:underline"
-                    >
-                      Open in editor
-                    </Link>
-                    <Link href="/library" className="text-[#2456D6] hover:underline">
-                      View in library
-                    </Link>
-                    <button
-                      type="button"
-                      onClick={handleExport}
-                      className="cursor-pointer rounded-[8px] border border-[#B8E6C8] bg-white px-3 py-1.5 text-[12.5px] font-semibold text-[#1B5E36] hover:border-[#8FD4A8] hover:bg-[#F7FDF9]"
-                    >
-                      ↓ Export PDF
-                    </button>
-                  </div>
+                  <>
+                    <div className="mt-1.5">
+                      <EditableVersionName
+                        versionId={resultId}
+                        name={savedName}
+                        compact
+                        className="max-w-[420px]"
+                      />
+                      <p className="mt-1 text-[12.5px] leading-[1.45] text-[#3D6B4F]">
+                        Saved for {draft.jobRole || "this role"}
+                        {draft.jobCompany ? ` at ${draft.jobCompany}` : ""}. Click
+                        the name to rename — your base resume is unchanged.
+                      </p>
+                    </div>
+                    <div className="mt-2.5 flex flex-wrap items-center gap-3 text-[13px] font-semibold">
+                      <Link
+                        href={`/editor/${resultId}`}
+                        className="text-[#2456D6] hover:underline"
+                      >
+                        Open in editor
+                      </Link>
+                      <Link href="/library" className="text-[#2456D6] hover:underline">
+                        View in library
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={handleExport}
+                        className="cursor-pointer rounded-[8px] border border-[#B8E6C8] bg-white px-3 py-1.5 text-[12.5px] font-semibold text-[#1B5E36] hover:border-[#8FD4A8] hover:bg-[#F7FDF9]"
+                      >
+                        ↓ Export PDF
+                      </button>
+                    </div>
+                  </>
                 ) : (
                   <div className="mt-2.5">
+                    <p className="mb-2 text-[13px] leading-[1.5] text-[#3D6B4F]">
+                      Review the preview below. Save to your library before continuing.
+                    </p>
                     <button
                       type="button"
                       onClick={handleExport}
@@ -389,8 +397,15 @@ export function TailorPanel({
             ) : null}
 
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="text-[12.5px] font-semibold text-[#5A6573]">
-                Tailored resume preview
+              <div>
+                <div className="text-[12.5px] font-semibold text-[#5A6573]">
+                  Tailored resume preview
+                </div>
+                {resultTemplate === "classic" ? (
+                  <div className="mt-0.5 text-[11.5px] text-[#8A92A0]">
+                    ATS-friendly Classic layout — switch templates in the editor.
+                  </div>
+                ) : null}
               </div>
               <button
                 type="button"
@@ -497,7 +512,13 @@ export function TailorPanel({
                     Demo mode — add ANTHROPIC_API_KEY for production-quality tailoring.
                   </div>
                 ) : null}
-                <VersionSelect versions={versions} value={baseId} onChange={setBaseId} />
+                <VersionSelect
+                  versions={versions}
+                  value={baseId}
+                  onChange={setBaseId}
+                  defaultVersionId={defaultVersionId}
+                  hint="Your base stays unchanged — tailored output saves as a new version named after the job."
+                />
                 <JobUrlImport
                   urlOnly
                   onImported={(fields) =>

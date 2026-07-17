@@ -4,7 +4,6 @@ import { Spinner } from "@/components/ui/spinner";
 import { useEscapeKey } from "@/components/ui/confirm-dialog";
 import { clearWorkspaceJobDraft } from "@/lib/job-draft/actions";
 import { clearJobDraftLocal } from "@/lib/job-draft/storage";
-import { createResumeVersion } from "@/lib/resume/actions";
 import type { ResumeVersion } from "@/lib/resume/db-types";
 import { versionCardMeta } from "@/lib/resume/utils";
 import Link from "next/link";
@@ -95,18 +94,19 @@ export function ApplyToNewJobModal({
 
   function handleContinue() {
     if (!selectedId) {
-      setError("Pick a resume to copy from.");
+      setError("Pick a resume to start from.");
       return;
     }
 
     setError("");
     startTransition(async () => {
       try {
-        const copy = await createResumeVersion(selectedId);
+        // Tailor creates a new job-specific version on save — no intermediate
+        // "(copy)" stub, so the library doesn't fill with Master Resume (copy).
         clearJobDraftLocal();
         await clearWorkspaceJobDraft();
         onClose();
-        router.push(`/tailor?v=${copy.id}&new=1`);
+        router.push(`/tailor?v=${selectedId}&new=1`);
         router.refresh();
       } catch (e) {
         setError(e instanceof Error ? e.message : "Something went wrong");
@@ -142,8 +142,8 @@ export function ApplyToNewJobModal({
               </h2>
               <p className="mt-1.5 max-w-[420px] text-[13px] leading-[1.5] text-muted">
                 {isStudent
-                  ? "We'll copy a resume so your original stays untouched, then tailor it for the new role."
-                  : "We'll copy a resume so your original stays untouched, then tailor it for the new posting."}
+                  ? "Pick a base resume. We'll create a new tailored version for this role — your original stays untouched."
+                  : "Pick a base resume. We'll create a new tailored version for this posting — your original stays untouched."}
               </p>
             </div>
             <button
@@ -213,13 +213,13 @@ export function ApplyToNewJobModal({
               <button
                 type="button"
                 onClick={() => setQuery("")}
-                className="mt-3 cursor-pointer border-none bg-transparent p-0 text-[13px] font-semibold text-accent hover:underline"
+                className="cursor-pointer mt-3 border-none bg-transparent p-0 text-[13px] font-semibold text-accent hover:underline"
               >
                 Clear search
               </button>
             </div>
           ) : (
-            <div className="space-y-1.5" role="radiogroup" aria-label="Choose a resume to copy">
+            <div className="space-y-1.5" role="radiogroup" aria-label="Choose a resume to start from">
               {filteredVersions.map((version) => {
                 const meta = versionCardMeta(version);
                 const appCount = versionCounts[version.id] ?? 0;
@@ -313,7 +313,7 @@ export function ApplyToNewJobModal({
               className="inline-flex items-center gap-2 rounded-[11px] bg-accent px-[16px] py-[10px] text-[13.5px] font-semibold text-white shadow-[0_4px_14px_rgba(47,107,255,0.32)] hover:bg-[#1E54E6] disabled:opacity-60"
             >
               {pending ? <Spinner /> : null}
-              {pending ? "Copying resume…" : "Copy & tailor →"}
+              {pending ? "Opening…" : "Continue to tailor →"}
             </button>
           </div>
         ) : null}

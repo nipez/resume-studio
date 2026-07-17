@@ -107,7 +107,7 @@ export function EditableVersionName({
             compact ? "text-[14px]" : "text-[17px]"
           }`}
         >
-          {initialName}
+          {name}
         </span>
         <span className="mt-0.5 shrink-0 text-[11px] font-semibold text-[#9AA3AF] opacity-0 transition-opacity group-hover:opacity-100">
           Rename
