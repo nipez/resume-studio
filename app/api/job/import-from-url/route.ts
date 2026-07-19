@@ -30,6 +30,7 @@ export async function POST(request: Request) {
     const pageText = await fetchJobPageText(normalizedUrl);
     const result = await parseJobPostingText(pageText, normalizedUrl, {
       userId: auth.user.id,
+      userEmail: auth.user.email,
       planTier: auth.planTier,
     });
     return NextResponse.json(result);

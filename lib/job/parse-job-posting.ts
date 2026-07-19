@@ -5,7 +5,7 @@ import type { PlanTier } from "@/lib/ai/config";
 export async function parseJobPostingText(
   pageText: string,
   sourceUrl: string | undefined,
-  aiContext: { userId: string; planTier: PlanTier }
+  aiContext: { userId: string; userEmail?: string | null; planTier: PlanTier }
 ) {
   const trimmed = pageText.trim();
   if (trimmed.length < 80) {
@@ -18,6 +18,7 @@ export async function parseJobPostingText(
     parseJobPostingPrompt(trimmed.slice(0, 30_000), sourceUrl),
     {
       userId: aiContext.userId,
+      userEmail: aiContext.userEmail,
       planTier: aiContext.planTier,
       action: "job_parse",
     }

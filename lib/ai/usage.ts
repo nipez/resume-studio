@@ -12,10 +12,13 @@ import {
   AIFeatureNotAvailableError,
   AIQuotaExceededError,
 } from "@/lib/ai/errors";
+import { isAdminEmail } from "@/lib/auth/admin";
 import { createServiceClient } from "@/lib/supabase/server";
 
 export type AICompletionContext = {
   userId: string;
+  /** Used to skip fair-use caps for configured admin accounts. */
+  userEmail?: string | null;
   planTier: PlanTier;
   action: AIAction;
 };
@@ -94,6 +97,11 @@ export async function assertAIAllowed(ctx: AICompletionContext): Promise<void> {
     throw new AIQuotaExceededError(
       `Student plan includes ${AI_STUDENT_COVER_LETTER_CAP} AI cover letters per month. Upgrade to Pro for more.`
     );
+  }
+
+  // Super-admin accounts dogfood without the Pro fair-use wall.
+  if (isAdminEmail(ctx.userEmail)) {
+    return;
   }
 
   if (totals.actionCount >= AI_PRO_MONTHLY_CAP) {
