@@ -10,6 +10,7 @@ import type {
 } from "@/lib/admin/ai-usage-types";
 import { getAuthedDb } from "@/lib/auth";
 import { createServiceClient } from "@/lib/supabase/server";
+import { revalidatePath } from "next/cache";
 
 type UsageEventRow = {
   id: string;
@@ -134,6 +135,54 @@ function emptyDashboard(): AdminAIUsageDashboard {
     topUsersThisMonth: [],
     recentEvents: [],
   };
+}
+
+/** Clears this calendar month's AI quota for a user (events + monthly rollup). */
+export async function resetUserAIUsageMonth(
+  userId: string
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  try {
+    await requireAdmin();
+  } catch {
+    return { ok: false, error: "Not authorized" };
+  }
+
+  const trimmed = userId.trim();
+  if (!trimmed) {
+    return { ok: false, error: "Missing user id" };
+  }
+
+  const svc = createServiceClient();
+  const now = new Date();
+  const periodStart = monthStartKey(now);
+
+  const { error: monthlyError } = await svc.from("ai_usage_monthly").upsert(
+    {
+      user_id: trimmed,
+      period_start: periodStart,
+      action_count: 0,
+      estimated_cost_usd: 0,
+      cost_alert_sent: false,
+    },
+    { onConflict: "user_id,period_start" }
+  );
+
+  if (monthlyError) {
+    return { ok: false, error: monthlyError.message };
+  }
+
+  const { error: eventsError } = await svc
+    .from("ai_usage_events")
+    .delete()
+    .eq("user_id", trimmed)
+    .gte("created_at", `${periodStart}T00:00:00.000Z`);
+
+  if (eventsError) {
+    return { ok: false, error: eventsError.message };
+  }
+
+  revalidatePath("/admin");
+  return { ok: true };
 }
 
 export async function getAdminAIUsageDashboard(): Promise<AdminAIUsageDashboard> {

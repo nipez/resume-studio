@@ -34,6 +34,7 @@ export async function POST(request: Request) {
   try {
     const result = await parseJobPostingText(body.text, body.sourceUrl, {
       userId: auth.user.id,
+      userEmail: auth.user.email,
       planTier: auth.planTier,
     });
     return NextResponse.json(result);

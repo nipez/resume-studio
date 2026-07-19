@@ -6,6 +6,10 @@ import {
   type AdminAIUsageDashboard,
 } from "@/lib/admin/ai-usage-types";
 import { formatAdminDate } from "@/lib/admin/types";
+import { resetUserAIUsageMonth } from "@/lib/admin/ai-usage";
+import { AI_PRO_MONTHLY_CAP } from "@/lib/ai/config";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 
 type AdminAIUsageTabProps = {
   data: AdminAIUsageDashboard;
@@ -34,6 +38,32 @@ function formatMonthLabel(periodStart: string) {
 }
 
 export function AdminAIUsageTab({ data }: AdminAIUsageTabProps) {
+  const router = useRouter();
+  const [pending, startTransition] = useTransition();
+  const [resetError, setResetError] = useState<string | null>(null);
+  const [resetBusyId, setResetBusyId] = useState<string | null>(null);
+
+  function handleResetMonth(userId: string, label: string) {
+    if (
+      !window.confirm(
+        `Reset this month's AI usage for ${label}? This clears their ${AI_PRO_MONTHLY_CAP}-action fair-use count for the current month.`
+      )
+    ) {
+      return;
+    }
+    setResetError(null);
+    setResetBusyId(userId);
+    startTransition(async () => {
+      const result = await resetUserAIUsageMonth(userId);
+      setResetBusyId(null);
+      if (!result.ok) {
+        setResetError(result.error);
+        return;
+      }
+      router.refresh();
+    });
+  }
+
   if (!data.available) {
     return (
       <div className="mt-4 rounded-2xl border border-dashed border-[#D2D7DE] bg-[#FBFBFC] px-6 py-12 text-center">
@@ -72,8 +102,15 @@ export function AdminAIUsageTab({ data }: AdminAIUsageTabProps) {
             lib/ai/cost.ts
           </code>
           — useful for pricing margin, not exact billing. Compare with the Anthropic
-          dashboard periodically.
+          dashboard periodically. Pro fair-use is {AI_PRO_MONTHLY_CAP} actions/month;
+          configured admin emails skip that cap. Deep tailor runs count as multiple
+          actions.
         </p>
+        {resetError ? (
+          <div className="mt-3 rounded-[10px] border border-[#F2D2D2] bg-[#FCECEC] px-3.5 py-2.5 text-[13px] text-[#B23B3B]">
+            {resetError}
+          </div>
+        ) : null}
 
         <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <MetricCard label="Today" value={formatUsdCost(data.costTodayUsd)} meta={`${data.actionsToday} actions`} />
@@ -195,10 +232,30 @@ export function AdminAIUsageTab({ data }: AdminAIUsageTabProps) {
                     </div>
                     <div className="truncate text-[11.5px] text-muted">
                       {row.actionCount} actions
+                      {row.actionCount >= AI_PRO_MONTHLY_CAP
+                        ? " · at fair-use cap"
+                        : ""}
                     </div>
                   </div>
-                  <div className="flex-none font-semibold text-ink">
-                    {formatUsdCost(row.costUsd)}
+                  <div className="flex flex-none flex-col items-end gap-1.5">
+                    <div className="font-semibold text-ink">
+                      {formatUsdCost(row.costUsd)}
+                    </div>
+                    <button
+                      type="button"
+                      disabled={pending && resetBusyId === row.userId}
+                      onClick={() =>
+                        handleResetMonth(
+                          row.userId,
+                          row.fullName || row.email
+                        )
+                      }
+                      className="cursor-pointer border-none bg-transparent p-0 text-[11.5px] font-semibold text-[#2456D6] hover:underline disabled:opacity-60"
+                    >
+                      {pending && resetBusyId === row.userId
+                        ? "Resetting…"
+                        : "Reset month"}
+                    </button>
                   </div>
                 </div>
               ))}

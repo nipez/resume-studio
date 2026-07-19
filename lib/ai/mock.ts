@@ -370,6 +370,7 @@ import { assertAIAllowed, recordAIUsage, type AICompletionContext } from "@/lib/
 
 export type AICompletionOptions = {
   userId: string;
+  userEmail?: string | null;
   planTier: PlanTier;
   action: AIAction;
 };
@@ -383,6 +384,7 @@ export async function completeWithFallback(
 }> {
   const ctx: AICompletionContext = {
     userId: options.userId,
+    userEmail: options.userEmail,
     planTier: options.planTier,
     action: options.action,
   };
