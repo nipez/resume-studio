@@ -51,7 +51,8 @@ export function AdminPlansTab() {
         <ul className="mt-3 space-y-2 text-[13.5px] leading-relaxed text-[#3a4350]">
           <li>
             <strong>Pro:</strong> {AI_PRO_MONTHLY_CAP} AI actions per calendar month
-            (each generation = 1 action).
+            (each generation = 1 action; deep tailor uses several). Configured
+            admin emails skip this cap.
           </li>
           <li>
             <strong>Student:</strong> {AI_STUDENT_COVER_LETTER_CAP} AI cover letters
