@@ -91,6 +91,7 @@ export function computeInsights(apps: Application[]): InsightsData {
     "offer",
     "rejected",
     "ghosted",
+    "not_applied",
   ];
   const counts: Record<string, number> = {};
   for (const app of apps) counts[app.status] = (counts[app.status] ?? 0) + 1;

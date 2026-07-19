@@ -63,7 +63,12 @@ export function eventMatchesRecommendation(
 }
 
 function isTerminalStatus(status: ApplicationStatus): boolean {
-  return status === "offer" || status === "rejected" || status === "ghosted";
+  return (
+    status === "offer" ||
+    status === "rejected" ||
+    status === "ghosted" ||
+    status === "not_applied"
+  );
 }
 
 function latestInterviewDate(app: Application): string | null {
