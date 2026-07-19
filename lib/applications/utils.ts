@@ -15,6 +15,7 @@ export type StatusMeta = {
 
 export const APPLICATION_STATUSES: { id: ApplicationStatus; label: string }[] = [
   { id: "applied", label: "Applied" },
+  { id: "not_applied", label: "Didn't apply" },
   { id: "response", label: "Response" },
   { id: "interview", label: "Interview" },
   { id: "offer", label: "Offer" },
@@ -46,6 +47,12 @@ export function appStatusMeta(id: ApplicationStatus | string): StatusMeta {
     offer: { label: "Offer", fg: "#0E7C4B", bg: "#E6F7EE", bd: "#BFE8D1" },
     rejected: { label: "Rejected", fg: "#B23B3B", bg: "#FCECEC", bd: "#F2D2D2" },
     ghosted: { label: "No response", fg: "#8A92A0", bg: "#F2F3F5", bd: "#E2E5EA" },
+    not_applied: {
+      label: "Didn't apply",
+      fg: "#6B7280",
+      bg: "#F4F5F7",
+      bd: "#E4E7EC",
+    },
   };
   return m[id as ApplicationStatus] ?? m.applied;
 }
@@ -59,6 +66,7 @@ const STAGE_RANK: Record<ApplicationStatus, number> = {
   applied: 0,
   ghosted: 0,
   rejected: 0,
+  not_applied: 0,
   response: 1,
   interview: 2,
   offer: 3,

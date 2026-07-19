@@ -72,6 +72,7 @@ order by ok asc, check_name asc;
 --   applications.archived_at       → 0015_application_archive.sql
 --   table: saved_jobs              → 0010_saved_jobs.sql
 --   table: job_search_profiles     → 0018_job_discovery.sql
+--   enum: application_status       → 0019_application_status_not_applied.sql (not_applied)
 --   profiles.plan_tier             → 0011_ai_usage.sql
 --   profiles.persona             → 0012_student_persona.sql
 --   table: ai_usage_*              → 0011_ai_usage.sql

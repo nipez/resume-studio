@@ -7,7 +7,8 @@ export type ApplicationStatus =
   | "interview"
   | "offer"
   | "rejected"
-  | "ghosted";
+  | "ghosted"
+  | "not_applied";
 
 export type ApplicationType =
   | "part_time"
