@@ -1,5 +1,6 @@
 "use client";
 
+import { LogApplicationButton } from "@/components/applications/log-application-button";
 import {
   JobCompanyField,
   JobDescField,
@@ -8,32 +9,64 @@ import {
   mockBannerClass,
 } from "@/components/shared/job-fields";
 import { JobUrlImport } from "@/components/shared/job-url-import";
+import { PrepFlowStepper } from "@/components/shared/prep-flow-stepper";
 import { Spinner } from "@/components/ui/spinner";
 import { Toast } from "@/components/ui/toast";
 import { uid, type QAItem } from "@/lib/job-draft/storage";
 import { useJobDraft } from "@/lib/job-draft/use-job-draft";
 import { useQADraft } from "@/lib/job-draft/use-qa-draft";
 import type { ResumeVersion } from "@/lib/resume/db-types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type QAPanelProps = {
   versions: ResumeVersion[];
   defaultVersionId: string | null;
+  /** When set (tailored resume id), show the prep-flow stepper and log CTA. */
+  prepFlowResultId?: string | null;
+  savedJobId?: string | null;
+  isStudent?: boolean;
 };
 
-export function QAPanel({ versions, defaultVersionId }: QAPanelProps) {
+export function QAPanel({
+  versions,
+  defaultVersionId,
+  prepFlowResultId = null,
+  savedJobId = null,
+  isStudent = false,
+}: QAPanelProps) {
   const { draft, update } = useJobDraft();
   const { items, persist: persistItems } = useQADraft();
   const [baseId, setBaseId] = useState(
-    defaultVersionId ?? versions[0]?.id ?? ""
+    prepFlowResultId && versions.some((v) => v.id === prepFlowResultId)
+      ? prepFlowResultId
+      : (defaultVersionId ?? versions[0]?.id ?? "")
   );
   const [mockMode, setMockMode] = useState(false);
   const [busyIds, setBusyIds] = useState<Set<string>>(new Set());
   const [toast, setToast] = useState<string | null>(null);
   const [answerError, setAnswerError] = useState("");
+  const [prepStep, setPrepStep] = useState<4 | 5>(4);
 
   const base = versions.find((v) => v.id === baseId) ?? versions[0];
   const anyBusy = busyIds.size > 0;
+  const showPrepFlow = Boolean(prepFlowResultId);
+
+  useEffect(() => {
+    if (!showPrepFlow) return;
+    const syncHash = () => {
+      setPrepStep(
+        typeof window !== "undefined" && window.location.hash === "#log-application"
+          ? 5
+          : 4
+      );
+    };
+    syncHash();
+    window.addEventListener("hashchange", syncHash);
+    if (window.location.hash === "#log-application") {
+      document.getElementById("log-application")?.scrollIntoView({ behavior: "smooth" });
+    }
+    return () => window.removeEventListener("hashchange", syncHash);
+  }, [showPrepFlow]);
 
   function updateItem(id: string, patch: Partial<QAItem>) {
     persistItems(items.map((q) => (q.id === id ? { ...q, ...patch } : q)));
@@ -104,6 +137,45 @@ export function QAPanel({ versions, defaultVersionId }: QAPanelProps) {
 
   return (
     <>
+      {showPrepFlow ? (
+        <PrepFlowStepper
+          currentStep={prepStep}
+          resultId={prepFlowResultId}
+          savedJobId={savedJobId}
+          className="mb-5"
+        />
+      ) : null}
+
+      {showPrepFlow && base ? (
+        <div
+          id="log-application"
+          className="mb-5 scroll-mt-8 rounded-2xl border border-[#C8DAFF] bg-[#F4F8FF] px-5 py-4"
+        >
+          <div className="text-[14px] font-semibold text-ink">
+            Step 5 — Log this application
+          </div>
+          <p className="mt-1 max-w-[640px] text-[13px] leading-[1.55] text-muted">
+            Paste portal questions below and generate answers first if you need
+            them. When you&apos;ve submitted online, log{" "}
+            {draft.jobCompany?.trim() || "this role"} here so it appears in
+            Applications with your tailored resume.
+          </p>
+          <div className="mt-3">
+            <LogApplicationButton
+              versionId={base.id}
+              resumeVersionName={base.name}
+              initialRole={draft.jobRole}
+              initialCompany={draft.jobCompany}
+              savedJobId={savedJobId ?? undefined}
+              isStudent={isStudent}
+              className="inline-flex items-center gap-1.5 rounded-[10px] border-none bg-accent px-4 py-2.5 text-[13px] font-semibold text-white shadow-[0_4px_14px_rgba(47,107,255,0.32)] hover:bg-[#1E54E6]"
+            >
+              Log application →
+            </LogApplicationButton>
+          </div>
+        </div>
+      ) : null}
+
       {mockMode ? (
         <div className={`${mockBannerClass} mb-4`}>
           Demo mode — add ANTHROPIC_API_KEY for answers in your voice.
