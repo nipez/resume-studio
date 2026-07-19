@@ -15,12 +15,12 @@ export type StatusMeta = {
 
 export const APPLICATION_STATUSES: { id: ApplicationStatus; label: string }[] = [
   { id: "applied", label: "Applied" },
+  { id: "not_applied", label: "Didn't apply" },
   { id: "response", label: "Response" },
   { id: "interview", label: "Interview" },
   { id: "offer", label: "Offer" },
   { id: "rejected", label: "Rejected" },
   { id: "ghosted", label: "No response" },
-  { id: "not_applied", label: "Didn't apply" },
 ];
 
 export const APPLICATION_TYPES: { id: ApplicationType; label: string }[] = [
