@@ -5,6 +5,7 @@ import { mergeSeedIntoDraft } from "@/lib/job-draft/merge-seed";
 import type { CoverPrepSeed } from "@/lib/cover/prep-seed";
 import {
   clearJobDraftLocal,
+  clearQADraftLocal,
   readJobDraft,
   writeJobDraft,
   EMPTY_JOB_DRAFT,
@@ -111,8 +112,10 @@ export function useJobDraft(prepSeed?: CoverPrepSeed | null) {
 
   const reset = useCallback(() => {
     clearJobDraftLocal();
+    clearQADraftLocal();
     setDraft(EMPTY_JOB_DRAFT);
     if (saveTimer.current) clearTimeout(saveTimer.current);
+    // Clears job fields + Q&A on the server copy
     clearWorkspaceJobDraft().catch(() => {});
   }, []);
 

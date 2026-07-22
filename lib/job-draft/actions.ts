@@ -69,6 +69,7 @@ export async function clearWorkspaceJobDraft(): Promise<void> {
       cover_text: "",
       cover_hm: "",
       context_notes: "",
+      qa: [],
     },
     { onConflict: "user_id" }
   );
@@ -80,4 +81,8 @@ export async function saveQADraft(qa: QAItem[]): Promise<void> {
   await supabase
     .from("workspace_drafts")
     .upsert({ user_id: userId, qa }, { onConflict: "user_id" });
+}
+
+export async function clearWorkspaceQADraft(): Promise<void> {
+  await saveQADraft([]);
 }

@@ -12,11 +12,11 @@ import { JobUrlImport } from "@/components/shared/job-url-import";
 import { PrepFlowStepper } from "@/components/shared/prep-flow-stepper";
 import { Spinner } from "@/components/ui/spinner";
 import { Toast } from "@/components/ui/toast";
-import { uid, type QAItem } from "@/lib/job-draft/storage";
+import { qaScopeKey, uid, type QAItem } from "@/lib/job-draft/storage";
 import { useJobDraft } from "@/lib/job-draft/use-job-draft";
 import { useQADraft } from "@/lib/job-draft/use-qa-draft";
 import type { ResumeVersion } from "@/lib/resume/db-types";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type QAPanelProps = {
   versions: ResumeVersion[];
@@ -35,7 +35,24 @@ export function QAPanel({
   isStudent = false,
 }: QAPanelProps) {
   const { draft, update } = useJobDraft();
-  const { items, persist: persistItems } = useQADraft();
+  const scopeKey = useMemo(
+    () =>
+      qaScopeKey({
+        savedJobId,
+        resultId: prepFlowResultId,
+        jobRole: draft.jobRole,
+        jobCompany: draft.jobCompany,
+      }),
+    [savedJobId, prepFlowResultId, draft.jobRole, draft.jobCompany]
+  );
+  const {
+    items,
+    persist: persistItems,
+    clear,
+    scopeReset,
+    maybeStale,
+    dismissScopeReset,
+  } = useQADraft({ scopeKey });
   const [baseId, setBaseId] = useState(
     prepFlowResultId && versions.some((v) => v.id === prepFlowResultId)
       ? prepFlowResultId
@@ -46,10 +63,15 @@ export function QAPanel({
   const [toast, setToast] = useState<string | null>(null);
   const [answerError, setAnswerError] = useState("");
   const [prepStep, setPrepStep] = useState<4 | 5>(4);
+  const [contextOpen, setContextOpen] = useState(!prepFlowResultId);
 
   const base = versions.find((v) => v.id === baseId) ?? versions[0];
   const anyBusy = busyIds.size > 0;
   const showPrepFlow = Boolean(prepFlowResultId);
+  const filledCount = items.filter((i) => i.q.trim()).length;
+  const jobLabel = [draft.jobRole.trim(), draft.jobCompany.trim()]
+    .filter(Boolean)
+    .join(" · ");
 
   useEffect(() => {
     if (!showPrepFlow) return;
@@ -118,8 +140,27 @@ export function QAPanel({
   }
 
   function removeQuestion(id: string) {
-    if (items.length <= 1) return;
+    if (items.length <= 1) {
+      persistItems([{ id: uid(), q: "", a: "" }]);
+      return;
+    }
     persistItems(items.filter((q) => q.id !== id));
+  }
+
+  function clearAll() {
+    if (filledCount === 0 && items.every((i) => !i.a.trim())) {
+      clear();
+      return;
+    }
+    if (
+      !window.confirm(
+        "Clear all questions and answers for this job? This doesn’t affect other applications."
+      )
+    ) {
+      return;
+    }
+    clear();
+    setToast("Cleared — ready for this application’s questions");
   }
 
   function copyAnswer(text: string) {
@@ -155,10 +196,9 @@ export function QAPanel({
             Step 5 — Log this application
           </div>
           <p className="mt-1 max-w-[640px] text-[13px] leading-[1.55] text-muted">
-            Paste portal questions below and generate answers first if you need
-            them. When you&apos;ve submitted online, log{" "}
-            {draft.jobCompany?.trim() || "this role"} here so it appears in
-            Applications with your tailored resume.
+            Answer portal questions below if you need them, then log{" "}
+            {draft.jobCompany?.trim() || "this role"} when you&apos;ve submitted
+            online.
           </p>
           <div className="mt-3">
             <LogApplicationButton
@@ -176,6 +216,54 @@ export function QAPanel({
         </div>
       ) : null}
 
+      {scopeReset ? (
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-[10px] border border-[#C8DAFF] bg-[#F4F8FF] px-3.5 py-2.5 text-[13px] text-[#1E54E6]">
+          <span>
+            Started a fresh Q&amp;A for{" "}
+            <span className="font-semibold">
+              {jobLabel || "this application"}
+            </span>
+            . Previous job answers were cleared.
+          </span>
+          <button
+            type="button"
+            onClick={dismissScopeReset}
+            className="cursor-pointer border-none bg-transparent p-0 text-[12.5px] font-semibold text-[#2456D6] hover:underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      ) : null}
+
+      {maybeStale && !scopeReset ? (
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-[10px] border border-[#F1DDA6] bg-[#FEF3DA] px-3.5 py-2.5 text-[13px] text-[#9A6212]">
+          <span>
+            These questions may be from a previous application. Clear them if
+            they aren&apos;t for{" "}
+            <span className="font-semibold">
+              {jobLabel || "this role"}
+            </span>
+            .
+          </span>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={clearAll}
+              className="cursor-pointer rounded-lg border-none bg-[#9A6212] px-3 py-1.5 text-[12px] font-semibold text-white hover:bg-[#7E4F0E]"
+            >
+              Clear for this job
+            </button>
+            <button
+              type="button"
+              onClick={dismissScopeReset}
+              className="cursor-pointer border-none bg-transparent p-0 text-[12.5px] font-semibold text-[#9A6212] hover:underline"
+            >
+              Keep
+            </button>
+          </div>
+        </div>
+      ) : null}
+
       {mockMode ? (
         <div className={`${mockBannerClass} mb-4`}>
           Demo mode — add ANTHROPIC_API_KEY for answers in your voice.
@@ -186,70 +274,123 @@ export function QAPanel({
           {answerError}
         </div>
       ) : null}
-      <div className="mb-[18px] space-y-3.5 rounded-[14px] border border-[#E6E8EC] bg-white px-[18px] py-4">
-        <div className="flex flex-wrap items-end justify-between gap-3.5">
-          <VersionSelect
-            versions={versions}
-            value={baseId}
-            onChange={setBaseId}
-            label="Resume context"
-            id="qa-base"
-          />
+
+      <div className="mb-4 rounded-[14px] border border-[#E6E8EC] bg-white px-[18px] py-4">
+        <button
+          type="button"
+          onClick={() => setContextOpen((open) => !open)}
+          className="flex w-full cursor-pointer items-center justify-between gap-3 border-none bg-transparent p-0 text-left"
+          aria-expanded={contextOpen}
+        >
+          <div className="min-w-0">
+            <div className="text-[11px] font-bold uppercase tracking-[0.06em] text-[#8A92A0]">
+              Job context
+            </div>
+            <div className="mt-1 truncate text-[14px] font-semibold text-ink">
+              {jobLabel || "Add role and company"}
+            </div>
+            <div className="mt-0.5 truncate text-[12.5px] text-muted">
+              Resume: {base?.name ?? "—"}
+              {!contextOpen ? " · click to edit" : ""}
+            </div>
+          </div>
+          <span className="flex-none text-[12.5px] font-semibold text-[#2456D6]">
+            {contextOpen ? "Hide" : "Edit"}
+          </span>
+        </button>
+
+        {contextOpen ? (
+          <div className="mt-4 space-y-3.5 border-t border-[#EEF0F3] pt-4">
+            <div className="flex flex-wrap items-end justify-between gap-3.5">
+              <VersionSelect
+                versions={versions}
+                value={baseId}
+                onChange={setBaseId}
+                label="Resume context"
+                id="qa-base"
+              />
+            </div>
+            <JobUrlImport
+              className="mt-0"
+              onImported={(fields) =>
+                update({
+                  jobRole: fields.jobRole,
+                  jobCompany: fields.jobCompany,
+                  jobDesc: fields.jobDesc,
+                  jobUrl: fields.jobUrl ?? draft.jobUrl,
+                })
+              }
+              hint="Career pages work via URL. For Indeed or LinkedIn, use Paste text."
+              successMessage="Imported — job context updated below."
+            />
+            <div className="grid grid-cols-2 gap-3">
+              <JobRoleField
+                value={draft.jobRole}
+                onChange={(v) => update({ jobRole: v })}
+              />
+              <JobCompanyField
+                value={draft.jobCompany}
+                onChange={(v) => update({ jobCompany: v })}
+              />
+            </div>
+            <JobDescField
+              value={draft.jobDesc}
+              onChange={(v) => update({ jobDesc: v })}
+              rows={4}
+              label="Job description (optional context)"
+            />
+          </div>
+        ) : null}
+      </div>
+
+      <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
+        <div className="min-w-0">
+          <h2 className="font-display text-[17px] font-semibold text-ink">
+            Portal questions
+          </h2>
+          <p className="mt-1 text-[13px] text-muted">
+            {jobLabel
+              ? `For ${jobLabel} only — not carried over from other applications.`
+              : "Paste screening questions from the online application."}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={clearAll}
+            className="rounded-[10px] border border-[#E4E7EC] bg-white px-3.5 py-2 text-[13px] font-semibold text-[#5A6573] hover:border-[#C8CED6] hover:text-ink"
+          >
+            Clear all
+          </button>
           <button
             type="button"
             onClick={answerAll}
-            disabled={anyBusy}
-            className="rounded-[10px] bg-accent px-4 py-2.5 text-[13px] font-semibold text-white hover:bg-[#1E54E6] disabled:opacity-60"
+            disabled={anyBusy || filledCount === 0}
+            className="rounded-[10px] bg-accent px-4 py-2 text-[13px] font-semibold text-white hover:bg-[#1E54E6] disabled:opacity-60"
           >
             {anyBusy ? "Answering…" : "Answer all"}
           </button>
         </div>
-        <JobUrlImport
-          className="mt-0"
-          onImported={(fields) =>
-            update({
-              jobRole: fields.jobRole,
-              jobCompany: fields.jobCompany,
-              jobDesc: fields.jobDesc,
-              jobUrl: fields.jobUrl ?? draft.jobUrl,
-            })
-          }
-          hint="Career pages work via URL. For Indeed or LinkedIn, use Paste text."
-          successMessage="Imported — job context updated below."
-        />
-        <div className="grid grid-cols-2 gap-3">
-          <JobRoleField
-            value={draft.jobRole}
-            onChange={(v) => update({ jobRole: v })}
-          />
-          <JobCompanyField
-            value={draft.jobCompany}
-            onChange={(v) => update({ jobCompany: v })}
-          />
-        </div>
-        <JobDescField
-          value={draft.jobDesc}
-          onChange={(v) => update({ jobDesc: v })}
-          rows={4}
-          label="Job description (optional context)"
-        />
       </div>
 
       <div className="flex flex-col gap-3.5">
-        {items.map((q) => {
+        {items.map((q, index) => {
           const busy = busyIds.has(q.id);
           return (
             <div
               key={q.id}
               className="rounded-[14px] border border-[#E6E8EC] bg-white px-[18px] py-4"
             >
+              <div className="mb-2 text-[11px] font-bold uppercase tracking-[0.06em] text-[#9AA3AF]">
+                Question {index + 1}
+              </div>
               <div className="flex items-start gap-2.5">
                 <textarea
                   value={q.q}
                   onChange={(e) => updateItem(q.id, { q: e.target.value })}
-                  rows={1}
+                  rows={2}
                   placeholder="Paste an application question…"
-                  className="min-h-[42px] flex-1 resize-y rounded-[9px] border border-[#E2E5EA] px-3 py-2.5 text-sm font-semibold leading-[1.4] text-[#1a1f29] focus:border-accent focus:outline-none"
+                  className="min-h-[52px] flex-1 resize-y rounded-[9px] border border-[#E2E5EA] px-3 py-2.5 text-sm font-semibold leading-[1.45] text-[#1a1f29] focus:border-accent focus:outline-none"
                 />
                 <button
                   type="button"

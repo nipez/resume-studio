@@ -24,8 +24,8 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
         </h1>
         <p className="mt-2 mb-[22px] max-w-[640px] text-[14.5px] text-muted">
           {prepFlowResultId
-            ? "Step 4 of 5: paste the portal's screening questions, generate answers in your voice, then log the application when you've submitted."
-            : "Drop in the application's questions and generate answers in your voice — confident, specific, tied to real outcomes. Uses the shared job description for context."}
+            ? "Step 4 of 5: paste this portal's screening questions, generate answers in your voice, then log when you've submitted. Q&A is per job — prior applications stay separate."
+            : "Drop in an application's questions and generate answers in your voice. Each job keeps its own Q&A so answers don't carry over."}
         </p>
         <JobDraftBootstrap savedJobId={job ?? null} />
         <QAPanel
