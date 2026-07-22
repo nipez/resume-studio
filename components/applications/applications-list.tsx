@@ -466,10 +466,10 @@ export function ApplicationsList({
             <button
               type="button"
               onClick={() => setTab("active")}
-              className={`cursor-pointer rounded-[10px] border px-3.5 py-2 text-[13px] font-semibold transition-colors ${
+              className={`cursor-pointer border-b-2 px-1 pb-2 text-[13.5px] font-semibold transition-colors ${
                 tab === "active"
-                  ? "border-accent/30 bg-white text-accent shadow-[0_2px_10px_rgba(36,86,214,0.08)]"
-                  : "border-transparent bg-[#ECEEF1]/70 text-[#5A6573] hover:border-[#E2E5EA] hover:bg-white"
+                  ? "border-teal text-ink"
+                  : "border-transparent text-muted hover:text-ink"
               }`}
             >
               Active
@@ -482,10 +482,10 @@ export function ApplicationsList({
             <button
               type="button"
               onClick={() => setTab("archived")}
-              className={`cursor-pointer rounded-[10px] border px-3.5 py-2 text-[13px] font-semibold transition-colors ${
+              className={`cursor-pointer border-b-2 px-1 pb-2 text-[13.5px] font-semibold transition-colors ${
                 tab === "archived"
-                  ? "border-accent/30 bg-white text-accent shadow-[0_2px_10px_rgba(36,86,214,0.08)]"
-                  : "border-transparent bg-[#ECEEF1]/70 text-[#5A6573] hover:border-[#E2E5EA] hover:bg-white"
+                  ? "border-teal text-ink"
+                  : "border-transparent text-muted hover:text-ink"
               }`}
             >
               Archived
