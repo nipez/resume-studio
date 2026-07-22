@@ -355,47 +355,53 @@ export function ApplicationsList({
     });
   }
 
+  const secondaryBtnClass =
+    "inline-flex items-center gap-1.5 rounded-[10px] border border-[#E4E7EC] bg-white px-3.5 py-2 text-[13px] font-semibold text-[#5A6573] transition-colors hover:border-[#C8CED6] hover:bg-[#FAFBFC] hover:text-ink";
+
   return (
     <div className="scroll flex-1 overflow-auto">
-      <div className="mx-auto max-w-[1080px] px-5 pb-16 sm:px-8 lg:px-12 pt-[42px]">
-        <div className="mb-[26px] flex flex-wrap items-end justify-between gap-6">
-          <div>
+      <div className="mx-auto max-w-[1080px] px-5 pb-16 pt-5 sm:px-8 lg:px-12">
+        <div className="mb-5 flex flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0 max-w-[560px]">
             <h1 className="font-display text-[28px] font-semibold tracking-[-0.025em] text-ink">
               Applications
             </h1>
-            <p className="mt-2 max-w-[600px] text-[14.5px] leading-relaxed text-muted">
+            <p className="mt-1.5 text-[14.5px] leading-relaxed text-muted">
               {isStudent
-                ? "Save jobs and internships you want to apply to, then track each one with a snapshot of the resume, cover letter, and answers you sent."
-                : "Save jobs you want to apply to, then track each application with a snapshot of the resume, cover letter, and answers you sent."}
+                ? "Apply to a role with a tailored resume, then track each one with the materials you sent."
+                : "Apply to a job with a tailored resume, then track each application with the materials you sent."}
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <SaveJobButton />
+          <div className="flex flex-col items-stretch gap-2 sm:items-end">
             {versions.length > 0 ? (
               <ApplyToNewJobButton
                 versions={versions}
                 versionCounts={versionCounts}
                 defaultVersionId={defaultVersionId}
                 isStudent={isStudent}
-              />
-            ) : null}
-            {defaultVersionId ? (
-              <LogApplicationButton
-                versionId={defaultVersionId}
-                resumeVersionName={defaultVersionName ?? "Resume"}
-                initialRole={defaultVersionRole}
-                initialCompany={defaultVersionCompany}
-                isStudent={isStudent}
-                className="inline-flex items-center gap-1.5 rounded-[11px] border border-[#D6E4FF] bg-white px-[17px] py-[11px] text-[13.5px] font-semibold text-[#2456D6] transition-colors hover:border-accent hover:bg-[#F5F8FF]"
+                className="inline-flex items-center justify-center gap-1.5 rounded-[12px] border-none bg-accent px-5 py-3 text-[14.5px] font-semibold text-white shadow-[0_4px_16px_rgba(47,107,255,0.34)] transition-colors hover:bg-accent-dark"
               />
             ) : (
               <Link
                 href="/library"
-                className="inline-flex items-center gap-1.5 rounded-[11px] border border-[#D6E4FF] bg-[#F5F8FF] px-[17px] py-[11px] text-[13.5px] font-semibold text-[#2456D6] transition-colors hover:border-accent hover:bg-[#EAF1FF]"
+                className="inline-flex items-center justify-center gap-1.5 rounded-[12px] border-none bg-accent px-5 py-3 text-[14.5px] font-semibold text-white shadow-[0_4px_16px_rgba(47,107,255,0.34)] transition-colors hover:bg-accent-dark"
               >
                 + Create a resume first
               </Link>
             )}
+            <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+              <SaveJobButton className={secondaryBtnClass} />
+              {defaultVersionId ? (
+                <LogApplicationButton
+                  versionId={defaultVersionId}
+                  resumeVersionName={defaultVersionName ?? "Resume"}
+                  initialRole={defaultVersionRole}
+                  initialCompany={defaultVersionCompany}
+                  isStudent={isStudent}
+                  className={secondaryBtnClass}
+                />
+              ) : null}
+            </div>
           </div>
         </div>
 

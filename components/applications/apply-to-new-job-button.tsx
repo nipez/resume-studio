@@ -9,6 +9,7 @@ type ApplyToNewJobButtonProps = {
   versionCounts: Record<string, number>;
   defaultVersionId: string | null;
   isStudent?: boolean;
+  className?: string;
 };
 
 export function ApplyToNewJobButton({
@@ -16,6 +17,7 @@ export function ApplyToNewJobButton({
   versionCounts,
   defaultVersionId,
   isStudent = false,
+  className = "",
 }: ApplyToNewJobButtonProps) {
   const [open, setOpen] = useState(false);
 
@@ -24,7 +26,10 @@ export function ApplyToNewJobButton({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-1.5 rounded-[11px] border-none bg-accent px-[17px] py-[11px] text-[13.5px] font-semibold text-white shadow-[0_4px_14px_rgba(47,107,255,0.32)] transition-colors hover:bg-accent-dark"
+        className={
+          className ||
+          "inline-flex items-center gap-1.5 rounded-[11px] border-none bg-accent px-[17px] py-[11px] text-[13.5px] font-semibold text-white shadow-[0_4px_14px_rgba(47,107,255,0.32)] transition-colors hover:bg-accent-dark"
+        }
       >
         + {isStudent ? "Apply to new opportunity" : "Apply to new job"}
       </button>
