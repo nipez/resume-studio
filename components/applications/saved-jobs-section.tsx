@@ -77,21 +77,28 @@ export function SavedJobsSection({
   if (savedJobs.length === 0) {
     return (
       <section className="mb-8">
-        <div className="mb-3">
-          <h2 className="font-display text-[17px] font-semibold text-ink">
-            Jobs to apply to
-          </h2>
-          <p className="mt-1 text-[13px] text-muted">
-            Save roles you want to pursue — tailor, write a cover letter, then log
-            when you apply.
-          </p>
+        <div className="mb-3 flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <h2 className="font-display text-[17px] font-semibold text-ink">
+              My saved jobs
+            </h2>
+            <p className="mt-1 text-[13px] text-muted">
+              Queue roles before you apply — tailor, cover letter, then log.
+            </p>
+          </div>
         </div>
-        <div className="rounded-2xl border border-dashed border-[#D2D7DE] bg-[#FBFBFC] px-6 py-8 text-center">
-          <p className="text-[13.5px] text-muted">
-            No saved jobs yet. Click{" "}
-            <span className="font-semibold text-ink">Save job to apply to</span> to
-            build your queue.
-          </p>
+        <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-[#D2D7DE] bg-[#FBFBFC] px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <div className="font-display text-[15px] font-semibold text-ink">
+              Add your first job
+            </div>
+            <p className="mt-1 text-[13px] text-muted">
+              Save a posting here so it&apos;s ready when you want to tailor.
+            </p>
+          </div>
+          <span className="text-[12.5px] font-semibold text-accent">
+            Use “Save job” above →
+          </span>
         </div>
       </section>
     );
@@ -102,7 +109,7 @@ export function SavedJobsSection({
       <section className="mb-8">
       <div className="mb-3">
         <h2 className="font-display text-[17px] font-semibold text-ink">
-          Jobs to apply to
+          My saved jobs
         </h2>
         <p className="mt-1 text-[13px] text-muted">
           Roles you&apos;re preparing for — not logged until you apply.
