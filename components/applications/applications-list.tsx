@@ -72,11 +72,11 @@ function StatCard({
   }
 
   return (
-    <div className="min-w-[120px] flex-1 rounded-[14px] bg-sidebar px-[18px] py-4 text-white">
-      <div className="font-display text-[25px] font-semibold leading-none">
+    <div className="min-w-[120px] flex-1 rounded-2xl border border-border bg-white px-[18px] py-4">
+      <div className="font-display text-[25px] font-semibold leading-none tracking-[-0.03em] text-ink">
         {value}
       </div>
-      <div className="mt-1.5 text-xs font-semibold opacity-85">{label}</div>
+      <div className="mt-1.5 text-xs font-semibold text-muted">{label}</div>
     </div>
   );
 }
@@ -275,7 +275,7 @@ function ApplicationsTable({
               <div className="flex flex-wrap justify-end gap-1.5">
                 <Link
                   href={`/applications/${app.id}`}
-                  className="rounded-lg bg-sidebar px-2.5 py-[6px] text-[11.5px] font-semibold text-white transition-colors hover:bg-[#272b33]"
+                  className="rounded-lg bg-ink px-2.5 py-[6px] text-[11.5px] font-semibold text-white transition-colors hover:bg-[#2A3038]"
                 >
                   Open
                 </Link>
@@ -395,21 +395,13 @@ export function ApplicationsList({
 
   return (
     <div className="scroll flex-1 overflow-auto">
-      <div className="mx-auto max-w-[1080px] px-5 pb-16 pt-5 sm:px-8 lg:px-12">
+      <div className="mx-auto max-w-[1120px] px-5 pb-20 pt-8 sm:px-8 lg:px-10">
         <div className="mb-5 flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0 max-w-[560px]">
-            <div className="mb-1 flex items-center gap-2">
-              <span
-                className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#EEF3FF] text-[14px] text-accent"
-                aria-hidden
-              >
-                ⌖
-              </span>
-              <h1 className="font-display text-[28px] font-semibold tracking-[-0.025em] text-ink">
-                Job tracker
-              </h1>
-            </div>
-            <p className="mt-1.5 text-[14.5px] leading-relaxed text-muted">
+            <h1 className="font-display text-[30px] font-semibold tracking-[-0.03em] text-ink">
+              Job tracker
+            </h1>
+            <p className="mt-2 text-[15px] leading-relaxed text-muted">
               {isStudent
                 ? "Save roles, tailor what you send, then track every application in one sheet."
                 : "Your spreadsheet for the hunt — position, status, resume, cover letter, and next steps."}
@@ -422,14 +414,14 @@ export function ApplicationsList({
                 versionCounts={versionCounts}
                 defaultVersionId={defaultVersionId}
                 isStudent={isStudent}
-                className="inline-flex items-center justify-center gap-1.5 rounded-[12px] border-none bg-accent px-5 py-3 text-[14.5px] font-semibold text-white shadow-[0_4px_16px_rgba(47,107,255,0.34)] transition-colors hover:bg-accent-dark"
+                className="inline-flex items-center justify-center gap-1.5 rounded-[12px] border-none bg-accent px-5 py-3 text-[14.5px] font-semibold text-white shadow-accent transition-colors hover:bg-accent-dark"
               >
                 + New job application
               </ApplyToNewJobButton>
             ) : (
               <Link
                 href="/library"
-                className="inline-flex items-center justify-center gap-1.5 rounded-[12px] border-none bg-accent px-5 py-3 text-[14.5px] font-semibold text-white shadow-[0_4px_16px_rgba(47,107,255,0.34)] transition-colors hover:bg-accent-dark"
+                className="inline-flex items-center justify-center gap-1.5 rounded-[12px] border-none bg-accent px-5 py-3 text-[14.5px] font-semibold text-white shadow-accent transition-colors hover:bg-accent-dark"
               >
                 + Create a resume first
               </Link>
@@ -474,10 +466,10 @@ export function ApplicationsList({
             <button
               type="button"
               onClick={() => setTab("active")}
-              className={`cursor-pointer rounded-[10px] border px-3.5 py-2 text-[13px] font-semibold transition-colors ${
+              className={`cursor-pointer border-b-2 px-1 pb-2 text-[13.5px] font-semibold transition-colors ${
                 tab === "active"
-                  ? "border-accent/30 bg-white text-accent shadow-[0_2px_10px_rgba(36,86,214,0.08)]"
-                  : "border-transparent bg-[#ECEEF1]/70 text-[#5A6573] hover:border-[#E2E5EA] hover:bg-white"
+                  ? "border-teal text-ink"
+                  : "border-transparent text-muted hover:text-ink"
               }`}
             >
               Active
@@ -490,10 +482,10 @@ export function ApplicationsList({
             <button
               type="button"
               onClick={() => setTab("archived")}
-              className={`cursor-pointer rounded-[10px] border px-3.5 py-2 text-[13px] font-semibold transition-colors ${
+              className={`cursor-pointer border-b-2 px-1 pb-2 text-[13.5px] font-semibold transition-colors ${
                 tab === "archived"
-                  ? "border-accent/30 bg-white text-accent shadow-[0_2px_10px_rgba(36,86,214,0.08)]"
-                  : "border-transparent bg-[#ECEEF1]/70 text-[#5A6573] hover:border-[#E2E5EA] hover:bg-white"
+                  ? "border-teal text-ink"
+                  : "border-transparent text-muted hover:text-ink"
               }`}
             >
               Archived

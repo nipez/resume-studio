@@ -141,8 +141,8 @@ export function LibraryView({
                 onClick={() => setTab(item.id)}
                 className={`cursor-pointer border-b-2 px-3.5 py-2.5 text-[13.5px] font-semibold transition-colors ${
                   active
-                    ? "border-accent text-accent"
-                    : "border-transparent text-[#5A6573] hover:text-ink"
+                    ? "border-teal text-ink"
+                    : "border-transparent text-muted hover:text-ink"
                 }`}
               >
                 {item.label}

@@ -99,7 +99,7 @@ export function DashboardHomeSimple({ data }: { data: DashboardHomeData }) {
       <div className="mx-auto max-w-[760px] px-5 pb-16 sm:px-8 lg:px-12 pt-7">
         <div className="mb-7">
           {isStudent && onboardingPersonaSet ? (
-            <span className="mb-2 inline-flex rounded-full bg-[#EEF3FF] px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-accent">
+            <span className="mb-2 inline-flex rounded-full bg-[#E8FBF8] px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-teal-dark">
               Student mode
             </span>
           ) : null}
@@ -130,7 +130,7 @@ export function DashboardHomeSimple({ data }: { data: DashboardHomeData }) {
         ) : !hasResume ? (
           <Link
             href={buildLink}
-            className="mb-6 flex items-center gap-4 rounded-2xl border border-dashed border-[#B8D0FF] bg-gradient-to-br from-[#F3F7FF] to-white px-5 py-5 transition-shadow hover:shadow-[0_10px_28px_rgba(47,107,255,0.12)]"
+            className="mb-6 flex items-center gap-4 rounded-2xl border border-dashed border-[#9DE4DB] bg-[#F3FBFA] px-5 py-5 transition-shadow hover:shadow-soft"
           >
             <div className="min-w-0 flex-1">
               <div className="font-display text-[16px] font-semibold text-ink">
@@ -144,14 +144,14 @@ export function DashboardHomeSimple({ data }: { data: DashboardHomeData }) {
                   : "Step-by-step guided builder — easier than starting from scratch."}
               </div>
             </div>
-            <div className="flex-none whitespace-nowrap rounded-[11px] bg-accent px-4 py-2.5 text-[13px] font-semibold text-white">
+            <div className="flex-none whitespace-nowrap rounded-xl bg-accent px-4 py-2.5 text-[13px] font-semibold text-white">
               Open builder →
             </div>
           </Link>
         ) : !hasApplication ? (
           <Link
             href="/tailor"
-            className="mb-6 flex items-center gap-4 rounded-2xl border border-dashed border-[#B8D0FF] bg-gradient-to-br from-[#F3F7FF] to-white px-5 py-5 transition-shadow hover:shadow-[0_10px_28px_rgba(47,107,255,0.12)]"
+            className="mb-6 flex items-center gap-4 rounded-2xl border border-dashed border-[#9DE4DB] bg-[#F3FBFA] px-5 py-5 transition-shadow hover:shadow-soft"
           >
             <div className="min-w-0 flex-1">
               <div className="font-display text-[16px] font-semibold text-ink">
@@ -164,7 +164,7 @@ export function DashboardHomeSimple({ data }: { data: DashboardHomeData }) {
                 letter, and help you log what you sent.
               </div>
             </div>
-            <div className="flex-none whitespace-nowrap rounded-[11px] bg-accent px-4 py-2.5 text-[13px] font-semibold text-white">
+            <div className="flex-none whitespace-nowrap rounded-xl bg-accent px-4 py-2.5 text-[13px] font-semibold text-white">
               Start applying →
             </div>
           </Link>

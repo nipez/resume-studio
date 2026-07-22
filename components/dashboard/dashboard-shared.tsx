@@ -74,11 +74,11 @@ export const MODULES = [
 
 export function StatCard({ label, value }: DashboardStat) {
   return (
-    <div className="rounded-[14px] border border-border bg-white px-[18px] py-4">
-      <div className="font-display text-[24px] font-semibold leading-none text-ink">
+    <div className="rounded-2xl border border-border bg-white px-5 py-4">
+      <div className="font-display text-[26px] font-semibold leading-none tracking-[-0.03em] text-ink">
         {value}
       </div>
-      <div className="mt-1.5 text-xs font-semibold text-muted">{label}</div>
+      <div className="mt-2 text-[12px] font-medium text-muted">{label}</div>
     </div>
   );
 }
@@ -87,22 +87,20 @@ export function UpcomingSection({ upcoming }: { upcoming: DashboardUpcoming[] })
   if (upcoming.length === 0) return null;
 
   return (
-    <section className="rounded-2xl border border-border bg-white p-6">
-      <h2 className="mb-3 font-display text-[15px] font-semibold text-ink">
-        Upcoming
-      </h2>
-      <div className="space-y-2">
+    <section className="rounded-2xl border border-border bg-white p-5">
+      <h2 className="mb-3 text-[15px] font-semibold text-ink">Upcoming</h2>
+      <div className="space-y-1.5">
         {upcoming.map((event) => (
           <Link
             key={event.id}
             href={`/applications/${event.appId}`}
-            className="flex items-center gap-3 rounded-xl border border-[#EEF0F3] px-3.5 py-2.5 transition-colors hover:border-[#D9DEE5] hover:bg-[#FAFBFC]"
+            className="flex items-center gap-3 rounded-xl px-2 py-2.5 transition-colors hover:bg-soft"
           >
             <div
-              className={`flex-none rounded-lg px-2.5 py-1 text-[11px] font-bold ${
+              className={`flex-none rounded-md px-2 py-1 text-[11px] font-bold ${
                 event.overdue
                   ? "bg-[#FCECEC] text-[#B23B3B]"
-                  : "bg-[#EAF1FF] text-[#1E54E6]"
+                  : "bg-[#E8FBF8] text-teal-dark"
               }`}
             >
               {formatDay(event.date)}
@@ -146,44 +144,37 @@ export function ChecklistSection({
   items: ChecklistItem[];
   compact?: boolean;
 }) {
-  const doneCount = items.filter((c) => c.done).length;
-
   return (
     <section
       className={`rounded-2xl border border-border bg-white ${
         compact ? "p-5" : "p-6"
       }`}
     >
-      <div className="mb-1 flex items-center justify-between gap-2">
-        <h2 className="font-display text-[15px] font-semibold text-ink">{title}</h2>
-        <span className="text-[12.5px] font-semibold text-muted">
-          {doneCount}/{items.length}
-        </span>
-      </div>
+      <h2 className="text-[15px] font-semibold text-ink">{title}</h2>
       {subtitle ? (
-        <p className="mb-4 text-[12.5px] text-muted">{subtitle}</p>
+        <p className="mt-1 mb-4 text-[12.5px] text-muted">{subtitle}</p>
       ) : (
         <div className="mb-3" />
       )}
-      <div className="space-y-2">
+      <div className="space-y-0.5">
         {items.map((item) => (
           <Link
             key={item.label}
             href={item.href}
-            className="flex items-center gap-3 rounded-xl px-1 py-2 transition-colors hover:bg-[#FAFBFC]"
+            className="flex items-center gap-3 rounded-xl px-1 py-2.5 transition-colors hover:bg-soft"
           >
             <span
-              className={`flex h-6 w-6 flex-none items-center justify-center rounded-full text-[12px] font-bold ${
+              className={`flex h-7 w-7 flex-none items-center justify-center rounded-full text-[13px] font-bold ${
                 item.done
                   ? "bg-[#E6F7EE] text-[#0E7C4B]"
-                  : "bg-[#EEF3FF] text-accent"
+                  : "bg-[#F0ECFF] text-accent"
               }`}
             >
               {item.done ? "✓" : "+"}
             </span>
             <span
               className={`flex-1 text-[13.5px] ${
-                item.done ? "text-[#8A92A0] line-through" : "font-medium text-ink"
+                item.done ? "text-[#9AA3AF] line-through" : "font-medium text-ink"
               }`}
             >
               {item.label}

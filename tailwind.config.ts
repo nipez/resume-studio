@@ -9,14 +9,19 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        page: "#F5F6F8",
-        ink: "#0E1116",
-        muted: "#5A6573",
+        page: "#FFFFFF",
+        soft: "#F7F8FA",
+        ink: "#1A1D23",
+        muted: "#6B7280",
         accent: {
-          DEFAULT: "#2F6BFF",
-          dark: "#1E54E6",
+          DEFAULT: "#6B4EFF",
+          dark: "#5638E0",
         },
-        border: "#E6E8EC",
+        teal: {
+          DEFAULT: "#0FB5A6",
+          dark: "#0C9A8D",
+        },
+        border: "#E8EAED",
         sidebar: {
           DEFAULT: "#0D0F14",
           muted: "#C7CDD6",
@@ -25,7 +30,7 @@ const config: Config = {
           footer: "#5C6473",
         },
         status: {
-          applied: "#1E54E6",
+          applied: "#6B4EFF",
           response: "#0C7C8C",
           interview: "#9A6212",
           offer: "#0E7C4B",
@@ -39,7 +44,8 @@ const config: Config = {
         serif: ["var(--font-instrument-serif)", "Georgia", "serif"],
       },
       boxShadow: {
-        accent: "0 4px 14px rgba(47, 107, 255, 0.32)",
+        accent: "0 4px 14px rgba(107, 78, 255, 0.28)",
+        soft: "0 1px 2px rgba(26, 29, 35, 0.04), 0 8px 24px rgba(26, 29, 35, 0.04)",
       },
     },
   },
