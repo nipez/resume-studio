@@ -3,7 +3,7 @@
 import { Spinner } from "@/components/ui/spinner";
 import { useEscapeKey } from "@/components/ui/confirm-dialog";
 import { clearWorkspaceJobDraft } from "@/lib/job-draft/actions";
-import { clearJobDraftLocal } from "@/lib/job-draft/storage";
+import { clearJobDraftLocal, clearQADraftLocal } from "@/lib/job-draft/storage";
 import type { ResumeVersion } from "@/lib/resume/db-types";
 import { versionCardMeta } from "@/lib/resume/utils";
 import Link from "next/link";
@@ -104,6 +104,7 @@ export function ApplyToNewJobModal({
         // Tailor creates a new job-specific version on save — no intermediate
         // "(copy)" stub, so the library doesn't fill with Master Resume (copy).
         clearJobDraftLocal();
+        clearQADraftLocal();
         await clearWorkspaceJobDraft();
         onClose();
         router.push(`/tailor?v=${selectedId}&new=1`);

@@ -19,6 +19,7 @@ import {
 import { clearWorkspaceJobDraft } from "@/lib/job-draft/actions";
 import {
   clearJobDraftLocal,
+  clearQADraftLocal,
   readJobDraft,
   readQADraft,
   writeJobDraft,
@@ -137,6 +138,7 @@ export function LogApplicationModal({
           applicationType,
         });
         clearJobDraftLocal();
+        clearQADraftLocal();
         await clearWorkspaceJobDraft();
         setToast("Application logged — snapshot saved");
         onClose();
