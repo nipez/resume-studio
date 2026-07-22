@@ -1,5 +1,6 @@
 "use client";
 
+import { ApplicationActivityPanel } from "@/components/applications/application-activity-panel";
 import { ApplicationAnswersEditor } from "@/components/applications/application-answers-editor";
 import { CoverLetterControls } from "@/components/applications/cover-letter-controls";
 import { FollowUpRecommendationsPanel } from "@/components/applications/follow-up-recommendations-panel";
@@ -119,318 +120,332 @@ export function ApplicationDetailPanels({
   onFollowUpDismissed,
 }: ApplicationDetailPanelsProps) {
   if (tab === "overview") {
+    const metaFieldClass =
+      "w-full min-w-0 rounded-[9px] border border-transparent bg-transparent px-2 py-1.5 text-[13.5px] text-ink hover:border-[#E2E5EA] focus:border-accent focus:bg-white";
+
     return (
-      <div className="flex flex-col gap-4">
-        <DetailSection title="Outcome">
-          <div className="flex flex-wrap gap-2">
-            {APPLICATION_STATUSES.map((st) => {
-              const sm = appStatusMeta(st.id);
-              const on = app.status === st.id;
-              return (
+      <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
+        <div className="flex min-w-0 flex-col gap-4">
+          <DetailSection title="Details">
+            <div className="divide-y divide-[#F0F2F5]">
+              <div className="grid gap-2 py-2.5 sm:grid-cols-[120px_minmax(0,1fr)] sm:items-start">
+                <div className="pt-1.5 text-[12.5px] font-semibold text-[#8A92A0]">
+                  Status
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {APPLICATION_STATUSES.map((st) => {
+                    const sm = appStatusMeta(st.id);
+                    const on = app.status === st.id;
+                    return (
+                      <button
+                        key={st.id}
+                        type="button"
+                        disabled={pending}
+                        onClick={() => setStatus(st.id)}
+                        className="cursor-pointer rounded-full border px-2.5 py-1 text-[12px] transition-all duration-150 disabled:opacity-60"
+                        style={{
+                          borderColor: on ? sm.bd : "#E2E5EA",
+                          background: on ? sm.bg : "#fff",
+                          color: on ? sm.fg : "#7A828F",
+                          fontWeight: on ? 700 : 600,
+                        }}
+                      >
+                        {st.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="grid gap-2 py-2.5 sm:grid-cols-[120px_minmax(0,1fr)] sm:items-center">
+                <div className="text-[12.5px] font-semibold text-[#8A92A0]">Role</div>
+                <input
+                  value={app.role}
+                  onChange={(e) => patchLocal({ role: e.target.value })}
+                  onBlur={(e) => saveMeta({ role: e.target.value })}
+                  placeholder="Role"
+                  className={metaFieldClass}
+                />
+              </div>
+
+              <div className="grid gap-2 py-2.5 sm:grid-cols-[120px_minmax(0,1fr)] sm:items-center">
+                <div className="text-[12.5px] font-semibold text-[#8A92A0]">Company</div>
+                <input
+                  value={app.company}
+                  onChange={(e) => patchLocal({ company: e.target.value })}
+                  onBlur={(e) => saveMeta({ company: e.target.value })}
+                  placeholder="Company"
+                  className={metaFieldClass}
+                />
+              </div>
+
+              <div className="grid gap-2 py-2.5 sm:grid-cols-[120px_minmax(0,1fr)] sm:items-center">
+                <div className="text-[12.5px] font-semibold text-[#8A92A0]">Applied</div>
+                <input
+                  type="date"
+                  value={appliedDateInputValue(app.applied_at)}
+                  onChange={(e) => {
+                    const iso = appliedDateFromInput(e.target.value);
+                    if (!iso) return;
+                    patchLocal({ applied_at: iso });
+                    startTransition(async () => {
+                      await updateApplicationMeta(app.id, { applied_at: iso });
+                      router.refresh();
+                    });
+                  }}
+                  className={`${metaFieldClass} max-w-[200px]`}
+                />
+              </div>
+
+              <div className="grid gap-2 py-2.5 sm:grid-cols-[120px_minmax(0,1fr)] sm:items-center">
+                <div className="text-[12.5px] font-semibold text-[#8A92A0]">
+                  Decision by
+                </div>
+                <input
+                  type="date"
+                  value={app.decision_by ?? ""}
+                  onChange={(e) => {
+                    const value = e.target.value || null;
+                    patchLocal({ decision_by: value });
+                    startTransition(async () => {
+                      await updateApplicationMeta(app.id, { decision_by: value });
+                      router.refresh();
+                    });
+                  }}
+                  className={`${metaFieldClass} max-w-[200px]`}
+                />
+              </div>
+            </div>
+            <p className="mt-2 text-[11.5px] text-[#9AA3AF]">Saves automatically</p>
+          </DetailSection>
+
+          <DetailSection
+            title="Timeline & reminders"
+            actions={
+              <>
                 <button
-                  key={st.id}
                   type="button"
                   disabled={pending}
-                  onClick={() => setStatus(st.id)}
-                  className="cursor-pointer rounded-[9px] border px-3 py-2 text-[12.5px] transition-all duration-150 disabled:opacity-60"
-                  style={{
-                    borderColor: on ? sm.bd : "#E2E5EA",
-                    background: on ? sm.bg : "#fff",
-                    color: on ? sm.fg : "#7A828F",
-                    fontWeight: on ? 700 : 600,
-                  }}
+                  onClick={() =>
+                    startTransition(async () => {
+                      const ev = await addApplicationEvent(app.id, "interview");
+                      patchLocal({ events: [ev, ...(app.events ?? [])] });
+                      router.refresh();
+                    })
+                  }
+                  className="cursor-pointer rounded-lg border-none bg-[#FEF3DA] px-[11px] py-1.5 text-xs font-semibold text-[#9A6212] transition-colors hover:bg-[#fbe9c2] disabled:opacity-50"
                 >
-                  {st.label}
+                  + Interview
                 </button>
-              );
-            })}
-          </div>
-          <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
-            <label className="flex flex-col gap-[5px] text-xs font-semibold text-muted">
-              Role
-              <input
-                value={app.role}
-                onChange={(e) => patchLocal({ role: e.target.value })}
-                onBlur={(e) => saveMeta({ role: e.target.value })}
-                placeholder="Role"
-                className="rounded-[9px] border border-[#DFE3E8] px-2.5 py-2 text-[13.5px] text-ink focus:border-accent"
-              />
-            </label>
-            <label className="flex flex-col gap-[5px] text-xs font-semibold text-muted">
-              Company
-              <input
-                value={app.company}
-                onChange={(e) => patchLocal({ company: e.target.value })}
-                onBlur={(e) => saveMeta({ company: e.target.value })}
-                placeholder="Company"
-                className="rounded-[9px] border border-[#DFE3E8] px-2.5 py-2 text-[13.5px] text-ink focus:border-accent"
-              />
-            </label>
-            <label className="flex flex-col gap-[5px] text-xs font-semibold text-muted sm:col-span-2">
-              Applied date
-              <input
-                type="date"
-                value={appliedDateInputValue(app.applied_at)}
-                onChange={(e) => {
-                  const iso = appliedDateFromInput(e.target.value);
-                  if (!iso) return;
-                  patchLocal({ applied_at: iso });
-                  startTransition(async () => {
-                    await updateApplicationMeta(app.id, { applied_at: iso });
-                    router.refresh();
-                  });
-                }}
-                className="max-w-[220px] rounded-[9px] border border-[#DFE3E8] px-2.5 py-2 text-[13.5px] text-ink focus:border-accent"
-              />
-            </label>
-            <label className="flex flex-col gap-[5px] text-xs font-semibold text-muted sm:col-span-2">
-              Expected decision date{" "}
-              <span className="font-normal text-[#9AA3AF]">(optional)</span>
-              <input
-                type="date"
-                value={app.decision_by ?? ""}
-                onChange={(e) => {
-                  const value = e.target.value || null;
-                  patchLocal({ decision_by: value });
-                  startTransition(async () => {
-                    await updateApplicationMeta(app.id, { decision_by: value });
-                    router.refresh();
-                  });
-                }}
-                className="max-w-[220px] rounded-[9px] border border-[#DFE3E8] px-2.5 py-2 text-[13.5px] text-ink focus:border-accent"
-              />
-            </label>
-          </div>
-          <p className="mt-2 text-[11.5px] text-[#9AA3AF]">Saves automatically</p>
-        </DetailSection>
-
-        <DetailSection
-          title="Timeline & reminders"
-          actions={
-            <>
-              <button
-                type="button"
-                disabled={pending}
-                onClick={() =>
-                  startTransition(async () => {
-                    const ev = await addApplicationEvent(app.id, "interview");
-                    patchLocal({ events: [ev, ...(app.events ?? [])] });
-                    router.refresh();
-                  })
-                }
-                className="cursor-pointer rounded-lg border-none bg-[#FEF3DA] px-[11px] py-1.5 text-xs font-semibold text-[#9A6212] transition-colors hover:bg-[#fbe9c2] disabled:opacity-50"
-              >
-                + Interview
-              </button>
-              <button
-                type="button"
-                disabled={pending}
-                onClick={() =>
-                  startTransition(async () => {
-                    const ev = await addApplicationEvent(app.id, "followup");
-                    patchLocal({ events: [ev, ...(app.events ?? [])] });
-                    router.refresh();
-                  })
-                }
-                className="cursor-pointer rounded-lg border-none bg-[#EAF1FF] px-[11px] py-1.5 text-xs font-semibold text-[#2456D6] transition-colors hover:bg-[#dbe7ff] disabled:opacity-50"
-              >
-                + Follow-up
-              </button>
-            </>
-          }
-        >
-          <FollowUpRecommendationsPanel
-            applicationId={app.id}
-            recommendations={followUpRecommendations}
-            showLesson={showFollowUpLesson}
-            startTransition={startTransition}
-            router={router}
-            onEventAdded={onFollowUpEventAdded}
-            onDismissed={onFollowUpDismissed}
-          />
-          {sortedEvents && sortedEvents.length > 0 ? (
-            <div className="flex flex-col gap-2">
-              {sortedEvents.map((e) => {
-                const overdue = !e.done && e.date != null && e.date < todayISO();
-                return (
-                  <div
-                    key={e.id}
-                    className="flex items-start gap-2.5 rounded-[11px] border border-[#EEF0F3] px-3 py-[11px]"
-                  >
-                    <button
-                      type="button"
-                      disabled={pending}
-                      onClick={() =>
-                        startTransition(async () => {
-                          await updateApplicationEvent(e.id, app.id, { done: !e.done });
-                          patchLocal({
-                            events: (app.events ?? []).map((ev) =>
-                              ev.id === e.id ? { ...ev, done: !ev.done } : ev
-                            ),
-                          });
-                          router.refresh();
-                        })
-                      }
-                      className="flex h-5 w-5 flex-none cursor-pointer items-center justify-center rounded-md border-[1.5px] text-xs text-white disabled:opacity-50"
-                      style={{
-                        borderColor: e.done ? "#0E9F6E" : "#CBD2DB",
-                        background: e.done ? "#0E9F6E" : "#fff",
-                      }}
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={() =>
+                    startTransition(async () => {
+                      const ev = await addApplicationEvent(app.id, "followup");
+                      patchLocal({ events: [ev, ...(app.events ?? [])] });
+                      router.refresh();
+                    })
+                  }
+                  className="cursor-pointer rounded-lg border-none bg-[#EAF1FF] px-[11px] py-1.5 text-xs font-semibold text-[#2456D6] transition-colors hover:bg-[#dbe7ff] disabled:opacity-50"
+                >
+                  + Follow-up
+                </button>
+              </>
+            }
+          >
+            <FollowUpRecommendationsPanel
+              applicationId={app.id}
+              recommendations={followUpRecommendations}
+              showLesson={showFollowUpLesson}
+              startTransition={startTransition}
+              router={router}
+              onEventAdded={onFollowUpEventAdded}
+              onDismissed={onFollowUpDismissed}
+            />
+            {sortedEvents && sortedEvents.length > 0 ? (
+              <div className="flex flex-col gap-2">
+                {sortedEvents.map((e) => {
+                  const overdue = !e.done && e.date != null && e.date < todayISO();
+                  return (
+                    <div
+                      key={e.id}
+                      className="flex items-start gap-2.5 rounded-[11px] border border-[#EEF0F3] px-3 py-[11px]"
                     >
-                      {e.done ? "✓" : ""}
-                    </button>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="inline-flex items-center gap-1.5 text-[13px] font-bold text-[#141821]">
-                          <span
-                            className="inline-block h-2 w-2 rounded-full"
-                            style={{ background: eventDotColor(e.type) }}
-                          />
-                          {appEventLabel(e.type)}
-                        </span>
-                        <input
-                          type="date"
-                          value={e.date ?? ""}
-                          disabled={pending}
-                          onChange={(ev) => {
-                            const date = ev.target.value;
-                            patchLocal({
-                              events: (app.events ?? []).map((item) =>
-                                item.id === e.id ? { ...item, date } : item
-                              ),
-                            });
-                            startTransition(async () => {
-                              await updateApplicationEvent(e.id, app.id, { date });
-                              router.refresh();
-                            });
-                          }}
-                          className="rounded-md border border-[#E2E5EA] px-[7px] py-1 text-xs text-[#3a4350]"
-                        />
-                        <input
-                          value={e.time}
-                          disabled={pending}
-                          onChange={(ev) => {
-                            const time = ev.target.value;
-                            patchLocal({
-                              events: (app.events ?? []).map((item) =>
-                                item.id === e.id ? { ...item, time } : item
-                              ),
-                            });
-                          }}
-                          onBlur={(ev) =>
-                            startTransition(async () => {
-                              await updateApplicationEvent(e.id, app.id, {
-                                time: ev.target.value,
-                              });
-                              router.refresh();
-                            })
-                          }
-                          placeholder="time"
-                          className="w-[78px] rounded-md border border-[#E2E5EA] px-[7px] py-1 text-xs text-[#3a4350]"
-                        />
-                        {overdue ? (
-                          <span className="rounded-[5px] bg-[#FCECEC] px-[7px] py-0.5 text-[10.5px] font-bold text-[#B23B3B]">
-                            OVERDUE
-                          </span>
-                        ) : null}
-                      </div>
-                      <input
-                        value={e.notes}
+                      <button
+                        type="button"
                         disabled={pending}
-                        onChange={(ev) =>
-                          patchLocal({
-                            events: (app.events ?? []).map((item) =>
-                              item.id === e.id ? { ...item, notes: ev.target.value } : item
-                            ),
-                          })
-                        }
-                        onBlur={(ev) =>
+                        onClick={() =>
                           startTransition(async () => {
                             await updateApplicationEvent(e.id, app.id, {
-                              notes: ev.target.value,
+                              done: !e.done,
+                            });
+                            patchLocal({
+                              events: (app.events ?? []).map((ev) =>
+                                ev.id === e.id ? { ...ev, done: !ev.done } : ev
+                              ),
                             });
                             router.refresh();
                           })
                         }
-                        placeholder="Add a note…"
-                        className="mt-[7px] w-full border-none border-b border-[#EEF0F3] bg-transparent px-px py-1 text-[12.5px] text-[#3a4350] focus:border-accent"
-                      />
+                        className="flex h-5 w-5 flex-none cursor-pointer items-center justify-center rounded-md border-[1.5px] text-xs text-white disabled:opacity-50"
+                        style={{
+                          borderColor: e.done ? "#0E9F6E" : "#CBD2DB",
+                          background: e.done ? "#0E9F6E" : "#fff",
+                        }}
+                      >
+                        {e.done ? "✓" : ""}
+                      </button>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="inline-flex items-center gap-1.5 text-[13px] font-bold text-[#141821]">
+                            <span
+                              className="inline-block h-2 w-2 rounded-full"
+                              style={{ background: eventDotColor(e.type) }}
+                            />
+                            {appEventLabel(e.type)}
+                          </span>
+                          <input
+                            type="date"
+                            value={e.date ?? ""}
+                            disabled={pending}
+                            onChange={(ev) => {
+                              const date = ev.target.value;
+                              patchLocal({
+                                events: (app.events ?? []).map((item) =>
+                                  item.id === e.id ? { ...item, date } : item
+                                ),
+                              });
+                              startTransition(async () => {
+                                await updateApplicationEvent(e.id, app.id, { date });
+                                router.refresh();
+                              });
+                            }}
+                            className="rounded-md border border-[#E2E5EA] px-[7px] py-1 text-xs text-[#3a4350]"
+                          />
+                          <input
+                            value={e.time}
+                            disabled={pending}
+                            onChange={(ev) => {
+                              const time = ev.target.value;
+                              patchLocal({
+                                events: (app.events ?? []).map((item) =>
+                                  item.id === e.id ? { ...item, time } : item
+                                ),
+                              });
+                            }}
+                            onBlur={(ev) =>
+                              startTransition(async () => {
+                                await updateApplicationEvent(e.id, app.id, {
+                                  time: ev.target.value,
+                                });
+                                router.refresh();
+                              })
+                            }
+                            placeholder="time"
+                            className="w-[78px] rounded-md border border-[#E2E5EA] px-[7px] py-1 text-xs text-[#3a4350]"
+                          />
+                          {overdue ? (
+                            <span className="rounded-[5px] bg-[#FCECEC] px-[7px] py-0.5 text-[10.5px] font-bold text-[#B23B3B]">
+                              OVERDUE
+                            </span>
+                          ) : null}
+                        </div>
+                        <input
+                          value={e.notes}
+                          disabled={pending}
+                          onChange={(ev) =>
+                            patchLocal({
+                              events: (app.events ?? []).map((item) =>
+                                item.id === e.id
+                                  ? { ...item, notes: ev.target.value }
+                                  : item
+                              ),
+                            })
+                          }
+                          onBlur={(ev) =>
+                            startTransition(async () => {
+                              await updateApplicationEvent(e.id, app.id, {
+                                notes: ev.target.value,
+                              });
+                              router.refresh();
+                            })
+                          }
+                          placeholder="Add a note…"
+                          className="mt-[7px] w-full border-none border-b border-[#EEF0F3] bg-transparent px-px py-1 text-[12.5px] text-[#3a4350] focus:border-accent"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        disabled={pending}
+                        onClick={() =>
+                          startTransition(async () => {
+                            await deleteApplicationEvent(e.id, app.id);
+                            patchLocal({
+                              events: (app.events ?? []).filter((ev) => ev.id !== e.id),
+                            });
+                            router.refresh();
+                          })
+                        }
+                        className="cursor-pointer border-none bg-transparent p-0.5 text-[13px] text-[#b9bfc8] hover:text-[#B23B3B] disabled:opacity-50"
+                      >
+                        ✕
+                      </button>
                     </div>
-                    <button
-                      type="button"
-                      disabled={pending}
-                      onClick={() =>
-                        startTransition(async () => {
-                          await deleteApplicationEvent(e.id, app.id);
-                          patchLocal({
-                            events: (app.events ?? []).filter((ev) => ev.id !== e.id),
-                          });
-                          router.refresh();
-                        })
-                      }
-                      className="cursor-pointer border-none bg-transparent p-0.5 text-[13px] text-[#b9bfc8] hover:text-[#B23B3B] disabled:opacity-50"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <p className="text-[13px] text-[#8A92A0]">
-              Add interview dates or follow-up reminders so nothing slips through.
-            </p>
-          )}
-        </DetailSection>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-[13px] text-[#8A92A0]">
+                Add interview dates or follow-up reminders so nothing slips through.
+              </p>
+            )}
+          </DetailSection>
 
-        <DetailSection title="Notes">
-          <textarea
-            value={app.notes}
-            onChange={(e) => patchLocal({ notes: e.target.value })}
-            onBlur={(e) => saveMeta({ notes: e.target.value })}
-            rows={3}
-            placeholder="Recruiter name, referral, salary range, where you found it…"
-            className="w-full resize-y rounded-[10px] border border-[#DFE3E8] px-3 py-[11px] text-[13.5px] leading-[1.55] text-[#1a1f29] focus:border-accent"
-          />
-          <p className="mt-2 text-[11.5px] text-[#9AA3AF]">Saves automatically</p>
-        </DetailSection>
+          <DetailSection
+            title="Job posting"
+            description="Powers fit analysis, interview prep, and role suggestions on the Prepare tab."
+          >
+            <label className="mb-3 flex flex-col gap-[5px] text-xs font-semibold text-muted">
+              Posting URL
+              <div className="flex gap-2">
+                <input
+                  value={app.job_url}
+                  onChange={(e) => patchLocal({ job_url: e.target.value })}
+                  onBlur={(e) => saveMeta({ job_url: e.target.value })}
+                  placeholder="https://www.indeed.com/viewjob?jk=…"
+                  className="min-w-0 flex-1 rounded-[9px] border border-[#DFE3E8] px-2.5 py-2 text-[13.5px] text-ink focus:border-accent"
+                />
+                {app.job_url.trim() ? (
+                  <a
+                    href={app.job_url.trim()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex shrink-0 items-center rounded-[9px] border border-[#DFE3E8] bg-[#FAFBFC] px-3 text-[12.5px] font-semibold text-[#2456D6] hover:border-accent"
+                  >
+                    Open ↗
+                  </a>
+                ) : null}
+              </div>
+            </label>
+            <textarea
+              value={app.job_desc}
+              onChange={(e) => patchLocal({ job_desc: e.target.value })}
+              onBlur={(e) => saveMeta({ job_desc: e.target.value })}
+              rows={10}
+              placeholder="Paste the job description…"
+              className="w-full resize-y rounded-[10px] border border-[#DFE3E8] px-3.5 py-3 text-[13.5px] leading-[1.65] text-[#1a1f29] focus:border-accent"
+            />
+            <p className="mt-2 text-[11.5px] text-[#9AA3AF]">Saves automatically</p>
+          </DetailSection>
+        </div>
 
-        <DetailSection
-          title="Job posting"
-          description="Powers fit analysis, interview prep, and role suggestions on the Prepare tab."
-        >
-          <label className="mb-3 flex flex-col gap-[5px] text-xs font-semibold text-muted">
-            Posting URL
-            <div className="flex gap-2">
-              <input
-                value={app.job_url}
-                onChange={(e) => patchLocal({ job_url: e.target.value })}
-                onBlur={(e) => saveMeta({ job_url: e.target.value })}
-                placeholder="https://www.indeed.com/viewjob?jk=…"
-                className="min-w-0 flex-1 rounded-[9px] border border-[#DFE3E8] px-2.5 py-2 text-[13.5px] text-ink focus:border-accent"
-              />
-              {app.job_url.trim() ? (
-                <a
-                  href={app.job_url.trim()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex shrink-0 items-center rounded-[9px] border border-[#DFE3E8] bg-[#FAFBFC] px-3 text-[12.5px] font-semibold text-[#2456D6] hover:border-accent"
-                >
-                  Open ↗
-                </a>
-              ) : null}
-            </div>
-          </label>
-          <textarea
-            value={app.job_desc}
-            onChange={(e) => patchLocal({ job_desc: e.target.value })}
-            onBlur={(e) => saveMeta({ job_desc: e.target.value })}
-            rows={6}
-            placeholder="Paste the job description…"
-            className="w-full resize-y rounded-[10px] border border-[#DFE3E8] px-3 py-[11px] text-[13.5px] leading-[1.55] text-[#1a1f29] focus:border-accent"
-          />
-          <p className="mt-2 text-[11.5px] text-[#9AA3AF]">Saves automatically</p>
-        </DetailSection>
+        <ApplicationActivityPanel
+          app={app}
+          pending={pending}
+          patchLocal={patchLocal}
+          saveNotes={(notes) => saveMeta({ notes })}
+        />
       </div>
     );
   }

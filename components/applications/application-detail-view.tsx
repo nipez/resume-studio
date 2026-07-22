@@ -23,7 +23,6 @@ import {
 import { computeFollowUpRecommendations } from "@/lib/applications/follow-up-recommendations";
 import {
   appStatusMeta,
-  applicationDetailTitle,
   fitScoreStyle,
   formatAppDate,
 } from "@/lib/applications/utils";
@@ -54,7 +53,7 @@ type ApplicationDetailViewProps = {
 };
 
 const DETAIL_TABS: { id: DetailTab; label: string; hint: string }[] = [
-  { id: "overview", label: "Overview", hint: "Status, timeline, job posting" },
+  { id: "overview", label: "Overview", hint: "Details, activity notes, posting" },
   { id: "sent", label: "What you sent", hint: "Resume, cover letter, answers" },
   { id: "prep", label: "Prepare", hint: "Fit, prep, debrief, research" },
 ];
@@ -88,7 +87,8 @@ export function ApplicationDetailView({
   }, [initial]);
 
   const statusMeta = appStatusMeta(app.status);
-  const title = applicationDetailTitle(app);
+  const roleTitle = app.role?.trim() || "Untitled role";
+  const companyTitle = app.company?.trim() || "";
 
   const snapHtml = useMemo(
     () =>
@@ -356,7 +356,7 @@ export function ApplicationDetailView({
 
   return (
     <div className="scroll flex-1 overflow-auto bg-page">
-      <div className="mx-auto max-w-[1080px] px-4 pb-14 pt-5 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1180px] px-4 pb-14 pt-5 sm:px-6 lg:px-8">
         {companyHistory.length > 0 && (
           <div className="mb-4 rounded-xl border border-[#D6E4FF] bg-[#EAF1FF] px-4 py-3">
             <div className="text-[12px] font-bold uppercase tracking-[0.06em] text-[#2456D6]">
@@ -412,12 +412,19 @@ export function ApplicationDetailView({
             ←
           </Link>
           <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2.5">
-              <h1 className="font-display text-xl font-semibold tracking-[-0.02em] text-ink sm:text-[21px]">
-                {title}
-              </h1>
+            <div className="flex flex-wrap items-start gap-2.5">
+              <div className="min-w-0">
+                <h1 className="font-display text-xl font-semibold tracking-[-0.02em] text-ink sm:text-[22px]">
+                  {roleTitle}
+                </h1>
+                {companyTitle ? (
+                  <p className="mt-0.5 text-[15px] font-semibold text-[#3a4350]">
+                    {companyTitle}
+                  </p>
+                ) : null}
+              </div>
               <span
-                className="inline-flex items-center rounded-lg border px-2.5 py-1 text-[11px] font-bold"
+                className="mt-1 inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-bold"
                 style={{
                   background: statusMeta.bg,
                   color: statusMeta.fg,

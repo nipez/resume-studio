@@ -556,7 +556,7 @@ export async function addApplicationEvent(
   const labels: Record<EventType, string> = {
     interview: "Interview",
     followup: "Follow-up",
-    note: "Reminder",
+    note: "Note",
   };
 
   const today = new Date();
