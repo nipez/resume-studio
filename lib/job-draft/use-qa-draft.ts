@@ -73,7 +73,23 @@ export function useQADraft({ scopeKey }: UseQADraftOptions) {
     const localItems = readQADraft();
     if (!storedScope) {
       writeQAScope(scopeKey);
-      // First time we track scope: warn in prep flows if leftover Q&A exists.
+      const prepScoped =
+        scopeKey.startsWith("version:") || scopeKey.startsWith("saved:");
+      // First visit with a job-specific scope: don't keep another application's Q&A.
+      if (hasQAContent(localItems) && prepScoped) {
+        const next = emptyQADraft();
+        writeQADraft(next);
+        setItems(next);
+        setScopeReset(true);
+        setMaybeStale(false);
+        saveQADraft(next).catch(() => {});
+        try {
+          sessionStorage.setItem(HYDRATED_FLAG, "1");
+        } catch {
+          // ignore
+        }
+        return;
+      }
       if (hasQAContent(localItems) && scopeKey !== "default") {
         setMaybeStale(true);
       }
