@@ -1,3 +1,4 @@
+import { parseApplicationNotes } from "@/lib/applications/notes";
 import type {
   Application,
   ApplicationEvent,
@@ -114,6 +115,7 @@ export function computeApplicationStats(apps: Application[]) {
 export function appEventLabel(type: string): string {
   if (type === "interview") return "Interview";
   if (type === "followup") return "Follow-up";
+  if (type === "note") return "Note";
   return "Reminder";
 }
 
@@ -214,13 +216,16 @@ export function filterApplicationsBySearch(
     const statusLabel =
       APPLICATION_STATUSES.find((s) => s.id === app.status)?.label ?? app.status;
     const typeLabel = applicationTypeLabel(app.application_type) ?? "";
+    const noteBodies = parseApplicationNotes(app.notes, app.applied_at)
+      .map((note) => note.body)
+      .join(" ");
     const haystack = [
       app.role,
       app.company,
       app.job_desc,
       app.job_url,
       app.resume_version_name,
-      app.notes,
+      noteBodies,
       statusLabel,
       typeLabel,
       app.resume_snapshot?.name,
