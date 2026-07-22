@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { SuggestedFollowUp } from "@/lib/applications/insights";
 import { appEventLabel, formatDay } from "@/lib/applications/utils";
+import { buildHrefForPersona } from "@/lib/profile/persona";
 
 export type DashboardStat = { label: string; value: string };
 
@@ -12,6 +13,29 @@ export type DashboardUpcoming = {
   appTitle: string;
   company: string;
   overdue: boolean;
+};
+
+export type DashboardDocPreview = {
+  id: string;
+  name: string;
+  updatedAt: string;
+  createdAt: string;
+  tailoredLabel: string | null;
+};
+
+export type DashboardSavedJobPreview = {
+  id: string;
+  role: string;
+  company: string;
+};
+
+export type DashboardAppPreview = {
+  id: string;
+  role: string;
+  company: string;
+  status: string;
+  appliedAt: string;
+  hasPrep: boolean;
 };
 
 export type DashboardHomeData = {
@@ -26,13 +50,14 @@ export type DashboardHomeData = {
   stats: { respRate: number; interviewRate: number; offers: number };
   upcoming: DashboardUpcoming[];
   suggestedFollowUps: SuggestedFollowUp[];
+  recentVersions: DashboardDocPreview[];
+  savedJobs: DashboardSavedJobPreview[];
+  prepCandidates: DashboardAppPreview[];
 };
 
 export const DASHBOARD_VIEW_STORAGE_KEY = "resumetrakr-dashboard-view";
 
 export type DashboardView = "simple" | "full";
-
-import { buildHrefForPersona } from "@/lib/profile/persona";
 
 export function buildHref(isStudent: boolean) {
   return buildHrefForPersona(isStudent);
@@ -114,36 +139,47 @@ export function ChecklistSection({
   title,
   subtitle,
   items,
+  compact = false,
 }: {
   title: string;
-  subtitle: string;
+  subtitle?: string;
   items: ChecklistItem[];
+  compact?: boolean;
 }) {
   const doneCount = items.filter((c) => c.done).length;
 
   return (
-    <section className="rounded-2xl border border-border bg-white p-6">
-      <div className="mb-1 flex items-center justify-between">
+    <section
+      className={`rounded-2xl border border-border bg-white ${
+        compact ? "p-5" : "p-6"
+      }`}
+    >
+      <div className="mb-1 flex items-center justify-between gap-2">
         <h2 className="font-display text-[15px] font-semibold text-ink">{title}</h2>
         <span className="text-[12.5px] font-semibold text-muted">
-          {doneCount}/{items.length} done
+          {doneCount}/{items.length}
         </span>
       </div>
-      <p className="mb-4 text-[12.5px] text-muted">{subtitle}</p>
-      <div className="space-y-2.5">
+      {subtitle ? (
+        <p className="mb-4 text-[12.5px] text-muted">{subtitle}</p>
+      ) : (
+        <div className="mb-3" />
+      )}
+      <div className="space-y-2">
         {items.map((item) => (
-          <div
+          <Link
             key={item.label}
-            className="flex items-center gap-3 rounded-xl border border-[#EEF0F3] px-3.5 py-2.5"
+            href={item.href}
+            className="flex items-center gap-3 rounded-xl px-1 py-2 transition-colors hover:bg-[#FAFBFC]"
           >
             <span
-              className={`flex h-5 w-5 flex-none items-center justify-center rounded-full text-[11px] font-bold ${
+              className={`flex h-6 w-6 flex-none items-center justify-center rounded-full text-[12px] font-bold ${
                 item.done
                   ? "bg-[#E6F7EE] text-[#0E7C4B]"
-                  : "border border-[#D2D7DE] text-transparent"
+                  : "bg-[#EEF3FF] text-accent"
               }`}
             >
-              ✓
+              {item.done ? "✓" : "+"}
             </span>
             <span
               className={`flex-1 text-[13.5px] ${
@@ -152,24 +188,21 @@ export function ChecklistSection({
             >
               {item.label}
             </span>
-            {!item.done ? (
-              <Link
-                href={item.href}
-                className="flex-none rounded-lg bg-accent px-3 py-[6px] text-[12px] font-semibold text-white hover:bg-[#1E54E6]"
-              >
-                {item.cta}
-              </Link>
-            ) : (
-              <Link
-                href={item.href}
-                className="flex-none rounded-lg border border-[#E0E3E8] bg-white px-3 py-[6px] text-[12px] font-semibold text-[#5A6573] hover:border-[#C8CED6]"
-              >
-                {item.cta}
-              </Link>
-            )}
-          </div>
+          </Link>
         ))}
       </div>
     </section>
   );
+}
+
+export function formatShortDate(iso: string) {
+  try {
+    return new Date(iso).toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  } catch {
+    return "";
+  }
 }

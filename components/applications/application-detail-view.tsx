@@ -41,6 +41,13 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import type { FollowUpKind } from "@/lib/applications/follow-up-types";
 
+function tabFromLocation(): DetailTab {
+  if (typeof window === "undefined") return "overview";
+  const raw = new URLSearchParams(window.location.search).get("tab");
+  if (raw === "sent" || raw === "prep" || raw === "overview") return raw;
+  return "overview";
+}
+
 type ApplicationDetailViewProps = {
   application: Application;
   resumeVersions: ResumeVersion[];
@@ -81,6 +88,10 @@ export function ApplicationDetailView({
   const [mockMode, setMockMode] = useState(false);
   const [confirmKind, setConfirmKind] = useState<"archive" | "delete" | null>(null);
   const [tab, setTab] = useState<DetailTab>("overview");
+
+  useEffect(() => {
+    setTab(tabFromLocation());
+  }, []);
 
   useEffect(() => {
     setApp(initial);

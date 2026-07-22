@@ -18,7 +18,6 @@ import {
   appEventLabel,
   appStatusMeta,
   applicationListHeading,
-  applicationTags,
   computeApplicationStats,
   filterApplicationsBySearch,
   formatAppDate,
@@ -158,23 +157,20 @@ function ApplicationsTable({
   if (applications.length === 0) {
     const searching = searchQuery.trim().length > 0;
     return (
-      <div className="rounded-2xl border border-dashed border-[#D2D7DE] bg-[#FBFBFC] px-7 py-12 text-center text-[#8A92A0]">
-        <div className="mb-2.5 text-[32px] opacity-55">
-          {searching ? "🔍" : archived ? "📦" : "✓"}
-        </div>
-        <div className="font-display text-[15px] font-semibold text-muted">
+      <div className="rounded-2xl border border-dashed border-[#D2D7DE] bg-[#FBFBFC] px-6 py-10 text-center text-[#8A92A0]">
+        <div className="font-display text-[15px] font-semibold text-ink">
           {searching
             ? "No applications match your search"
             : archived
               ? "No archived applications"
-              : "No applications tracked yet"}
+              : "Add your first job"}
         </div>
-        <div className="mt-1.5 text-[13px]">
+        <div className="mx-auto mt-1.5 max-w-[420px] text-[13px] leading-relaxed">
           {searching
             ? `Nothing matched “${searchQuery.trim()}” in ${archived ? "archived" : "active"} applications. Try role, company, or resume name.`
             : archived
               ? "Archive old or rejected applications to keep your active list focused — snapshots are preserved."
-              : "Hit “Apply to new job” to copy a resume and tailor it, or “Log application” if you already sent one."}
+              : "Track roles like a spreadsheet — status, resume, cover letter, and notes in one row."}
         </div>
         {!archived && !searching && emptyActions ? (
           <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
@@ -187,104 +183,143 @@ function ApplicationsTable({
 
   return (
     <div className="overflow-x-auto rounded-2xl border border-border bg-white">
-      <div className="min-w-[680px]">
-      <div className="grid grid-cols-[1fr_120px_150px_minmax(140px,1fr)] gap-3.5 border-b border-[#EEF0F3] bg-[#FAFBFC] px-[22px] py-[13px] text-[11px] font-bold uppercase tracking-[0.06em] text-[#8A92A0]">
-        <div>Role / Company</div>
-        <div>Applied</div>
-        <div>Status</div>
-        <div className="text-right">Actions</div>
-      </div>
-      {applications.map((app) => {
-        const tags = applicationTags(app);
-        const nextEv = nextOpenEvent(app.events ?? []);
-        const suggested =
-          !archived ? nextActionableRecommendation(app) : null;
-        const { primary, secondary } = applicationListHeading(app);
+      <div className="min-w-[980px]">
+        <div className="grid grid-cols-[1.2fr_1fr_140px_110px_120px_110px_minmax(120px,auto)] gap-3 border-b border-[#EEF0F3] bg-[#FAFBFC] px-5 py-3 text-[11px] font-bold uppercase tracking-[0.06em] text-[#8A92A0]">
+          <div>Position</div>
+          <div>Company</div>
+          <div>Status</div>
+          <div>Date applied</div>
+          <div>Resume</div>
+          <div>Cover letter</div>
+          <div className="text-right">Actions</div>
+        </div>
+        {applications.map((app) => {
+          const nextEv = nextOpenEvent(app.events ?? []);
+          const suggested = !archived ? nextActionableRecommendation(app) : null;
+          const { primary, secondary } = applicationListHeading(app);
+          const resumeLabel =
+            app.resume_version_name?.trim() ||
+            app.resume_snapshot?.name?.trim() ||
+            "";
+          const hasCover = Boolean(app.cover_letter?.trim());
 
-        return (
-          <div
-            key={app.id}
-            className={`grid grid-cols-[1fr_120px_150px_minmax(140px,1fr)] items-center gap-3.5 border-b border-[#F2F3F5] px-[22px] py-[15px] last:border-b-0 ${
-              archived ? "bg-[#FAFBFC]/80" : ""
-            }`}
-          >
-            <Link
-              href={`/applications/${app.id}`}
-              className="min-w-0 cursor-pointer no-underline"
+          return (
+            <div
+              key={app.id}
+              className={`grid grid-cols-[1.2fr_1fr_140px_110px_120px_110px_minmax(120px,auto)] items-center gap-3 border-b border-[#F2F3F5] px-5 py-3.5 last:border-b-0 ${
+                archived ? "bg-[#FAFBFC]/80" : ""
+              }`}
             >
-              <div className="truncate text-[14.5px] font-bold text-[#141821]">
-                {primary}
-              </div>
-              {secondary ? (
-                <div className="mt-0.5 truncate text-[13px] font-semibold text-[#3a4350]">
-                  {secondary}
-                </div>
-              ) : null}
-              <div className="mt-[3px] truncate text-[12.3px] text-[#8A92A0]">
-                {tags.join("  ·  ")}
-              </div>
-              {nextEv && !archived ? (
-                <div className="mt-1.5 inline-flex items-center gap-1 rounded-md border border-[#E8ECF1] bg-[#F5F7FA] px-2 py-[3px] text-[11px] font-semibold text-muted">
-                  📅 {appEventLabel(nextEv.type)} · {formatDay(nextEv.date)}
-                </div>
-              ) : suggested ? (
-                <div className="mt-1.5 inline-flex items-center gap-1 rounded-md border border-[#D9E4FF] bg-[#F0F5FF] px-2 py-[3px] text-[11px] font-semibold text-[#2456D6]">
-                  ✦ Suggested: {suggested.title}
-                </div>
-              ) : null}
-            </Link>
-            <div className="text-[13px] text-[#3a4350]">
-              {formatAppDate(app.applied_at)}
-            </div>
-            <div>
-              <StatusSelect
-                status={app.status}
-                applicationId={app.id}
-                disabled={pending}
-                onResult={onStatusResult}
-              />
-            </div>
-            <div className="flex flex-wrap justify-end gap-[7px]">
               <Link
                 href={`/applications/${app.id}`}
-                className="rounded-lg bg-sidebar px-3 py-[7px] text-xs font-semibold text-white transition-colors hover:bg-[#272b33]"
+                className="min-w-0 cursor-pointer no-underline"
               >
-                Open
+                <div className="truncate text-[14px] font-semibold text-[#141821]">
+                  {primary || (
+                    <span className="font-medium text-[#9AA3AF]">
+                      Add job position
+                    </span>
+                  )}
+                </div>
+                {nextEv && !archived ? (
+                  <div className="mt-1 truncate text-[11px] font-semibold text-muted">
+                    {appEventLabel(nextEv.type)} · {formatDay(nextEv.date)}
+                  </div>
+                ) : suggested ? (
+                  <div className="mt-1 truncate text-[11px] font-semibold text-[#2456D6]">
+                    ✦ {suggested.title}
+                  </div>
+                ) : null}
               </Link>
-              {archived ? (
-                <>
-                  <button
-                    type="button"
-                    disabled={pending}
-                    onClick={() => onRestore(app.id)}
-                    className="cursor-pointer rounded-lg border border-[#CFE0FF] bg-[#EAF1FF] px-3 py-[7px] text-xs font-semibold text-[#2456D6] transition-colors hover:border-[#A8C4FF] disabled:opacity-50"
-                  >
-                    Restore
-                  </button>
-                  <button
-                    type="button"
-                    disabled={pending}
-                    onClick={() => onDelete(app.id)}
-                    title="Delete permanently"
-                    className="cursor-pointer rounded-lg border border-[#E0E3E8] bg-white px-2.5 py-[7px] text-xs text-[#B23B3B] transition-colors hover:border-[#E0A0A0] hover:bg-[#FFF6F6] disabled:opacity-50"
-                  >
-                    Delete
-                  </button>
-                </>
-              ) : (
-                <button
-                  type="button"
+              <Link
+                href={`/applications/${app.id}`}
+                className="min-w-0 truncate text-[13.5px] text-[#3a4350] no-underline hover:text-ink"
+              >
+                {secondary || (
+                  <span className="text-[#9AA3AF]">Add company</span>
+                )}
+              </Link>
+              <div>
+                <StatusSelect
+                  status={app.status}
+                  applicationId={app.id}
                   disabled={pending}
-                  onClick={() => onArchive(app.id)}
-                  className="cursor-pointer rounded-lg border border-[#E0E3E8] bg-white px-3 py-[7px] text-xs font-semibold text-[#5A6573] transition-colors hover:border-[#C8CED6] hover:text-ink disabled:opacity-50"
+                  onResult={onStatusResult}
+                />
+              </div>
+              <div className="text-[13px] text-[#3a4350]">
+                {formatAppDate(app.applied_at) || (
+                  <span className="text-[#9AA3AF]">+ Date</span>
+                )}
+              </div>
+              <Link
+                href={`/applications/${app.id}?tab=sent`}
+                className="truncate text-[12.5px] font-semibold no-underline"
+              >
+                {resumeLabel ? (
+                  <span className="text-[#2456D6] hover:underline">{resumeLabel}</span>
+                ) : (
+                  <span className="text-[#9AA3AF]">+ Resume</span>
+                )}
+              </Link>
+              <Link
+                href={`/applications/${app.id}?tab=sent`}
+                className="truncate text-[12.5px] font-semibold no-underline"
+              >
+                {hasCover ? (
+                  <span className="text-[#2456D6] hover:underline">Attached</span>
+                ) : (
+                  <span className="text-[#9AA3AF]">+ Cover letter</span>
+                )}
+              </Link>
+              <div className="flex flex-wrap justify-end gap-1.5">
+                <Link
+                  href={`/applications/${app.id}`}
+                  className="rounded-lg bg-sidebar px-2.5 py-[6px] text-[11.5px] font-semibold text-white transition-colors hover:bg-[#272b33]"
                 >
-                  Archive
-                </button>
-              )}
+                  Open
+                </Link>
+                {!archived ? (
+                  <Link
+                    href={`/applications/${app.id}?tab=prep`}
+                    className="rounded-lg border border-[#D6E4FF] bg-[#F5F8FF] px-2.5 py-[6px] text-[11.5px] font-semibold text-[#2456D6] transition-colors hover:border-accent"
+                  >
+                    Prep
+                  </Link>
+                ) : null}
+                {archived ? (
+                  <>
+                    <button
+                      type="button"
+                      disabled={pending}
+                      onClick={() => onRestore(app.id)}
+                      className="cursor-pointer rounded-lg border border-[#CFE0FF] bg-[#EAF1FF] px-2.5 py-[6px] text-[11.5px] font-semibold text-[#2456D6] disabled:opacity-50"
+                    >
+                      Restore
+                    </button>
+                    <button
+                      type="button"
+                      disabled={pending}
+                      onClick={() => onDelete(app.id)}
+                      className="cursor-pointer rounded-lg border border-[#E0E3E8] bg-white px-2.5 py-[6px] text-[11.5px] text-[#B23B3B] disabled:opacity-50"
+                    >
+                      Delete
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    disabled={pending}
+                    onClick={() => onArchive(app.id)}
+                    className="cursor-pointer rounded-lg border border-[#E0E3E8] bg-white px-2.5 py-[6px] text-[11.5px] font-semibold text-[#5A6573] disabled:opacity-50"
+                  >
+                    Archive
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
       </div>
     </div>
   );
@@ -363,13 +398,21 @@ export function ApplicationsList({
       <div className="mx-auto max-w-[1080px] px-5 pb-16 pt-5 sm:px-8 lg:px-12">
         <div className="mb-5 flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0 max-w-[560px]">
-            <h1 className="font-display text-[28px] font-semibold tracking-[-0.025em] text-ink">
-              Applications
-            </h1>
+            <div className="mb-1 flex items-center gap-2">
+              <span
+                className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#EEF3FF] text-[14px] text-accent"
+                aria-hidden
+              >
+                ⌖
+              </span>
+              <h1 className="font-display text-[28px] font-semibold tracking-[-0.025em] text-ink">
+                Job tracker
+              </h1>
+            </div>
             <p className="mt-1.5 text-[14.5px] leading-relaxed text-muted">
               {isStudent
-                ? "Apply to a role with a tailored resume, then track each one with the materials you sent."
-                : "Apply to a job with a tailored resume, then track each application with the materials you sent."}
+                ? "Save roles, tailor what you send, then track every application in one sheet."
+                : "Your spreadsheet for the hunt — position, status, resume, cover letter, and next steps."}
             </p>
           </div>
           <div className="flex flex-col items-stretch gap-2 sm:items-end">
@@ -380,7 +423,9 @@ export function ApplicationsList({
                 defaultVersionId={defaultVersionId}
                 isStudent={isStudent}
                 className="inline-flex items-center justify-center gap-1.5 rounded-[12px] border-none bg-accent px-5 py-3 text-[14.5px] font-semibold text-white shadow-[0_4px_16px_rgba(47,107,255,0.34)] transition-colors hover:bg-accent-dark"
-              />
+              >
+                + New job application
+              </ApplyToNewJobButton>
             ) : (
               <Link
                 href="/library"
@@ -412,10 +457,16 @@ export function ApplicationsList({
           isStudent={isStudent}
         />
 
-        <div className="mb-3 flex flex-wrap items-center gap-2">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <h2 className="font-display text-[17px] font-semibold text-ink">
             Logged applications
           </h2>
+          <Link
+            href="/discover"
+            className="text-[13px] font-semibold text-accent hover:underline"
+          >
+            Explore more jobs →
+          </Link>
         </div>
 
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">

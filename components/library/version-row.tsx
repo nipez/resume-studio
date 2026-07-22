@@ -69,12 +69,10 @@ export function VersionRow({
             </span>
           ) : null}
         </div>
-        <div className="mt-0.5 truncate text-[12px] text-[#8A92A0]">{meta.headline}</div>
-        {meta.tailored ? (
-          <div className="mt-1 truncate text-[11px] font-semibold text-[#2456D6]">
-            {meta.tailored}
-          </div>
-        ) : null}
+        <div className="mt-0.5 truncate text-[12px] text-[#8A92A0]">
+          {meta.headline}
+          {meta.badge !== "Resume" ? ` · ${meta.badge}` : ""}
+        </div>
         {!archived ? (
           <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5">
             <Link
@@ -96,11 +94,17 @@ export function VersionRow({
 
       <div>
         <span className="inline-block rounded-md bg-[#F1F3F6] px-2 py-1 text-[10px] font-bold uppercase tracking-[0.04em] text-[#6B7480]">
-          {meta.badge}
+          Resume
         </span>
       </div>
 
-      <div className="text-[12.5px] text-[#5A6573]">{meta.meta}</div>
+      <div className="truncate text-[12.5px] text-[#5A6573]">
+        {meta.tailored ? (
+          <span className="text-[#2456D6]">{meta.tailored.replace(/^Tailored:\s*/, "")}</span>
+        ) : (
+          <span className="font-semibold text-accent">+ Add</span>
+        )}
+      </div>
 
       <div className="text-[12.5px]">
         {archived ? (
@@ -237,11 +241,11 @@ export function VersionRow({
 export function VersionTableHeader() {
   return (
     <div className="grid grid-cols-[minmax(200px,1.6fr)_88px_100px_88px_88px_minmax(220px,auto)] gap-3 border-b border-[#EEF0F3] bg-[#FAFBFC] px-[22px] py-[13px] text-[11px] font-bold uppercase tracking-[0.06em] text-[#8A92A0]">
-      <div>Resume</div>
-      <div>Layout</div>
-      <div>Content</div>
+      <div>Name</div>
+      <div>Type</div>
+      <div>Job</div>
       <div>Apps</div>
-      <div>Updated</div>
+      <div>Modified</div>
       <div className="text-right">Actions</div>
     </div>
   );

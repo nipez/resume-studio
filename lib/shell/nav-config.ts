@@ -8,15 +8,15 @@ const PROFESSIONAL_NAV: NavGroup[] = [
   {
     label: "",
     items: [
-      { href: "/dashboard", label: "Home", icon: "home" },
+      { href: "/dashboard", label: "Dashboard", icon: "home" },
       { href: "/build", label: "Build resume", icon: "library" },
     ],
   },
   {
     label: "Prepare",
     items: [
-      { href: "/discover", label: "Job discovery", icon: "search" },
-      { href: "/library", label: "Resume library", icon: "library" },
+      { href: "/discover", label: "Find jobs", icon: "search" },
+      { href: "/library", label: "Documents", icon: "library" },
       { href: "/tailor?new=1", label: "Tailor to a job", icon: "target" },
       { href: "/cover", label: "Cover letter", icon: "mail" },
       { href: "/questions", label: "Application Q&A", icon: "chat" },
@@ -25,7 +25,7 @@ const PROFESSIONAL_NAV: NavGroup[] = [
   {
     label: "Track",
     items: [
-      { href: "/applications", label: "Applications", icon: "briefcase" },
+      { href: "/applications", label: "Job tracker", icon: "briefcase" },
       { href: "/insights", label: "Insights", icon: "chart" },
     ],
   },
@@ -38,7 +38,7 @@ export function buildStudentNavGroups(hasResume: boolean): NavGroup[] {
       {
         label: "",
         items: [
-          { href: "/dashboard", label: "Home", icon: "home" },
+          { href: "/dashboard", label: "Dashboard", icon: "home" },
           { href: "/build?mode=student", label: "Build resume", icon: "library" },
         ],
       },
@@ -49,21 +49,21 @@ export function buildStudentNavGroups(hasResume: boolean): NavGroup[] {
     {
       label: "",
       items: [
-        { href: "/dashboard", label: "Home", icon: "home" },
+        { href: "/dashboard", label: "Dashboard", icon: "home" },
         { href: "/tailor", label: "Apply to a job", icon: "target" },
       ],
     },
     {
       label: "Your stuff",
       items: [
-        { href: "/library", label: "My resume", icon: "library" },
-        { href: "/applications", label: "Applications", icon: "briefcase" },
+        { href: "/library", label: "Documents", icon: "library" },
+        { href: "/applications", label: "Job tracker", icon: "briefcase" },
       ],
     },
     {
       label: "More",
       items: [
-        { href: "/discover", label: "Job discovery", icon: "search" },
+        { href: "/discover", label: "Find jobs", icon: "search" },
         { href: "/build?mode=student", label: "Edit in builder", icon: "library" },
         { href: "/cover", label: "Cover letter", icon: "mail" },
         { href: "/questions", label: "Application Q&A", icon: "chat" },

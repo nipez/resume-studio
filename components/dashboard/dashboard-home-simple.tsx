@@ -24,6 +24,8 @@ export function DashboardHomeSimple({ data }: { data: DashboardHomeData }) {
     stats,
     upcoming,
     suggestedFollowUps,
+    recentVersions,
+    savedJobs,
   } = data;
 
   const buildLink = buildHref(isStudent);
@@ -94,14 +96,14 @@ export function DashboardHomeSimple({ data }: { data: DashboardHomeData }) {
 
   return (
     <div className="scroll flex-1 overflow-auto">
-      <div className="mx-auto max-w-[720px] px-5 pb-16 sm:px-8 lg:px-12 pt-[42px]">
-        <div className="mb-8">
+      <div className="mx-auto max-w-[760px] px-5 pb-16 sm:px-8 lg:px-12 pt-7">
+        <div className="mb-7">
           {isStudent && onboardingPersonaSet ? (
             <span className="mb-2 inline-flex rounded-full bg-[#EEF3FF] px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-accent">
               Student mode
             </span>
           ) : null}
-          <h1 className="font-display text-[30px] font-semibold tracking-[-0.025em] text-ink">
+          <h1 className="font-display text-[28px] font-semibold tracking-[-0.025em] text-ink">
             {hasResume
               ? `Welcome back${firstName ? `, ${firstName}` : ""}`
               : `Hi${firstName ? ` ${firstName}` : ""} — let's get started`}
@@ -128,52 +130,46 @@ export function DashboardHomeSimple({ data }: { data: DashboardHomeData }) {
         ) : !hasResume ? (
           <Link
             href={buildLink}
-            className="mb-7 flex items-center gap-[18px] rounded-2xl bg-gradient-to-br from-sidebar to-[#1b2740] px-[24px] py-[22px] text-white transition-shadow hover:shadow-[0_14px_36px_rgba(15,17,22,0.22)]"
+            className="mb-6 flex items-center gap-4 rounded-2xl border border-dashed border-[#B8D0FF] bg-gradient-to-br from-[#F3F7FF] to-white px-5 py-5 transition-shadow hover:shadow-[0_10px_28px_rgba(47,107,255,0.12)]"
           >
-            <div className="flex h-12 w-12 flex-none items-center justify-center rounded-[14px] bg-gradient-to-br from-accent to-[#7A53FF] text-[23px] shadow-[0_6px_18px_rgba(47,107,255,0.4)]">
-              ✎
-            </div>
             <div className="min-w-0 flex-1">
-              <div className="font-display text-[16.5px] font-semibold">
+              <div className="font-display text-[16px] font-semibold text-ink">
                 {isStudent
                   ? "Continue building your resume"
                   : "Build your first resume"}
               </div>
-              <div className="mt-[3px] text-[13.3px] leading-[1.5] text-[#AEB6C2]">
+              <div className="mt-1 text-[13px] leading-relaxed text-muted">
                 {isStudent
                   ? "Pick up where you left off in the guided builder."
                   : "Step-by-step guided builder — easier than starting from scratch."}
               </div>
             </div>
-            <div className="flex-none whitespace-nowrap rounded-[11px] bg-white px-[18px] py-[11px] text-[13.5px] font-semibold text-ink">
+            <div className="flex-none whitespace-nowrap rounded-[11px] bg-accent px-4 py-2.5 text-[13px] font-semibold text-white">
               Open builder →
             </div>
           </Link>
         ) : !hasApplication ? (
           <Link
             href="/tailor"
-            className="mb-7 flex items-center gap-[18px] rounded-2xl bg-gradient-to-br from-sidebar to-[#1b2740] px-[24px] py-[22px] text-white transition-shadow hover:shadow-[0_14px_36px_rgba(15,17,22,0.22)]"
+            className="mb-6 flex items-center gap-4 rounded-2xl border border-dashed border-[#B8D0FF] bg-gradient-to-br from-[#F3F7FF] to-white px-5 py-5 transition-shadow hover:shadow-[0_10px_28px_rgba(47,107,255,0.12)]"
           >
-            <div className="flex h-12 w-12 flex-none items-center justify-center rounded-[14px] bg-gradient-to-br from-accent to-[#7A53FF] text-[23px] shadow-[0_6px_18px_rgba(47,107,255,0.4)]">
-              ◎
-            </div>
             <div className="min-w-0 flex-1">
-              <div className="font-display text-[16.5px] font-semibold">
+              <div className="font-display text-[16px] font-semibold text-ink">
                 {isStudent
                   ? "Apply to a job or internship"
                   : "Apply to your first job"}
               </div>
-              <div className="mt-[3px] text-[13.3px] leading-[1.5] text-[#AEB6C2]">
+              <div className="mt-1 text-[13px] leading-relaxed text-muted">
                 Paste a job description — we&apos;ll tailor your resume, draft a cover
                 letter, and help you log what you sent.
               </div>
             </div>
-            <div className="flex-none whitespace-nowrap rounded-[11px] bg-white px-[18px] py-[11px] text-[13.5px] font-semibold text-ink">
+            <div className="flex-none whitespace-nowrap rounded-[11px] bg-accent px-4 py-2.5 text-[13px] font-semibold text-white">
               Start applying →
             </div>
           </Link>
         ) : (
-          <div className="mb-7 grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
             <StatCard label="Resumes" value={String(versionsCount)} />
             <StatCard label="Applications" value={String(applicationsCount)} />
             {stats.respRate > 0 ? (
@@ -182,25 +178,75 @@ export function DashboardHomeSimple({ data }: { data: DashboardHomeData }) {
           </div>
         )}
 
+        {hasResume && savedJobs.length > 0 ? (
+          <section className="mb-5 rounded-2xl border border-border bg-white px-5 py-4">
+            <div className="mb-2 flex items-center justify-between">
+              <h2 className="font-display text-[14px] font-semibold text-ink">
+                Apply today
+              </h2>
+              <Link
+                href="/applications"
+                className="text-[12.5px] font-semibold text-accent hover:underline"
+              >
+                View all
+              </Link>
+            </div>
+            <div className="space-y-2">
+              {savedJobs.slice(0, 2).map((job) => (
+                <div
+                  key={job.id}
+                  className="flex items-center justify-between gap-3 rounded-xl border border-[#EEF0F3] px-3 py-2.5"
+                >
+                  <div className="min-w-0">
+                    <div className="truncate text-[13.5px] font-semibold text-ink">
+                      {job.role || "Untitled role"}
+                    </div>
+                    <div className="truncate text-[12px] text-muted">
+                      {job.company || "Add company"}
+                    </div>
+                  </div>
+                  <Link
+                    href="/applications"
+                    className="shrink-0 text-[12px] font-semibold text-accent hover:underline"
+                  >
+                    Prepare
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
         <ChecklistSection
           title="Your next steps"
           subtitle={subtitle}
           items={checklist}
         />
 
-        {hasResume && primaryVersionId ? (
+        {hasResume && recentVersions[0] ? (
           <p className="mt-5 text-center text-[13px] text-muted">
-            Need to edit your resume?{" "}
+            Latest doc:{" "}
             <Link
-              href={`/editor/${primaryVersionId}`}
+              href={`/editor/${recentVersions[0].id}`}
               className="font-semibold text-accent hover:underline"
             >
-              Open editor
+              {recentVersions[0].name}
             </Link>
             {" · "}
             <Link href="/library" className="font-semibold text-accent hover:underline">
-              Resume library
+              All documents
             </Link>
+            {primaryVersionId && primaryVersionId !== recentVersions[0].id ? (
+              <>
+                {" · "}
+                <Link
+                  href={`/editor/${primaryVersionId}`}
+                  className="font-semibold text-accent hover:underline"
+                >
+                  Open editor
+                </Link>
+              </>
+            ) : null}
           </p>
         ) : null}
 
