@@ -303,7 +303,11 @@ export function TailorPanel({
         jobCompany={draft.jobCompany}
       />
 
-      <PrepFlowStepper currentStep={currentStep} resultId={resultId} />
+      <PrepFlowStepper
+        currentStep={currentStep}
+        resultId={resultId}
+        savedJobId={savedJobId}
+      />
 
       {phase === "result" && resultData ? (
         <div className="rounded-2xl border border-[#B8E6C8] bg-[#F0FBF4] px-5 py-4">
@@ -464,11 +468,13 @@ export function TailorPanel({
 
             {saveStatus === "saved" && resultId ? (
               <div className="rounded-2xl border border-[#E6E8EC] bg-white px-5 py-4">
-                <div className="text-[13px] font-semibold text-ink">Step 3 — Cover letter</div>
+                <div className="text-[13px] font-semibold text-ink">
+                  Next — Cover letter or Q&amp;A
+                </div>
                 <p className="mt-1 text-[13px] leading-[1.5] text-muted">
                   {draft.jobCompany?.trim()
-                    ? `Write a cover letter for ${draft.jobCompany}, then log the application.`
-                    : "Write a cover letter, then log the application."}{" "}
+                    ? `Optional: write a cover letter for ${draft.jobCompany}. Many portals also ask screening questions — generate answers in Application Q&A before you log.`
+                    : "Cover letter is optional. Many portals ask screening questions — generate answers in Application Q&A before you log."}{" "}
                   Job details carry over and this tailored resume is already saved.
                 </p>
                 <Link
@@ -476,6 +482,12 @@ export function TailorPanel({
                   className="mt-3 inline-flex w-full justify-center rounded-[9px] bg-accent px-4 py-2.5 text-[13px] font-semibold text-white hover:bg-[#1E54E6]"
                 >
                   Continue to cover letter →
+                </Link>
+                <Link
+                  href={`/questions?v=${resultId}${savedJobId ? `&job=${savedJobId}` : ""}`}
+                  className="mt-2 inline-flex w-full justify-center rounded-[9px] border border-[#D5DBE4] bg-white px-4 py-2.5 text-[13px] font-semibold text-ink hover:border-[#C0C7D2] hover:bg-[#FAFBFC]"
+                >
+                  Skip cover letter → Application Q&amp;A
                 </Link>
               </div>
             ) : null}

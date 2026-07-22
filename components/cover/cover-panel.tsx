@@ -1,6 +1,5 @@
 "use client";
 
-import { LogApplicationButton } from "@/components/applications/log-application-button";
 import {
   JobCompanyField,
   JobDescField,
@@ -27,18 +26,18 @@ import type { CoverLetter } from "@/lib/cover/types";
 import { useJobDraft } from "@/lib/job-draft/use-job-draft";
 import { buildCoverHTML, openPrintHtml } from "@/lib/resume/build-cover-html";
 import type { ResumeVersion } from "@/lib/resume/db-types";
-import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useState } from "react";
 
 type CoverPanelProps = {
   versions: ResumeVersion[];
   defaultVersionId: string | null;
   savedLetters?: CoverLetter[];
   initialVersionId?: string | null;
-  /** When set, show the 4-step prep flow stepper (from Tailor → Cover). */
+  /** When set, show the prep flow stepper (from Tailor → Cover). */
   prepFlowResultId?: string | null;
   savedJobId?: string | null;
   prepSeed?: CoverPrepSeed | null;
-  isStudent?: boolean;
 };
 
 function formatWhen(iso: string) {
@@ -61,7 +60,6 @@ export function CoverPanel({
   prepFlowResultId = null,
   savedJobId = null,
   prepSeed = null,
-  isStudent = false,
 }: CoverPanelProps) {
   const { draft, update } = useJobDraft(prepSeed);
   const [baseId, setBaseId] = useState(
@@ -129,18 +127,13 @@ export function CoverPanel({
         location: base.data.location,
       })
     );
-    setToast("PDF exported — log this application to track it in Applications.");
+    setToast("PDF exported — continue to Q&A or log when you've submitted.");
   }
 
-  const prepStep = draft.coverText.trim() ? 4 : 3;
   const showPrepFlow = Boolean(prepFlowResultId);
-
-  useEffect(() => {
-    if (!draft.coverText.trim()) return;
-    if (typeof window !== "undefined" && window.location.hash === "#log-application") {
-      document.getElementById("log-application")?.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [draft.coverText]);
+  const qaHref = prepFlowResultId
+    ? `/questions?v=${prepFlowResultId}${savedJobId ? `&job=${savedJobId}` : ""}`
+    : "/questions";
 
   async function handleSave() {
     if (!draft.coverText.trim()) {
@@ -226,37 +219,40 @@ export function CoverPanel({
     <>
       {showPrepFlow ? (
         <PrepFlowStepper
-          currentStep={prepStep}
+          currentStep={3}
           resultId={prepFlowResultId}
+          savedJobId={savedJobId}
           className="mb-5"
         />
       ) : null}
 
-      {showPrepFlow && draft.coverText.trim() && base ? (
-        <div
-          id="log-application"
-          className="mb-5 scroll-mt-8 rounded-2xl border border-[#C8DAFF] bg-[#F4F8FF] px-5 py-4"
-        >
+      {showPrepFlow && prepFlowResultId ? (
+        <div className="mb-5 rounded-2xl border border-[#C8DAFF] bg-[#F4F8FF] px-5 py-4">
           <div className="text-[14px] font-semibold text-ink">
-            Step 4 — Log this application
+            {draft.coverText.trim()
+              ? "Next — Application Q&A"
+              : "Cover letter is optional"}
           </div>
           <p className="mt-1 max-w-[640px] text-[13px] leading-[1.55] text-muted">
-            Exporting or saving your letter doesn&apos;t add it to Applications
-            automatically. Log it here to track{" "}
-            {draft.jobCompany?.trim() || "this role"} with your tailored resume
-            and cover letter snapshot.
+            {draft.coverText.trim()
+              ? "Many online applications ask screening questions before you submit. Generate answers next, then log the application."
+              : "Skip this step if the posting doesn't need a letter. Continue to Application Q&A for portal questions, then log when you're ready."}
           </p>
-          <div className="mt-3">
-            <LogApplicationButton
-              versionId={base.id}
-              resumeVersionName={base.name}
-              initialRole={draft.jobRole}
-              initialCompany={draft.jobCompany}
-              isStudent={isStudent}
-              className="inline-flex items-center gap-1.5 rounded-[10px] border-none bg-accent px-4 py-2.5 text-[13px] font-semibold text-white shadow-[0_4px_14px_rgba(47,107,255,0.32)] hover:bg-[#1E54E6]"
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Link
+              href={qaHref}
+              className="inline-flex items-center rounded-[10px] bg-accent px-4 py-2.5 text-[13px] font-semibold text-white hover:bg-[#1E54E6]"
             >
-              Log application →
-            </LogApplicationButton>
+              {draft.coverText.trim()
+                ? "Continue to Application Q&A →"
+                : "Skip cover letter → Application Q&A"}
+            </Link>
+            <Link
+              href={`${qaHref}#log-application`}
+              className="inline-flex items-center rounded-[10px] border border-[#D5DBE4] bg-white px-4 py-2.5 text-[13px] font-semibold text-ink hover:border-[#C0C7D2] hover:bg-[#FAFBFC]"
+            >
+              Skip to log application
+            </Link>
           </div>
         </div>
       ) : null}

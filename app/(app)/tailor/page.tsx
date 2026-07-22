@@ -33,8 +33,8 @@ export default async function TailorPage({ searchParams }: PageProps) {
         </h1>
         <p className="mt-2 max-w-[640px] text-[14.5px] text-muted">
           {isStudent
-            ? "Four steps: add the job or internship, review your tailored resume, write a cover letter, then log it so you can track responses. Job details stay filled while you move between steps."
-            : "Four steps: add the job, review your tailored resume, write a cover letter, then log the application. Job details stay filled while you move between steps — choose Start new job when you're ready for a different role."}
+            ? "Add the job or internship, review your tailored resume, optionally write a cover letter, generate answers for portal questions, then log it so you can track responses. Job details stay filled while you move between steps."
+            : "Add the job, review your tailored resume, optionally write a cover letter, generate answers for application questions, then log the application. Job details stay filled while you move between steps — choose Start new job when you're ready for a different role."}
         </p>
         <div className="mt-[26px]">
           <JobDraftBootstrap savedJobId={job ?? null} />
