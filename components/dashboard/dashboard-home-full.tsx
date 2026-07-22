@@ -11,6 +11,11 @@ import {
 import { StudentWelcomePanel } from "@/components/dashboard/student-welcome-panel";
 import { formatRelativeTime } from "@/lib/resume/utils";
 
+/** Shared right rail so purple CTAs share one vertical edge across sections. */
+const CTA_RAIL = "w-[132px] shrink-0";
+const CTA_BTN =
+  "inline-flex h-10 w-full items-center justify-center rounded-[10px] bg-accent text-[13.5px] font-semibold text-white transition-colors hover:bg-accent-dark";
+
 function buildChecklist(data: DashboardHomeData): ChecklistItem[] {
   const { isStudent, versionsCount, applicationsCount, hasTailored, primaryVersionId } =
     data;
@@ -47,6 +52,32 @@ function buildChecklist(data: DashboardHomeData): ChecklistItem[] {
   ];
 }
 
+function SectionHeading({
+  title,
+  linkHref,
+  linkLabel,
+}: {
+  title: string;
+  linkHref?: string;
+  linkLabel?: string;
+}) {
+  return (
+    <div className="mb-3 flex items-baseline justify-between gap-3">
+      <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-ink">
+        {title}
+      </h2>
+      {linkHref && linkLabel ? (
+        <Link
+          href={linkHref}
+          className="text-[13px] font-medium text-teal-dark hover:underline"
+        >
+          {linkLabel}
+        </Link>
+      ) : null}
+    </div>
+  );
+}
+
 export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
   const {
     firstName,
@@ -69,14 +100,14 @@ export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
 
   return (
     <div className="scroll flex-1 overflow-auto bg-page">
-      <div className="mx-auto max-w-[1180px] px-5 pb-20 pt-8 sm:px-8 lg:px-10">
-        <div className="mb-8 animate-[fadeUp_0.35s_ease]">
-          <h1 className="font-display text-[30px] font-semibold tracking-[-0.03em] text-ink">
+      <div className="mx-auto max-w-[1180px] px-5 pb-20 pt-9 sm:px-8 lg:px-10">
+        <div className="mb-9 animate-[fadeUp_0.35s_ease]">
+          <h1 className="font-display text-[32px] font-semibold tracking-[-0.035em] text-ink">
             {isNew
               ? `Hi${firstName ? ` ${firstName}` : ""}`
               : `Welcome back${firstName ? `, ${firstName}` : ""}`}
           </h1>
-          <p className="mt-2 max-w-[520px] text-[15px] leading-relaxed text-muted">
+          <p className="mt-2 max-w-[480px] text-[15px] leading-relaxed text-muted">
             {isNew
               ? "Start with a resume, then find roles and track every send."
               : "Find roles, tailor what you send, and keep every application in one place."}
@@ -89,77 +120,75 @@ export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
           </div>
         ) : null}
 
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_272px]">
-          <div className="min-w-0 space-y-8">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-10">
+          <div className="min-w-0 space-y-9">
             <section className="animate-[fadeUp_0.4s_ease]">
-              <div className="mb-3 flex items-baseline justify-between gap-3">
-                <h2 className="text-[16px] font-semibold text-ink">New jobs</h2>
-                <Link
-                  href="/discover"
-                  className="text-[13px] font-medium text-teal-dark hover:underline"
-                >
-                  Explore more jobs
-                </Link>
-              </div>
-              <div className="overflow-hidden rounded-2xl border border-dashed border-[#9DE4DB] bg-[#F3FBFA] px-6 py-8 sm:px-8">
-                <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="max-w-[460px]">
-                    <h3 className="font-display text-[22px] font-semibold tracking-[-0.025em] text-ink">
+              <SectionHeading
+                title="New jobs"
+                linkHref="/discover"
+                linkLabel="Explore more jobs"
+              />
+              <div className="rounded-2xl border border-dashed border-[#9DE4DB] bg-[#F3FBFA] px-5 py-6">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-display text-[20px] font-semibold tracking-[-0.025em] text-ink sm:text-[22px]">
                       Find jobs that match your experience
                     </h3>
-                    <p className="mt-2 text-[14px] leading-relaxed text-muted">
+                    <p className="mt-1.5 max-w-[440px] text-[13.5px] leading-relaxed text-muted">
                       Describe the role you want. We&apos;ll suggest companies and
                       searches you can validate yourself.
                     </p>
                   </div>
-                  <Link
-                    href={isNew ? buildLink : "/discover"}
-                    className="inline-flex shrink-0 items-center justify-center rounded-xl bg-accent px-5 py-3 text-[14px] font-semibold text-white transition-transform hover:-translate-y-0.5 hover:bg-accent-dark"
-                  >
-                    {isNew ? "Upload resume" : "Find jobs"}
-                  </Link>
+                  <div className={`${CTA_RAIL} flex justify-end self-end sm:self-center`}>
+                    <Link
+                      href={isNew ? buildLink : "/discover"}
+                      className={CTA_BTN}
+                    >
+                      {isNew ? "Upload resume" : "Find jobs"}
+                    </Link>
+                  </div>
                 </div>
               </div>
             </section>
 
             <section className="animate-[fadeUp_0.45s_ease]">
-              <div className="mb-3 flex items-baseline justify-between gap-3">
-                <h2 className="text-[16px] font-semibold text-ink">Apply today</h2>
-                <Link
-                  href="/applications"
-                  className="text-[13px] font-medium text-teal-dark hover:underline"
-                >
-                  Open tracker
-                </Link>
-              </div>
+              <SectionHeading
+                title="Apply today"
+                linkHref="/applications"
+                linkLabel="Open tracker"
+              />
               {applyQueue.length === 0 ? (
-                <div className="flex flex-col gap-4 rounded-2xl border border-dashed border-[#D5D9E0] bg-soft px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <div className="text-[15px] font-semibold text-ink">
-                      Add your first job
+                <div className="rounded-2xl border border-dashed border-[#D5D9E0] bg-soft px-5 py-5">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[15px] font-semibold text-ink">
+                        Add your first job
+                      </div>
+                      <p className="mt-1 max-w-[400px] text-[13.5px] leading-relaxed text-muted">
+                        Save a role to your queue, tailor a resume cut, then log what
+                        you send.
+                      </p>
                     </div>
-                    <p className="mt-1 max-w-[400px] text-[13.5px] leading-relaxed text-muted">
-                      Save a role to your queue, tailor a resume cut, then log what
-                      you send.
-                    </p>
+                    <div className={`${CTA_RAIL} flex justify-end self-end sm:self-center`}>
+                      <Link
+                        href="/applications"
+                        className="inline-flex h-10 w-full items-center justify-center rounded-[10px] border border-accent/30 bg-white text-[13.5px] font-semibold text-accent transition-colors hover:bg-[#F5F2FF]"
+                      >
+                        + Add job
+                      </Link>
+                    </div>
                   </div>
-                  <Link
-                    href="/applications"
-                    className="inline-flex shrink-0 items-center justify-center rounded-xl border border-accent/30 bg-white px-4 py-2.5 text-[13.5px] font-semibold text-accent transition-colors hover:bg-[#F5F2FF]"
-                  >
-                    + Add job
-                  </Link>
                 </div>
               ) : (
-                <div className="overflow-hidden rounded-2xl border border-border bg-white">
+                <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-[0_1px_0_rgba(26,29,35,0.03)]">
                   {applyQueue.map((job, index) => (
                     <div
                       key={job.id}
-                      className={`flex flex-wrap items-center justify-between gap-3 px-5 py-4 ${
+                      className={`flex items-center gap-4 px-5 py-3.5 ${
                         index < applyQueue.length - 1 ? "border-b border-[#F0F1F3]" : ""
                       }`}
                     >
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         <div className="truncate text-[14.5px] font-semibold text-ink">
                           {job.role || "Untitled role"}
                         </div>
@@ -167,12 +196,11 @@ export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
                           {job.company || "Add company"}
                         </div>
                       </div>
-                      <Link
-                        href="/applications"
-                        className="shrink-0 rounded-lg bg-accent px-3.5 py-2 text-[13px] font-semibold text-white hover:bg-accent-dark"
-                      >
-                        Prepare
-                      </Link>
+                      <div className={`${CTA_RAIL} flex justify-end`}>
+                        <Link href="/applications" className={CTA_BTN}>
+                          Prepare
+                        </Link>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -180,26 +208,20 @@ export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
             </section>
 
             <section className="animate-[fadeUp_0.5s_ease]">
-              <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-                <h2 className="text-[16px] font-semibold text-ink">Documents</h2>
-                <div className="flex items-center gap-3">
-                  <Link
-                    href="/library"
-                    className="text-[13px] font-medium text-teal-dark hover:underline"
-                  >
-                    All documents
-                  </Link>
-                  <Link
-                    href={primaryVersionId ? `/editor/${primaryVersionId}` : buildLink}
-                    className="inline-flex rounded-lg bg-accent px-3.5 py-2 text-[13px] font-semibold text-white hover:bg-accent-dark"
-                  >
-                    + Create
-                  </Link>
-                </div>
-              </div>
+              <SectionHeading title="Documents" linkHref="/library" linkLabel="All documents" />
               {docs.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-[#D5D9E0] bg-white px-5 py-10 text-center">
-                  <p className="text-[14px] text-muted">
+                <div className="rounded-2xl border border-dashed border-[#D5D9E0] bg-white px-5 py-5">
+                  <div className="mb-4 flex justify-end">
+                    <div className={CTA_RAIL}>
+                      <Link
+                        href={primaryVersionId ? `/editor/${primaryVersionId}` : buildLink}
+                        className={CTA_BTN}
+                      >
+                        + Create
+                      </Link>
+                    </div>
+                  </div>
+                  <p className="py-6 text-center text-[14px] text-muted">
                     No documents yet.{" "}
                     <Link href={buildLink} className="font-semibold text-accent hover:underline">
                       Build your first resume
@@ -208,7 +230,21 @@ export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
                   </p>
                 </div>
               ) : (
-                <div className="overflow-x-auto rounded-2xl border border-border bg-white">
+                <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-[0_1px_0_rgba(26,29,35,0.03)]">
+                  <div className="flex items-center gap-4 border-b border-[#F0F1F3] px-5 py-3">
+                    <div className="min-w-0 flex-1 text-[13px] text-muted">
+                      {docs.length} resume{docs.length === 1 ? "" : "s"}
+                    </div>
+                    <div className={`${CTA_RAIL} flex justify-end`}>
+                      <Link
+                        href={primaryVersionId ? `/editor/${primaryVersionId}` : buildLink}
+                        className={CTA_BTN}
+                      >
+                        + Create
+                      </Link>
+                    </div>
+                  </div>
+                  <div className="overflow-x-auto">
                   <div className="min-w-[680px]">
                     <div className="grid grid-cols-[1.5fr_1.1fr_88px_120px_120px] gap-3 border-b border-[#F0F1F3] px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.04em] text-[#9AA3AF]">
                       <div>Name</div>
@@ -249,22 +285,23 @@ export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
                       </Link>
                     ))}
                   </div>
+                  </div>
                 </div>
               )}
             </section>
 
             {prepCandidates.length > 0 || applicationsCount > 0 ? (
-              <section className="overflow-hidden rounded-2xl border border-border bg-white animate-[fadeUp_0.55s_ease]">
+              <section className="overflow-hidden rounded-2xl border border-border bg-white shadow-[0_1px_0_rgba(26,29,35,0.03)] animate-[fadeUp_0.55s_ease]">
                 <div className="grid gap-0 lg:grid-cols-[1.15fr_0.85fr]">
-                  <div className="border-b border-[#F0F1F3] px-7 py-7 lg:border-b-0 lg:border-r">
-                    <h2 className="font-display text-[24px] font-semibold tracking-[-0.03em] text-ink">
+                  <div className="border-b border-[#F0F1F3] px-7 py-8 lg:border-b-0 lg:border-r">
+                    <h2 className="font-display text-[26px] font-semibold tracking-[-0.035em] text-ink">
                       Two steps. Interview{" "}
                       <span className="text-accent">ready.</span>
                     </h2>
-                    <p className="mt-2 text-[14px] text-muted">
+                    <p className="mt-2 text-[14px] leading-relaxed text-muted">
                       Get a personalized prep guide from a logged application.
                     </p>
-                    <ul className="mt-5 space-y-2 text-[13.5px] text-[#3a4350]">
+                    <ul className="mt-5 space-y-2.5 text-[13.5px] text-[#3a4350]">
                       {[
                         "Concise company overview",
                         "STAR storylines",
@@ -278,7 +315,7 @@ export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
                       ))}
                     </ul>
                   </div>
-                  <div className="flex flex-col justify-center px-6 py-7">
+                  <div className="flex flex-col justify-center px-6 py-8">
                     <div className="mb-3 flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.08em] text-[#9AA3AF]">
                       <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#F0ECFF] text-[12px] text-accent">
                         1
@@ -291,7 +328,7 @@ export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
                           <Link
                             key={app.id}
                             href={`/applications/${app.id}?tab=prep`}
-                            className="flex items-center justify-between gap-3 rounded-xl border border-border px-3.5 py-3 transition-colors hover:border-accent/35 hover:bg-[#FBFaff]"
+                            className="flex items-center justify-between gap-3 rounded-xl border border-border px-3.5 py-3 transition-colors hover:border-accent/35 hover:bg-[#FBFAFF]"
                           >
                             <div className="min-w-0">
                               <div className="truncate text-[13.5px] font-semibold text-ink">
