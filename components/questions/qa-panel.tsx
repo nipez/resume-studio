@@ -16,7 +16,14 @@ import { qaScopeKey, uid, type QAItem } from "@/lib/job-draft/storage";
 import { useJobDraft } from "@/lib/job-draft/use-job-draft";
 import { useQADraft } from "@/lib/job-draft/use-qa-draft";
 import type { ResumeVersion } from "@/lib/resume/db-types";
-import { useEffect, useMemo, useState } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type TextareaHTMLAttributes,
+} from "react";
 
 type QAPanelProps = {
   versions: ResumeVersion[];
@@ -26,6 +33,35 @@ type QAPanelProps = {
   savedJobId?: string | null;
   isStudent?: boolean;
 };
+
+function AutoGrowTextarea({
+  value,
+  className = "",
+  minRows = 2,
+  ...props
+}: TextareaHTMLAttributes<HTMLTextAreaElement> & {
+  minRows?: number;
+}) {
+  const ref = useRef<HTMLTextAreaElement>(null);
+
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.height = "0px";
+    const minHeight = minRows * 24 + 20;
+    el.style.height = `${Math.max(minHeight, el.scrollHeight)}px`;
+  }, [value, minRows]);
+
+  return (
+    <textarea
+      {...props}
+      ref={ref}
+      value={value}
+      rows={minRows}
+      className={`block w-full resize-none overflow-hidden ${className}`}
+    />
+  );
+}
 
 export function QAPanel({
   versions,
@@ -69,6 +105,7 @@ export function QAPanel({
   const anyBusy = busyIds.size > 0;
   const showPrepFlow = Boolean(prepFlowResultId);
   const filledCount = items.filter((i) => i.q.trim()).length;
+  const answeredCount = items.filter((i) => i.a.trim()).length;
   const jobLabel = [draft.jobRole.trim(), draft.jobCompany.trim()]
     .filter(Boolean)
     .join(" · ");
@@ -223,7 +260,7 @@ export function QAPanel({
             <span className="font-semibold">
               {jobLabel || "this application"}
             </span>
-            . Previous job answers were cleared.
+            .
           </span>
           <button
             type="button"
@@ -240,10 +277,7 @@ export function QAPanel({
           <span>
             These questions may be from a previous application. Clear them if
             they aren&apos;t for{" "}
-            <span className="font-semibold">
-              {jobLabel || "this role"}
-            </span>
-            .
+            <span className="font-semibold">{jobLabel || "this role"}</span>.
           </span>
           <div className="flex flex-wrap gap-2">
             <button
@@ -275,7 +309,7 @@ export function QAPanel({
         </div>
       ) : null}
 
-      <div className="mb-4 rounded-[14px] border border-[#E6E8EC] bg-white px-[18px] py-4">
+      <div className="mb-5 rounded-xl border border-[#E8ECF1] bg-[#FAFBFC] px-4 py-3">
         <button
           type="button"
           onClick={() => setContextOpen((open) => !open)}
@@ -283,33 +317,27 @@ export function QAPanel({
           aria-expanded={contextOpen}
         >
           <div className="min-w-0">
-            <div className="text-[11px] font-bold uppercase tracking-[0.06em] text-[#8A92A0]">
-              Job context
-            </div>
-            <div className="mt-1 truncate text-[14px] font-semibold text-ink">
+            <div className="truncate text-[14px] font-semibold text-ink">
               {jobLabel || "Add role and company"}
             </div>
             <div className="mt-0.5 truncate text-[12.5px] text-muted">
-              Resume: {base?.name ?? "—"}
-              {!contextOpen ? " · click to edit" : ""}
+              Using {base?.name ?? "resume"} for answers
             </div>
           </div>
           <span className="flex-none text-[12.5px] font-semibold text-[#2456D6]">
-            {contextOpen ? "Hide" : "Edit"}
+            {contextOpen ? "Done" : "Edit context"}
           </span>
         </button>
 
         {contextOpen ? (
-          <div className="mt-4 space-y-3.5 border-t border-[#EEF0F3] pt-4">
-            <div className="flex flex-wrap items-end justify-between gap-3.5">
-              <VersionSelect
-                versions={versions}
-                value={baseId}
-                onChange={setBaseId}
-                label="Resume context"
-                id="qa-base"
-              />
-            </div>
+          <div className="mt-3 space-y-3.5 border-t border-[#E8ECF1] bg-white px-1 pt-3">
+            <VersionSelect
+              versions={versions}
+              value={baseId}
+              onChange={setBaseId}
+              label="Resume context"
+              id="qa-base"
+            />
             <JobUrlImport
               className="mt-0"
               onImported={(fields) =>
@@ -323,7 +351,7 @@ export function QAPanel({
               hint="Career pages work via URL. For Indeed or LinkedIn, use Paste text."
               successMessage="Imported — job context updated below."
             />
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <JobRoleField
                 value={draft.jobRole}
                 onChange={(v) => update({ jobRole: v })}
@@ -336,107 +364,127 @@ export function QAPanel({
             <JobDescField
               value={draft.jobDesc}
               onChange={(v) => update({ jobDesc: v })}
-              rows={4}
-              label="Job description (optional context)"
+              rows={3}
+              label="Job description (optional)"
             />
           </div>
         ) : null}
       </div>
 
-      <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
-        <div className="min-w-0">
-          <h2 className="font-display text-[17px] font-semibold text-ink">
-            Portal questions
-          </h2>
-          <p className="mt-1 text-[13px] text-muted">
-            {jobLabel
-              ? `For ${jobLabel} only — not carried over from other applications.`
-              : "Paste screening questions from the online application."}
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={clearAll}
-            className="rounded-[10px] border border-[#E4E7EC] bg-white px-3.5 py-2 text-[13px] font-semibold text-[#5A6573] hover:border-[#C8CED6] hover:text-ink"
-          >
-            Clear all
-          </button>
-          <button
-            type="button"
-            onClick={answerAll}
-            disabled={anyBusy || filledCount === 0}
-            className="rounded-[10px] bg-accent px-4 py-2 text-[13px] font-semibold text-white hover:bg-[#1E54E6] disabled:opacity-60"
-          >
-            {anyBusy ? "Answering…" : "Answer all"}
-          </button>
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-3.5">
-        {items.map((q, index) => {
-          const busy = busyIds.has(q.id);
-          return (
-            <div
-              key={q.id}
-              className="rounded-[14px] border border-[#E6E8EC] bg-white px-[18px] py-4"
+      <section className="overflow-hidden rounded-2xl border border-[#E6E8EC] bg-white">
+        <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[#EEF0F3] px-5 py-4">
+          <div className="min-w-0">
+            <h2 className="font-display text-[18px] font-semibold tracking-[-0.02em] text-ink">
+              Portal questions
+            </h2>
+            <p className="mt-1 text-[13px] text-muted">
+              {filledCount === 0
+                ? "Paste each screening question, then generate an answer."
+                : `${filledCount} question${filledCount === 1 ? "" : "s"}${
+                    answeredCount
+                      ? ` · ${answeredCount} answered`
+                      : " · none answered yet"
+                  }`}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {filledCount > 0 || answeredCount > 0 ? (
+              <button
+                type="button"
+                onClick={clearAll}
+                className="rounded-[9px] border border-transparent px-3 py-2 text-[13px] font-semibold text-[#8A92A0] hover:bg-[#F4F5F7] hover:text-ink"
+              >
+                Clear all
+              </button>
+            ) : null}
+            <button
+              type="button"
+              onClick={answerAll}
+              disabled={anyBusy || filledCount === 0}
+              className="rounded-[9px] bg-accent px-3.5 py-2 text-[13px] font-semibold text-white hover:bg-[#1E54E6] disabled:opacity-60"
             >
-              <div className="mb-2 text-[11px] font-bold uppercase tracking-[0.06em] text-[#9AA3AF]">
-                Question {index + 1}
-              </div>
-              <div className="flex items-start gap-2.5">
-                <textarea
-                  value={q.q}
-                  onChange={(e) => updateItem(q.id, { q: e.target.value })}
-                  rows={2}
-                  placeholder="Paste an application question…"
-                  className="min-h-[52px] flex-1 resize-y rounded-[9px] border border-[#E2E5EA] px-3 py-2.5 text-sm font-semibold leading-[1.45] text-[#1a1f29] focus:border-accent focus:outline-none"
-                />
-                <button
-                  type="button"
-                  onClick={() => answerOne(q.id)}
-                  disabled={busy || !q.q.trim()}
-                  className="flex h-[42px] flex-none items-center gap-1.5 rounded-[9px] bg-accent px-3.5 text-[12.5px] font-semibold text-white hover:bg-[#1E54E6] disabled:opacity-60"
-                >
-                  {busy ? <Spinner className="h-3 w-3" /> : null}
-                  {busy ? "…" : "Answer"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => removeQuestion(q.id)}
-                  className="flex h-[42px] w-[38px] flex-none items-center justify-center rounded-[9px] bg-[#FFF4F4] text-[13px] text-[#B23B3B]"
-                  aria-label="Remove question"
-                >
-                  ✕
-                </button>
-              </div>
-              {q.a ? (
-                <div className="relative mt-3 animate-[fadeUp_0.3s_ease_both] rounded-[11px] border border-[#EAEEF3] bg-[#F7F9FC] px-4 py-3.5">
-                  <textarea
-                    value={q.a}
-                    onChange={(e) => updateItem(q.id, { a: e.target.value })}
-                    className="min-h-[120px] w-full resize-y border-none bg-transparent font-sans text-[13.8px] leading-[1.65] text-[#1a1f29] focus:outline-none"
-                  />
+              {anyBusy ? "Answering…" : "Answer all"}
+            </button>
+          </div>
+        </div>
+
+        <div className="divide-y divide-[#EEF0F3]">
+          {items.map((q, index) => {
+            const busy = busyIds.has(q.id);
+            const hasAnswer = Boolean(q.a.trim());
+            return (
+              <article key={q.id} className="px-5 py-5">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <div className="text-[12px] font-semibold text-[#8A92A0]">
+                    Question {index + 1}
+                  </div>
                   <button
                     type="button"
-                    onClick={() => copyAnswer(q.a)}
-                    className="absolute right-2.5 top-2.5 rounded-[7px] border border-[#E2E5EA] bg-white px-[11px] py-[5px] text-[11.5px] font-semibold text-[#3a4350] hover:border-accent hover:text-accent"
+                    onClick={() => removeQuestion(q.id)}
+                    className="cursor-pointer border-none bg-transparent p-0 text-[12px] font-semibold text-[#B23B3B] hover:underline"
                   >
-                    Copy
+                    Remove
                   </button>
                 </div>
-              ) : null}
-            </div>
-          );
-        })}
-        <button
-          type="button"
-          onClick={addQuestion}
-          className="self-start rounded-[10px] border-none bg-[#EAF1FF] px-4 py-2.5 text-[13.5px] font-semibold text-[#2456D6] hover:bg-[#dbe7ff]"
-        >
-          + Add question
-        </button>
-      </div>
+
+                <AutoGrowTextarea
+                  value={q.q}
+                  onChange={(e) => updateItem(q.id, { q: e.target.value })}
+                  minRows={2}
+                  placeholder="Paste the portal question here…"
+                  className="rounded-xl border border-[#E2E5EA] bg-[#FAFBFC] px-3.5 py-3 text-[14.5px] font-medium leading-[1.55] text-ink placeholder:font-normal placeholder:text-[#9AA3AF] focus:border-accent focus:bg-white focus:outline-none"
+                />
+
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => answerOne(q.id)}
+                    disabled={busy || !q.q.trim()}
+                    className="inline-flex items-center gap-1.5 rounded-[9px] bg-accent px-3.5 py-2 text-[13px] font-semibold text-white hover:bg-[#1E54E6] disabled:opacity-60"
+                  >
+                    {busy ? <Spinner className="h-3.5 w-3.5" /> : null}
+                    {busy ? "Writing…" : hasAnswer ? "Regenerate" : "Generate answer"}
+                  </button>
+                  {hasAnswer ? (
+                    <button
+                      type="button"
+                      onClick={() => copyAnswer(q.a)}
+                      className="rounded-[9px] border border-[#E4E7EC] bg-white px-3.5 py-2 text-[13px] font-semibold text-[#3a4350] hover:border-[#C8CED6]"
+                    >
+                      Copy answer
+                    </button>
+                  ) : null}
+                </div>
+
+                {hasAnswer ? (
+                  <div className="mt-4 border-t border-[#F0F2F5] pt-4">
+                    <div className="mb-2 text-[12px] font-semibold text-[#8A92A0]">
+                      Your answer
+                    </div>
+                    <AutoGrowTextarea
+                      value={q.a}
+                      onChange={(e) => updateItem(q.id, { a: e.target.value })}
+                      minRows={4}
+                      className="rounded-xl bg-[#F7F9FC] px-3.5 py-3 font-sans text-[14.5px] leading-[1.7] text-[#1a1f29] focus:bg-white focus:outline-none focus:ring-1 focus:ring-accent"
+                    />
+                  </div>
+                ) : null}
+              </article>
+            );
+          })}
+        </div>
+
+        <div className="border-t border-[#EEF0F3] px-5 py-4">
+          <button
+            type="button"
+            onClick={addQuestion}
+            className="cursor-pointer border-none bg-transparent p-0 text-[13.5px] font-semibold text-[#2456D6] hover:underline"
+          >
+            + Add another question
+          </button>
+        </div>
+      </section>
+
       {toast ? <Toast message={toast} onDone={() => setToast(null)} /> : null}
     </>
   );
