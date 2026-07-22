@@ -214,13 +214,12 @@ function ApplicationsTable({
             >
               <div className="truncate text-[14.5px] font-bold text-[#141821]">
                 {primary}
-                {secondary && (
-                  <span className="font-semibold text-[#8A92A0]">
-                    {" "}
-                    · {secondary}
-                  </span>
-                )}
               </div>
+              {secondary ? (
+                <div className="mt-0.5 truncate text-[13px] font-semibold text-[#3a4350]">
+                  {secondary}
+                </div>
+              ) : null}
               <div className="mt-[3px] truncate text-[12.3px] text-[#8A92A0]">
                 {tags.join("  ·  ")}
               </div>
