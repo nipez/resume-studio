@@ -314,7 +314,7 @@ export function MarketingHomePage() {
             <span className="eyebrow" style={{ background: "var(--cream)" }}>Templates</span>
             <h2>Three templates, print-ready.</h2>
             <p>
-              Classic, Two-Column, and Editorial — with full PDF export.{" "}
+              Classic, Modern, Two-Column, and Editorial — with full PDF export.{" "}
               <Link href="/features#templates" className="features-inline-link">
                 See templates →
               </Link>

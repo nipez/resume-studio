@@ -225,7 +225,7 @@ export function StudentsPage() {
             <span className="eyebrow" style={{ background: "var(--cream)" }}>
               Templates
             </span>
-            <h2>Three templates built for students.</h2>
+            <h2>Templates built for students.</h2>
             <p>
               Same professional layouts as the full workspace — previewed with
               real high-school sample data.
