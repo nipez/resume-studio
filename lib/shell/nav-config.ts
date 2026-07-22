@@ -31,6 +31,66 @@ const PROFESSIONAL_NAV: NavGroup[] = [
   },
 ];
 
+/** Primary horizontal links for the light top nav (Enhancv-style). */
+export function buildTopNavItems(input: {
+  isStudent: boolean;
+  hasResume: boolean;
+}): NavItem[] {
+  if (input.isStudent && !input.hasResume) {
+    return [
+      { href: "/dashboard", label: "Dashboard", icon: "home" },
+      { href: "/build?mode=student", label: "Build resume", icon: "library" },
+    ];
+  }
+
+  if (input.isStudent) {
+    return [
+      { href: "/dashboard", label: "Dashboard", icon: "home" },
+      { href: "/library", label: "Documents", icon: "library" },
+      { href: "/discover", label: "Find jobs", icon: "search" },
+      { href: "/applications", label: "My saved jobs", icon: "briefcase" },
+      { href: "/tailor", label: "Apply", icon: "target" },
+    ];
+  }
+
+  return [
+    { href: "/dashboard", label: "Dashboard", icon: "home" },
+    { href: "/library", label: "Documents", icon: "library" },
+    { href: "/discover", label: "Find jobs", icon: "search" },
+    { href: "/applications", label: "My saved jobs", icon: "briefcase" },
+    { href: "/tailor?new=1", label: "Tailor", icon: "target" },
+  ];
+}
+
+/** Secondary links for the overflow / account menu. */
+export function buildMoreNavItems(input: {
+  isStudent: boolean;
+  hasResume: boolean;
+  isAdmin?: boolean;
+}): NavItem[] {
+  const items: NavItem[] = input.isStudent
+    ? input.hasResume
+      ? [
+          { href: "/build?mode=student", label: "Guided builder", icon: "library" },
+          { href: "/cover", label: "Cover letter", icon: "mail" },
+          { href: "/questions", label: "Application Q&A", icon: "chat" },
+          { href: "/insights", label: "Insights", icon: "chart" },
+        ]
+      : []
+    : [
+        { href: "/build", label: "Guided builder", icon: "library" },
+        { href: "/cover", label: "Cover letter", icon: "mail" },
+        { href: "/questions", label: "Application Q&A", icon: "chat" },
+        { href: "/insights", label: "Insights", icon: "chart" },
+      ];
+
+  if (input.isAdmin) {
+    items.push({ href: "/admin", label: "Super admin", icon: "chart" });
+  }
+
+  return items;
+}
+
 /** Fewer, clearer links for student persona — grows slightly once they have a resume. */
 export function buildStudentNavGroups(hasResume: boolean): NavGroup[] {
   if (!hasResume) {

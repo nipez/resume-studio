@@ -30,7 +30,7 @@ export function ApplyToNewJobButton({
         onClick={() => setOpen(true)}
         className={
           className ||
-          "inline-flex items-center gap-1.5 rounded-[11px] border-none bg-accent px-[17px] py-[11px] text-[13.5px] font-semibold text-white shadow-[0_4px_14px_rgba(47,107,255,0.32)] transition-colors hover:bg-accent-dark"
+          "inline-flex items-center gap-1.5 rounded-[11px] border-none bg-accent px-[17px] py-[11px] text-[13.5px] font-semibold text-white shadow-accent transition-colors hover:bg-accent-dark"
         }
       >
         {children ??

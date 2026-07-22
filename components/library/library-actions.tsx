@@ -16,25 +16,25 @@ export function LibraryActions({
 
   return (
     <>
-      <div className="flex flex-wrap gap-2.5">
+      <div className="flex flex-wrap gap-2">
         <Link
           href={buildHref}
-          className="inline-flex items-center gap-1.5 rounded-[11px] border border-[#DCE0E6] bg-white px-[17px] py-[11px] text-[13.5px] font-semibold text-[#3a4350] transition-colors hover:bg-[#F4F5F7]"
+          className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-white px-4 py-2.5 text-[13.5px] font-semibold text-[#3a4350] transition-colors hover:bg-soft"
         >
-          ✎ Build
+          Build
         </Link>
         <button
           type="button"
           onClick={() => setImportOpen(true)}
-          className="inline-flex items-center gap-1.5 rounded-[11px] border border-[#DCE0E6] bg-white px-[17px] py-[11px] text-[13.5px] font-semibold text-[#3a4350] transition-colors hover:bg-[#F4F5F7]"
+          className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-border bg-white px-4 py-2.5 text-[13.5px] font-semibold text-[#3a4350] transition-colors hover:bg-soft"
         >
-          ↑ Import
+          Import
         </button>
         <Link
           href="/tailor?new=1"
-          className="inline-flex items-center gap-1.5 rounded-[11px] border border-[#D6E4FF] bg-[#F5F8FF] px-[17px] py-[11px] text-[13.5px] font-semibold text-[#2456D6] transition-colors hover:border-accent hover:bg-[#EAF1FF]"
+          className="inline-flex items-center gap-1.5 rounded-xl border border-[#D9D2FF] bg-[#F7F5FF] px-4 py-2.5 text-[13.5px] font-semibold text-accent transition-colors hover:bg-[#F0ECFF]"
         >
-          ⌖ Tailor
+          Tailor
         </Link>
         <LibraryToolbar createLabel={createLabel} />
       </div>

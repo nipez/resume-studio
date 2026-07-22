@@ -64,7 +64,7 @@ export function VersionRow({
             className="min-w-0 flex-1"
           />
           {isDefault ? (
-            <span className="shrink-0 rounded-md bg-[#EEF3FF] px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.03em] text-[#1E54E6]">
+            <span className="shrink-0 rounded-md bg-[#F0ECFF] px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.03em] text-[#5638E0]">
               Default
             </span>
           ) : null}
@@ -77,13 +77,13 @@ export function VersionRow({
           <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5">
             <Link
               href={`/tailor?v=${version.id}&new=1`}
-              className="text-[11px] font-semibold text-[#2456D6] hover:underline"
+              className="text-[11px] font-semibold text-[#6B4EFF] hover:underline"
             >
               Tailor
             </Link>
             <Link
               href={`/cover?v=${version.id}`}
-              className="text-[11px] font-semibold text-[#2456D6] hover:underline"
+              className="text-[11px] font-semibold text-[#6B4EFF] hover:underline"
             >
               Cover
             </Link>
@@ -100,7 +100,7 @@ export function VersionRow({
 
       <div className="truncate text-[12.5px] text-[#5A6573]">
         {meta.tailored ? (
-          <span className="text-[#2456D6]">{meta.tailored.replace(/^Tailored:\s*/, "")}</span>
+          <span className="text-[#6B4EFF]">{meta.tailored.replace(/^Tailored:\s*/, "")}</span>
         ) : (
           <span className="font-semibold text-accent">+ Add</span>
         )}
@@ -109,7 +109,7 @@ export function VersionRow({
       <div className="text-[12.5px]">
         {archived ? (
           appCount > 0 ? (
-            <Link href="/applications" className="font-semibold text-[#2456D6] hover:underline">
+            <Link href="/applications" className="font-semibold text-[#6B4EFF] hover:underline">
               {appCount}
             </Link>
           ) : (
@@ -138,7 +138,7 @@ export function VersionRow({
       <div className="flex flex-wrap items-center justify-end gap-1.5">
         <Link
           href={`/editor/${version.id}`}
-          className="rounded-lg bg-accent px-2.5 py-[6px] text-[11.5px] font-semibold text-white transition-colors hover:bg-[#1E54E6]"
+          className="rounded-lg bg-accent px-2.5 py-[6px] text-[11.5px] font-semibold text-white transition-colors hover:bg-accent-dark"
         >
           Editor
         </Link>
@@ -164,7 +164,7 @@ export function VersionRow({
                 await setDefaultResumeVersion(version.id);
               })
             }
-            className="rounded-lg border border-[#D6E4FF] bg-[#F5F8FF] px-2.5 py-[6px] text-[11.5px] font-semibold text-[#2456D6] transition-colors hover:border-accent disabled:opacity-50"
+            className="rounded-lg border border-[#D9D2FF] bg-[#F7F5FF] px-2.5 py-[6px] text-[11.5px] font-semibold text-[#6B4EFF] transition-colors hover:border-accent disabled:opacity-50"
           >
             Default
           </button>
@@ -179,7 +179,7 @@ export function VersionRow({
                   await restoreResumeVersion(version.id);
                 })
               }
-              className="rounded-lg border border-[#D6E4FF] bg-[#F5F8FF] px-2.5 py-[6px] text-[11.5px] font-semibold text-[#2456D6] transition-colors hover:border-accent disabled:opacity-50"
+              className="rounded-lg border border-[#D9D2FF] bg-[#F7F5FF] px-2.5 py-[6px] text-[11.5px] font-semibold text-[#6B4EFF] transition-colors hover:border-accent disabled:opacity-50"
             >
               Restore
             </button>

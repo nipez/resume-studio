@@ -11,8 +11,8 @@ export default async function DiscoverPage() {
   ]);
 
   return (
-    <div className="scroll flex-1 overflow-auto">
-      <div className="mx-auto max-w-[1080px] px-5 pb-16 sm:px-8 lg:px-12 pt-6">
+    <div className="scroll flex-1 overflow-auto bg-page">
+      <div className="mx-auto max-w-[1080px] px-5 pb-20 sm:px-8 lg:px-10">
         <DiscoveryPanel profiles={profiles} isStudent={profile.isStudent} />
       </div>
     </div>

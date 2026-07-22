@@ -16,41 +16,9 @@ function buildChecklist(data: DashboardHomeData): ChecklistItem[] {
     data;
   const buildLink = buildHref(isStudent);
 
-  if (isStudent) {
-    return [
-      {
-        label: "Upload or build your resume",
-        done: versionsCount > 0,
-        href:
-          versionsCount > 0 && primaryVersionId
-            ? `/editor/${primaryVersionId}`
-            : buildLink,
-        cta: "Build",
-      },
-      {
-        label: "Find a job worth applying to",
-        done: data.savedJobs.length > 0 || applicationsCount > 0,
-        href: "/discover",
-        cta: "Find",
-      },
-      {
-        label: "Tailor for a role",
-        done: hasTailored,
-        href: "/tailor",
-        cta: "Tailor",
-      },
-      {
-        label: "Log your first application",
-        done: applicationsCount > 0,
-        href: "/applications",
-        cta: "Log",
-      },
-    ];
-  }
-
   return [
     {
-      label: "Upload your resume",
+      label: isStudent ? "Upload or build your resume" : "Upload your resume",
       done: versionsCount > 0,
       href:
         versionsCount > 0 && primaryVersionId
@@ -59,13 +27,13 @@ function buildChecklist(data: DashboardHomeData): ChecklistItem[] {
       cta: "Build",
     },
     {
-      label: "Find jobs that match",
+      label: "Find jobs that match your experience",
       done: data.savedJobs.length > 0 || applicationsCount > 0,
       href: "/discover",
       cta: "Find",
     },
     {
-      label: "Tailor a version to a job",
+      label: isStudent ? "Tailor for a role" : "Tailor a version to a job",
       done: hasTailored,
       href: "/tailor",
       cta: "Tailor",
@@ -100,76 +68,53 @@ export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
   const docs = recentVersions.slice(0, 5);
 
   return (
-    <div className="scroll flex-1 overflow-auto">
-      <div className="mx-auto max-w-[1180px] px-5 pb-16 sm:px-8 lg:px-12 pt-7">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h1 className="font-display text-[28px] font-semibold tracking-[-0.025em] text-ink">
-              {isStudent && isNew
-                ? `Hi${firstName ? ` ${firstName}` : ""}`
-                : `Welcome back${firstName ? `, ${firstName}` : ""}`}
-            </h1>
-            <p className="mt-1.5 max-w-[560px] text-[14px] leading-relaxed text-muted">
-              {isNew
-                ? "Start with a resume, then find roles and track every send."
-                : "Find roles, tailor what you send, and keep every application in one place."}
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Link
-              href="/discover"
-              className="inline-flex rounded-[11px] border border-[#DCE0E6] bg-white px-4 py-2.5 text-[13px] font-semibold text-ink hover:bg-[#F4F5F7]"
-            >
-              Find jobs
-            </Link>
-            <Link
-              href={versionsCount > 0 ? "/tailor?new=1" : buildLink}
-              className="inline-flex rounded-[11px] bg-accent px-4 py-2.5 text-[13px] font-semibold text-white hover:bg-accent-dark"
-            >
-              {versionsCount > 0 ? "Apply to a job" : "Build resume"}
-            </Link>
-          </div>
+    <div className="scroll flex-1 overflow-auto bg-page">
+      <div className="mx-auto max-w-[1180px] px-5 pb-20 pt-8 sm:px-8 lg:px-10">
+        <div className="mb-8 animate-[fadeUp_0.35s_ease]">
+          <h1 className="font-display text-[30px] font-semibold tracking-[-0.03em] text-ink">
+            {isNew
+              ? `Hi${firstName ? ` ${firstName}` : ""}`
+              : `Welcome back${firstName ? `, ${firstName}` : ""}`}
+          </h1>
+          <p className="mt-2 max-w-[520px] text-[15px] leading-relaxed text-muted">
+            {isNew
+              ? "Start with a resume, then find roles and track every send."
+              : "Find roles, tailor what you send, and keep every application in one place."}
+          </p>
         </div>
 
         {isStudent && isNew ? (
-          <div className="mb-6">
+          <div className="mb-8">
             <StudentWelcomePanel firstName={firstName || undefined} />
           </div>
         ) : null}
 
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
-          <div className="min-w-0 space-y-6">
-            {/* Find jobs band */}
-            <section>
-              <div className="mb-2.5 flex items-center justify-between gap-3">
-                <h2 className="font-display text-[16px] font-semibold text-ink">
-                  New jobs
-                </h2>
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_272px]">
+          <div className="min-w-0 space-y-8">
+            <section className="animate-[fadeUp_0.4s_ease]">
+              <div className="mb-3 flex items-baseline justify-between gap-3">
+                <h2 className="text-[16px] font-semibold text-ink">New jobs</h2>
                 <Link
                   href="/discover"
-                  className="text-[13px] font-semibold text-accent hover:underline"
+                  className="text-[13px] font-medium text-teal-dark hover:underline"
                 >
-                  Explore more jobs →
+                  Explore more jobs
                 </Link>
               </div>
-              <div className="relative overflow-hidden rounded-2xl border border-dashed border-[#B8D0FF] bg-gradient-to-br from-[#F3F7FF] via-[#F8FAFF] to-white px-6 py-7 sm:px-8">
-                <div
-                  className="pointer-events-none absolute -right-8 -top-10 h-40 w-40 rounded-full bg-[#2F6BFF]/10 blur-2xl"
-                  aria-hidden
-                />
-                <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="max-w-[480px]">
-                    <h3 className="font-display text-[20px] font-semibold tracking-[-0.02em] text-ink">
+              <div className="overflow-hidden rounded-2xl border border-dashed border-[#9DE4DB] bg-[#F3FBFA] px-6 py-8 sm:px-8">
+                <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="max-w-[460px]">
+                    <h3 className="font-display text-[22px] font-semibold tracking-[-0.025em] text-ink">
                       Find jobs that match your experience
                     </h3>
-                    <p className="mt-1.5 text-[13.5px] leading-relaxed text-muted">
-                      Describe the role you want — we&apos;ll suggest companies and
-                      search strings you can validate yourself.
+                    <p className="mt-2 text-[14px] leading-relaxed text-muted">
+                      Describe the role you want. We&apos;ll suggest companies and
+                      searches you can validate yourself.
                     </p>
                   </div>
                   <Link
                     href={isNew ? buildLink : "/discover"}
-                    className="inline-flex shrink-0 items-center justify-center rounded-[11px] bg-accent px-5 py-3 text-[13.5px] font-semibold text-white shadow-[0_6px_18px_rgba(47,107,255,0.28)] transition-transform hover:-translate-y-0.5 hover:bg-accent-dark"
+                    className="inline-flex shrink-0 items-center justify-center rounded-xl bg-accent px-5 py-3 text-[14px] font-semibold text-white transition-transform hover:-translate-y-0.5 hover:bg-accent-dark"
                   >
                     {isNew ? "Upload resume" : "Find jobs"}
                   </Link>
@@ -177,33 +122,30 @@ export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
               </div>
             </section>
 
-            {/* Apply today */}
-            <section>
-              <div className="mb-2.5 flex items-center justify-between gap-3">
-                <h2 className="font-display text-[16px] font-semibold text-ink">
-                  Apply today
-                </h2>
+            <section className="animate-[fadeUp_0.45s_ease]">
+              <div className="mb-3 flex items-baseline justify-between gap-3">
+                <h2 className="text-[16px] font-semibold text-ink">Apply today</h2>
                 <Link
                   href="/applications"
-                  className="text-[13px] font-semibold text-accent hover:underline"
+                  className="text-[13px] font-medium text-teal-dark hover:underline"
                 >
-                  Open job tracker →
+                  Open tracker
                 </Link>
               </div>
               {applyQueue.length === 0 ? (
-                <div className="flex flex-col gap-4 rounded-2xl border border-dashed border-[#D2D7DE] bg-[#FBFBFC] px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-col gap-4 rounded-2xl border border-dashed border-[#D5D9E0] bg-soft px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <div className="font-display text-[15px] font-semibold text-ink">
+                    <div className="text-[15px] font-semibold text-ink">
                       Add your first job
                     </div>
-                    <p className="mt-1 max-w-[420px] text-[13px] leading-relaxed text-muted">
+                    <p className="mt-1 max-w-[400px] text-[13.5px] leading-relaxed text-muted">
                       Save a role to your queue, tailor a resume cut, then log what
                       you send.
                     </p>
                   </div>
                   <Link
                     href="/applications"
-                    className="inline-flex shrink-0 items-center justify-center rounded-[11px] border border-accent/35 bg-white px-4 py-2.5 text-[13px] font-semibold text-accent transition-colors hover:bg-[#F5F8FF]"
+                    className="inline-flex shrink-0 items-center justify-center rounded-xl border border-accent/30 bg-white px-4 py-2.5 text-[13.5px] font-semibold text-accent transition-colors hover:bg-[#F5F2FF]"
                   >
                     + Add job
                   </Link>
@@ -213,21 +155,21 @@ export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
                   {applyQueue.map((job, index) => (
                     <div
                       key={job.id}
-                      className={`flex flex-wrap items-center justify-between gap-3 px-5 py-3.5 ${
-                        index < applyQueue.length - 1 ? "border-b border-[#F2F3F5]" : ""
+                      className={`flex flex-wrap items-center justify-between gap-3 px-5 py-4 ${
+                        index < applyQueue.length - 1 ? "border-b border-[#F0F1F3]" : ""
                       }`}
                     >
                       <div className="min-w-0">
-                        <div className="truncate text-[14px] font-semibold text-ink">
+                        <div className="truncate text-[14.5px] font-semibold text-ink">
                           {job.role || "Untitled role"}
                         </div>
-                        <div className="truncate text-[12.5px] text-muted">
+                        <div className="truncate text-[13px] text-muted">
                           {job.company || "Add company"}
                         </div>
                       </div>
                       <Link
                         href="/applications"
-                        className="shrink-0 rounded-[9px] bg-accent px-3.5 py-2 text-[12.5px] font-semibold text-white hover:bg-accent-dark"
+                        className="shrink-0 rounded-lg bg-accent px-3.5 py-2 text-[13px] font-semibold text-white hover:bg-accent-dark"
                       >
                         Prepare
                       </Link>
@@ -237,30 +179,27 @@ export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
               )}
             </section>
 
-            {/* Documents */}
-            <section>
-              <div className="mb-2.5 flex flex-wrap items-center justify-between gap-3">
-                <h2 className="font-display text-[16px] font-semibold text-ink">
-                  Documents
-                </h2>
+            <section className="animate-[fadeUp_0.5s_ease]">
+              <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+                <h2 className="text-[16px] font-semibold text-ink">Documents</h2>
                 <div className="flex items-center gap-3">
                   <Link
                     href="/library"
-                    className="text-[13px] font-semibold text-accent hover:underline"
+                    className="text-[13px] font-medium text-teal-dark hover:underline"
                   >
                     All documents
                   </Link>
                   <Link
                     href={primaryVersionId ? `/editor/${primaryVersionId}` : buildLink}
-                    className="inline-flex rounded-[10px] bg-accent px-3.5 py-2 text-[12.5px] font-semibold text-white hover:bg-accent-dark"
+                    className="inline-flex rounded-lg bg-accent px-3.5 py-2 text-[13px] font-semibold text-white hover:bg-accent-dark"
                   >
                     + Create
                   </Link>
                 </div>
               </div>
               {docs.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-[#D2D7DE] bg-white px-5 py-8 text-center">
-                  <p className="text-[13.5px] text-muted">
+                <div className="rounded-2xl border border-dashed border-[#D5D9E0] bg-white px-5 py-10 text-center">
+                  <p className="text-[14px] text-muted">
                     No documents yet.{" "}
                     <Link href={buildLink} className="font-semibold text-accent hover:underline">
                       Build your first resume
@@ -270,8 +209,8 @@ export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
                 </div>
               ) : (
                 <div className="overflow-x-auto rounded-2xl border border-border bg-white">
-                  <div className="min-w-[640px]">
-                    <div className="grid grid-cols-[1.4fr_1fr_90px_120px_120px] gap-3 border-b border-[#EEF0F3] bg-[#FAFBFC] px-5 py-3 text-[11px] font-bold uppercase tracking-[0.06em] text-[#8A92A0]">
+                  <div className="min-w-[680px]">
+                    <div className="grid grid-cols-[1.5fr_1.1fr_88px_120px_120px] gap-3 border-b border-[#F0F1F3] px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.04em] text-[#9AA3AF]">
                       <div>Name</div>
                       <div>Job</div>
                       <div>Type</div>
@@ -282,29 +221,29 @@ export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
                       <Link
                         key={doc.id}
                         href={`/editor/${doc.id}`}
-                        className="grid grid-cols-[1.4fr_1fr_90px_120px_120px] items-center gap-3 border-b border-[#F2F3F5] px-5 py-3.5 last:border-b-0 transition-colors hover:bg-[#FAFBFC]"
+                        className="grid grid-cols-[1.5fr_1.1fr_88px_120px_120px] items-center gap-3 border-b border-[#F5F6F8] px-5 py-3.5 last:border-b-0 transition-colors hover:bg-soft"
                       >
-                        <div className="flex min-w-0 items-center gap-2.5">
+                        <div className="flex min-w-0 items-center gap-3">
                           <span
-                            className="flex h-8 w-8 flex-none items-center justify-center rounded-lg bg-[#EEF3FF] text-[13px] text-accent"
+                            className="flex h-8 w-8 flex-none items-center justify-center rounded-lg bg-[#F0ECFF] text-[12px] text-accent"
                             aria-hidden
                           >
                             ▤
                           </span>
-                          <span className="truncate text-[13.5px] font-semibold text-ink">
+                          <span className="truncate text-[14px] font-medium text-ink">
                             {doc.name}
                           </span>
                         </div>
-                        <div className="truncate text-[12.5px] text-muted">
+                        <div className="truncate text-[13px] text-muted">
                           {doc.tailoredLabel || (
-                            <span className="font-semibold text-accent">+ Add</span>
+                            <span className="font-medium text-accent">+ Add</span>
                           )}
                         </div>
-                        <div className="text-[12.5px] text-[#5A6573]">Resume</div>
-                        <div className="text-[12.5px] text-[#5A6573]">
+                        <div className="text-[13px] text-muted">Resume</div>
+                        <div className="text-[13px] text-muted">
                           {formatShortDate(doc.createdAt)}
                         </div>
-                        <div className="text-[12.5px] text-[#8A92A0]">
+                        <div className="text-[13px] text-[#9AA3AF]">
                           {formatRelativeTime(doc.updatedAt)}
                         </div>
                       </Link>
@@ -314,35 +253,34 @@ export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
               )}
             </section>
 
-            {/* Interview prep entry */}
             {prepCandidates.length > 0 || applicationsCount > 0 ? (
-              <section className="overflow-hidden rounded-2xl border border-border bg-white">
-                <div className="grid gap-0 lg:grid-cols-[1.1fr_0.9fr]">
-                  <div className="border-b border-[#EEF0F3] px-6 py-6 lg:border-b-0 lg:border-r">
-                    <h2 className="font-display text-[20px] font-semibold tracking-[-0.02em] text-ink">
+              <section className="overflow-hidden rounded-2xl border border-border bg-white animate-[fadeUp_0.55s_ease]">
+                <div className="grid gap-0 lg:grid-cols-[1.15fr_0.85fr]">
+                  <div className="border-b border-[#F0F1F3] px-7 py-7 lg:border-b-0 lg:border-r">
+                    <h2 className="font-display text-[24px] font-semibold tracking-[-0.03em] text-ink">
                       Two steps. Interview{" "}
-                      <span className="text-[#6B7CFF]">ready.</span>
+                      <span className="text-accent">ready.</span>
                     </h2>
-                    <p className="mt-2 text-[13.5px] text-muted">
+                    <p className="mt-2 text-[14px] text-muted">
                       Get a personalized prep guide from a logged application.
                     </p>
-                    <ul className="mt-4 space-y-1.5 text-[13px] text-[#3a4350]">
+                    <ul className="mt-5 space-y-2 text-[13.5px] text-[#3a4350]">
                       {[
                         "Concise company overview",
                         "STAR storylines",
                         "Key talking points",
                         "Practice questions",
                       ].map((item) => (
-                        <li key={item} className="flex items-center gap-2">
-                          <span className="text-accent">✓</span>
+                        <li key={item} className="flex items-center gap-2.5">
+                          <span className="text-teal">✓</span>
                           {item}
                         </li>
                       ))}
                     </ul>
                   </div>
-                  <div className="flex flex-col justify-center px-6 py-6">
-                    <div className="mb-3 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.08em] text-[#8A92A0]">
-                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#EEF3FF] text-[12px] text-accent">
+                  <div className="flex flex-col justify-center px-6 py-7">
+                    <div className="mb-3 flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.08em] text-[#9AA3AF]">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#F0ECFF] text-[12px] text-accent">
                         1
                       </span>
                       Select a job
@@ -353,7 +291,7 @@ export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
                           <Link
                             key={app.id}
                             href={`/applications/${app.id}?tab=prep`}
-                            className="flex items-center justify-between gap-3 rounded-xl border border-[#E6E8EC] px-3.5 py-3 transition-colors hover:border-accent/40 hover:bg-[#F8FAFF]"
+                            className="flex items-center justify-between gap-3 rounded-xl border border-border px-3.5 py-3 transition-colors hover:border-accent/35 hover:bg-[#FBFaff]"
                           >
                             <div className="min-w-0">
                               <div className="truncate text-[13.5px] font-semibold text-ink">
@@ -371,9 +309,8 @@ export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
                         ))}
                       </div>
                     ) : (
-                      <div className="rounded-xl border border-dashed border-[#D2D7DE] bg-[#FBFBFC] px-4 py-5 text-[13px] text-muted">
-                        Log an application first, then generate interview prep from
-                        its Prepare tab.
+                      <div className="rounded-xl border border-dashed border-[#D5D9E0] bg-soft px-4 py-5 text-[13px] text-muted">
+                        Log an application first, then generate interview prep.
                         <Link
                           href="/applications"
                           className="mt-2 block font-semibold text-accent hover:underline"
@@ -393,40 +330,31 @@ export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
             ) : null}
           </div>
 
-          <aside className="space-y-4 lg:sticky lg:top-6 lg:self-start">
+          <aside className="space-y-4 lg:sticky lg:top-6 lg:self-start animate-[fadeUp_0.45s_ease]">
             <ChecklistSection title="Get started" items={checklist} compact />
-            <section className="rounded-2xl border border-[#D9E0FF] bg-gradient-to-b from-[#F5F7FF] to-white p-5">
-              <h3 className="font-display text-[15px] font-semibold text-ink">
-                Keep the loop tight
-              </h3>
-              <ul className="mt-3 space-y-2 text-[12.5px] text-[#3a4350]">
+            <section className="rounded-2xl border border-[#D9D2FF] bg-[#F7F5FF] p-5">
+              <h3 className="text-[15px] font-semibold text-ink">Get Pro</h3>
+              <ul className="mt-3 space-y-2 text-[13px] text-[#3a4350]">
                 <li className="flex gap-2">
-                  <span className="text-accent">✓</span>
-                  Tailor before you send
+                  <span className="text-teal">✓</span>
+                  Higher AI tailor limits
                 </li>
                 <li className="flex gap-2">
-                  <span className="text-accent">✓</span>
-                  Snapshot every application
+                  <span className="text-teal">✓</span>
+                  Job discovery planning
                 </li>
                 <li className="flex gap-2">
-                  <span className="text-accent">✓</span>
-                  Prep from the same job record
+                  <span className="text-teal">✓</span>
+                  Interview prep & insights
                 </li>
               </ul>
               <Link
-                href="/insights"
-                className="mt-4 flex w-full items-center justify-center rounded-[11px] bg-sidebar px-4 py-2.5 text-[13px] font-semibold text-white transition-colors hover:bg-[#1c212b]"
+                href="/pricing"
+                className="mt-4 flex w-full items-center justify-center rounded-full bg-teal px-4 py-2.5 text-[13.5px] font-semibold text-white transition-colors hover:bg-teal-dark"
               >
-                View insights
+                Upgrade to Pro
               </Link>
             </section>
-            {versionsCount > 0 ? (
-              <p className="px-1 text-center text-[12.5px] text-muted">
-                {versionsCount} resume{versionsCount === 1 ? "" : "s"} ·{" "}
-                {applicationsCount} application
-                {applicationsCount === 1 ? "" : "s"}
-              </p>
-            ) : null}
           </aside>
         </div>
       </div>

@@ -142,7 +142,7 @@ export function SavedJobsSection({
                   type="button"
                   disabled={pending}
                   onClick={() => setEditingJob(job)}
-                  className="cursor-pointer flex-none border-none bg-transparent p-0 text-[12px] font-semibold text-[#2456D6] hover:underline disabled:opacity-50"
+                  className="cursor-pointer flex-none border-none bg-transparent p-0 text-[12px] font-semibold text-[#6B4EFF] hover:underline disabled:opacity-50"
                 >
                   Edit
                 </button>
@@ -156,7 +156,7 @@ export function SavedJobsSection({
                       href={job.job_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-semibold text-[#2456D6] hover:underline"
+                      className="font-semibold text-[#6B4EFF] hover:underline"
                     >
                       Posting
                     </a>
@@ -196,7 +196,7 @@ export function SavedJobsSection({
                     {
                       label: "Tailor resume",
                       href: `/tailor?job=${job.id}${versionQuery}`,
-                      cls: "border-[#D6E4FF] bg-[#F5F8FF] text-[#2456D6] hover:bg-[#EAF1FF]",
+                      cls: "border-[#D9D2FF] bg-[#F7F5FF] text-[#6B4EFF] hover:bg-[#F0ECFF]",
                     },
                     {
                       label: "Cover letter",
@@ -235,7 +235,7 @@ export function SavedJobsSection({
                     initialRole={job.role}
                     initialCompany={job.company}
                     isStudent={isStudent}
-                    className="rounded-[9px] border-none bg-accent px-3 py-2 text-[12.5px] font-semibold text-white hover:bg-[#1E54E6]"
+                    className="rounded-[9px] border-none bg-accent px-3 py-2 text-[12.5px] font-semibold text-white hover:bg-[#5638E0]"
                     onSuccess={() => {
                       void deleteSavedJob(job.id).then(() => router.refresh());
                     }}

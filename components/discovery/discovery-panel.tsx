@@ -209,11 +209,11 @@ export function DiscoveryPanel({ profiles, isStudent = false }: DiscoveryPanelPr
     <div className="mt-2">
       {showHero ? (
         <section className="mx-auto flex min-h-[52vh] max-w-[720px] flex-col items-center justify-center px-2 pb-10 pt-8 text-center">
-          <h2 className="font-display text-[32px] font-semibold tracking-[-0.03em] text-ink sm:text-[36px]">
+          <h2 className="font-display text-[34px] font-semibold tracking-[-0.035em] text-ink sm:text-[40px]">
             Find fresh jobs worth applying to
           </h2>
-          <p className="mt-3 max-w-[520px] text-[15px] leading-relaxed text-muted">
-            No endless feed. Plan real targets, save them to your queue, then tailor and track.
+          <p className="mt-3 max-w-[520px] text-[16px] leading-relaxed text-[#7B6AAF]">
+            No ghost jobs. No listings with 500 applicants. Just roles worth your time.
           </p>
 
           <form
@@ -225,7 +225,7 @@ export function DiscoveryPanel({ profiles, isStudent = false }: DiscoveryPanelPr
           >
             <div className="flex items-center gap-2 rounded-full border border-[#E0E3EA] bg-white py-2 pl-4 pr-2 shadow-[0_10px_40px_rgba(15,17,22,0.06)]">
               <svg
-                className="h-5 w-5 flex-none text-accent"
+                className="h-5 w-5 flex-none text-[#7B6AAF]"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -245,7 +245,7 @@ export function DiscoveryPanel({ profiles, isStudent = false }: DiscoveryPanelPr
               <button
                 type="submit"
                 disabled={generating}
-                className="flex h-11 w-11 flex-none cursor-pointer items-center justify-center rounded-full border-none bg-accent text-white transition-transform hover:scale-[1.03] hover:bg-accent-dark disabled:opacity-60"
+                className="flex h-11 w-11 flex-none cursor-pointer items-center justify-center rounded-full border-none bg-teal text-white transition-transform hover:scale-[1.03] hover:bg-teal-dark disabled:opacity-60"
                 aria-label="Search"
               >
                 <svg
@@ -334,7 +334,7 @@ export function DiscoveryPanel({ profiles, isStudent = false }: DiscoveryPanelPr
                 }}
                 className={`cursor-pointer rounded-full border px-3 py-1 text-[12px] font-semibold transition-colors ${
                   activeProfileId === profile.id
-                    ? "border-accent bg-[#EAF1FF] text-accent"
+                    ? "border-accent bg-[#F0ECFF] text-accent"
                     : "border-[#DFE3E8] bg-white text-[#5A6573] hover:bg-[#F7F8FA]"
                 }`}
               >

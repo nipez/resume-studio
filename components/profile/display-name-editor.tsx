@@ -9,12 +9,14 @@ type DisplayNameEditorProps = {
   displayName: string;
   profileFullName: string | null;
   email?: string | null;
+  variant?: "dark" | "light";
 };
 
 export function DisplayNameEditor({
   displayName,
   profileFullName,
   email,
+  variant = "light",
 }: DisplayNameEditorProps) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
@@ -62,17 +64,27 @@ export function DisplayNameEditor({
           placeholder="Your name"
           autoFocus
           disabled={pending}
-          className="w-full rounded-md border border-white/15 bg-white/10 px-2 py-1 text-[12px] text-white placeholder:text-white/40 focus:border-accent focus:outline-none"
+          className={
+            variant === "dark"
+              ? "w-full rounded-md border border-white/15 bg-white/10 px-2 py-1 text-[12px] text-white placeholder:text-white/40 focus:border-accent focus:outline-none"
+              : "w-full rounded-md border border-border bg-white px-2 py-1 text-[12px] text-ink placeholder:text-[#9AA3AF] focus:border-accent focus:outline-none"
+          }
         />
         {error ? (
-          <p className="mt-1 text-[10px] leading-snug text-[#ffb4b4]">{error}</p>
+          <p
+            className={`mt-1 text-[10px] leading-snug ${
+              variant === "dark" ? "text-[#ffb4b4]" : "text-[#B23B3B]"
+            }`}
+          >
+            {error}
+          </p>
         ) : null}
         <div className="mt-1.5 flex gap-1">
           <button
             type="button"
             disabled={pending}
             onClick={save}
-            className="cursor-pointer rounded border-none bg-accent px-2 py-0.5 text-[10.5px] font-semibold text-white hover:bg-[#1E54E6] disabled:opacity-60"
+            className="cursor-pointer rounded border-none bg-accent px-2 py-0.5 text-[10.5px] font-semibold text-white hover:bg-accent-dark disabled:opacity-60"
           >
             {pending ? "Saving…" : "Save"}
           </button>
@@ -80,7 +92,11 @@ export function DisplayNameEditor({
             type="button"
             disabled={pending}
             onClick={cancelEdit}
-            className="cursor-pointer rounded border-none bg-transparent px-1 py-0.5 text-[10.5px] font-semibold text-sidebar-subtle hover:text-white"
+            className={
+              variant === "dark"
+                ? "cursor-pointer rounded border-none bg-transparent px-1 py-0.5 text-[10.5px] font-semibold text-sidebar-subtle hover:text-white"
+                : "cursor-pointer rounded border-none bg-transparent px-1 py-0.5 text-[10.5px] font-semibold text-muted hover:text-ink"
+            }
           >
             Cancel
           </button>
@@ -97,18 +113,25 @@ export function DisplayNameEditor({
         className="group flex w-full cursor-pointer items-center gap-1 border-none bg-transparent p-0 text-left"
         title="Edit display name"
       >
-        <span className="truncate text-[11px] text-sidebar-subtle group-hover:text-white">
-          {displayName}
+        <span
+          className={
+            variant === "dark"
+              ? "truncate text-[11px] text-sidebar-subtle group-hover:text-white"
+              : "truncate text-[12px] text-muted group-hover:text-ink"
+          }
+        >
+          {usingEmailFallback ? "Set your name" : "Edit display name"}
         </span>
-        <span className="shrink-0 text-[10px] text-sidebar-footer opacity-0 transition-opacity group-hover:opacity-100">
+        <span
+          className={
+            variant === "dark"
+              ? "shrink-0 text-[10px] text-sidebar-footer opacity-0 transition-opacity group-hover:opacity-100"
+              : "shrink-0 text-[10px] text-muted opacity-0 transition-opacity group-hover:opacity-100"
+          }
+        >
           ✎
         </span>
       </button>
-      {usingEmailFallback ? (
-        <p className="mt-0.5 text-[10px] leading-snug text-sidebar-footer">
-          Set your name
-        </p>
-      ) : null}
     </div>
   );
 }

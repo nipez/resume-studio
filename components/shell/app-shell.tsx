@@ -2,15 +2,18 @@
 
 import { DisplayNameEditor } from "@/components/profile/display-name-editor";
 import { Logo } from "@/components/brand/logo";
-import { NavIcon } from "@/components/icons/nav-icons";
 import { SignOutButton } from "@/components/sign-out-button";
 import { HelpMeWidget } from "@/components/support/help-me-widget";
 import { SupportInboxButton } from "@/components/support/support-inbox-button";
 import { SITE_NAME } from "@/lib/marketing/content";
-import { buildNavGroups, isNavItemActive } from "@/lib/shell/nav-config";
+import {
+  buildMoreNavItems,
+  buildTopNavItems,
+  isNavItemActive,
+} from "@/lib/shell/nav-config";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const EXIT_VIEW_AS_HREF = "/api/admin/exit-view-as";
 
@@ -43,22 +46,6 @@ function ImpersonationBanner({ label }: { label: string }) {
   );
 }
 
-function SidebarExitToSuperAdmin() {
-  return (
-    <div className="mb-3 px-1">
-      <a
-        href={EXIT_VIEW_AS_HREF}
-        className="flex w-full items-center gap-2.5 rounded-[9px] border border-[#FFB86A]/35 bg-[#FFB86A]/15 px-2.5 py-2.5 text-left text-[13px] font-semibold text-[#FFE8CC] transition-colors hover:bg-[#FFB86A]/25"
-      >
-        <span className="flex h-[17px] w-[17px] items-center justify-center opacity-90">
-          ←
-        </span>
-        <span>Back to Super admin</span>
-      </a>
-    </div>
-  );
-}
-
 function FloatingExitToSuperAdmin() {
   return (
     <a
@@ -69,6 +56,13 @@ function FloatingExitToSuperAdmin() {
       Back to Super admin
     </a>
   );
+}
+
+function initialsFromName(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0].slice(0, 1).toUpperCase();
+  return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
 }
 
 export function AppShell({
@@ -85,142 +79,191 @@ export function AppShell({
 }: AppShellProps) {
   const pathname = usePathname();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const navGroups = useMemo(
-    () => buildNavGroups({ isStudent, hasResume }),
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  const topNav = useMemo(
+    () => buildTopNavItems({ isStudent, hasResume }),
     [isStudent, hasResume]
   );
+  const moreNav = useMemo(
+    () => buildMoreNavItems({ isStudent, hasResume, isAdmin }),
+    [isStudent, hasResume, isAdmin]
+  );
 
-  // Close the drawer whenever navigation happens.
   useEffect(() => {
     setMobileNavOpen(false);
+    setMenuOpen(false);
   }, [pathname]);
 
   useEffect(() => {
-    if (!mobileNavOpen) return;
+    if (!mobileNavOpen && !menuOpen) return;
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") setMobileNavOpen(false);
+      if (e.key === "Escape") {
+        setMobileNavOpen(false);
+        setMenuOpen(false);
+      }
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [mobileNavOpen]);
+  }, [mobileNavOpen, menuOpen]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    function onPointerDown(e: MouseEvent) {
+      if (!menuRef.current?.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+    window.addEventListener("mousedown", onPointerDown);
+    return () => window.removeEventListener("mousedown", onPointerDown);
+  }, [menuOpen]);
+
+  const initials = initialsFromName(profileFullName?.trim() || userName);
 
   return (
-    <div className="appshell flex h-screen w-screen overflow-hidden bg-page text-ink">
-      {mobileNavOpen ? (
-        <div
-          className="fixed inset-0 z-[340] bg-black/50 md:hidden"
-          aria-hidden
-          onClick={() => setMobileNavOpen(false)}
-        />
+    <div className="appshell flex h-screen w-screen flex-col overflow-hidden bg-page text-ink">
+      {impersonatingLabel ? (
+        <ImpersonationBanner label={impersonatingLabel} />
       ) : null}
-      <aside
-        className={`${
-          mobileNavOpen ? "translate-x-0" : "-translate-x-full"
-        } fixed inset-y-0 left-0 z-[350] flex w-[248px] flex-none flex-col border-r border-white/[0.06] bg-sidebar px-3 py-4 text-sidebar-muted transition-transform duration-200 md:static md:translate-x-0 md:transition-none`}
-      >
-        <div className="flex items-center gap-2.5 px-2 pb-4">
-          <Logo
-            size={34}
-            className="shrink-0 shadow-[0_6px_16px_-6px_rgba(15,181,166,0.45)]"
-          />
-          <div className="min-w-0">
-            <div className="truncate font-display text-[15px] font-semibold tracking-[-0.01em] text-white">
+
+      <header className="relative z-[200] flex flex-none items-center gap-3 border-b border-border bg-white px-4 sm:px-6 lg:px-8">
+        <div className="flex min-w-0 flex-1 items-center gap-6 lg:gap-8">
+          <Link
+            href="/dashboard"
+            className="flex shrink-0 items-center gap-2.5 py-3.5 no-underline"
+            aria-label={SITE_NAME}
+          >
+            <Logo size={30} className="shrink-0" />
+            <span className="hidden font-display text-[15px] font-semibold tracking-[-0.02em] text-ink sm:inline">
               {SITE_NAME}
-            </div>
-            <DisplayNameEditor
-              displayName={userName}
-              profileFullName={profileFullName}
-              email={userEmail}
-            />
-            {isStudent ? (
-              <span className="mt-1 inline-flex rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#c8d4f0]">
-                Student
-              </span>
-            ) : null}
-          </div>
+            </span>
+          </Link>
+
+          <nav className="hidden min-w-0 items-stretch gap-0.5 md:flex">
+            {topNav.map((item) => {
+              const active = isNavItemActive(pathname, item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`relative inline-flex items-center whitespace-nowrap px-3 py-4 text-[13.5px] transition-colors ${
+                    active
+                      ? "font-semibold text-ink"
+                      : "font-medium text-muted hover:text-ink"
+                  }`}
+                >
+                  {item.label}
+                  {active ? (
+                    <span className="absolute inset-x-3 bottom-0 h-[2px] rounded-full bg-teal" />
+                  ) : null}
+                </Link>
+              );
+            })}
+          </nav>
         </div>
 
-        <nav className="flex flex-1 flex-col gap-4 overflow-y-auto">
-          {impersonatingLabel ? <SidebarExitToSuperAdmin /> : null}
-          {navGroups.map((group) => (
-            <div key={group.label || "home"}>
-              {group.label ? (
-                <div className="mb-1.5 px-2 text-[10px] font-bold uppercase tracking-[0.08em] text-sidebar-footer">
-                  {group.label}
-                </div>
-              ) : null}
-              <div className="flex flex-col gap-0.5">
-                {group.items.map((item) => {
-                  const active = isNavItemActive(pathname, item.href);
-                  const isPrimaryStudentCta =
-                    isStudent && item.href === "/tailor" && hasResume;
+        <div className="flex shrink-0 items-center gap-2 sm:gap-2.5">
+          {impersonatingLabel ? (
+            <a
+              href={EXIT_VIEW_AS_HREF}
+              className="hidden items-center gap-1.5 rounded-lg border border-[#FFB86A]/45 bg-[#FFF8F0] px-3 py-1.5 text-[12.5px] font-bold text-[#231a2e] transition-colors hover:bg-[#FFE8CC] sm:inline-flex"
+            >
+              <span aria-hidden>←</span>
+              Super admin
+            </a>
+          ) : null}
 
-                  return (
+          <SupportInboxButton unreadCount={supportUnreadCount} />
+
+          <Link
+            href="/pricing"
+            className="hidden rounded-full bg-teal px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-teal-dark sm:inline-flex"
+          >
+            Upgrade
+          </Link>
+
+          <div className="relative" ref={menuRef}>
+            <button
+              type="button"
+              onClick={() => setMenuOpen((v) => !v)}
+              aria-expanded={menuOpen}
+              aria-haspopup="menu"
+              aria-label="Account menu"
+              className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-[#2A3038] text-[12px] font-bold text-white transition-transform hover:scale-[1.03]"
+            >
+              {initials}
+            </button>
+
+            {menuOpen ? (
+              <div
+                role="menu"
+                className="absolute right-0 top-[calc(100%+8px)] z-[220] w-[240px] rounded-2xl border border-border bg-white p-2 shadow-soft animate-[fadeUp_0.18s_ease]"
+              >
+                <div className="border-b border-[#F0F1F3] px-3 pb-3 pt-2">
+                  <div className="truncate text-[13.5px] font-semibold text-ink">
+                    {profileFullName?.trim() || userName}
+                  </div>
+                  {userEmail ? (
+                    <div className="mt-0.5 truncate text-[12px] text-muted">
+                      {userEmail}
+                    </div>
+                  ) : null}
+                  {isStudent ? (
+                    <span className="mt-2 inline-flex rounded-full bg-[#E8FBF8] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-teal-dark">
+                      Student
+                    </span>
+                  ) : null}
+                  <div className="mt-2">
+                    <DisplayNameEditor
+                      displayName={userName}
+                      profileFullName={profileFullName}
+                      email={userEmail}
+                    />
+                  </div>
+                  {positioning?.trim() ? (
+                    <p className="mt-2 line-clamp-2 text-[11.5px] leading-snug text-muted">
+                      {positioning.trim()}
+                    </p>
+                  ) : null}
+                </div>
+
+                <div className="py-1">
+                  {moreNav.map((item) => (
                     <Link
                       key={item.href}
                       href={item.href}
-                      className={`flex w-full items-center gap-2.5 rounded-[9px] px-2.5 py-2 text-left text-[13px] transition-[background,color] duration-150 ${
-                        active
-                          ? "bg-accent/18 font-semibold text-white"
-                          : isPrimaryStudentCta
-                            ? "bg-accent/12 font-semibold text-white hover:bg-accent/18"
-                            : "font-medium text-sidebar-nav hover:bg-white/[0.04] hover:text-white"
+                      role="menuitem"
+                      className={`block rounded-lg px-3 py-2 text-[13px] no-underline transition-colors hover:bg-[#F4F5F7] ${
+                        isNavItemActive(pathname, item.href)
+                          ? "font-semibold text-accent"
+                          : "font-medium text-[#3a4350]"
                       }`}
                     >
-                      <span className="flex h-[17px] w-[17px] items-center justify-center opacity-90">
-                        <NavIcon name={item.icon} />
-                      </span>
-                      <span className="truncate">{item.label}</span>
+                      {item.label}
                     </Link>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-          {isAdmin ? (
-            <div>
-              <div className="mb-1.5 px-2 text-[10px] font-bold uppercase tracking-[0.08em] text-sidebar-footer">
-                Admin
-              </div>
-              <Link
-                href="/admin"
-                className={`flex w-full items-center gap-2.5 rounded-[9px] px-2.5 py-2 text-left text-[13px] transition-[background,color] duration-150 ${
-                  isNavItemActive(pathname, "/admin")
-                    ? "bg-accent/18 font-semibold text-white"
-                    : "font-medium text-sidebar-nav hover:bg-white/[0.04] hover:text-white"
-                }`}
-              >
-                <span className="flex h-[17px] w-[17px] items-center justify-center opacity-90">
-                  <NavIcon name="chart" />
-                </span>
-                <span>Super admin</span>
-              </Link>
-            </div>
-          ) : null}
-        </nav>
+                  ))}
+                  <Link
+                    href="/pricing"
+                    role="menuitem"
+                    className="block rounded-lg px-3 py-2 text-[13px] font-medium text-[#3a4350] no-underline transition-colors hover:bg-[#F4F5F7] sm:hidden"
+                  >
+                    Upgrade
+                  </Link>
+                </div>
 
-        <div className="mt-3 border-t border-white/[0.07] pt-3">
-          {positioning?.trim() ? (
-            <p className="mb-2.5 line-clamp-2 px-2 text-[10.5px] leading-[1.5] text-sidebar-footer">
-              {positioning.trim()}
-            </p>
-          ) : null}
-          <div className="px-1">
-            <SignOutButton />
+                <div className="border-t border-[#F0F1F3] pt-1">
+                  <SignOutButton variant="light" />
+                </div>
+              </div>
+            ) : null}
           </div>
-        </div>
-      </aside>
 
-      <main className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
-        {impersonatingLabel ? (
-          <ImpersonationBanner label={impersonatingLabel} />
-        ) : null}
-        <div className="flex flex-none items-center justify-between gap-3 border-b border-[#ECEEF1] bg-white px-4 py-2.5 sm:px-6 md:justify-end">
           <button
             type="button"
             onClick={() => setMobileNavOpen(true)}
             aria-label="Open navigation menu"
-            className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-[9px] border border-[#E2E5EA] bg-white text-ink hover:bg-[#F4F5F7] md:hidden"
+            className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-[9px] border border-border bg-white text-ink hover:bg-soft md:hidden"
           >
             <svg
               width="18"
@@ -234,19 +277,67 @@ export function AppShell({
               <path d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-          <div className="flex items-center gap-3">
-            {impersonatingLabel ? (
-              <a
-                href={EXIT_VIEW_AS_HREF}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-[#FFB86A]/45 bg-[#FFF8F0] px-3 py-1.5 text-[12.5px] font-bold text-[#231a2e] transition-colors hover:bg-[#FFE8CC]"
-              >
-                <span aria-hidden>←</span>
-                Super admin
-              </a>
-            ) : null}
-            <SupportInboxButton unreadCount={supportUnreadCount} />
-          </div>
         </div>
+      </header>
+
+      {mobileNavOpen ? (
+        <div
+          className="fixed inset-0 z-[340] bg-black/40 md:hidden"
+          aria-hidden
+          onClick={() => setMobileNavOpen(false)}
+        />
+      ) : null}
+
+      <aside
+        className={`${
+          mobileNavOpen ? "translate-x-0" : "translate-x-full"
+        } fixed inset-y-0 right-0 z-[350] flex w-[min(320px,88vw)] flex-col border-l border-border bg-white shadow-soft transition-transform duration-200 md:hidden`}
+      >
+        <div className="flex items-center justify-between border-b border-border px-4 py-3.5">
+          <span className="font-display text-[15px] font-semibold text-ink">
+            Menu
+          </span>
+          <button
+            type="button"
+            onClick={() => setMobileNavOpen(false)}
+            className="cursor-pointer rounded-lg border border-border px-2.5 py-1.5 text-[12.5px] font-semibold text-muted"
+          >
+            Close
+          </button>
+        </div>
+        <nav className="flex-1 overflow-y-auto px-2 py-3">
+          {[...topNav, ...moreNav].map((item) => {
+            const active = isNavItemActive(pathname, item.href);
+            return (
+              <Link
+                key={`m-${item.href}`}
+                href={item.href}
+                className={`flex items-center justify-between rounded-xl px-3 py-3 text-[14px] no-underline ${
+                  active
+                    ? "bg-[#E8FBF8] font-semibold text-teal-dark"
+                    : "font-medium text-ink hover:bg-soft"
+                }`}
+              >
+                {item.label}
+                {active ? (
+                  <span className="h-1.5 w-1.5 rounded-full bg-teal" />
+                ) : null}
+              </Link>
+            );
+          })}
+        </nav>
+        <div className="border-t border-border p-3">
+          <Link
+            href="/pricing"
+            className="mb-2 flex w-full items-center justify-center rounded-full bg-teal px-4 py-2.5 text-[13.5px] font-semibold text-white"
+          >
+            Upgrade
+          </Link>
+          <SignOutButton variant="light" />
+        </div>
+      </aside>
+
+      <main className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-page">
         <div className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           {children}
         </div>
