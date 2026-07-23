@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SuggestedFollowUpsSection } from "@/components/applications/suggested-follow-ups-section";
+import { DashboardApplyHero } from "@/components/dashboard/dashboard-apply-hero";
 import {
   type ChecklistItem,
   type DashboardHomeData,
@@ -32,22 +33,22 @@ function buildChecklist(data: DashboardHomeData): ChecklistItem[] {
       cta: "Build",
     },
     {
-      label: "Find jobs that match your experience",
-      done: data.savedJobs.length > 0 || applicationsCount > 0,
-      href: "/discover",
-      cta: "Find",
+      label: isStudent ? "Apply to a role" : "Apply to a role (tailor from master)",
+      done: hasTailored || applicationsCount > 0,
+      href: "/tailor?new=1",
+      cta: "Apply",
     },
     {
-      label: isStudent ? "Tailor for a role" : "Tailor a version to a job",
-      done: hasTailored,
-      href: "/tailor",
-      cta: "Tailor",
-    },
-    {
-      label: "Track your first application",
+      label: "Track the application you sent",
       done: applicationsCount > 0,
       href: "/applications",
       cta: "Track",
+    },
+    {
+      label: "Find more roles worth applying to",
+      done: data.savedJobs.length > 0 || applicationsCount > 0,
+      href: "/discover",
+      cta: "Find",
     },
   ];
 }
@@ -85,6 +86,8 @@ export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
     versionsCount,
     applicationsCount,
     primaryVersionId,
+    versions,
+    versionCounts,
     upcoming,
     suggestedFollowUps,
     recentVersions,
@@ -101,16 +104,16 @@ export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
   return (
     <div className="scroll flex-1 overflow-auto bg-page">
       <div className="mx-auto max-w-[1180px] px-5 pb-20 pt-9 sm:px-8 lg:px-10">
-        <div className="mb-9 animate-[fadeUp_0.35s_ease]">
+        <div className="mb-7 animate-[fadeUp_0.35s_ease]">
           <h1 className="font-display text-[32px] font-semibold tracking-[-0.035em] text-ink">
             {isNew
               ? `Hi${firstName ? ` ${firstName}` : ""}`
               : `Welcome back${firstName ? `, ${firstName}` : ""}`}
           </h1>
-          <p className="mt-2 max-w-[480px] text-[15px] leading-relaxed text-muted">
+          <p className="mt-2 max-w-[520px] text-[15px] leading-relaxed text-muted">
             {isNew
-              ? "Start with a resume, then find roles and track every send."
-              : "Find roles, tailor what you send, and keep every application in one place."}
+              ? "Build a master resume once — then tailor a cut for every role you apply to."
+              : "Apply to a role: copy from your master resume, tailor to the job description, and track what you send."}
           </p>
         </div>
 
@@ -120,37 +123,19 @@ export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
           </div>
         ) : null}
 
+        <div className="mb-9">
+          <DashboardApplyHero
+            versions={versions}
+            versionCounts={versionCounts}
+            defaultVersionId={primaryVersionId}
+            isStudent={isStudent}
+            buildHref={buildLink}
+            hasResume={!isNew}
+          />
+        </div>
+
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_280px] lg:gap-10">
           <div className="min-w-0 space-y-9">
-            <section className="animate-[fadeUp_0.4s_ease]">
-              <SectionHeading
-                title="New jobs"
-                linkHref="/discover"
-                linkLabel="Explore more jobs"
-              />
-              <div className="rounded-2xl border border-dashed border-[#9DE4DB] bg-[#F3FBFA] px-5 py-6">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                  <div className="min-w-0 flex-1">
-                    <h3 className="font-display text-[20px] font-semibold tracking-[-0.025em] text-ink sm:text-[22px]">
-                      Find jobs that match your experience
-                    </h3>
-                    <p className="mt-1.5 max-w-[440px] text-[13.5px] leading-relaxed text-muted">
-                      Describe the role you want. We&apos;ll suggest companies and
-                      searches you can validate yourself.
-                    </p>
-                  </div>
-                  <div className={`${CTA_RAIL} flex justify-end self-end sm:self-center`}>
-                    <Link
-                      href={isNew ? buildLink : "/discover"}
-                      className={CTA_BTN}
-                    >
-                      {isNew ? "Upload resume" : "Find jobs"}
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </section>
-
             <section className="animate-[fadeUp_0.45s_ease]">
               <SectionHeading
                 title="Apply today"
@@ -205,6 +190,32 @@ export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
                   ))}
                 </div>
               )}
+            </section>
+
+            <section className="animate-[fadeUp_0.48s_ease]">
+              <SectionHeading
+                title="Find more jobs"
+                linkHref="/discover"
+                linkLabel="Open discovery"
+              />
+              <div className="rounded-2xl border border-dashed border-[#9DE4DB] bg-[#F3FBFA] px-5 py-5">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-[16px] font-semibold tracking-[-0.015em] text-ink">
+                      Need roles to apply to?
+                    </h3>
+                    <p className="mt-1 max-w-[440px] text-[13.5px] leading-relaxed text-muted">
+                      Plan targets and searches — then come back here to tailor from
+                      your master resume.
+                    </p>
+                  </div>
+                  <div className={`${CTA_RAIL} flex justify-end self-end sm:self-center`}>
+                    <Link href="/discover" className={CTA_BTN}>
+                      Find jobs
+                    </Link>
+                  </div>
+                </div>
+              </div>
             </section>
 
             <section className="animate-[fadeUp_0.5s_ease]">

@@ -10,13 +10,14 @@ import { getSavedJobsList } from "@/lib/saved-jobs/actions";
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const [library, { applications }, profile, savedJobs] = await Promise.all([
+  const [library, appsList, profile, savedJobs] = await Promise.all([
     getLibraryData(),
     getApplicationsList(),
     getUserProfileContext(),
     getSavedJobsList(),
   ]);
 
+  const { applications, versionCounts } = appsList;
   const insights = computeInsights(applications);
   const versions = library.versions;
   const primaryVersionId =
@@ -60,6 +61,8 @@ export default async function DashboardPage() {
         applicationsCount={insights.stats.total}
         hasTailored={hasTailored}
         primaryVersionId={primaryVersionId}
+        versions={versions}
+        versionCounts={versionCounts}
         stats={{
           respRate: insights.stats.respRate,
           interviewRate: insights.interviewRate,
