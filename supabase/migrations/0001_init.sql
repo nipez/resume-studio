@@ -10,7 +10,7 @@ create extension if not exists "pgcrypto";
 -- ============================================================
 -- Enums
 -- ============================================================
-create type template_style as enum ('classic', 'twocol', 'editorial');
+create type template_style as enum ('classic', 'twocol', 'editorial', 'modern');
 create type application_status as enum ('applied','response','interview','offer','rejected','ghosted','not_applied');
 create type event_type as enum ('interview','followup','note');
 

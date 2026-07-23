@@ -89,11 +89,11 @@ export function TailorPanel({
     initialResultVersion?.data ?? null
   );
   const [resultTemplate, setResultTemplate] = useState<
-    "classic" | "twocol" | "editorial"
+    "classic" | "twocol" | "editorial" | "modern"
   >(initialResultVersion?.template_style ?? "classic");
   const [pendingSave, setPendingSave] = useState<{
     data: ResumeData;
-    template: "classic" | "twocol" | "editorial";
+    template: "classic" | "twocol" | "editorial" | "modern";
     notes: string;
   } | null>(null);
 
@@ -143,7 +143,7 @@ export function TailorPanel({
 
   async function persistTailoredVersion(
     data: ResumeData,
-    template: "classic" | "twocol" | "editorial",
+    template: "classic" | "twocol" | "editorial" | "modern",
     notes: string
   ) {
     if (!base) throw new Error("Create a resume version first.");

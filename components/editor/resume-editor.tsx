@@ -28,6 +28,7 @@ const TEMPLATES: {
   atsRecommended?: boolean;
 }[] = [
   { id: "classic", label: "Classic", atsRecommended: true },
+  { id: "modern", label: "Modern" },
   { id: "twocol", label: "Two-Column" },
   { id: "editorial", label: "Editorial" },
 ];
