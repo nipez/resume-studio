@@ -1,11 +1,11 @@
 "use client";
 
 import { SuggestedFollowUpsSection } from "@/components/applications/suggested-follow-ups-section";
+import { DashboardApplyHero } from "@/components/dashboard/dashboard-apply-hero";
 import {
   type DashboardHomeData,
   buildHref,
   ChecklistSection,
-  StatCard,
   UpcomingSection,
 } from "@/components/dashboard/dashboard-shared";
 import { FirstRunPathPicker } from "@/components/dashboard/first-run-path-picker";
@@ -21,7 +21,8 @@ export function DashboardHomeSimple({ data }: { data: DashboardHomeData }) {
     applicationsCount,
     hasTailored,
     primaryVersionId,
-    stats,
+    versions,
+    versionCounts,
     upcoming,
     suggestedFollowUps,
     recentVersions,
@@ -48,7 +49,7 @@ export function DashboardHomeSimple({ data }: { data: DashboardHomeData }) {
             ? "Apply to a part-time job or internship"
             : "Apply to your first job",
           done: false,
-          href: "/tailor",
+          href: "/tailor?new=1",
           cta: "Apply",
         },
       ]
@@ -56,11 +57,11 @@ export function DashboardHomeSimple({ data }: { data: DashboardHomeData }) {
       ? [
           {
             label: isStudent
-              ? "Tailor for a job or internship"
-              : "Tailor your resume to a job",
+              ? "Apply to a role (tailor from master)"
+              : "Apply to a role (tailor from master)",
             done: hasTailored,
-            href: "/tailor",
-            cta: "Tailor",
+            href: "/tailor?new=1",
+            cta: "Apply",
           },
           {
             label: "Log your first application",
@@ -71,9 +72,9 @@ export function DashboardHomeSimple({ data }: { data: DashboardHomeData }) {
         ]
       : [
           {
-            label: isStudent ? "Apply to another role" : "Keep applying",
+            label: isStudent ? "Apply to another role" : "Apply to another role",
             done: true,
-            href: "/tailor",
+            href: "/tailor?new=1",
             cta: "Apply again",
           },
           {
@@ -86,13 +87,11 @@ export function DashboardHomeSimple({ data }: { data: DashboardHomeData }) {
 
   const subtitle = !hasResume
     ? isStudent
-      ? "Two steps: your first resume, then an application."
-      : "Two steps: resume first, then your first application."
+      ? "Two steps: your first resume, then apply to a role."
+      : "Two steps: master resume first, then apply to a role."
     : !hasApplication
-      ? isStudent
-        ? "Resume ready — tailor it for a job posting and log what you send."
-        : "You have a resume — now match it to a job and log the send."
-      : "You're tracking applications. Keep going or check Insights.";
+      ? "Resume ready — copy from master, tailor to a job description, and log the send."
+      : "Keep applying: tailor from master for each new role.";
 
   return (
     <div className="scroll flex-1 overflow-auto">
@@ -111,13 +110,9 @@ export function DashboardHomeSimple({ data }: { data: DashboardHomeData }) {
           <p className="mt-2 max-w-[520px] text-[14.5px] leading-relaxed text-muted">
             {!hasResume
               ? isStudent
-                ? "You're getting ahead — let's build your first resume, then apply and track."
-                : "We'll keep this simple. One resume, one job application at a time."
-              : !hasApplication
-                ? isStudent
-                  ? "Next: paste a job posting, tailor your resume, and track what you send."
-                  : "Your resume is ready. Next up: apply to a job and track what you sent."
-                : "Your search is underway. Apply to more roles or see what's getting responses."}
+                ? "You're getting ahead — build a master resume, then apply to roles from it."
+                : "Build a master resume once, then tailor a cut for every role you apply to."
+              : "Apply to a role: copy from your master resume, tailor to the job description, and track what you send."}
           </p>
         </div>
 
@@ -127,54 +122,16 @@ export function DashboardHomeSimple({ data }: { data: DashboardHomeData }) {
 
         {showPathPicker ? (
           <FirstRunPathPicker isStudent={isStudent} />
-        ) : !hasResume ? (
-          <Link
-            href={buildLink}
-            className="mb-6 flex items-center gap-4 rounded-2xl border border-dashed border-[#9DE4DB] bg-[#F3FBFA] px-5 py-5 transition-shadow hover:shadow-soft"
-          >
-            <div className="min-w-0 flex-1">
-              <div className="font-display text-[16px] font-semibold text-ink">
-                {isStudent
-                  ? "Continue building your resume"
-                  : "Build your first resume"}
-              </div>
-              <div className="mt-1 text-[13px] leading-relaxed text-muted">
-                {isStudent
-                  ? "Pick up where you left off in the guided builder."
-                  : "Step-by-step guided builder — easier than starting from scratch."}
-              </div>
-            </div>
-            <div className="flex-none whitespace-nowrap rounded-xl bg-accent px-4 py-2.5 text-[13px] font-semibold text-white">
-              Open builder →
-            </div>
-          </Link>
-        ) : !hasApplication ? (
-          <Link
-            href="/tailor"
-            className="mb-6 flex items-center gap-4 rounded-2xl border border-dashed border-[#9DE4DB] bg-[#F3FBFA] px-5 py-5 transition-shadow hover:shadow-soft"
-          >
-            <div className="min-w-0 flex-1">
-              <div className="font-display text-[16px] font-semibold text-ink">
-                {isStudent
-                  ? "Apply to a job or internship"
-                  : "Apply to your first job"}
-              </div>
-              <div className="mt-1 text-[13px] leading-relaxed text-muted">
-                Paste a job description — we&apos;ll tailor your resume, draft a cover
-                letter, and help you log what you sent.
-              </div>
-            </div>
-            <div className="flex-none whitespace-nowrap rounded-xl bg-accent px-4 py-2.5 text-[13px] font-semibold text-white">
-              Start applying →
-            </div>
-          </Link>
         ) : (
-          <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
-            <StatCard label="Resumes" value={String(versionsCount)} />
-            <StatCard label="Applications" value={String(applicationsCount)} />
-            {stats.respRate > 0 ? (
-              <StatCard label="Response rate" value={`${stats.respRate}%`} />
-            ) : null}
+          <div className="mb-6">
+            <DashboardApplyHero
+              versions={versions}
+              versionCounts={versionCounts}
+              defaultVersionId={primaryVersionId}
+              isStudent={isStudent}
+              buildHref={buildLink}
+              hasResume={hasResume}
+            />
           </div>
         )}
 
