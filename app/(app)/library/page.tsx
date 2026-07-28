@@ -21,7 +21,7 @@ export default async function LibraryPage() {
 
   return (
     <div className="scroll flex-1 overflow-auto bg-page">
-      <div className="mx-auto max-w-[1120px] px-5 pb-20 pt-8 sm:px-8 lg:px-10">
+      <div className="mx-auto max-w-[1360px] px-5 pb-20 pt-8 sm:px-8 lg:px-10">
         <div className="mb-8 flex flex-wrap items-end justify-between gap-5">
           <div className="min-w-0 max-w-[640px]">
             <h1 className="font-display text-[30px] font-semibold tracking-[-0.03em] text-ink">
@@ -31,7 +31,7 @@ export default async function LibraryPage() {
             </h1>
             <p className="mt-2 text-[15px] leading-relaxed text-muted">
               {hasVersions
-                ? "Tailored cuts show the job they were built for. Rename copies to match the role you applied to."
+                ? "Each cut shows the role and company it was tailored or applied for."
                 : "Build or import a resume — then keep tailored cuts organized in one place."}
             </p>
           </div>
