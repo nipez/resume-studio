@@ -1,19 +1,20 @@
 import { LibraryActions } from "@/components/library/library-actions";
 import { LibraryView } from "@/components/library/library-view";
 import { buildHref } from "@/components/dashboard/dashboard-shared";
-import { getApplicationCountsByVersion } from "@/lib/applications/actions";
+import { getLibraryVersionLinks } from "@/lib/applications/actions";
 import { getUserProfileContext } from "@/lib/profile/actions";
 import { resolveFirstName } from "@/lib/profile/utils";
 import { getLibraryData } from "@/lib/resume/actions";
 import Link from "next/link";
 
 export default async function LibraryPage() {
-  const [{ versions, archivedVersions, defaultVersionId, userName }, versionCounts, profile] =
+  const [{ versions, archivedVersions, defaultVersionId, userName }, links, profile] =
     await Promise.all([
       getLibraryData(),
-      getApplicationCountsByVersion(),
+      getLibraryVersionLinks(),
       getUserProfileContext(),
     ]);
+  const { versionCounts, versionJobs } = links;
   const hasVersions = versions.length > 0 || archivedVersions.length > 0;
   const buildLink = buildHref(profile.isStudent);
   const firstName = resolveFirstName(userName);
@@ -30,7 +31,7 @@ export default async function LibraryPage() {
             </h1>
             <p className="mt-2 text-[15px] leading-relaxed text-muted">
               {hasVersions
-                ? "It's nice to see you here. Duplicate a cut, tailor for a role, or open the editor."
+                ? "Tailored cuts show the job they were built for. Rename copies to match the role you applied to."
                 : "Build or import a resume — then keep tailored cuts organized in one place."}
             </p>
           </div>
@@ -68,6 +69,7 @@ export default async function LibraryPage() {
             archivedVersions={archivedVersions}
             defaultVersionId={defaultVersionId}
             versionCounts={versionCounts}
+            versionJobs={versionJobs}
             isStudent={profile.isStudent}
           />
         ) : (

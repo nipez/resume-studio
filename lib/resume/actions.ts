@@ -164,6 +164,7 @@ export async function updateResumeVersion(
     name?: string;
     template_style?: TemplateStyle;
     data?: ResumeData;
+    tailored_for?: ResumeVersion["tailored_for"];
   }
 ) {
   const supabase = createServiceClient();
@@ -172,6 +173,7 @@ export async function updateResumeVersion(
   if (patch.template_style !== undefined)
     payload.template_style = patch.template_style;
   if (patch.data !== undefined) payload.data = patch.data;
+  if (patch.tailored_for !== undefined) payload.tailored_for = patch.tailored_for;
 
   const { data, error } = await supabase
     .from("resume_versions")

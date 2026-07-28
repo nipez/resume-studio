@@ -3,6 +3,7 @@
 import { EditableVersionName } from "@/components/library/editable-version-name";
 import { LogApplicationButton } from "@/components/applications/log-application-button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import type { VersionJobLink } from "@/lib/applications/types";
 import {
   archiveResumeVersion,
   createResumeVersion,
@@ -11,7 +12,11 @@ import {
   setDefaultResumeVersion,
 } from "@/lib/resume/actions";
 import type { ResumeVersion } from "@/lib/resume/db-types";
-import { versionCardMeta } from "@/lib/resume/utils";
+import {
+  formatJobAssociationLabel,
+  suggestedNameFromJob,
+  versionCardMeta,
+} from "@/lib/resume/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
@@ -20,6 +25,7 @@ type VersionRowProps = {
   version: ResumeVersion;
   isDefault: boolean;
   appCount?: number;
+  jobLinks?: VersionJobLink[];
   archived?: boolean;
   isStudent?: boolean;
 };
@@ -28,6 +34,7 @@ export function VersionRow({
   version,
   isDefault,
   appCount = 0,
+  jobLinks = [],
   archived = false,
   isStudent = false,
 }: VersionRowProps) {
@@ -37,6 +44,30 @@ export function VersionRow({
   const [confirmKind, setConfirmKind] = useState<"archive" | "delete" | null>(null);
   const [editRequest, setEditRequest] = useState(0);
   const meta = versionCardMeta(version);
+
+  const tailoredLabel = formatJobAssociationLabel(
+    version.tailored_for?.role,
+    version.tailored_for?.company
+  );
+  const primaryJob = tailoredLabel
+    ? {
+        label: tailoredLabel,
+        href: jobLinks[0]
+          ? `/applications/${jobLinks[0].applicationId}`
+          : "/applications",
+      }
+    : jobLinks[0]
+      ? {
+          label: formatJobAssociationLabel(jobLinks[0].role, jobLinks[0].company),
+          href: `/applications/${jobLinks[0].applicationId}`,
+        }
+      : null;
+  const moreCount = jobLinks.length > 1 ? jobLinks.length - 1 : 0;
+  const suggestedName =
+    suggestedNameFromJob(
+      version.tailored_for?.role || jobLinks[0]?.role,
+      version.tailored_for?.company || jobLinks[0]?.company
+    ) || null;
 
   function run(action: () => Promise<void>) {
     setError(null);
@@ -52,7 +83,7 @@ export function VersionRow({
 
   return (
     <div
-      className={`grid grid-cols-[minmax(220px,1.7fr)_88px_100px_72px_80px_minmax(280px,auto)] items-center gap-3 border-b border-[#F2F3F5] px-[22px] py-3 last:border-b-0 ${
+      className={`grid grid-cols-[minmax(220px,1.6fr)_72px_minmax(140px,1.1fr)_64px_72px_minmax(280px,auto)] items-center gap-3 border-b border-[#F2F3F5] px-[22px] py-3 last:border-b-0 ${
         archived ? "bg-[#FAFBFC]/80" : ""
       }`}
     >
@@ -63,6 +94,7 @@ export function VersionRow({
             name={version.name}
             compact
             editRequest={editRequest}
+            suggestedName={suggestedName}
             className="min-w-0 flex-1"
           />
           {isDefault ? (
@@ -100,11 +132,32 @@ export function VersionRow({
         </span>
       </div>
 
-      <div className="truncate text-[12.5px] text-[#5A6573]">
-        {meta.tailored ? (
-          <span className="text-[#6B4EFF]">{meta.tailored.replace(/^Tailored:\s*/, "")}</span>
+      <div className="min-w-0 text-[12.5px]">
+        {primaryJob ? (
+          <div className="min-w-0">
+            <Link
+              href={primaryJob.href}
+              className="block truncate font-semibold text-accent hover:underline"
+              title={primaryJob.label}
+            >
+              {primaryJob.label}
+            </Link>
+            {moreCount > 0 ? (
+              <Link
+                href="/applications"
+                className="mt-0.5 inline-block text-[11px] font-semibold text-muted hover:underline"
+              >
+                +{moreCount} more
+              </Link>
+            ) : null}
+          </div>
         ) : (
-          <span className="font-semibold text-accent">+ Add</span>
+          <Link
+            href={`/tailor?v=${version.id}&new=1`}
+            className="font-semibold text-accent hover:underline"
+          >
+            + Add job
+          </Link>
         )}
       </div>
 
@@ -250,7 +303,7 @@ export function VersionRow({
 
 export function VersionTableHeader() {
   return (
-    <div className="grid grid-cols-[minmax(220px,1.7fr)_88px_100px_72px_80px_minmax(280px,auto)] gap-3 border-b border-[#EEF0F3] bg-[#FAFBFC] px-[22px] py-[13px] text-[11px] font-bold uppercase tracking-[0.06em] text-[#8A92A0]">
+    <div className="grid grid-cols-[minmax(220px,1.6fr)_72px_minmax(140px,1.1fr)_64px_72px_minmax(280px,auto)] gap-3 border-b border-[#EEF0F3] bg-[#FAFBFC] px-[22px] py-[13px] text-[11px] font-bold uppercase tracking-[0.06em] text-[#8A92A0]">
       <div>Name</div>
       <div>Type</div>
       <div>Job</div>

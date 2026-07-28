@@ -1,6 +1,7 @@
 "use client";
 
 import { updateResumeVersion } from "@/lib/resume/actions";
+import { isGenericResumeName } from "@/lib/resume/utils";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 
@@ -11,6 +12,8 @@ type EditableVersionNameProps = {
   compact?: boolean;
   /** Increment to force open the rename input (e.g. from an Actions “Rename” button). */
   editRequest?: number;
+  /** Suggested job-based name (Role · Company) for one-click rename. */
+  suggestedName?: string | null;
 };
 
 function stripCopySuffix(value: string) {
@@ -27,6 +30,7 @@ export function EditableVersionName({
   className = "",
   compact = false,
   editRequest = 0,
+  suggestedName = null,
 }: EditableVersionNameProps) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -96,6 +100,11 @@ export function EditableVersionName({
     commit(cleaned);
   }
 
+  const showSuggested =
+    Boolean(suggestedName?.trim()) &&
+    suggestedName!.trim() !== initialName.trim() &&
+    isGenericResumeName(initialName);
+
   if (editing) {
     return (
       <div className={className}>
@@ -156,7 +165,17 @@ export function EditableVersionName({
           </span>
         </button>
       </div>
-      {hasCopySuffix(name) ? (
+      {showSuggested ? (
+        <button
+          type="button"
+          disabled={pending}
+          onClick={() => commit(suggestedName!.trim())}
+          className="mt-1 cursor-pointer border-none bg-transparent p-0 text-left text-[11.5px] font-semibold text-accent hover:underline disabled:opacity-50"
+          title={`Rename to ${suggestedName}`}
+        >
+          Rename to {suggestedName}
+        </button>
+      ) : hasCopySuffix(name) ? (
         <button
           type="button"
           disabled={pending}

@@ -112,3 +112,10 @@ export type LogApplicationInput = {
   answers?: ApplicationAnswer[];
   applicationType?: ApplicationType;
 };
+
+/** Applications linked to a resume version — for Documents Job column. */
+export type VersionJobLink = {
+  applicationId: string;
+  role: string;
+  company: string;
+};

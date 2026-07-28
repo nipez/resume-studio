@@ -3,6 +3,7 @@
 import { EditableVersionName } from "@/components/library/editable-version-name";
 import { LogApplicationButton } from "@/components/applications/log-application-button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import type { VersionJobLink } from "@/lib/applications/types";
 import {
   archiveResumeVersion,
   createResumeVersion,
@@ -11,7 +12,11 @@ import {
   setDefaultResumeVersion,
 } from "@/lib/resume/actions";
 import type { ResumeVersion } from "@/lib/resume/db-types";
-import { versionCardMeta } from "@/lib/resume/utils";
+import {
+  formatJobAssociationLabel,
+  suggestedNameFromJob,
+  versionCardMeta,
+} from "@/lib/resume/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
@@ -20,6 +25,7 @@ type VersionCardProps = {
   version: ResumeVersion;
   isDefault: boolean;
   appCount?: number;
+  jobLinks?: VersionJobLink[];
   archived?: boolean;
   isStudent?: boolean;
 };
@@ -28,6 +34,7 @@ export function VersionCard({
   version,
   isDefault,
   appCount = 0,
+  jobLinks = [],
   archived = false,
   isStudent = false,
 }: VersionCardProps) {
@@ -36,6 +43,19 @@ export function VersionCard({
   const [error, setError] = useState<string | null>(null);
   const [confirmKind, setConfirmKind] = useState<"archive" | "delete" | null>(null);
   const meta = versionCardMeta(version);
+  const jobLabel =
+    formatJobAssociationLabel(
+      version.tailored_for?.role,
+      version.tailored_for?.company
+    ) ||
+    (jobLinks[0]
+      ? formatJobAssociationLabel(jobLinks[0].role, jobLinks[0].company)
+      : "");
+  const suggestedName =
+    suggestedNameFromJob(
+      version.tailored_for?.role || jobLinks[0]?.role,
+      version.tailored_for?.company || jobLinks[0]?.company
+    ) || null;
 
   function run(action: () => Promise<void>) {
     setError(null);
@@ -61,6 +81,7 @@ export function VersionCard({
         <EditableVersionName
           versionId={version.id}
           name={version.name}
+          suggestedName={suggestedName}
           className="min-w-0 flex-1"
         />
         <div className="flex flex-none items-center gap-1.5">
@@ -79,11 +100,16 @@ export function VersionCard({
         {meta.headline}
       </div>
 
-      {meta.tailored && (
-        <div className="mt-2.5 inline-flex items-center gap-1.5 self-start rounded-[7px] bg-[#EAF1FF] px-2.5 py-1 text-[11.5px] font-semibold text-[#2456D6]">
-          ⌖ {meta.tailored}
+      {jobLabel ? (
+        <div className="mt-2.5 inline-flex max-w-full items-center gap-1.5 self-start rounded-[7px] bg-[#F0ECFF] px-2.5 py-1 text-[11.5px] font-semibold text-accent">
+          <span className="truncate" title={jobLabel}>
+            ⌖ {jobLabel}
+          </span>
+          {jobLinks.length > 1 ? (
+            <span className="shrink-0 text-muted">+{jobLinks.length - 1}</span>
+          ) : null}
         </div>
-      )}
+      ) : null}
 
       <div className="mt-3 flex items-center gap-3 border-t border-[#F0F1F4] pt-3 text-xs text-[#8A92A0]">
         <span>{meta.meta}</span>

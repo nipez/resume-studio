@@ -17,6 +17,28 @@ export function formatRelativeTime(iso: string): string {
   });
 }
 
+export function formatJobAssociationLabel(role?: string, company?: string) {
+  const r = role?.trim() ?? "";
+  const c = company?.trim() ?? "";
+  if (r && c) return `${r} · ${c}`;
+  return r || c || "";
+}
+
+export function suggestedNameFromJob(role?: string, company?: string) {
+  return formatJobAssociationLabel(role, company);
+}
+
+export function isGenericResumeName(name: string) {
+  const n = name.trim().toLowerCase();
+  if (!n) return true;
+  if (/(?:\s*\(copy\))+\s*$/i.test(name)) return true;
+  if (/^untitled(\s+resume)?$/i.test(n)) return true;
+  if (/^master(\s+resume)?$/i.test(n)) return true;
+  if (/^new resume$/i.test(n)) return true;
+  if (/^tailored$/i.test(n)) return true;
+  return false;
+}
+
 export function versionCardMeta(version: ResumeVersion) {
   const roles = version.data.experience?.length ?? 0;
   const skills = version.data.skills?.length ?? 0;
