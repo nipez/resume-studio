@@ -12,6 +12,7 @@ import type {
   LogApplicationInput,
   ResumeSnapshot,
   StatusHistoryEntry,
+  VersionJobLink,
 } from "@/lib/applications/types";
 import type { FollowUpKind } from "@/lib/applications/follow-up-types";
 import {
@@ -25,7 +26,11 @@ import {
   stripApplicationColumn,
   stripOptionalApplicationColumns,
 } from "@/lib/applications/db-write";
-import { getResumeVersion } from "@/lib/resume/actions";
+import { getResumeVersion, updateResumeVersion } from "@/lib/resume/actions";
+import {
+  isGenericResumeName,
+  suggestedNameFromJob,
+} from "@/lib/resume/utils";
 import { getAuthedDb, getAuthUser } from "@/lib/auth";
 import { createServiceClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
@@ -206,6 +211,39 @@ export async function getApplicationCountsByVersion(): Promise<
   return versionCounts;
 }
 
+/** Applications grouped by resume version — for Documents Job column. */
+export async function getLibraryVersionLinks(): Promise<{
+  versionCounts: Record<string, number>;
+  versionJobs: Record<string, VersionJobLink[]>;
+}> {
+  const { applications, archivedApplications, versionCounts } =
+    await getApplicationsList();
+
+  const versionJobs: Record<string, VersionJobLink[]> = {};
+  const seen = new Set<string>();
+
+  for (const app of [...applications, ...archivedApplications]) {
+    if (!app.resume_version_id) continue;
+    const role = app.role.trim();
+    const company = app.company.trim();
+    if (!role && !company) continue;
+
+    const dedupeKey = `${app.resume_version_id}::${role.toLowerCase()}::${company.toLowerCase()}`;
+    if (seen.has(dedupeKey)) continue;
+    seen.add(dedupeKey);
+
+    const list = versionJobs[app.resume_version_id] ?? [];
+    list.push({
+      applicationId: app.id,
+      role,
+      company,
+    });
+    versionJobs[app.resume_version_id] = list;
+  }
+
+  return { versionCounts, versionJobs };
+}
+
 export async function getApplication(id: string): Promise<Application | null> {
   const supabase = createServiceClient();
   const { data: row, error } = await supabase
@@ -267,6 +305,30 @@ export async function logApplication(input: LogApplicationInput) {
 
   if (error || !created) {
     throw new Error(error?.message ?? "Failed to log application");
+  }
+
+  // Keep the library readable: if this cut still has a generic/copy name,
+  // rename it to the role · company it was just logged against.
+  if ((role || company) && isGenericResumeName(version.name)) {
+    const nextName = suggestedNameFromJob(role, company);
+    if (nextName) {
+      const nextTailored = {
+        role: role || version.tailored_for?.role || "",
+        company: company || version.tailored_for?.company || "",
+        depth: version.tailored_for?.depth,
+        jobDesc: input.jobDesc?.trim() || version.tailored_for?.jobDesc || "",
+        jobUrl: input.jobUrl?.trim() || version.tailored_for?.jobUrl || "",
+        contextNotes: version.tailored_for?.contextNotes || "",
+      };
+      try {
+        await updateResumeVersion(version.id, {
+          name: nextName,
+          tailored_for: nextTailored,
+        });
+      } catch (renameError) {
+        console.error("logApplication rename version:", renameError);
+      }
+    }
   }
 
   revalidatePath("/applications");

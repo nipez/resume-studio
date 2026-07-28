@@ -2,6 +2,7 @@
 
 import { VersionCard } from "@/components/library/version-card";
 import { VersionRow, VersionTableHeader } from "@/components/library/version-row";
+import type { VersionJobLink } from "@/lib/applications/types";
 import type { ResumeVersion } from "@/lib/resume/db-types";
 import { useEffect, useMemo, useState } from "react";
 
@@ -13,6 +14,7 @@ type LibraryViewProps = {
   archivedVersions: ResumeVersion[];
   defaultVersionId: string | null;
   versionCounts: Record<string, number>;
+  versionJobs?: Record<string, VersionJobLink[]>;
   isStudent?: boolean;
 };
 
@@ -73,6 +75,7 @@ export function LibraryView({
   archivedVersions,
   defaultVersionId,
   versionCounts,
+  versionJobs = {},
   isStudent = false,
 }: LibraryViewProps) {
   const [tab, setTab] = useState<"all" | "active" | "archived">("all");
@@ -194,6 +197,7 @@ export function LibraryView({
                   version={version}
                   isDefault={version.id === defaultVersionId}
                   appCount={versionCounts[version.id] ?? 0}
+                  jobLinks={versionJobs[version.id] ?? []}
                   archived={Boolean(version.archived_at)}
                   isStudent={isStudent}
                 />
@@ -208,6 +212,7 @@ export function LibraryView({
                 version={version}
                 isDefault={version.id === defaultVersionId}
                 appCount={versionCounts[version.id] ?? 0}
+                jobLinks={versionJobs[version.id] ?? []}
                 archived={Boolean(version.archived_at)}
                 isStudent={isStudent}
               />
