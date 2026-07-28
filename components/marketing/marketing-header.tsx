@@ -2,7 +2,11 @@ import Link from "next/link";
 import { MarketingBrand } from "@/components/marketing/marketing-brand";
 import { NAV_LINKS } from "@/lib/marketing/content";
 
-export function MarketingHeader() {
+type MarketingHeaderProps = {
+  signedIn?: boolean;
+};
+
+export function MarketingHeader({ signedIn = false }: MarketingHeaderProps) {
   return (
     <header className="sticky top-0 z-50 border-b border-[rgba(40,20,30,.08)] bg-[#fbf6f2]/82 backdrop-blur-[16px]">
       <div className="marketing-shell-pad mx-auto flex max-w-[1180px] items-center justify-between gap-3 py-3 sm:gap-4 sm:py-3.5">
@@ -47,21 +51,47 @@ export function MarketingHeader() {
                   {link.label}
                 </Link>
               ))}
+              {signedIn ? (
+                <Link
+                  href="/dashboard"
+                  className="mt-1 block border-t border-[rgba(40,20,30,.08)] px-4 py-2.5 text-[14px] font-semibold text-[#231a2e] transition hover:bg-[#fbf6f2]"
+                >
+                  Open app
+                </Link>
+              ) : (
+                <Link
+                  href="/login"
+                  className="mt-1 block border-t border-[rgba(40,20,30,.08)] px-4 py-2.5 text-[14px] font-semibold text-[#231a2e] transition hover:bg-[#fbf6f2]"
+                >
+                  Sign in
+                </Link>
+              )}
             </div>
           </details>
 
-          <Link
-            href="/login"
-            className="hidden whitespace-nowrap text-[14.5px] font-semibold text-[#231a2e] sm:inline-flex"
-          >
-            Sign in
-          </Link>
-          <Link
-            href="/login"
-            className="hidden items-center justify-center whitespace-nowrap rounded-[10px] bg-[#231a2e] px-[18px] py-2.5 text-[14.5px] font-semibold text-white transition hover:-translate-y-px hover:shadow-[0_10px_22px_-8px_rgba(40,20,30,.5)] sm:inline-flex"
-          >
-            Get started
-          </Link>
+          {signedIn ? (
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-[10px] bg-[#231a2e] px-[18px] py-2.5 text-[14.5px] font-semibold text-white transition hover:-translate-y-px hover:shadow-[0_10px_22px_-8px_rgba(40,20,30,.5)]"
+            >
+              Open app
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="hidden whitespace-nowrap text-[14.5px] font-semibold text-[#231a2e] sm:inline-flex"
+              >
+                Sign in
+              </Link>
+              <Link
+                href="/login"
+                className="hidden items-center justify-center whitespace-nowrap rounded-[10px] bg-[#231a2e] px-[18px] py-2.5 text-[14.5px] font-semibold text-white transition hover:-translate-y-px hover:shadow-[0_10px_22px_-8px_rgba(40,20,30,.5)] sm:inline-flex"
+              >
+                Get started
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>

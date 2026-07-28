@@ -250,6 +250,13 @@ export function AppShell({
                   >
                     Upgrade
                   </Link>
+                  <Link
+                    href="/"
+                    role="menuitem"
+                    className="block rounded-lg px-3 py-2 text-[13px] font-medium text-[#3a4350] no-underline transition-colors hover:bg-[#F4F5F7]"
+                  >
+                    Marketing site
+                  </Link>
                 </div>
 
                 <div className="border-t border-[#F0F1F3] pt-1">
@@ -327,6 +334,12 @@ export function AppShell({
           })}
         </nav>
         <div className="border-t border-border p-3">
+          <Link
+            href="/"
+            className="mb-2 flex w-full items-center justify-center rounded-xl border border-border bg-white px-4 py-2.5 text-[13.5px] font-semibold text-ink"
+          >
+            Marketing site
+          </Link>
           <Link
             href="/pricing"
             className="mb-2 flex w-full items-center justify-center rounded-full bg-teal px-4 py-2.5 text-[13.5px] font-semibold text-white"
