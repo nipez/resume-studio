@@ -148,9 +148,10 @@ export function EditableVersionName({
           title="Click to rename"
         >
           <span
-            className={`min-w-0 flex-1 truncate font-display font-semibold leading-tight tracking-[-0.01em] text-ink ${
-              compact ? "text-[14px]" : "text-[17px]"
+            className={`min-w-0 flex-1 font-display font-semibold leading-tight tracking-[-0.01em] text-ink ${
+              compact ? "line-clamp-2 text-[14px]" : "truncate text-[17px]"
             }`}
+            title={name}
           >
             {name}
           </span>

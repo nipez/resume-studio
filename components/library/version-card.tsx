@@ -13,7 +13,6 @@ import {
 } from "@/lib/resume/actions";
 import type { ResumeVersion } from "@/lib/resume/db-types";
 import {
-  formatJobAssociationLabel,
   suggestedNameFromJob,
   versionCardMeta,
 } from "@/lib/resume/utils";
@@ -43,19 +42,14 @@ export function VersionCard({
   const [error, setError] = useState<string | null>(null);
   const [confirmKind, setConfirmKind] = useState<"archive" | "delete" | null>(null);
   const meta = versionCardMeta(version);
-  const jobLabel =
-    formatJobAssociationLabel(
-      version.tailored_for?.role,
-      version.tailored_for?.company
-    ) ||
-    (jobLinks[0]
-      ? formatJobAssociationLabel(jobLinks[0].role, jobLinks[0].company)
-      : "");
+  const jobRole =
+    version.tailored_for?.role?.trim() || jobLinks[0]?.role?.trim() || "";
+  const jobCompany =
+    version.tailored_for?.company?.trim() ||
+    jobLinks[0]?.company?.trim() ||
+    "";
   const suggestedName =
-    suggestedNameFromJob(
-      version.tailored_for?.role || jobLinks[0]?.role,
-      version.tailored_for?.company || jobLinks[0]?.company
-    ) || null;
+    suggestedNameFromJob(jobRole, jobCompany) || null;
 
   function run(action: () => Promise<void>) {
     setError(null);
@@ -100,13 +94,25 @@ export function VersionCard({
         {meta.headline}
       </div>
 
-      {jobLabel ? (
-        <div className="mt-2.5 inline-flex max-w-full items-center gap-1.5 self-start rounded-[7px] bg-[#F0ECFF] px-2.5 py-1 text-[11.5px] font-semibold text-accent">
-          <span className="truncate" title={jobLabel}>
-            ⌖ {jobLabel}
-          </span>
+      {jobRole || jobCompany ? (
+        <div className="mt-2.5 w-full rounded-[10px] border border-[#EDE9FF] bg-[#F8F6FF] px-3 py-2.5">
+          <p className="text-[10.5px] font-bold uppercase tracking-[0.05em] text-[#8A7AD6]">
+            Applied / tailored for
+          </p>
+          {jobRole ? (
+            <p className="mt-1 text-[13.5px] font-semibold leading-snug text-ink">
+              {jobRole}
+            </p>
+          ) : null}
+          {jobCompany ? (
+            <p className="mt-0.5 text-[13px] font-medium leading-snug text-[#4A5360]">
+              {jobCompany}
+            </p>
+          ) : null}
           {jobLinks.length > 1 ? (
-            <span className="shrink-0 text-muted">+{jobLinks.length - 1}</span>
+            <p className="mt-1 text-[11px] font-semibold text-muted">
+              +{jobLinks.length - 1} more applications
+            </p>
           ) : null}
         </div>
       ) : null}
@@ -211,8 +217,8 @@ export function VersionCard({
           <LogApplicationButton
             versionId={version.id}
             resumeVersionName={version.name}
-            initialRole={version.tailored_for?.role ?? ""}
-            initialCompany={version.tailored_for?.company ?? ""}
+            initialRole={jobRole}
+            initialCompany={jobCompany}
             isStudent={isStudent}
             className="mt-3 flex w-full items-center justify-center gap-[7px] rounded-[9px] border border-dashed border-[#C6D8CC] bg-white px-2 py-2 text-[12.5px] font-semibold text-[#0E7C4B] transition-colors hover:border-[#0E9F6E] hover:bg-[#F2FBF6] disabled:opacity-50"
           >
@@ -232,8 +238,8 @@ export function VersionCard({
             <LogApplicationButton
               versionId={version.id}
               resumeVersionName={version.name}
-              initialRole={version.tailored_for?.role ?? ""}
-              initialCompany={version.tailored_for?.company ?? ""}
+              initialRole={jobRole}
+              initialCompany={jobCompany}
               isStudent={isStudent}
               className="border-none bg-transparent p-0 text-[11.5px] font-semibold text-[#5d7a69] shadow-none hover:bg-transparent hover:text-[#0E7C4B] hover:underline disabled:opacity-50"
             >

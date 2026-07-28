@@ -12,14 +12,13 @@ import {
   setDefaultResumeVersion,
 } from "@/lib/resume/actions";
 import type { ResumeVersion } from "@/lib/resume/db-types";
-import {
-  formatJobAssociationLabel,
-  suggestedNameFromJob,
-  versionCardMeta,
-} from "@/lib/resume/utils";
+import { suggestedNameFromJob, versionCardMeta } from "@/lib/resume/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useId, useRef, useState, useTransition } from "react";
+
+const ROW_GRID =
+  "grid-cols-[minmax(200px,1.15fr)_minmax(200px,1.2fr)_minmax(150px,0.95fr)_56px_78px_minmax(108px,auto)]";
 
 type VersionRowProps = {
   version: ResumeVersion;
@@ -29,6 +28,26 @@ type VersionRowProps = {
   archived?: boolean;
   isStudent?: boolean;
 };
+
+function resolveJob(version: ResumeVersion, jobLinks: VersionJobLink[]) {
+  const role =
+    version.tailored_for?.role?.trim() || jobLinks[0]?.role?.trim() || "";
+  const company =
+    version.tailored_for?.company?.trim() ||
+    jobLinks[0]?.company?.trim() ||
+    "";
+  const href = jobLinks[0]
+    ? `/applications/${jobLinks[0].applicationId}`
+    : role || company
+      ? "/applications"
+      : null;
+  return {
+    role,
+    company,
+    href,
+    moreCount: jobLinks.length > 1 ? jobLinks.length - 1 : 0,
+  };
+}
 
 export function VersionRow({
   version,
@@ -41,36 +60,37 @@ export function VersionRow({
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const [confirmKind, setConfirmKind] = useState<"archive" | "delete" | null>(null);
-  const [editRequest, setEditRequest] = useState(0);
-  const meta = versionCardMeta(version);
-
-  const tailoredLabel = formatJobAssociationLabel(
-    version.tailored_for?.role,
-    version.tailored_for?.company
+  const [confirmKind, setConfirmKind] = useState<"archive" | "delete" | null>(
+    null
   );
-  const primaryJob = tailoredLabel
-    ? {
-        label: tailoredLabel,
-        href: jobLinks[0]
-          ? `/applications/${jobLinks[0].applicationId}`
-          : "/applications",
-      }
-    : jobLinks[0]
-      ? {
-          label: formatJobAssociationLabel(jobLinks[0].role, jobLinks[0].company),
-          href: `/applications/${jobLinks[0].applicationId}`,
-        }
-      : null;
-  const moreCount = jobLinks.length > 1 ? jobLinks.length - 1 : 0;
+  const [editRequest, setEditRequest] = useState(0);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const menuId = useId();
+  const meta = versionCardMeta(version);
+  const job = resolveJob(version, jobLinks);
   const suggestedName =
-    suggestedNameFromJob(
-      version.tailored_for?.role || jobLinks[0]?.role,
-      version.tailored_for?.company || jobLinks[0]?.company
-    ) || null;
+    suggestedNameFromJob(job.role, job.company) || null;
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    function onPointerDown(e: PointerEvent) {
+      if (!menuRef.current?.contains(e.target as Node)) setMenuOpen(false);
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setMenuOpen(false);
+    }
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [menuOpen]);
 
   function run(action: () => Promise<void>) {
     setError(null);
+    setMenuOpen(false);
     startTransition(async () => {
       try {
         await action();
@@ -83,12 +103,12 @@ export function VersionRow({
 
   return (
     <div
-      className={`grid grid-cols-[minmax(220px,1.6fr)_72px_minmax(140px,1.1fr)_64px_72px_minmax(280px,auto)] items-center gap-3 border-b border-[#F2F3F5] px-[22px] py-3 last:border-b-0 ${
+      className={`grid ${ROW_GRID} items-start gap-x-4 gap-y-1 border-b border-[#F2F3F5] px-[22px] py-3.5 last:border-b-0 ${
         archived ? "bg-[#FAFBFC]/80" : ""
       }`}
     >
       <div className="min-w-0">
-        <div className="flex min-w-0 items-center gap-2">
+        <div className="flex min-w-0 items-start gap-2">
           <EditableVersionName
             versionId={version.id}
             name={version.name}
@@ -98,17 +118,16 @@ export function VersionRow({
             className="min-w-0 flex-1"
           />
           {isDefault ? (
-            <span className="shrink-0 rounded-md bg-[#F0ECFF] px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.03em] text-[#5638E0]">
+            <span className="mt-1 shrink-0 rounded-md bg-[#F0ECFF] px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.03em] text-[#5638E0]">
               Default
             </span>
           ) : null}
         </div>
-        <div className="mt-0.5 truncate text-[12px] text-[#8A92A0]">
+        <div className="mt-0.5 line-clamp-2 text-[12px] leading-snug text-[#8A92A0]">
           {meta.headline}
-          {meta.badge !== "Resume" ? ` · ${meta.badge}` : ""}
         </div>
         {!archived ? (
-          <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5">
+          <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5">
             <Link
               href={`/tailor?v=${version.id}&new=1`}
               className="text-[11px] font-semibold text-[#6B4EFF] hover:underline"
@@ -126,45 +145,74 @@ export function VersionRow({
         {error ? <p className="mt-1 text-[11px] text-[#B23B3B]">{error}</p> : null}
       </div>
 
-      <div>
-        <span className="inline-block rounded-md bg-[#F1F3F6] px-2 py-1 text-[10px] font-bold uppercase tracking-[0.04em] text-[#6B7480]">
-          Resume
-        </span>
-      </div>
-
-      <div className="min-w-0 text-[12.5px]">
-        {primaryJob ? (
-          <div className="min-w-0">
+      <div className="min-w-0 pt-0.5">
+        {job.role || job.company ? (
+          job.href ? (
             <Link
-              href={primaryJob.href}
-              className="block truncate font-semibold text-accent hover:underline"
-              title={primaryJob.label}
+              href={job.href}
+              className="block text-[13.5px] font-semibold leading-snug text-ink hover:text-accent hover:underline"
+              title={job.role || undefined}
             >
-              {primaryJob.label}
+              {job.role || "—"}
             </Link>
-            {moreCount > 0 ? (
-              <Link
-                href="/applications"
-                className="mt-0.5 inline-block text-[11px] font-semibold text-muted hover:underline"
-              >
-                +{moreCount} more
-              </Link>
-            ) : null}
-          </div>
+          ) : (
+            <p
+              className="text-[13.5px] font-semibold leading-snug text-ink"
+              title={job.role || undefined}
+            >
+              {job.role || "—"}
+            </p>
+          )
         ) : (
           <Link
             href={`/tailor?v=${version.id}&new=1`}
-            className="font-semibold text-accent hover:underline"
+            className="text-[12.5px] font-semibold text-accent hover:underline"
           >
-            + Add job
+            + Add role
           </Link>
+        )}
+        {job.moreCount > 0 ? (
+          <Link
+            href="/applications"
+            className="mt-1 inline-block text-[11px] font-semibold text-muted hover:underline"
+          >
+            +{job.moreCount} more apps
+          </Link>
+        ) : null}
+      </div>
+
+      <div className="min-w-0 pt-0.5">
+        {job.company ? (
+          job.href ? (
+            <Link
+              href={job.href}
+              className="block text-[13.5px] font-semibold leading-snug text-ink hover:text-accent hover:underline"
+              title={job.company}
+            >
+              {job.company}
+            </Link>
+          ) : (
+            <p
+              className="text-[13.5px] font-semibold leading-snug text-ink"
+              title={job.company}
+            >
+              {job.company}
+            </p>
+          )
+        ) : job.role ? (
+          <span className="text-[12.5px] text-[#9AA3AF]">No company</span>
+        ) : (
+          <span className="text-[12.5px] text-[#9AA3AF]">—</span>
         )}
       </div>
 
-      <div className="text-[12.5px]">
+      <div className="pt-0.5 text-[12.5px]">
         {archived ? (
           appCount > 0 ? (
-            <Link href="/applications" className="font-semibold text-[#6B4EFF] hover:underline">
+            <Link
+              href="/applications"
+              className="font-semibold text-[#6B4EFF] hover:underline"
+            >
               {appCount}
             </Link>
           ) : (
@@ -174,97 +222,144 @@ export function VersionRow({
           <LogApplicationButton
             versionId={version.id}
             resumeVersionName={version.name}
-            initialRole={version.tailored_for?.role ?? ""}
-            initialCompany={version.tailored_for?.company ?? ""}
+            initialRole={job.role}
+            initialCompany={job.company}
             isStudent={isStudent}
             className="border-none bg-transparent p-0 text-[12px] font-semibold text-[#0E7C4B] shadow-none hover:bg-transparent hover:underline disabled:opacity-50"
           >
             Log
           </LogApplicationButton>
         ) : (
-          <Link href="/applications" className="font-semibold text-[#0E7C4B] hover:underline">
+          <Link
+            href="/applications"
+            className="font-semibold text-[#0E7C4B] hover:underline"
+          >
             {appCount}
           </Link>
         )}
       </div>
 
-      <div className="text-[12px] text-[#8A92A0]">{meta.updated.replace("Updated ", "")}</div>
+      <div className="pt-0.5 text-[12px] text-[#8A92A0]">
+        {meta.updated.replace("Updated ", "")}
+      </div>
 
-      <div className="flex flex-wrap items-center justify-end gap-1.5">
-        <button
-          type="button"
-          disabled={pending}
-          onClick={() => setEditRequest((n) => n + 1)}
-          className="rounded-lg border border-border bg-white px-2.5 py-[6px] text-[11.5px] font-semibold text-ink transition-colors hover:border-accent hover:text-accent disabled:opacity-50"
-        >
-          Rename
-        </button>
+      <div className="flex items-start justify-end gap-1.5 pt-0.5">
         <Link
           href={`/editor/${version.id}`}
-          className="rounded-lg bg-accent px-2.5 py-[6px] text-[11.5px] font-semibold text-white transition-colors hover:bg-accent-dark"
+          className="rounded-lg bg-accent px-3 py-[6px] text-[11.5px] font-semibold text-white transition-colors hover:bg-accent-dark"
         >
           Editor
         </Link>
-        <button
-          type="button"
-          disabled={pending}
-          onClick={() =>
-            run(async () => {
-              const copy = await createResumeVersion(version.id);
-              router.push(`/editor/${copy.id}`);
-            })
-          }
-          className="rounded-lg border border-border bg-white px-2.5 py-[6px] text-[11.5px] font-semibold text-ink transition-colors hover:border-accent hover:text-accent disabled:opacity-50"
-        >
-          Duplicate
-        </button>
-        {!archived && !isDefault ? (
+        <div className="relative" ref={menuRef}>
           <button
             type="button"
             disabled={pending}
-            onClick={() =>
-              run(async () => {
-                await setDefaultResumeVersion(version.id);
-              })
-            }
-            className="rounded-lg border border-[#D9D2FF] bg-[#F7F5FF] px-2.5 py-[6px] text-[11.5px] font-semibold text-[#6B4EFF] transition-colors hover:border-accent disabled:opacity-50"
+            aria-haspopup="menu"
+            aria-expanded={menuOpen}
+            aria-controls={menuId}
+            onClick={() => setMenuOpen((v) => !v)}
+            className="inline-flex h-[30px] w-[30px] items-center justify-center rounded-lg border border-border bg-white text-ink transition-colors hover:border-accent hover:text-accent disabled:opacity-50"
+            title="More actions"
           >
-            Default
+            <span className="sr-only">More actions</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+              <circle cx="5" cy="12" r="2" />
+              <circle cx="12" cy="12" r="2" />
+              <circle cx="19" cy="12" r="2" />
+            </svg>
           </button>
-        ) : null}
-        {archived ? (
-          <>
-            <button
-              type="button"
-              disabled={pending}
-              onClick={() =>
-                run(async () => {
-                  await restoreResumeVersion(version.id);
-                })
-              }
-              className="rounded-lg border border-[#D9D2FF] bg-[#F7F5FF] px-2.5 py-[6px] text-[11.5px] font-semibold text-[#6B4EFF] transition-colors hover:border-accent disabled:opacity-50"
+          {menuOpen ? (
+            <div
+              id={menuId}
+              role="menu"
+              className="absolute right-0 z-20 mt-1.5 min-w-[168px] overflow-hidden rounded-xl border border-border bg-white py-1 shadow-[0_12px_32px_rgba(15,17,22,0.12)]"
             >
-              Restore
-            </button>
-            <button
-              type="button"
-              disabled={pending}
-              onClick={() => setConfirmKind("delete")}
-              className="rounded-lg border border-[#F2D2D2] bg-[#FFF4F4] px-2.5 py-[6px] text-[11.5px] font-semibold text-[#B23B3B] transition-colors hover:bg-[#FCECEC] disabled:opacity-50"
-            >
-              Delete
-            </button>
-          </>
-        ) : (
-          <button
-            type="button"
-            disabled={pending}
-            onClick={() => setConfirmKind("archive")}
-            className="rounded-lg border border-[#E2E5EA] bg-[#FAFBFC] px-2.5 py-[6px] text-[11.5px] font-semibold text-[#5A6573] transition-colors hover:border-[#CFD5DD] hover:text-ink disabled:opacity-50"
-          >
-            Archive
-          </button>
-        )}
+              <button
+                type="button"
+                role="menuitem"
+                disabled={pending}
+                onClick={() => {
+                  setMenuOpen(false);
+                  setEditRequest((n) => n + 1);
+                }}
+                className="flex w-full cursor-pointer border-none bg-transparent px-3.5 py-2 text-left text-[13px] font-semibold text-ink hover:bg-[#F7F8FA] disabled:opacity-50"
+              >
+                Rename
+              </button>
+              <button
+                type="button"
+                role="menuitem"
+                disabled={pending}
+                onClick={() =>
+                  run(async () => {
+                    const copy = await createResumeVersion(version.id);
+                    router.push(`/editor/${copy.id}`);
+                  })
+                }
+                className="flex w-full cursor-pointer border-none bg-transparent px-3.5 py-2 text-left text-[13px] font-semibold text-ink hover:bg-[#F7F8FA] disabled:opacity-50"
+              >
+                Duplicate
+              </button>
+              {!archived && !isDefault ? (
+                <button
+                  type="button"
+                  role="menuitem"
+                  disabled={pending}
+                  onClick={() =>
+                    run(async () => {
+                      await setDefaultResumeVersion(version.id);
+                    })
+                  }
+                  className="flex w-full cursor-pointer border-none bg-transparent px-3.5 py-2 text-left text-[13px] font-semibold text-ink hover:bg-[#F7F8FA] disabled:opacity-50"
+                >
+                  Set as default
+                </button>
+              ) : null}
+              {archived ? (
+                <>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    disabled={pending}
+                    onClick={() =>
+                      run(async () => {
+                        await restoreResumeVersion(version.id);
+                      })
+                    }
+                    className="flex w-full cursor-pointer border-none bg-transparent px-3.5 py-2 text-left text-[13px] font-semibold text-ink hover:bg-[#F7F8FA] disabled:opacity-50"
+                  >
+                    Restore
+                  </button>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    disabled={pending}
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setConfirmKind("delete");
+                    }}
+                    className="flex w-full cursor-pointer border-none bg-transparent px-3.5 py-2 text-left text-[13px] font-semibold text-[#B23B3B] hover:bg-[#FFF4F4] disabled:opacity-50"
+                  >
+                    Delete
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  role="menuitem"
+                  disabled={pending}
+                  onClick={() => {
+                    setMenuOpen(false);
+                    setConfirmKind("archive");
+                  }}
+                  className="flex w-full cursor-pointer border-none bg-transparent px-3.5 py-2 text-left text-[13px] font-semibold text-[#5A6573] hover:bg-[#F7F8FA] disabled:opacity-50"
+                >
+                  Archive
+                </button>
+              )}
+            </div>
+          ) : null}
+        </div>
       </div>
 
       <ConfirmDialog
@@ -303,12 +398,14 @@ export function VersionRow({
 
 export function VersionTableHeader() {
   return (
-    <div className="grid grid-cols-[minmax(220px,1.6fr)_72px_minmax(140px,1.1fr)_64px_72px_minmax(280px,auto)] gap-3 border-b border-[#EEF0F3] bg-[#FAFBFC] px-[22px] py-[13px] text-[11px] font-bold uppercase tracking-[0.06em] text-[#8A92A0]">
-      <div>Name</div>
-      <div>Type</div>
-      <div>Job</div>
+    <div
+      className={`grid ${ROW_GRID} gap-x-4 border-b border-[#EEF0F3] bg-[#FAFBFC] px-[22px] py-[13px] text-[11px] font-bold uppercase tracking-[0.06em] text-[#8A92A0]`}
+    >
+      <div>Document</div>
+      <div>Role</div>
+      <div>Company</div>
       <div>Apps</div>
-      <div>Modified</div>
+      <div>Updated</div>
       <div className="text-right">Actions</div>
     </div>
   );
