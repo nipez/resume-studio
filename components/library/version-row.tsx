@@ -35,6 +35,7 @@ export function VersionRow({
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [confirmKind, setConfirmKind] = useState<"archive" | "delete" | null>(null);
+  const [editRequest, setEditRequest] = useState(0);
   const meta = versionCardMeta(version);
 
   function run(action: () => Promise<void>) {
@@ -51,7 +52,7 @@ export function VersionRow({
 
   return (
     <div
-      className={`grid grid-cols-[minmax(200px,1.6fr)_88px_100px_88px_88px_minmax(220px,auto)] items-center gap-3 border-b border-[#F2F3F5] px-[22px] py-3 last:border-b-0 ${
+      className={`grid grid-cols-[minmax(220px,1.7fr)_88px_100px_72px_80px_minmax(280px,auto)] items-center gap-3 border-b border-[#F2F3F5] px-[22px] py-3 last:border-b-0 ${
         archived ? "bg-[#FAFBFC]/80" : ""
       }`}
     >
@@ -61,6 +62,7 @@ export function VersionRow({
             versionId={version.id}
             name={version.name}
             compact
+            editRequest={editRequest}
             className="min-w-0 flex-1"
           />
           {isDefault ? (
@@ -136,6 +138,14 @@ export function VersionRow({
       <div className="text-[12px] text-[#8A92A0]">{meta.updated.replace("Updated ", "")}</div>
 
       <div className="flex flex-wrap items-center justify-end gap-1.5">
+        <button
+          type="button"
+          disabled={pending}
+          onClick={() => setEditRequest((n) => n + 1)}
+          className="rounded-lg border border-border bg-white px-2.5 py-[6px] text-[11.5px] font-semibold text-ink transition-colors hover:border-accent hover:text-accent disabled:opacity-50"
+        >
+          Rename
+        </button>
         <Link
           href={`/editor/${version.id}`}
           className="rounded-lg bg-accent px-2.5 py-[6px] text-[11.5px] font-semibold text-white transition-colors hover:bg-accent-dark"
@@ -240,7 +250,7 @@ export function VersionRow({
 
 export function VersionTableHeader() {
   return (
-    <div className="grid grid-cols-[minmax(200px,1.6fr)_88px_100px_88px_88px_minmax(220px,auto)] gap-3 border-b border-[#EEF0F3] bg-[#FAFBFC] px-[22px] py-[13px] text-[11px] font-bold uppercase tracking-[0.06em] text-[#8A92A0]">
+    <div className="grid grid-cols-[minmax(220px,1.7fr)_88px_100px_72px_80px_minmax(280px,auto)] gap-3 border-b border-[#EEF0F3] bg-[#FAFBFC] px-[22px] py-[13px] text-[11px] font-bold uppercase tracking-[0.06em] text-[#8A92A0]">
       <div>Name</div>
       <div>Type</div>
       <div>Job</div>

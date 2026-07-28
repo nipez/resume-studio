@@ -115,7 +115,10 @@ export async function createResumeVersion(copyFromId?: string) {
     const source = await getResumeVersion(sourceId);
     if (source) {
       if (copyFromId) {
-        name = `${source.name} (copy)`;
+        const base =
+          source.name.replace(/(?:\s*\(copy\))+\s*$/i, "").trim() ||
+          source.name;
+        name = `${base} (copy)`;
       } else {
         name = "Untitled Resume";
       }
