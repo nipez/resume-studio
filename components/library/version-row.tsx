@@ -18,7 +18,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState, useTransition } from "react";
 
 const ROW_GRID =
-  "grid-cols-[minmax(200px,1.15fr)_minmax(200px,1.2fr)_minmax(150px,0.95fr)_56px_78px_minmax(108px,auto)]";
+  "grid-cols-[minmax(220px,1.55fr)_minmax(112px,0.5fr)_minmax(112px,0.5fr)_48px_64px_auto]";
+const ROW_GAP = "gap-x-3";
 
 type VersionRowProps = {
   version: ResumeVersion;
@@ -103,7 +104,7 @@ export function VersionRow({
 
   return (
     <div
-      className={`grid ${ROW_GRID} items-start gap-x-4 gap-y-1 border-b border-[#F2F3F5] px-[22px] py-3.5 last:border-b-0 ${
+      className={`grid ${ROW_GRID} items-start ${ROW_GAP} gap-y-1 border-b border-[#F2F3F5] px-[22px] py-3.5 last:border-b-0 ${
         archived ? "bg-[#FAFBFC]/80" : ""
       }`}
     >
@@ -150,14 +151,14 @@ export function VersionRow({
           job.href ? (
             <Link
               href={job.href}
-              className="block text-[13.5px] font-semibold leading-snug text-ink hover:text-accent hover:underline"
+              className="block break-words text-[13.5px] font-semibold leading-[1.35] text-ink hover:text-accent hover:underline"
               title={job.role || undefined}
             >
               {job.role || "—"}
             </Link>
           ) : (
             <p
-              className="text-[13.5px] font-semibold leading-snug text-ink"
+              className="break-words text-[13.5px] font-semibold leading-[1.35] text-ink"
               title={job.role || undefined}
             >
               {job.role || "—"}
@@ -186,14 +187,14 @@ export function VersionRow({
           job.href ? (
             <Link
               href={job.href}
-              className="block text-[13.5px] font-semibold leading-snug text-ink hover:text-accent hover:underline"
+              className="block break-words text-[13.5px] font-semibold leading-[1.35] text-ink hover:text-accent hover:underline"
               title={job.company}
             >
               {job.company}
             </Link>
           ) : (
             <p
-              className="text-[13.5px] font-semibold leading-snug text-ink"
+              className="break-words text-[13.5px] font-semibold leading-[1.35] text-ink"
               title={job.company}
             >
               {job.company}
@@ -399,7 +400,7 @@ export function VersionRow({
 export function VersionTableHeader() {
   return (
     <div
-      className={`grid ${ROW_GRID} gap-x-4 border-b border-[#EEF0F3] bg-[#FAFBFC] px-[22px] py-[13px] text-[11px] font-bold uppercase tracking-[0.06em] text-[#8A92A0]`}
+      className={`grid ${ROW_GRID} ${ROW_GAP} border-b border-[#EEF0F3] bg-[#FAFBFC] px-[22px] py-[13px] text-[11px] font-bold uppercase tracking-[0.06em] text-[#8A92A0]`}
     >
       <div>Document</div>
       <div>Role</div>
