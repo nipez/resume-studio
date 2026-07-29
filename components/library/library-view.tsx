@@ -248,17 +248,23 @@ export function LibraryView({
       </div>
 
       {showDefaultHero && visibleVersions.length > 0 ? (
-        <h3 className="mb-3 text-[12px] font-bold uppercase tracking-[0.07em] text-[#8A92A0]">
-          Other documents
-        </h3>
+        <div className="mb-3.5 flex items-center gap-3">
+          <h3 className="text-[12px] font-bold uppercase tracking-[0.07em] text-[#5A6573]">
+            Other documents
+          </h3>
+          <div className="h-px flex-1 bg-[#E2E5EA]" aria-hidden />
+          <span className="text-[12px] font-semibold text-[#8A92A0]">
+            {visibleVersions.length}
+          </span>
+        </div>
       ) : null}
 
       {visibleVersions.length > 0 ? (
         effectiveLayout === "table" ? (
-          <div className="overflow-x-auto rounded-2xl border border-border bg-white">
-            <div className="min-w-[880px]">
+          <div className="overflow-hidden rounded-2xl border border-[#D5DAE0] bg-white shadow-[0_1px_2px_rgba(15,17,22,0.04)]">
+            <div className="min-w-[880px] overflow-x-auto">
               <VersionTableHeader />
-              {visibleVersions.map((version) => (
+              {visibleVersions.map((version, index) => (
                 <VersionRow
                   key={version.id}
                   version={version}
@@ -267,6 +273,7 @@ export function LibraryView({
                   jobLinks={versionJobs[version.id] ?? []}
                   archived={Boolean(version.archived_at)}
                   isStudent={isStudent}
+                  striped={index % 2 === 1}
                 />
               ))}
             </div>
