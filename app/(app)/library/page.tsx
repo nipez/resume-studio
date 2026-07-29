@@ -14,7 +14,7 @@ export default async function LibraryPage() {
       getLibraryVersionLinks(),
       getUserProfileContext(),
     ]);
-  const { versionCounts, versionJobs } = links;
+  const { versionCounts, versionJobs, allJobLinks } = links;
   const hasVersions = versions.length > 0 || archivedVersions.length > 0;
   const buildLink = buildHref(profile.isStudent);
   const firstName = resolveFirstName(userName);
@@ -31,7 +31,7 @@ export default async function LibraryPage() {
             </h1>
             <p className="mt-2 text-[15px] leading-relaxed text-muted">
               {hasVersions
-                ? "Your primary resume stays on top. Tailored cuts below show the role and company they were for."
+                ? "Your primary resume stays on top. Set status on any cut to track outcomes like Rejected."
                 : "Build or import a resume — then keep tailored cuts organized in one place."}
             </p>
           </div>
@@ -70,6 +70,7 @@ export default async function LibraryPage() {
             defaultVersionId={defaultVersionId}
             versionCounts={versionCounts}
             versionJobs={versionJobs}
+            allJobLinks={allJobLinks}
             isStudent={profile.isStudent}
           />
         ) : (

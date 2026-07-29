@@ -183,12 +183,26 @@ export function parseJobFromVersionName(name: string): {
   company: string;
 } {
   const trimmed = name.trim();
-  const sep = trimmed.indexOf(" · ");
-  if (sep === -1) return { role: "", company: "" };
-  return {
-    role: trimmed.slice(0, sep).trim(),
-    company: trimmed.slice(sep + 3).trim(),
-  };
+  const separators = [" · ", " • ", " – ", " — ", " - ", " | "];
+  for (const sep of separators) {
+    const at = trimmed.indexOf(sep);
+    if (at === -1) continue;
+    return {
+      role: trimmed.slice(0, at).trim(),
+      company: trimmed.slice(at + sep.length).trim(),
+    };
+  }
+  return { role: "", company: "" };
+}
+
+/** Prefer the fuller of two role/company labels (helps incomplete tailored titles). */
+export function preferFullerLabel(a?: string, b?: string) {
+  const left = a?.trim() ?? "";
+  const right = b?.trim() ?? "";
+  if (!left) return right;
+  if (!right) return left;
+  if (left.length === right.length) return left;
+  return left.length > right.length ? left : right;
 }
 
 export function applicationListHeading(app: Application): {
