@@ -1,5 +1,6 @@
 "use client";
 
+import { DefaultResumeHero } from "@/components/library/default-resume-hero";
 import { VersionCard } from "@/components/library/version-card";
 import { VersionRow, VersionTableHeader } from "@/components/library/version-row";
 import type { VersionJobLink } from "@/lib/applications/types";
@@ -95,6 +96,36 @@ export function LibraryView({
 
   const effectiveLayout = ready ? layout : "table";
 
+  const defaultVersion = useMemo(() => {
+    if (!defaultVersionId) return null;
+    return (
+      activeVersions.find((v) => v.id === defaultVersionId) ??
+      archivedVersions.find((v) => v.id === defaultVersionId) ??
+      null
+    );
+  }, [activeVersions, archivedVersions, defaultVersionId]);
+
+  const defaultMatchesQuery = useMemo(() => {
+    if (!defaultVersion) return false;
+    const q = query.trim().toLowerCase();
+    if (!q) return true;
+    const tailored = defaultVersion.tailored_for
+      ? `${defaultVersion.tailored_for.role ?? ""} ${defaultVersion.tailored_for.company ?? ""}`
+      : "";
+    const linked = (versionJobs[defaultVersion.id] ?? [])
+      .map((j) => `${j.role} ${j.company}`)
+      .join(" ");
+    const hay =
+      `${defaultVersion.name} ${defaultVersion.data.headline ?? ""} ${tailored} ${linked}`.toLowerCase();
+    return hay.includes(q);
+  }, [defaultVersion, query, versionJobs]);
+
+  const showDefaultHero =
+    Boolean(defaultVersion) &&
+    tab !== "archived" &&
+    !defaultVersion?.archived_at &&
+    defaultMatchesQuery;
+
   const visibleVersions = useMemo(() => {
     const pool =
       tab === "archived"
@@ -103,22 +134,48 @@ export function LibraryView({
           ? activeVersions
           : [...activeVersions, ...archivedVersions];
     const q = query.trim().toLowerCase();
-    if (!q) return pool;
-    return pool.filter((v) => {
-      const tailored = v.tailored_for
-        ? `${v.tailored_for.role ?? ""} ${v.tailored_for.company ?? ""}`
-        : "";
-      const linked = (versionJobs[v.id] ?? [])
-        .map((j) => `${j.role} ${j.company}`)
-        .join(" ");
-      const hay =
-        `${v.name} ${v.data.headline ?? ""} ${tailored} ${linked}`.toLowerCase();
-      return hay.includes(q);
+    const filtered = !q
+      ? pool
+      : pool.filter((v) => {
+          const tailored = v.tailored_for
+            ? `${v.tailored_for.role ?? ""} ${v.tailored_for.company ?? ""}`
+            : "";
+          const linked = (versionJobs[v.id] ?? [])
+            .map((j) => `${j.role} ${j.company}`)
+            .join(" ");
+          const hay =
+            `${v.name} ${v.data.headline ?? ""} ${tailored} ${linked}`.toLowerCase();
+          return hay.includes(q);
+        });
+
+    // Primary resume is featured above — keep the list focused on other cuts.
+    const withoutFeatured = showDefaultHero
+      ? filtered.filter((v) => v.id !== defaultVersionId)
+      : filtered;
+
+    if (!defaultVersionId || showDefaultHero) return withoutFeatured;
+
+    return [...withoutFeatured].sort((a, b) => {
+      if (a.id === defaultVersionId) return -1;
+      if (b.id === defaultVersionId) return 1;
+      return 0;
     });
-  }, [tab, activeVersions, archivedVersions, query, versionJobs]);
+  }, [
+    tab,
+    activeVersions,
+    archivedVersions,
+    query,
+    versionJobs,
+    showDefaultHero,
+    defaultVersionId,
+  ]);
 
   return (
     <>
+      {showDefaultHero && defaultVersion ? (
+        <DefaultResumeHero version={defaultVersion} />
+      ) : null}
+
       <div className="mb-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-wrap items-center gap-1 border-b border-[#EEF0F3]">
           {(
@@ -190,6 +247,12 @@ export function LibraryView({
         </div>
       </div>
 
+      {showDefaultHero && visibleVersions.length > 0 ? (
+        <h3 className="mb-3 text-[12px] font-bold uppercase tracking-[0.07em] text-[#8A92A0]">
+          Other documents
+        </h3>
+      ) : null}
+
       {visibleVersions.length > 0 ? (
         effectiveLayout === "table" ? (
           <div className="overflow-x-auto rounded-2xl border border-border bg-white">
@@ -223,6 +286,14 @@ export function LibraryView({
             ))}
           </div>
         )
+      ) : showDefaultHero ? (
+        <div className="rounded-2xl border border-dashed border-border bg-white px-6 py-8 text-center">
+          <p className="text-[14px] text-muted">
+            {query.trim()
+              ? `No other documents match “${query.trim()}”.`
+              : "Your tailored cuts and copies will show up here."}
+          </p>
+        </div>
       ) : (
         <div className="rounded-2xl border border-dashed border-border bg-white px-6 py-10 text-center">
           <p className="text-[14px] text-muted">
