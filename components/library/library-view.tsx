@@ -261,8 +261,8 @@ export function LibraryView({
 
       {visibleVersions.length > 0 ? (
         effectiveLayout === "table" ? (
-          <div className="overflow-hidden rounded-2xl border border-[#D5DAE0] bg-white shadow-[0_1px_2px_rgba(15,17,22,0.04)]">
-            <div className="min-w-[880px] overflow-x-auto">
+          <div className="overflow-x-auto pb-1">
+            <div className="flex min-w-[880px] flex-col gap-2.5">
               <VersionTableHeader />
               {visibleVersions.map((version, index) => (
                 <VersionRow

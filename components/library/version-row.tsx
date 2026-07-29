@@ -106,14 +106,14 @@ export function VersionRow({
   }
 
   const rowTone = archived
-    ? "bg-[#F5F6F8]"
+    ? "border-[#E0E3E8] bg-[#F3F4F6]"
     : striped
-      ? "bg-[#F7F8FA]"
-      : "bg-white";
+      ? "border-[#E2E5EA] bg-[#F4F6F8]"
+      : "border-[#E6E8EC] bg-white";
 
   return (
     <div
-      className={`grid ${ROW_GRID} items-start ${ROW_GAP} gap-y-1 border-b border-[#E8EBEE] px-[22px] py-4 last:border-b-0 transition-colors hover:bg-[#EEF6F5] ${rowTone}`}
+      className={`grid ${ROW_GRID} items-start ${ROW_GAP} gap-y-1 rounded-xl border px-4 py-4 shadow-[0_1px_2px_rgba(15,17,22,0.03)] transition-[border-color,box-shadow,background-color] hover:border-[#B7D9D4] hover:bg-[#F3FBFA] hover:shadow-[0_4px_14px_rgba(15,17,22,0.06)] sm:px-5 ${rowTone}`}
     >
       <div className="min-w-0">
         <div className="flex min-w-0 items-start gap-2">
@@ -407,7 +407,7 @@ export function VersionRow({
 export function VersionTableHeader() {
   return (
     <div
-      className={`grid ${ROW_GRID} ${ROW_GAP} border-b border-[#DCE1E6] bg-[#EEF1F4] px-[22px] py-3.5 text-[11px] font-bold uppercase tracking-[0.07em] text-[#5A6573]`}
+      className={`grid ${ROW_GRID} ${ROW_GAP} rounded-xl border border-[#D5DAE0] bg-[#EEF1F4] px-4 py-3 text-[11px] font-bold uppercase tracking-[0.07em] text-[#5A6573] sm:px-5`}
     >
       <div>Document</div>
       <div>Role</div>
