@@ -52,6 +52,7 @@ function stepsForMode(mode: GuidedMode): Step[] {
 
 const TEMPLATES: { id: TemplateStyle; label: string }[] = [
   { id: "classic", label: "Classic" },
+  { id: "modern", label: "Modern" },
   { id: "twocol", label: "Two-Column" },
   { id: "editorial", label: "Editorial" },
 ];

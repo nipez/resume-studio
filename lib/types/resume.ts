@@ -1,4 +1,4 @@
-export type TemplateStyle = "classic" | "twocol" | "editorial";
+export type TemplateStyle = "classic" | "twocol" | "editorial" | "modern";
 
 export type ResumeExperience = {
   company: string;
