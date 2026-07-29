@@ -28,6 +28,8 @@ type VersionRowProps = {
   jobLinks?: VersionJobLink[];
   archived?: boolean;
   isStudent?: boolean;
+  /** Alternate-row shading for list readability. */
+  striped?: boolean;
 };
 
 function resolveJob(version: ResumeVersion, jobLinks: VersionJobLink[]) {
@@ -57,6 +59,7 @@ export function VersionRow({
   jobLinks = [],
   archived = false,
   isStudent = false,
+  striped = false,
 }: VersionRowProps) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -102,11 +105,15 @@ export function VersionRow({
     });
   }
 
+  const rowTone = archived
+    ? "bg-[#F5F6F8]"
+    : striped
+      ? "bg-[#F7F8FA]"
+      : "bg-white";
+
   return (
     <div
-      className={`grid ${ROW_GRID} items-start ${ROW_GAP} gap-y-1 border-b border-[#F2F3F5] px-[22px] py-3.5 last:border-b-0 ${
-        archived ? "bg-[#FAFBFC]/80" : ""
-      }`}
+      className={`grid ${ROW_GRID} items-start ${ROW_GAP} gap-y-1 border-b border-[#E8EBEE] px-[22px] py-4 last:border-b-0 transition-colors hover:bg-[#EEF6F5] ${rowTone}`}
     >
       <div className="min-w-0">
         <div className="flex min-w-0 items-start gap-2">
@@ -400,7 +407,7 @@ export function VersionRow({
 export function VersionTableHeader() {
   return (
     <div
-      className={`grid ${ROW_GRID} ${ROW_GAP} border-b border-[#EEF0F3] bg-[#FAFBFC] px-[22px] py-[13px] text-[11px] font-bold uppercase tracking-[0.06em] text-[#8A92A0]`}
+      className={`grid ${ROW_GRID} ${ROW_GAP} border-b border-[#DCE1E6] bg-[#EEF1F4] px-[22px] py-3.5 text-[11px] font-bold uppercase tracking-[0.07em] text-[#5A6573]`}
     >
       <div>Document</div>
       <div>Role</div>
