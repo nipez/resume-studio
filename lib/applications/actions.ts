@@ -215,33 +215,47 @@ export async function getApplicationCountsByVersion(): Promise<
 export async function getLibraryVersionLinks(): Promise<{
   versionCounts: Record<string, number>;
   versionJobs: Record<string, VersionJobLink[]>;
+  /** All tracked apps — used to match tailored cuts that were never linked by version id. */
+  allJobLinks: VersionJobLink[];
 }> {
   const { applications, archivedApplications, versionCounts } =
     await getApplicationsList();
 
   const versionJobs: Record<string, VersionJobLink[]> = {};
   const seen = new Set<string>();
+  const allJobLinks: VersionJobLink[] = [];
+  const allSeen = new Set<string>();
 
   for (const app of [...applications, ...archivedApplications]) {
-    if (!app.resume_version_id) continue;
     const role = app.role.trim();
     const company = app.company.trim();
     if (!role && !company) continue;
+
+    const link: VersionJobLink = {
+      applicationId: app.id,
+      role,
+      company,
+      status: app.status,
+    };
+
+    const allKey = `${app.id}`;
+    if (!allSeen.has(allKey)) {
+      allSeen.add(allKey);
+      allJobLinks.push(link);
+    }
+
+    if (!app.resume_version_id) continue;
 
     const dedupeKey = `${app.resume_version_id}::${role.toLowerCase()}::${company.toLowerCase()}`;
     if (seen.has(dedupeKey)) continue;
     seen.add(dedupeKey);
 
     const list = versionJobs[app.resume_version_id] ?? [];
-    list.push({
-      applicationId: app.id,
-      role,
-      company,
-    });
+    list.push(link);
     versionJobs[app.resume_version_id] = list;
   }
 
-  return { versionCounts, versionJobs };
+  return { versionCounts, versionJobs, allJobLinks };
 }
 
 export async function getApplication(id: string): Promise<Application | null> {
@@ -274,7 +288,7 @@ export async function logApplication(input: LogApplicationInput) {
   const role = input.role?.trim() || tf?.role || fromName.role || "";
   const company = input.company?.trim() || tf?.company || fromName.company || "";
   const now = new Date().toISOString();
-  const status: ApplicationStatus = "applied";
+  const status: ApplicationStatus = input.status ?? "applied";
 
   const answers = (input.answers ?? []).filter(
     (a) => a.q?.trim() && a.a?.trim()
@@ -359,6 +373,93 @@ export async function updateApplicationStatus(
   revalidatePath("/applications");
   revalidatePath(`/applications/${id}`);
   revalidatePath("/insights");
+  revalidatePath("/library");
+}
+
+/**
+ * Set outcome for a Documents cut: update a linked/matched application, or
+ * create one with the given status (e.g. Rejected from the library row).
+ */
+export async function setLibraryApplicationStatus(input: {
+  versionId: string;
+  status: ApplicationStatus;
+  applicationId?: string;
+  role?: string;
+  company?: string;
+}) {
+  const { userId } = await getAuthedDb();
+  const version = await getResumeVersion(input.versionId);
+  if (!version) throw new Error("Resume version not found");
+
+  const fromName = parseJobFromVersionName(version.name);
+  const role =
+    input.role?.trim() ||
+    version.tailored_for?.role?.trim() ||
+    fromName.role ||
+    "";
+  const company =
+    input.company?.trim() ||
+    version.tailored_for?.company?.trim() ||
+    fromName.company ||
+    "";
+
+  let applicationId = input.applicationId?.trim() || "";
+
+  if (!applicationId) {
+    const { applications, archivedApplications } = await getApplicationsList();
+    const pool = [...applications, ...archivedApplications];
+    const linked = pool.find((app) => app.resume_version_id === version.id);
+    const companyKey = company.toLowerCase();
+    const roleKey = role.toLowerCase();
+    const matched =
+      linked ??
+      pool.find((app) => {
+        const appCompany = app.company.trim().toLowerCase();
+        if (!companyKey || appCompany !== companyKey) return false;
+        if (!roleKey) return true;
+        const appRole = app.role.trim().toLowerCase();
+        return (
+          !appRole ||
+          appRole.includes(roleKey) ||
+          roleKey.includes(appRole) ||
+          appRole.slice(0, 12) === roleKey.slice(0, 12)
+        );
+      });
+    applicationId = matched?.id ?? "";
+  }
+
+  if (applicationId) {
+    const app = await getApplication(applicationId);
+    if (!app || app.user_id !== userId) {
+      throw new Error("Application not found");
+    }
+
+    await updateApplicationStatus(applicationId, input.status);
+
+    if (app.resume_version_id !== version.id) {
+      const { error } = await updateApplicationRow(applicationId, {
+        resume_version_id: version.id,
+        resume_version_name: version.name,
+      });
+      if (error) console.error("setLibraryApplicationStatus link:", error);
+    }
+
+    revalidatePath("/library");
+    return { applicationId, created: false as const };
+  }
+
+  if (!role && !company) {
+    throw new Error("Add a role or company before setting status");
+  }
+
+  const created = await logApplication({
+    versionId: version.id,
+    role,
+    company,
+    status: input.status,
+  });
+
+  return { applicationId: created.id, created: true as const };
 }
 
 export async function updateApplicationCoverLetter(id: string, coverLetter: string) {

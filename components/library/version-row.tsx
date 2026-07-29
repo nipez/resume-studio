@@ -1,9 +1,10 @@
 "use client";
 
 import { EditableVersionName } from "@/components/library/editable-version-name";
-import { LogApplicationButton } from "@/components/applications/log-application-button";
+import { LibraryStatusControl } from "@/components/library/library-status-control";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import type { VersionJobLink } from "@/lib/applications/types";
+import { resolveVersionJobs } from "@/lib/library/resolve-version-jobs";
 import {
   archiveResumeVersion,
   createResumeVersion,
@@ -18,7 +19,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState, useTransition } from "react";
 
 const ROW_GRID =
-  "grid-cols-[minmax(220px,1.55fr)_minmax(112px,0.5fr)_minmax(112px,0.5fr)_48px_64px_auto]";
+  "grid-cols-[minmax(210px,1.4fr)_minmax(150px,0.85fr)_minmax(110px,0.55fr)_minmax(122px,0.55fr)_64px_auto]";
 const ROW_GAP = "gap-x-3";
 
 type VersionRowProps = {
@@ -26,39 +27,19 @@ type VersionRowProps = {
   isDefault: boolean;
   appCount?: number;
   jobLinks?: VersionJobLink[];
+  allJobLinks?: VersionJobLink[];
   archived?: boolean;
   isStudent?: boolean;
   /** Alternate-row shading for list readability. */
   striped?: boolean;
 };
 
-function resolveJob(version: ResumeVersion, jobLinks: VersionJobLink[]) {
-  const role =
-    version.tailored_for?.role?.trim() || jobLinks[0]?.role?.trim() || "";
-  const company =
-    version.tailored_for?.company?.trim() ||
-    jobLinks[0]?.company?.trim() ||
-    "";
-  const href = jobLinks[0]
-    ? `/applications/${jobLinks[0].applicationId}`
-    : role || company
-      ? "/applications"
-      : null;
-  return {
-    role,
-    company,
-    href,
-    moreCount: jobLinks.length > 1 ? jobLinks.length - 1 : 0,
-  };
-}
-
 export function VersionRow({
   version,
   isDefault,
-  appCount = 0,
   jobLinks = [],
+  allJobLinks = [],
   archived = false,
-  isStudent = false,
   striped = false,
 }: VersionRowProps) {
   const router = useRouter();
@@ -72,7 +53,14 @@ export function VersionRow({
   const menuRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
   const meta = versionCardMeta(version);
-  const job = resolveJob(version, jobLinks);
+  const job = resolveVersionJobs(
+    version,
+    { [version.id]: jobLinks },
+    allJobLinks
+  );
+  const appHref = job.applicationId
+    ? `/applications/${job.applicationId}`
+    : null;
   const suggestedName =
     suggestedNameFromJob(job.role, job.company) || null;
 
@@ -148,6 +136,14 @@ export function VersionRow({
             >
               Cover
             </Link>
+            {appHref ? (
+              <Link
+                href={appHref}
+                className="text-[11px] font-semibold text-[#0E7C4B] hover:underline"
+              >
+                Application
+              </Link>
+            ) : null}
           </div>
         ) : null}
         {error ? <p className="mt-1 text-[11px] text-[#B23B3B]">{error}</p> : null}
@@ -155,17 +151,17 @@ export function VersionRow({
 
       <div className="min-w-0 pt-0.5">
         {job.role || job.company ? (
-          job.href ? (
+          appHref ? (
             <Link
-              href={job.href}
-              className="block break-words text-[13.5px] font-semibold leading-[1.35] text-ink hover:text-accent hover:underline"
+              href={appHref}
+              className="block whitespace-normal break-words text-[13.5px] font-semibold leading-[1.35] text-ink hover:text-accent hover:underline"
               title={job.role || undefined}
             >
               {job.role || "—"}
             </Link>
           ) : (
             <p
-              className="break-words text-[13.5px] font-semibold leading-[1.35] text-ink"
+              className="whitespace-normal break-words text-[13.5px] font-semibold leading-[1.35] text-ink"
               title={job.role || undefined}
             >
               {job.role || "—"}
@@ -179,9 +175,9 @@ export function VersionRow({
             + Add role
           </Link>
         )}
-        {job.moreCount > 0 ? (
+        {job.moreCount > 0 && appHref ? (
           <Link
-            href="/applications"
+            href={appHref}
             className="mt-1 inline-block text-[11px] font-semibold text-muted hover:underline"
           >
             +{job.moreCount} more apps
@@ -191,17 +187,17 @@ export function VersionRow({
 
       <div className="min-w-0 pt-0.5">
         {job.company ? (
-          job.href ? (
+          appHref ? (
             <Link
-              href={job.href}
-              className="block break-words text-[13.5px] font-semibold leading-[1.35] text-ink hover:text-accent hover:underline"
+              href={appHref}
+              className="block whitespace-normal break-words text-[13.5px] font-semibold leading-[1.35] text-ink hover:text-accent hover:underline"
               title={job.company}
             >
               {job.company}
             </Link>
           ) : (
             <p
-              className="break-words text-[13.5px] font-semibold leading-[1.35] text-ink"
+              className="whitespace-normal break-words text-[13.5px] font-semibold leading-[1.35] text-ink"
               title={job.company}
             >
               {job.company}
@@ -214,36 +210,25 @@ export function VersionRow({
         )}
       </div>
 
-      <div className="pt-0.5 text-[12.5px]">
+      <div className="min-w-0 pt-0.5">
         {archived ? (
-          appCount > 0 ? (
-            <Link
-              href="/applications"
-              className="font-semibold text-[#6B4EFF] hover:underline"
-            >
-              {appCount}
-            </Link>
+          job.status ? (
+            <span className="text-[12px] font-semibold text-muted">
+              {job.status}
+            </span>
           ) : (
             <span className="text-[#9AA3AF]">—</span>
           )
-        ) : appCount === 0 ? (
-          <LogApplicationButton
-            versionId={version.id}
-            resumeVersionName={version.name}
-            initialRole={job.role}
-            initialCompany={job.company}
-            isStudent={isStudent}
-            className="border-none bg-transparent p-0 text-[12px] font-semibold text-[#0E7C4B] shadow-none hover:bg-transparent hover:underline disabled:opacity-50"
-          >
-            Log
-          </LogApplicationButton>
         ) : (
-          <Link
-            href="/applications"
-            className="font-semibold text-[#0E7C4B] hover:underline"
-          >
-            {appCount}
-          </Link>
+          <LibraryStatusControl
+            versionId={version.id}
+            status={job.status}
+            applicationId={job.applicationId}
+            role={job.role}
+            company={job.company}
+            disabled={pending}
+            onError={setError}
+          />
         )}
       </div>
 
@@ -412,7 +397,7 @@ export function VersionTableHeader() {
       <div>Document</div>
       <div>Role</div>
       <div>Company</div>
-      <div>Apps</div>
+      <div>Status</div>
       <div>Updated</div>
       <div className="text-right">Actions</div>
     </div>

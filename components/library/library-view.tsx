@@ -16,6 +16,7 @@ type LibraryViewProps = {
   defaultVersionId: string | null;
   versionCounts: Record<string, number>;
   versionJobs?: Record<string, VersionJobLink[]>;
+  allJobLinks?: VersionJobLink[];
   isStudent?: boolean;
 };
 
@@ -77,6 +78,7 @@ export function LibraryView({
   defaultVersionId,
   versionCounts,
   versionJobs = {},
+  allJobLinks = [],
   isStudent = false,
 }: LibraryViewProps) {
   const [tab, setTab] = useState<"all" | "active" | "archived">("all");
@@ -112,13 +114,21 @@ export function LibraryView({
     const tailored = defaultVersion.tailored_for
       ? `${defaultVersion.tailored_for.role ?? ""} ${defaultVersion.tailored_for.company ?? ""}`
       : "";
-    const linked = (versionJobs[defaultVersion.id] ?? [])
-      .map((j) => `${j.role} ${j.company}`)
+    const company = (defaultVersion.tailored_for?.company ?? "")
+      .trim()
+      .toLowerCase();
+    const linked = [
+      ...(versionJobs[defaultVersion.id] ?? []),
+      ...allJobLinks.filter(
+        (j) => company && j.company.trim().toLowerCase() === company
+      ),
+    ]
+      .map((j) => `${j.role} ${j.company} ${j.status}`)
       .join(" ");
     const hay =
       `${defaultVersion.name} ${defaultVersion.data.headline ?? ""} ${tailored} ${linked}`.toLowerCase();
     return hay.includes(q);
-  }, [defaultVersion, query, versionJobs]);
+  }, [defaultVersion, query, versionJobs, allJobLinks]);
 
   const showDefaultHero =
     Boolean(defaultVersion) &&
@@ -141,10 +151,17 @@ export function LibraryView({
             ? `${v.tailored_for.role ?? ""} ${v.tailored_for.company ?? ""}`
             : "";
           const linked = (versionJobs[v.id] ?? [])
-            .map((j) => `${j.role} ${j.company}`)
+            .map((j) => `${j.role} ${j.company} ${j.status}`)
             .join(" ");
+          const company = (v.tailored_for?.company ?? "").trim().toLowerCase();
+          const matched = company
+            ? allJobLinks
+                .filter((j) => j.company.trim().toLowerCase() === company)
+                .map((j) => `${j.role} ${j.company} ${j.status}`)
+                .join(" ")
+            : "";
           const hay =
-            `${v.name} ${v.data.headline ?? ""} ${tailored} ${linked}`.toLowerCase();
+            `${v.name} ${v.data.headline ?? ""} ${tailored} ${linked} ${matched}`.toLowerCase();
           return hay.includes(q);
         });
 
@@ -166,6 +183,7 @@ export function LibraryView({
     archivedVersions,
     query,
     versionJobs,
+    allJobLinks,
     showDefaultHero,
     defaultVersionId,
   ]);
@@ -271,6 +289,7 @@ export function LibraryView({
                   isDefault={version.id === defaultVersionId}
                   appCount={versionCounts[version.id] ?? 0}
                   jobLinks={versionJobs[version.id] ?? []}
+                  allJobLinks={allJobLinks}
                   archived={Boolean(version.archived_at)}
                   isStudent={isStudent}
                   striped={index % 2 === 1}

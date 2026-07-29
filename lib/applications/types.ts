@@ -111,6 +111,8 @@ export type LogApplicationInput = {
   coverLetter?: string;
   answers?: ApplicationAnswer[];
   applicationType?: ApplicationType;
+  /** Defaults to "applied" when logging a new application. */
+  status?: ApplicationStatus;
 };
 
 /** Applications linked to a resume version — for Documents Job column. */
@@ -118,4 +120,5 @@ export type VersionJobLink = {
   applicationId: string;
   role: string;
   company: string;
+  status: ApplicationStatus;
 };
