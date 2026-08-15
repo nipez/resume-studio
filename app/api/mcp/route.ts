@@ -1,8 +1,8 @@
-import { createMcpHandler, withMcpAuth } from "mcp-handler";
+import { createMcpHandler } from "mcp-handler";
 import {
   agentUserFromAuth,
-  verifyAgentApiKey,
 } from "@/lib/mcp/auth";
+import { withAgentKeyAuth } from "@/lib/mcp/with-agent-auth";
 import { runAsUser } from "@/lib/auth/run-as-user";
 import {
   draftCoverLetter,
@@ -139,10 +139,6 @@ const mcpHandler = createMcpHandler(
   }
 );
 
-const handler = withMcpAuth(mcpHandler, verifyAgentApiKey, {
-  required: true,
-  requiredScopes: ["agent:apply"],
-  resourceMetadataPath: "/.well-known/oauth-protected-resource",
-});
+const handler = withAgentKeyAuth(mcpHandler);
 
-export { handler as GET, handler as POST, handler as DELETE };
+export { handler as GET, handler as POST, handler as DELETE, handler as OPTIONS };

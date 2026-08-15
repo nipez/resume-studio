@@ -1,11 +1,22 @@
 import { timingSafeEqual } from "crypto";
 import type { AuthInfo } from "@modelcontextprotocol/server";
+import {
+  AGENT_API_KEY_HEADER,
+  MCP_AUTHORIZATION_COPY_HEADER,
+  tokenFromAuthorizationHeader,
+} from "@/lib/mcp/auth-headers";
 import { createServiceClient } from "@/lib/supabase/server";
 
 export type AgentAuthExtra = {
   userId: string;
   email: string;
 };
+
+export {
+  AGENT_API_KEY_HEADER,
+  MCP_AUTHORIZATION_COPY_HEADER,
+  tokenFromAuthorizationHeader,
+} from "@/lib/mcp/auth-headers";
 
 function configuredAgentKey(): string | null {
   const key = process.env.AGENT_API_KEY?.trim();
@@ -86,20 +97,77 @@ async function resolveAgentUser(): Promise<AgentAuthExtra | null> {
   return null;
 }
 
+function headerPresent(req: Request, name: string): boolean {
+  const value = req.headers.get(name);
+  return typeof value === "string" && value.trim().length > 0;
+}
+
 /**
- * Verify Authorization: Bearer <AGENT_API_KEY>.
+ * Resolve the agent API key from (in order):
+ * 1. bearerToken already parsed by a wrapper
+ * 2. Authorization: Bearer …
+ * 3. x-agent-api-key
+ * 4. x-mcp-authorization (middleware copy of Authorization)
+ * Never logs the raw key.
+ */
+export function extractAgentApiKey(
+  req: Request,
+  bearerToken?: string
+): string | undefined {
+  if (bearerToken?.trim()) return bearerToken.trim();
+
+  const fromAuth = tokenFromAuthorizationHeader(
+    req.headers.get("authorization")
+  );
+  if (fromAuth) return fromAuth;
+
+  const fromAgentHeader = req.headers.get(AGENT_API_KEY_HEADER)?.trim();
+  if (fromAgentHeader) return fromAgentHeader;
+
+  const fromCopy = tokenFromAuthorizationHeader(
+    req.headers.get(MCP_AUTHORIZATION_COPY_HEADER)
+  );
+  if (fromCopy) return fromCopy;
+
+  // Middleware may copy the raw key (without Bearer) into the copy header.
+  const rawCopy = req.headers.get(MCP_AUTHORIZATION_COPY_HEADER)?.trim();
+  if (rawCopy && !/^Bearer\s+/i.test(rawCopy)) return rawCopy;
+
+  return undefined;
+}
+
+export function logMissingAgentAuth(req: Request): void {
+  console.warn(
+    `[mcp] auth missing: authorization=${headerPresent(req, "authorization")} x-agent-api-key=${headerPresent(req, AGENT_API_KEY_HEADER)}`
+  );
+}
+
+/**
+ * Verify agent API key from Authorization Bearer and/or x-agent-api-key.
  * Never logs the raw key.
  */
 export async function verifyAgentApiKey(
-  _req: Request,
+  req: Request,
   bearerToken?: string
 ): Promise<AuthInfo | undefined> {
   const expected = configuredAgentKey();
   if (!expected) {
     console.error("[mcp] AGENT_API_KEY is not configured");
+    logMissingAgentAuth(req);
     return undefined;
   }
-  if (!bearerToken || !safeEqualString(bearerToken, expected)) {
+
+  const provided = extractAgentApiKey(req, bearerToken);
+  if (!provided) {
+    logMissingAgentAuth(req);
+    return undefined;
+  }
+
+  if (!safeEqualString(provided, expected)) {
+    // Key was present but did not match — still only log header presence, never the key.
+    console.warn(
+      `[mcp] auth rejected: authorization=${headerPresent(req, "authorization")} x-agent-api-key=${headerPresent(req, AGENT_API_KEY_HEADER)}`
+    );
     return undefined;
   }
 
