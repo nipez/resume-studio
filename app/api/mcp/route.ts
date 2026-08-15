@@ -13,6 +13,8 @@ import {
   getDefaultResumeSchema,
   tailorForJob,
   tailorForJobSchema,
+  updateResume,
+  updateResumeSchema,
 } from "@/lib/mcp/tools";
 
 export const runtime = "nodejs";
@@ -128,6 +130,35 @@ const mcpHandler = createMcpHandler(
         }
       }
     );
+
+    server.registerTool(
+      "update_resume",
+      {
+        title: "Update resume data",
+        description:
+          "Persist structured ResumeData onto an existing resume version owned by the authenticated user (e.g. after a section rewrite). Pass resume_version_id and the full data object.",
+        inputSchema: updateResumeSchema,
+      },
+      async (args, ctx) => {
+        const user = agentUserFromAuth(ctx.http?.authInfo);
+        if (!user) {
+          return {
+            isError: true,
+            content: [{ type: "text", text: "Unauthorized" }],
+          };
+        }
+        try {
+          return await runAsUser(user, () => updateResume(args));
+        } catch (err) {
+          const message =
+            err instanceof Error ? err.message : "Update resume failed.";
+          return {
+            isError: true,
+            content: [{ type: "text", text: message }],
+          };
+        }
+      }
+    );
   },
   {
     serverInfo: {
@@ -135,7 +166,7 @@ const mcpHandler = createMcpHandler(
       version: "1.0.0",
     },
     instructions:
-      "ResumeTrakr apply-loop tools. Typical order: get_default_resume → tailor_for_job → draft_cover_letter → export_and_track. Never invent credentials, employers, or dates — only use facts from the user's resume and the job posting.",
+      "ResumeTrakr apply-loop tools. Typical order: get_default_resume → tailor_for_job → (optional update_resume) → draft_cover_letter → export_and_track. Never invent credentials, employers, or dates — only use facts from the user's resume and the job posting.",
   }
 );
 
