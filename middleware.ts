@@ -13,6 +13,8 @@ const PUBLIC_PREFIXES = [
   "/set-password",
   "/api/auth",
   "/api/health",
+  "/api/mcp",
+  "/.well-known/oauth-protected-resource",
 ];
 
 const PUBLIC_EXACT = new Set([

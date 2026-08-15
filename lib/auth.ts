@@ -1,3 +1,4 @@
+import { getRequestUserOverride } from "@/lib/auth/run-as-user";
 import {
   APP_SESSION_COOKIE,
   createSessionPayload,
@@ -26,6 +27,9 @@ export async function readSessionFromRequest(
 }
 
 export async function getSession(): Promise<SessionPayload | null> {
+  const override = getRequestUserOverride();
+  if (override) return override;
+
   const cookieStore = cookies();
   return readSession(cookieStore.get(APP_SESSION_COOKIE)?.value);
 }
