@@ -46,8 +46,9 @@ Call in order for one job:
 
 1. **`get_default_resume`** — default/master resume id + structured content
 2. **`tailor_for_job`** — `job_url` **or** `title` / `company` / `description`; clones the default resume and runs the product **deep** tailor flow; returns tailored resume id + content
-3. **`draft_cover_letter`** — `resume_version_id` (+ optional job fields); uses the product cover-letter route; returns cover letter id + body
-4. **`export_and_track`** — exports print-ready resume/cover HTML to the `generated-pdfs` bucket (same builders as UI Print → PDF), logs one application with snapshot, returns signed `resume_pdf_url` / `cover_pdf_url` and `application_url`
+3. **`update_resume`** — `resume_version_id` + `data` (full `ResumeData`); persists a section rewrite via `updateResumeVersion` (own versions only)
+4. **`draft_cover_letter`** — `resume_version_id` (+ optional job fields); uses the product cover-letter route; returns cover letter id + body
+5. **`export_and_track`** — exports print-ready resume/cover HTML to the `generated-pdfs` bucket (same builders as UI Print → PDF), logs one application with snapshot, returns signed `resume_pdf_url` / `cover_pdf_url` and `application_url`
 
 Constraints match the product: never invent credentials, employers, or dates; one job → one tailored resume + one cover + one tracked application. Job URLs use the existing import-from-url path.
 

@@ -11,8 +11,10 @@ import {
   getLibraryData,
   getResumeVersion,
   saveTailoredVersion,
+  updateResumeVersion,
 } from "@/lib/resume/actions";
 import { createServiceClient } from "@/lib/supabase/server";
+import type { ResumeData } from "@/lib/types/resume";
 import { z } from "zod";
 
 function toolText(payload: unknown) {
@@ -312,5 +314,27 @@ export async function exportAndTrack(
     resume_pdf_url: resumePdfUrl,
     cover_pdf_url: coverPdfUrl,
     job: { title: role, company, description: jobDesc, url: jobUrl },
+  });
+}
+
+export const updateResumeSchema = z.object({
+  resume_version_id: z.string().uuid(),
+  data: z.custom<ResumeData>(),
+});
+
+/** Persist structured resume data (e.g. after a section rewrite) on an owned version. */
+export async function updateResume(input: z.infer<typeof updateResumeSchema>) {
+  const auth = await requireMcpAIUser();
+  const version = await getResumeVersion(input.resume_version_id);
+  if (!version || version.user_id !== auth.user.id) {
+    return toolError("Resume version not found for this account.");
+  }
+
+  const updated = await updateResumeVersion(version.id, { data: input.data });
+  return toolText({
+    resume_id: updated.id,
+    name: updated.name,
+    template_style: updated.template_style,
+    data: updated.data,
   });
 }
