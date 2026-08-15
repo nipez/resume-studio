@@ -10,10 +10,16 @@ run the apply loop without the UI.
 | Production | `https://resumetrakr.com/api/mcp` |
 | Local | `http://127.0.0.1:3000/api/mcp` |
 
-Auth is a personal agent API key only (no OAuth):
+Auth is a personal agent API key only (no OAuth). Send **either**:
 
 ```http
 Authorization: Bearer <AGENT_API_KEY>
+```
+
+or (useful when a proxy strips `Authorization`):
+
+```http
+x-agent-api-key: <AGENT_API_KEY>
 ```
 
 Configure on the server (Railway / `.env.local`):
@@ -42,7 +48,8 @@ Cursor Settings → MCP → add a remote server, or put this in your MCP config:
     "resumetrakr": {
       "url": "https://resumetrakr.com/api/mcp",
       "headers": {
-        "Authorization": "Bearer YOUR_AGENT_API_KEY"
+        "Authorization": "Bearer YOUR_AGENT_API_KEY",
+        "x-agent-api-key": "YOUR_AGENT_API_KEY"
       }
     }
   }
@@ -57,7 +64,8 @@ Local:
     "resumetrakr": {
       "url": "http://127.0.0.1:3000/api/mcp",
       "headers": {
-        "Authorization": "Bearer YOUR_AGENT_API_KEY"
+        "Authorization": "Bearer YOUR_AGENT_API_KEY",
+        "x-agent-api-key": "YOUR_AGENT_API_KEY"
       }
     }
   }
@@ -70,13 +78,22 @@ Local:
 npx @modelcontextprotocol/inspector
 ```
 
-Connect to Streamable HTTP at `https://resumetrakr.com/api/mcp` (or local) and set the Authorization header to `Bearer <AGENT_API_KEY>`. Then run `initialize` / list tools.
+Connect to Streamable HTTP at `https://resumetrakr.com/api/mcp` (or local) and set
+`Authorization: Bearer <AGENT_API_KEY>` and/or `x-agent-api-key: <AGENT_API_KEY>`.
+Then run `initialize` / list tools.
 
 ## curl smoke test
 
 ```bash
 curl -sS -X POST https://resumetrakr.com/api/mcp \
   -H "Authorization: Bearer $AGENT_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"smoke","version":"0.0.1"}}}'
+
+# Fallback header (if Authorization is stripped):
+curl -sS -X POST https://resumetrakr.com/api/mcp \
+  -H "x-agent-api-key: $AGENT_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Accept: application/json, text/event-stream" \
   -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"smoke","version":"0.0.1"}}}'
