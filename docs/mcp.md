@@ -27,6 +27,19 @@ Configure on the server (Railway / `.env.local`):
 - `AGENT_API_KEY` — long random secret (never log or commit)
 - `AGENT_USER_ID` **or** `AGENT_USER_EMAIL` — the single user this key acts as
 
+Prefer `AGENT_USER_ID` (UUID). Email lookup uses Auth Admin `listUsers`
+pagination (no `getUserByEmail`); if the account is beyond the page cap the
+API returns `agent_user_not_resolved`.
+
+Auth failures return distinguishable `error_description` values (never the key):
+
+| `error_description` | Meaning |
+| --- | --- |
+| `agent_key_not_configured` | `AGENT_API_KEY` env missing on the server |
+| `No authorization provided` | No Bearer / `x-agent-api-key` on the request |
+| `invalid_token` | Token present but does not match `AGENT_API_KEY` |
+| `agent_user_not_resolved` | Key matched but user scope (`AGENT_USER_ID` / email) failed |
+
 ## Tools
 
 Call in order for one job:
