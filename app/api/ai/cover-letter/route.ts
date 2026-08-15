@@ -1,8 +1,6 @@
 import { requireAIUser } from "@/lib/ai/auth";
-import { aiCallOptions } from "@/lib/ai/context";
 import { aiRouteErrorResponse } from "@/lib/ai/route-error";
-import { completeWithFallback } from "@/lib/ai/mock";
-import { coverLetterPrompt } from "@/lib/ai/prompts";
+import { runCoverLetter } from "@/lib/ai/cover-letter-run";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -29,21 +27,8 @@ export async function POST(request: Request) {
   }
 
   try {
-    const prompt = coverLetterPrompt(
-      auth.positioning,
-      auth.userName,
-      body.jobRole,
-      body.jobCompany,
-      body.jobDesc,
-      body.hiringManager ?? "",
-      body.summary,
-      body.contextNotes ?? ""
-    );
-    const { text, mock } = await completeWithFallback(
-      prompt,
-      aiCallOptions(auth, "cover_letter")
-    );
-    return NextResponse.json({ letter: (text || "").trim(), mock });
+    const result = await runCoverLetter(auth, body);
+    return NextResponse.json(result);
   } catch (err) {
     const aiError = aiRouteErrorResponse(err);
     if (aiError) return aiError;
