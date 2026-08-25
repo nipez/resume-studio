@@ -1,4 +1,8 @@
 import type { ResumeData } from "@/lib/types/resume";
+import {
+  answerLengthInstruction,
+  extractAnswerLengthLimit,
+} from "@/lib/ai/answer-length";
 
 export function buildPositioningContext(
   positioning: string,
@@ -238,11 +242,20 @@ export function answerQuestionPrompt(
   question: string,
   summary: string
 ): string {
+  const lengthLimit = extractAnswerLengthLimit(question);
+  const lengthRule = answerLengthInstruction(lengthLimit);
+  const hardLimitNote = lengthLimit
+    ? " Obey any word or character limit stated in the QUESTION as a hard ceiling — never exceed it.\n\n"
+    : "\n\n";
+
   return (
     buildPositioningContext(positioning, userName) +
     "\n\nAnswer the following job-application question as " +
     userName +
-    " — first person, confident and specific, 120-180 words. Tie it to concrete outcomes where relevant. No generic filler, no markdown.\n\n" +
+    " — first person, confident and specific, " +
+    lengthRule +
+    ". Tie it to concrete outcomes where relevant. No generic filler, no markdown." +
+    hardLimitNote +
     "TARGET ROLE: " +
     (jobRole || "(n/a)") +
     " at " +

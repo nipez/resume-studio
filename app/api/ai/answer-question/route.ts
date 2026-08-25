@@ -1,4 +1,8 @@
 import { requireAIUser } from "@/lib/ai/auth";
+import {
+  enforceAnswerLengthLimit,
+  extractAnswerLengthLimit,
+} from "@/lib/ai/answer-length";
 import { aiCallOptions } from "@/lib/ai/context";
 import { aiRouteErrorResponse } from "@/lib/ai/route-error";
 import { completeWithFallback } from "@/lib/ai/mock";
@@ -28,20 +32,23 @@ export async function POST(request: Request) {
   }
 
   try {
+    const question = body.question.trim();
+    const lengthLimit = extractAnswerLengthLimit(question);
     const prompt = answerQuestionPrompt(
       auth.positioning,
       auth.userName,
       body.jobRole,
       body.jobCompany,
       body.jobDesc,
-      body.question.trim(),
+      question,
       body.summary
     );
     const { text, mock } = await completeWithFallback(
       prompt,
       aiCallOptions(auth, "answer_question")
     );
-    return NextResponse.json({ answer: (text || "").trim(), mock });
+    const answer = enforceAnswerLengthLimit((text || "").trim(), lengthLimit);
+    return NextResponse.json({ answer, mock });
   } catch (err) {
     const aiError = aiRouteErrorResponse(err);
     if (aiError) return aiError;
