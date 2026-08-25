@@ -166,10 +166,16 @@ export function mockComplete(prompt: string): string {
   }
 
   if (prompt.includes("job-application question")) {
-    return (
-      "Demo answer: with AI configured, this would be a 120–180 word response in your voice, tied to your real experience and the target role. " +
-      "It will not invent facts — only reframe what is already in your resume."
-    );
+    const limitMatch = prompt.match(/at most (\d+) words \(HARD LIMIT/i);
+    const maxWords = limitMatch ? Number(limitMatch[1]) : 150;
+    const demo =
+      "Demo answer: with AI configured, this would be a concise response in your voice, tied to your real experience and the target role. " +
+      "It will not invent facts — only reframe what is already in your resume. " +
+      (limitMatch
+        ? `Length respects the stated ${maxWords}-word hard limit from the question.`
+        : "Default length is about 120–180 words when the question does not set a limit.");
+    const words = demo.split(/\s+/);
+    return words.slice(0, Math.min(words.length, maxWords)).join(" ");
   }
 
   if (prompt.includes("Assess how well this application's materials fit")) {
