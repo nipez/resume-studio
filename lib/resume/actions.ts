@@ -1,6 +1,7 @@
 "use server";
 
 import { createEmptyResumeData, normalizeResumeData } from "@/lib/resume/defaults";
+import { hybridVersionName } from "@/lib/resume/merge";
 import type { ResumeVersion } from "@/lib/resume/db-types";
 import type { ResumeData, TemplateStyle } from "@/lib/types/resume";
 import { getAuthedDb, getAuthUser } from "@/lib/auth";
@@ -450,4 +451,55 @@ export async function saveTailoredVersion(input: {
   revalidatePath("/tailor");
   revalidatePath("/cover");
   return mapRow({ ...created, tailored_for: tailoredFor });
+}
+
+export async function saveCombinedVersion(input: {
+  sourceAId: string;
+  sourceBId: string;
+  data: ResumeData;
+  name?: string;
+}) {
+  const { supabase, userId } = await getAuthedDb();
+
+  if (input.sourceAId === input.sourceBId) {
+    throw new Error("Choose two different resumes to combine.");
+  }
+
+  const [sourceA, sourceB] = await Promise.all([
+    getResumeVersion(input.sourceAId),
+    getResumeVersion(input.sourceBId),
+  ]);
+
+  if (
+    !sourceA ||
+    !sourceB ||
+    sourceA.user_id !== userId ||
+    sourceB.user_id !== userId
+  ) {
+    throw new Error("Resume version not found");
+  }
+
+  if (sourceA.archived_at || sourceB.archived_at) {
+    throw new Error("Restore archived resumes before combining them.");
+  }
+
+  const name =
+    input.name?.trim() || hybridVersionName(sourceA.name, sourceB.name);
+
+  const { data: created, error } = await supabase
+    .from("resume_versions")
+    .insert({
+      user_id: userId,
+      name,
+      template_style: sourceA.template_style,
+      tailored_for: null,
+      data: normalizeResumeData(input.data),
+    })
+    .select("*")
+    .single();
+
+  if (error || !created) throw new Error(error?.message ?? "Failed to save");
+
+  revalidatePath("/library");
+  return mapRow(created);
 }

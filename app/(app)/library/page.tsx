@@ -35,7 +35,12 @@ export default async function LibraryPage() {
                 : "Build or import a resume — then keep tailored cuts organized in one place."}
             </p>
           </div>
-          <LibraryActions buildHref={buildLink} createLabel="+ Create new" />
+          <LibraryActions
+            buildHref={buildLink}
+            createLabel="+ Create new"
+            versions={versions}
+            defaultVersionId={defaultVersionId}
+          />
         </div>
 
         {!hasVersions ? (
