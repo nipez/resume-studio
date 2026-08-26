@@ -50,6 +50,7 @@ const PRO_AI_ACTIONS = [
   "resume_assist",
   "parse_resume",
   "apply_resume_context",
+  "combine_resumes",
   "job_parse",
   "job_discovery",
 ];

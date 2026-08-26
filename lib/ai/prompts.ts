@@ -506,6 +506,45 @@ export function applyResumeContextPrompt(
   );
 }
 
+export function combineResumesPrompt(
+  positioning: string,
+  userName: string,
+  primary: ResumeData,
+  secondary: ResumeData,
+  emphasis: string
+): string {
+  const notes = emphasis.trim();
+  return (
+    buildPositioningContext(positioning, userName) +
+    "\n\n" +
+    "COMBINE TWO RESUMES INTO ONE HYBRID.\n" +
+    "The candidate has two generated cuts (for example marketing/growth vs product/AI). " +
+    "Produce one resume that a hiring manager can read as a single coherent document.\n\n" +
+    "PRIMARY RESUME (keep contact, name, and overall voice from this version):\n" +
+    JSON.stringify(primary) +
+    "\n\n" +
+    "SECONDARY RESUME (pull unique roles, skills, and bullets from this version):\n" +
+    JSON.stringify(secondary) +
+    "\n\n" +
+    (notes
+      ? "EMPHASIS NOTES (honor when blending; do not invent facts beyond either resume and these notes):\n" +
+        notes +
+        "\n\n"
+      : "") +
+    "TASK: Combine these two resumes into one hybrid.\n" +
+    "Rules:\n" +
+    "- Use ONLY facts that appear in the primary resume, the secondary resume, or the emphasis notes. Do NOT invent companies, titles, dates, metrics, awards, or skills.\n" +
+    "- Keep contact fields (name, phone, email, location, linkedin) exactly as in the primary resume; fill an empty primary field from the secondary if present.\n" +
+    "- Blend headline and summary so both directions of experience are visible, unless emphasis notes ask to lean one way.\n" +
+    "- Union skills and awards; drop exact duplicates (case-insensitive).\n" +
+    "- Merge roles that are the same company + title: keep one role, union unique bullets, prefer the more complete dates/blurb.\n" +
+    "- Keep roles that exist on only one resume. Preserve reverse-chronological order as much as possible.\n" +
+    "- Same rules for activities. Union education by school + degree.\n" +
+    "- Do not drop a real role just to shorten the page unless emphasis notes explicitly ask to de-emphasize it — then keep the role but you may trim weaker bullets.\n" +
+    'Return ONLY valid minified JSON with the full resume: {"name":"","headline":"","phone":"","email":"","location":"","linkedin":"","summary":"","skills":[],"experience":[{"company":"","title":"","dates":"","blurb":"","bullets":[]}],"activities":[],"education":[{"school":"","degree":"","year":""}],"awards":[]}'
+  );
+}
+
 export function hiringContactsPrompt(
   jobRole: string,
   jobCompany: string,

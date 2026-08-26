@@ -13,6 +13,7 @@ export type AIAction =
   | "resume_assist"
   | "parse_resume"
   | "apply_resume_context"
+  | "combine_resumes"
   | "job_parse"
   | "job_discovery";
 
@@ -40,6 +41,7 @@ export function modelTierForAction(action: AIAction): ModelTier {
     case "interview_debrief":
     case "resume_assist":
     case "parse_resume":
+    case "combine_resumes":
       return "quality";
     default:
       return "fast";

@@ -1,5 +1,6 @@
 import type { ResumeData } from "@/lib/types/resume";
 import { extractJSON } from "@/lib/ai/extract-json";
+import { mergeResumeData } from "@/lib/resume/merge";
 
 /** Demo responses when ANTHROPIC_API_KEY is not configured. */
 export function mockComplete(prompt: string): string {
@@ -154,6 +155,49 @@ export function mockComplete(prompt: string): string {
         })),
       });
     }
+  }
+
+  if (prompt.includes("COMBINE TWO RESUMES INTO ONE HYBRID")) {
+    const primaryMatch = prompt.match(
+      /PRIMARY RESUME \(keep contact[\s\S]*?\):\n([\s\S]+?)\n\nSECONDARY RESUME/
+    );
+    const secondaryMatch = prompt.match(
+      /SECONDARY RESUME \(pull unique[\s\S]*?\):\n([\s\S]+?)\n\n(?:EMPHASIS NOTES|TASK:)/
+    );
+    const primary = primaryMatch?.[1]
+      ? extractJSON<ResumeData>(primaryMatch[1])
+      : null;
+    const secondary = secondaryMatch?.[1]
+      ? extractJSON<ResumeData>(secondaryMatch[1])
+      : null;
+    if (primary && secondary) {
+      const merged = mergeResumeData(primary, secondary);
+      const emphasisMatch = prompt.match(
+        /EMPHASIS NOTES[\s\S]*?\n([\s\S]+?)\n\nTASK:/
+      );
+      const note = emphasisMatch?.[1]?.trim();
+      return JSON.stringify({
+        ...merged,
+        headline:
+          merged.headline ||
+          "Hybrid professional · demo combine",
+        summary:
+          (merged.summary || "") +
+          (merged.summary ? " " : "") +
+          `[Demo hybrid — ${
+            note ? `would lean ${note.slice(0, 80)}` : "union of both resumes"
+          }. Add ANTHROPIC_API_KEY for a blended rewrite.]`,
+      });
+    }
+    return JSON.stringify({
+      name: "Demo Resume",
+      headline: "Hybrid professional · demo combine",
+      summary:
+        "Demo mode — configure ANTHROPIC_API_KEY to blend two resume versions into one hybrid.",
+      skills: ["Communication", "Leadership"],
+      experience: [],
+      education: [],
+    });
   }
 
   if (prompt.includes("cover letter")) {
