@@ -4,6 +4,7 @@ import {
   createDemoUser,
   deleteDemoUser,
   resetUserPersona,
+  updateUserFullName,
   type DemoUser,
 } from "@/lib/admin/actions";
 import { AdminPlansTab } from "@/components/admin/admin-plans-tab";
@@ -181,6 +182,22 @@ export function AdminPanel({
     setError("");
     setBusyId(userId);
     window.location.href = `/api/admin/view-as?userId=${encodeURIComponent(userId)}`;
+  }
+
+  function handleSaveName(userId: string, fullName: string) {
+    setError("");
+    setBusyId(userId);
+    startTransition(async () => {
+      try {
+        await updateUserFullName(userId, fullName);
+        setToast("Name saved — they'll see it on next login");
+        router.refresh();
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Failed to save name");
+      } finally {
+        setBusyId(null);
+      }
+    });
   }
 
   function handleConfirmAction() {
@@ -435,6 +452,7 @@ export function AdminPanel({
                   onResetPersona={() =>
                     setConfirmAction({ kind: "resetPersona", id: u.id })
                   }
+                  onSaveName={(name) => handleSaveName(u.id, name)}
                 />
               ))
             )}
@@ -647,27 +665,71 @@ function UserRow({
   busy,
   onViewAs,
   onResetPersona,
+  onSaveName,
 }: {
   user: AdminUserRow;
   busy: boolean;
   onViewAs: () => void;
   onResetPersona: () => void;
+  onSaveName: (fullName: string) => void;
 }) {
   const active = isActiveUser(user.lastSignInAt);
+  const [editingName, setEditingName] = useState(false);
+  const [nameDraft, setNameDraft] = useState(user.fullName ?? "");
+
+  function startEditName() {
+    setNameDraft(user.fullName ?? "");
+    setEditingName(true);
+  }
+
+  function submitName(e: React.FormEvent) {
+    e.preventDefault();
+    const next = nameDraft.trim();
+    if (!next) return;
+    onSaveName(next);
+    setEditingName(false);
+  }
 
   return (
     <div className="border-b border-[#F2F3F5] px-6 py-4 last:border-b-0 lg:grid lg:grid-cols-[minmax(160px,1.2fr)_minmax(110px,0.7fr)_80px_72px_56px_56px_140px] lg:items-center lg:gap-3 lg:py-3.5">
       <div className="min-w-0">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="truncate text-[14px] font-semibold text-ink">
-            {user.fullName || user.email}
-          </span>
-          {user.isAdmin ? (
-            <Badge tone="admin">Admin</Badge>
-          ) : null}
-          {user.isDemo ? <Badge tone="demo">Demo</Badge> : null}
-          {active ? <Badge tone="active">Active</Badge> : null}
-        </div>
+        {editingName ? (
+          <form onSubmit={submitName} className="flex min-w-0 flex-wrap items-center gap-1.5">
+            <input
+              value={nameDraft}
+              onChange={(e) => setNameDraft(e.target.value)}
+              autoFocus
+              maxLength={80}
+              placeholder="Display name"
+              className="min-w-[140px] flex-1 rounded-lg border border-[#DFE3E8] px-2.5 py-1.5 text-[13px] text-ink focus:border-accent focus:outline-none"
+            />
+            <button
+              type="submit"
+              disabled={busy || !nameDraft.trim()}
+              className="cursor-pointer rounded-lg bg-sidebar px-2.5 py-1.5 text-xs font-semibold text-white disabled:opacity-60"
+            >
+              Save
+            </button>
+            <button
+              type="button"
+              onClick={() => setEditingName(false)}
+              className="cursor-pointer rounded-lg border border-[#E0E3E8] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#5A6573]"
+            >
+              Cancel
+            </button>
+          </form>
+        ) : (
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="truncate text-[14px] font-semibold text-ink">
+              {user.fullName || user.email}
+            </span>
+            {user.isAdmin ? (
+              <Badge tone="admin">Admin</Badge>
+            ) : null}
+            {user.isDemo ? <Badge tone="demo">Demo</Badge> : null}
+            {active ? <Badge tone="active">Active</Badge> : null}
+          </div>
+        )}
         <div className="truncate text-[12px] text-muted">{user.email}</div>
       </div>
 
@@ -694,9 +756,16 @@ function UserRow({
       <div className="mt-2 text-[13px] text-ink lg:mt-0">{user.applicationCount}</div>
 
       <div className="mt-3 flex flex-wrap justify-start gap-1.5 lg:mt-0 lg:justify-end">
-        {user.isAdmin ? (
-          <span className="text-[12px] text-muted">—</span>
-        ) : (
+        <button
+          type="button"
+          disabled={busy}
+          onClick={startEditName}
+          title="Set the name used in Hi / Hello greetings"
+          className="cursor-pointer rounded-lg border border-[#E0E3E8] bg-white px-2.5 py-[7px] text-xs font-semibold text-[#5A6573] transition-colors hover:border-[#C8CED6] disabled:opacity-60"
+        >
+          {user.fullName ? "Name" : "Set name"}
+        </button>
+        {user.isAdmin ? null : (
           <>
             <button
               type="button"
