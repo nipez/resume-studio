@@ -19,6 +19,7 @@ export async function POST(request: NextRequest) {
 
   let email = "";
   let password = "";
+  let fullName = "";
   let next: string | null = null;
 
   const contentType = request.headers.get("content-type") ?? "";
@@ -26,25 +27,29 @@ export async function POST(request: NextRequest) {
     const body = (await request.json().catch(() => null)) as {
       email?: string;
       password?: string;
+      fullName?: string;
+      name?: string;
       next?: string;
     } | null;
     email = body?.email?.trim() ?? "";
     password = body?.password ?? "";
+    fullName = (body?.fullName ?? body?.name ?? "").trim();
     next = body?.next ?? null;
   } else {
     const form = await request.formData();
     email = String(form.get("email") ?? "").trim();
     password = String(form.get("password") ?? "");
+    fullName = String(form.get("fullName") ?? form.get("name") ?? "").trim();
     next = String(form.get("next") ?? "") || null;
   }
 
-  if (!email || password.length < 8) {
+  if (!email || password.length < 8 || fullName.length < 1 || fullName.length > 80) {
     signupUrl.searchParams.set("error", "invalid");
     return NextResponse.redirect(signupUrl);
   }
 
   try {
-    const userId = await setUserPassword(email, password);
+    const userId = await setUserPassword(email, password, fullName);
     const dest = safeNextPath(next);
     const response = NextResponse.redirect(new URL(dest, origin));
     return await attachSessionCookie(response, userId, email.toLowerCase());

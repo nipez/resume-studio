@@ -21,14 +21,25 @@ export async function findUserIdByEmail(email: string): Promise<string | null> {
   return null;
 }
 
-export async function setUserPassword(email: string, password: string): Promise<string> {
+export async function setUserPassword(
+  email: string,
+  password: string,
+  fullName?: string
+): Promise<string> {
   const svc = createServiceClient();
   const normalized = email.trim().toLowerCase();
+  const name = fullName?.trim().slice(0, 80) || "";
   const existingId = await findUserIdByEmail(normalized);
 
   if (existingId) {
-    const { error } = await svc.auth.admin.updateUserById(existingId, { password });
+    const { error } = await svc.auth.admin.updateUserById(existingId, {
+      password,
+      ...(name ? { user_metadata: { full_name: name } } : {}),
+    });
     if (error) throw new Error(error.message);
+    if (name) {
+      await svc.from("profiles").update({ full_name: name }).eq("id", existingId);
+    }
     return existingId;
   }
 
@@ -36,9 +47,13 @@ export async function setUserPassword(email: string, password: string): Promise<
     email: normalized,
     password,
     email_confirm: true,
+    ...(name ? { user_metadata: { full_name: name } } : {}),
   });
   if (error || !data.user?.id) {
     throw new Error(error?.message ?? "Failed to create user");
+  }
+  if (name) {
+    await svc.from("profiles").update({ full_name: name }).eq("id", data.user.id);
   }
   return data.user.id;
 }

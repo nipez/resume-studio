@@ -3,7 +3,7 @@ import { ExitViewAsFailedNotice } from "@/components/admin/exit-view-as-failed-n
 import { getApplicationsList } from "@/lib/applications/actions";
 import { computeInsights } from "@/lib/applications/insights";
 import { getUserProfileContext } from "@/lib/profile/actions";
-import { resolveFirstName } from "@/lib/profile/utils";
+import { resolveGreetingFirstName } from "@/lib/profile/utils";
 import { getLibraryData } from "@/lib/resume/actions";
 import { getSavedJobsList } from "@/lib/saved-jobs/actions";
 
@@ -23,7 +23,10 @@ export default async function DashboardPage() {
   const primaryVersionId =
     library.defaultVersionId ?? versions[0]?.id ?? null;
   const hasTailored = versions.some((v) => v.tailored_for);
-  const firstName = resolveFirstName(library.userName);
+  const firstName = resolveGreetingFirstName(
+    library.userName,
+    library.userEmail
+  );
 
   const recentVersions = versions.slice(0, 8).map((v) => ({
     id: v.id,
