@@ -10,7 +10,7 @@ export default function SignupForm() {
 
   const errorMessage =
     error === "invalid"
-      ? "Enter a valid email and a password with at least 8 characters."
+      ? "Enter your name, a valid email, and a password with at least 8 characters."
       : error === "failed"
         ? "Could not create that account. Try signing in instead."
         : null;
@@ -33,7 +33,7 @@ export default function SignupForm() {
             Create your account
           </h1>
           <p className="mt-1.5 text-[14px] leading-relaxed text-[#5c5269]">
-            Set your email and password once. Daily sign-in sends no email.
+            Your name is how we greet you. Daily sign-in uses email and password — no email.
           </p>
 
           {errorMessage ? (
@@ -43,6 +43,19 @@ export default function SignupForm() {
           ) : null}
 
           <form action="/api/auth/signup" method="post" className="mt-6 space-y-4">
+            <label className="flex flex-col gap-2 text-[12px] font-semibold uppercase tracking-[0.06em] text-[#8a8094]">
+              Your name
+              <input
+                type="text"
+                name="fullName"
+                required
+                minLength={1}
+                maxLength={80}
+                autoComplete="name"
+                placeholder="e.g. Nick Perez"
+                className="rounded-[12px] border border-[rgba(40,20,30,.12)] bg-[#fbf6f2]/40 px-3.5 py-3 text-[15px] normal-case tracking-normal text-[#231a2e] focus:border-[#ff5c38] focus:outline-none focus:ring-2 focus:ring-[#ff5c38]/15"
+              />
+            </label>
             <label className="flex flex-col gap-2 text-[12px] font-semibold uppercase tracking-[0.06em] text-[#8a8094]">
               Email address
               <input

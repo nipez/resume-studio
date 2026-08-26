@@ -22,6 +22,18 @@ export function resolveFirstName(displayName: string): string {
   return trimmed.split(/\s+/)[0] ?? "";
 }
 
+/** First name for greetings — never the email local-part (e.g. nickperez+test1). */
+export function resolveGreetingFirstName(
+  displayName: string,
+  email?: string | null
+): string {
+  if (isEmailDerivedName(displayName, email)) return "";
+  const first = resolveFirstName(displayName);
+  if (!first) return "";
+  if (first.includes("+") || first.includes("@")) return "";
+  return first;
+}
+
 export function isEmailDerivedName(displayName: string, email?: string | null): boolean {
   const local = email?.split("@")[0]?.trim().toLowerCase();
   if (!local) return false;

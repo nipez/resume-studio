@@ -3,12 +3,12 @@ import { LibraryView } from "@/components/library/library-view";
 import { buildHref } from "@/components/dashboard/dashboard-shared";
 import { getLibraryVersionLinks } from "@/lib/applications/actions";
 import { getUserProfileContext } from "@/lib/profile/actions";
-import { resolveFirstName } from "@/lib/profile/utils";
+import { resolveGreetingFirstName } from "@/lib/profile/utils";
 import { getLibraryData } from "@/lib/resume/actions";
 import Link from "next/link";
 
 export default async function LibraryPage() {
-  const [{ versions, archivedVersions, defaultVersionId, userName }, links, profile] =
+  const [{ versions, archivedVersions, defaultVersionId, userName, userEmail }, links, profile] =
     await Promise.all([
       getLibraryData(),
       getLibraryVersionLinks(),
@@ -17,7 +17,7 @@ export default async function LibraryPage() {
   const { versionCounts, versionJobs, allJobLinks } = links;
   const hasVersions = versions.length > 0 || archivedVersions.length > 0;
   const buildLink = buildHref(profile.isStudent);
-  const firstName = resolveFirstName(userName);
+  const firstName = resolveGreetingFirstName(userName, userEmail);
 
   return (
     <div className="scroll flex-1 overflow-auto bg-page">
