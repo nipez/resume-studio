@@ -317,6 +317,42 @@ export async function resetUserPersona(userId: string): Promise<void> {
   revalidatePath("/admin");
 }
 
+export async function updateUserFullName(
+  userId: string,
+  fullName: string
+): Promise<void> {
+  await requireAdmin();
+  const svc = createServiceClient();
+  const trimmed = fullName.trim();
+  if (!trimmed) {
+    throw new Error("Enter a name to display.");
+  }
+  if (trimmed.length > 80) {
+    throw new Error("Name is too long.");
+  }
+
+  const { data: updated, error } = await svc
+    .from("profiles")
+    .update({ full_name: trimmed })
+    .eq("id", userId)
+    .select("id")
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  if (!updated) {
+    const { error: insertError } = await svc
+      .from("profiles")
+      .insert({ id: userId, full_name: trimmed });
+    if (insertError) throw new Error(insertError.message);
+  }
+
+  const { error: authError } = await svc.auth.admin.updateUserById(userId, {
+    user_metadata: { full_name: trimmed },
+  });
+  if (authError) throw new Error(authError.message);
+
+  revalidatePath("/admin");
+}
+
 export type ImpersonationState = {
   impersonating: boolean;
   label: string | null;
