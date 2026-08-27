@@ -15,15 +15,15 @@ export const SITE_TITLE = `${SITE_NAME} — track every application, resume to o
 
 export const SITE_DESCRIPTION = `${SITE_TAGLINE_PRIMARY} ${SITE_TAGLINE_SECONDARY} Resume library, tailor, cover letters, Q&A, tracking, and insights in one workspace with immutable snapshots.`;
 
-export const PILOT_CTA = "Free during pilot";
+export const PILOT_CTA = "Free during beta";
 
-export const PILOT_START_CTA = "Start free during pilot";
+export const PILOT_START_CTA = "Start free during beta";
 
 export const PILOT_FINE_PRINT =
-  "Full Pro access while we build with early users. No credit card · Magic link sign-in";
+  "Full Pro access while we build with early users. No credit card · Invite code required";
 
 export const BETA_BANNER =
-  "Free during pilot — full Pro unlocked while we refine the product. Pricing below previews launch tiers; invite codes for friends & family testers coming soon.";
+  "Free during beta — full Pro unlocked while we refine the product. Pricing below previews launch tiers. Ask for an invite code to create your account.";
 
 export const HUMAN_VOICE_PILLAR =
   "AI that sounds human — tailored to each job, in your voice, never generic ChatGPT filler.";

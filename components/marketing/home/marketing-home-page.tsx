@@ -16,6 +16,7 @@ import {
   SITE_TAGLINE_SECONDARY,
   TESTIMONIALS,
 } from "@/lib/marketing/content";
+import { BetaPricingCallout } from "@/components/marketing/beta-pricing-callout";
 import { MarketingHomeTemplates } from "./marketing-home-templates";
 import { Reveal } from "./reveal-on-scroll";
 import "./marketing-home.css";
@@ -391,6 +392,9 @@ export function MarketingHomePage() {
             <h2>{PRICING_SECTION_HEADLINE}</h2>
             <p>{PRICING_SECTION_SUB}</p>
           </Reveal>
+          <Reveal>
+            <BetaPricingCallout />
+          </Reveal>
           <Reveal className="pgrid">
             {PRICING_PLANS.map((plan) => (
               <div key={plan.id} className={`plan${plan.highlighted ? " feat" : ""}`}>
@@ -403,7 +407,7 @@ export function MarketingHomePage() {
                 </div>
                 <p className="pdesc">{plan.description}</p>
                 <Link
-                  href="/login"
+                  href="/signup"
                   className={`plan-btn${plan.highlighted ? " coral" : ""}`}
                 >
                   {plan.cta}

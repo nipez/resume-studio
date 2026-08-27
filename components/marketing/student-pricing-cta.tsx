@@ -40,7 +40,7 @@ export function StudentPricingCta() {
               ))}
             </ul>
             <Link
-              href="/login"
+              href="/signup"
               className="mt-6 inline-flex w-full justify-center rounded-[11px] bg-accent px-4 py-3.5 text-[14px] font-semibold text-white shadow-accent transition hover:bg-accent-dark"
             >
               {plan.cta}

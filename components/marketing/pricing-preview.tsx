@@ -52,7 +52,7 @@ export function PricingPreview() {
                 {plan.description}
               </p>
               <Link
-                href="/login"
+                href="/signup"
                 className={`mt-6 inline-flex w-full justify-center rounded-[11px] px-4 py-3 text-[13.5px] font-semibold transition ${
                   plan.highlighted
                     ? "bg-accent text-white shadow-accent hover:bg-accent-dark"
