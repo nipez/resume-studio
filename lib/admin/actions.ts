@@ -17,6 +17,10 @@ import {
 import type { UserPersona } from "@/lib/profile/persona";
 import type { BillingPlanId } from "@/lib/billing/plans";
 import { getAuthUser } from "@/lib/auth";
+import {
+  generateInviteCodeValue,
+  type InviteCodeRow,
+} from "@/lib/auth/invite-codes";
 import { createServiceClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
@@ -350,6 +354,96 @@ export async function updateUserFullName(
   });
   if (authError) throw new Error(authError.message);
 
+  revalidatePath("/admin");
+}
+
+export async function listInviteCodes(): Promise<InviteCodeRow[]> {
+  await requireAdmin();
+  const svc = createServiceClient();
+  const { data, error } = await svc
+    .from("signup_invite_codes")
+    .select("id, code, note, created_at, used_at, used_by, revoked_at")
+    .order("created_at", { ascending: false })
+    .limit(200);
+
+  if (error) throw new Error(error.message);
+
+  const usedIds = Array.from(
+    new Set(
+      (data ?? [])
+        .map((row) => row.used_by as string | null)
+        .filter((id): id is string => Boolean(id))
+    )
+  );
+
+  const emailById = new Map<string, string>();
+  if (usedIds.length > 0) {
+    const lookups = await Promise.all(
+      usedIds.map(async (id) => {
+        const { data } = await svc.auth.admin.getUserById(id);
+        return [id, data.user?.email ?? null] as const;
+      })
+    );
+    for (const [id, email] of lookups) {
+      if (email) emailById.set(id, email);
+    }
+  }
+
+  return (data ?? []).map((row) => ({
+    id: String(row.id),
+    code: String(row.code),
+    note: row.note ? String(row.note) : null,
+    createdAt: String(row.created_at),
+    usedAt: row.used_at ? String(row.used_at) : null,
+    usedBy: row.used_by ? String(row.used_by) : null,
+    usedByEmail: row.used_by ? emailById.get(String(row.used_by)) ?? null : null,
+    revokedAt: row.revoked_at ? String(row.revoked_at) : null,
+  }));
+}
+
+export async function createInviteCode(note?: string): Promise<string> {
+  const admin = await requireAdmin();
+  const svc = createServiceClient();
+  const trimmedNote = note?.trim().slice(0, 120) || null;
+
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    const code = generateInviteCodeValue();
+    const { data, error } = await svc
+      .from("signup_invite_codes")
+      .insert({
+        code,
+        note: trimmedNote,
+        created_by: admin.id,
+      })
+      .select("code")
+      .maybeSingle();
+
+    if (!error && data?.code) {
+      revalidatePath("/admin");
+      return String(data.code);
+    }
+    if (error && !error.message.toLowerCase().includes("duplicate")) {
+      throw new Error(error.message);
+    }
+  }
+
+  throw new Error("Could not generate a unique invite code. Try again.");
+}
+
+export async function revokeInviteCode(id: string): Promise<void> {
+  await requireAdmin();
+  const svc = createServiceClient();
+  const { data, error } = await svc
+    .from("signup_invite_codes")
+    .update({ revoked_at: new Date().toISOString() })
+    .eq("id", id)
+    .is("used_at", null)
+    .is("revoked_at", null)
+    .select("id")
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error("That code is already used or revoked.");
   revalidatePath("/admin");
 }
 

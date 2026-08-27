@@ -17,3 +17,7 @@ grant all on all functions in schema public to anon, authenticated, service_role
 alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
 alter default privileges in schema public grant all on sequences to anon, authenticated, service_role;
 alter default privileges in schema public grant all on functions to anon, authenticated, service_role;
+
+insert into public.signup_invite_codes (code, note)
+values ('RT-DEV1-TEST', 'Local development')
+on conflict (code) do nothing;
