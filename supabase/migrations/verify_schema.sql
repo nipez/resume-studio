@@ -14,6 +14,7 @@ with checks as (
   union all select 'table: saved_jobs', to_regclass('public.saved_jobs') is not null
   union all select 'table: job_search_profiles', to_regclass('public.job_search_profiles') is not null
   union all select 'table: demo_users', to_regclass('public.demo_users') is not null
+  union all select 'table: signup_invite_codes', to_regclass('public.signup_invite_codes') is not null
 
   union all select 'table: support_tickets', to_regclass('public.support_tickets') is not null
   union all select 'table: support_messages', to_regclass('public.support_messages') is not null
@@ -79,3 +80,4 @@ order by ok asc, check_name asc;
 --   applications.job_url           → 0002_application_metadata.sql
 --   profiles.is_student            → 0003_student_profile.sql
 --   table: demo_users              → 0004_demo_users.sql (optional)
+--   table: signup_invite_codes     → 0020_signup_invite_codes.sql

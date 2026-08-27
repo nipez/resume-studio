@@ -2,6 +2,7 @@ import { AdminPanel } from "@/components/admin/admin-panel";
 import {
   getAdminDashboardData,
   listDemoUsers,
+  listInviteCodes,
 } from "@/lib/admin/actions";
 import { getStoredImpersonatorEmail } from "@/lib/admin/restore-session";
 import { isAdminUser } from "@/lib/auth/admin";
@@ -27,9 +28,14 @@ export default async function AdminPage() {
     redirect("/library");
   }
 
-  const [{ users, stats }, demoUsers] = await Promise.all([
+  let inviteLoadFailed = false;
+  const [{ users, stats }, demoUsers, inviteCodes] = await Promise.all([
     getAdminDashboardData(),
     listDemoUsers(),
+    listInviteCodes().catch(() => {
+      inviteLoadFailed = true;
+      return [];
+    }),
   ]);
 
   let supportLoadFailed = false;
@@ -74,6 +80,8 @@ export default async function AdminPage() {
       aiEnforcePlanTiers={AI_ENFORCE_PLAN_TIERS}
       supportLoadFailed={supportLoadFailed}
       aiLoadFailed={aiLoadFailed}
+      inviteCodes={inviteCodes}
+      inviteLoadFailed={inviteLoadFailed}
     />
   );
 }

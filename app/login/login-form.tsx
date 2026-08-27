@@ -141,7 +141,7 @@ export default function LoginForm() {
 
               <p className="mt-5 text-center text-[13px] text-[#5c5269]">
                 <Link href="/signup" className="font-semibold hover:text-[#ff5c38]">
-                  Create account
+                  Create account with invite code
                 </Link>
                 <span className="mx-2 text-[#c4bcc8]">·</span>
                 <Link

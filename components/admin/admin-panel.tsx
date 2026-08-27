@@ -7,9 +7,11 @@ import {
   updateUserFullName,
   type DemoUser,
 } from "@/lib/admin/actions";
+import { AdminInvitesTab } from "@/components/admin/admin-invites-tab";
 import { AdminPlansTab } from "@/components/admin/admin-plans-tab";
 import { AdminSupportTab } from "@/components/admin/admin-support-tab";
 import { AdminAIUsageTab } from "@/components/admin/admin-ai-usage-tab";
+import type { InviteCodeRow } from "@/lib/auth/invite-codes";
 import type { AdminDashboardStats, AdminUserRow } from "@/lib/admin/types";
 import { formatUsdCost, type AdminAIUsageDashboard } from "@/lib/admin/ai-usage-types";
 import type { AdminSupportTicket } from "@/lib/support/types";
@@ -36,11 +38,13 @@ type AdminPanelProps = {
   aiEnforcePlanTiers?: boolean;
   supportLoadFailed?: boolean;
   aiLoadFailed?: boolean;
+  inviteCodes?: InviteCodeRow[];
+  inviteLoadFailed?: boolean;
 };
 
-type Tab = "users" | "demos" | "support" | "ai" | "plans";
+type Tab = "users" | "demos" | "support" | "ai" | "plans" | "invites";
 
-const TAB_IDS: Tab[] = ["users", "demos", "support", "ai", "plans"];
+const TAB_IDS: Tab[] = ["users", "demos", "support", "ai", "plans", "invites"];
 
 function parseTab(value: string | null): Tab {
   return TAB_IDS.includes(value as Tab) ? (value as Tab) : "users";
@@ -67,6 +71,8 @@ export function AdminPanel({
   aiEnforcePlanTiers = false,
   supportLoadFailed = false,
   aiLoadFailed = false,
+  inviteCodes = [],
+  inviteLoadFailed = false,
 }: AdminPanelProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -346,6 +352,12 @@ export function AdminPanel({
           <TabButton active={tab === "plans"} onClick={() => switchTab("plans")}>
             Plans
           </TabButton>
+          <TabButton active={tab === "invites"} onClick={() => switchTab("invites")}>
+            Invites
+            {inviteCodes.filter((c) => !c.usedAt && !c.revokedAt).length > 0
+              ? ` (${inviteCodes.filter((c) => !c.usedAt && !c.revokedAt).length})`
+              : ""}
+          </TabButton>
         </div>
 
         {error ? (
@@ -489,6 +501,8 @@ export function AdminPanel({
           <AdminAIUsageTab data={aiUsage} />
         ) : tab === "plans" ? (
           <AdminPlansTab />
+        ) : tab === "invites" ? (
+          <AdminInvitesTab codes={inviteCodes} loadFailed={inviteLoadFailed} />
         ) : (
           <>
             <div className="mt-4 rounded-2xl border border-border bg-white p-6">

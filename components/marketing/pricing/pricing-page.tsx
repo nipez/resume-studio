@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { Reveal } from "@/components/marketing/home/reveal-on-scroll";
 import { MarketingPageCta } from "@/components/marketing/shared/marketing-page-cta";
-import { BETA_BANNER, PRICING_PLANS, PILOT_CTA, SITE_NAME } from "@/lib/marketing/content";
+import { BetaPricingCallout } from "@/components/marketing/beta-pricing-callout";
+import { BETA_BANNER, PRICING_PLANS, SITE_NAME } from "@/lib/marketing/content";
 import "@/components/marketing/home/marketing-home.css";
 import "@/components/marketing/shared/marketing-subpage.css";
 import "./pricing.css";
@@ -73,13 +74,19 @@ export function PricingPage() {
             <span className="eyebrow" style={{ background: "var(--cream)" }}>
               Plans
             </span>
-            <h2>Three tiers. Pro is where the AI lives.</h2>
+            <h2>
+              Three tiers. Pro is where{" "}
+              <span className="pricing-phrase">the AI lives.</span>
+            </h2>
             <p>
               <strong>Pro</strong> is the full apply loop — job-tailored resumes, cover letters
               that sound like you, Q&amp;A, and interview prep. <strong>Standard</strong> is the
               smart budget pick for organizing your search yourself. <strong>Student</strong> for
               first resumes.
             </p>
+          </Reveal>
+          <Reveal>
+            <BetaPricingCallout />
           </Reveal>
           <Reveal className="pgrid">
             {[...PRICING_PLANS]
@@ -106,7 +113,7 @@ export function PricingPage() {
                   ))}
                 </ul>
                 <Link
-                  href="/login"
+                  href="/signup"
                   className={`plan-btn${plan.highlighted ? " coral" : ""}`}
                 >
                   {plan.cta}
@@ -150,8 +157,8 @@ export function PricingPage() {
       </section>
 
       <MarketingPageCta
-        title={`Start free — ${PILOT_CTA.toLowerCase()}`}
-        description="Full Pro access while we pilot with early users. Sign in with a magic link — no credit card."
+        title="Start free during beta"
+        description="Full Pro access while we pilot with early users. Ask for an invite code — no credit card."
         secondaryHref="/faq"
         secondaryLabel="Read the FAQ →"
       />
