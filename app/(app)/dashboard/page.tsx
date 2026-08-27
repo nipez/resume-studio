@@ -5,6 +5,7 @@ import { computeInsights } from "@/lib/applications/insights";
 import { getUserProfileContext } from "@/lib/profile/actions";
 import { resolveGreetingFirstName } from "@/lib/profile/utils";
 import { getLibraryData } from "@/lib/resume/actions";
+import { toResumeSearchDoc } from "@/lib/resume/search";
 import { getSavedJobsList } from "@/lib/saved-jobs/actions";
 
 export const dynamic = "force-dynamic";
@@ -20,6 +21,7 @@ export default async function DashboardPage() {
   const { applications, versionCounts } = appsList;
   const insights = computeInsights(applications);
   const versions = library.versions;
+  const archivedVersions = library.archivedVersions;
   const primaryVersionId =
     library.defaultVersionId ?? versions[0]?.id ?? null;
   const hasTailored = versions.some((v) => v.tailored_for);
@@ -74,6 +76,9 @@ export default async function DashboardPage() {
         upcoming={insights.upcoming.slice(0, 3)}
         suggestedFollowUps={insights.suggestedFollowUps.slice(0, 3)}
         recentVersions={recentVersions}
+        searchDocs={[...versions, ...archivedVersions].map((version) =>
+          toResumeSearchDoc(version, primaryVersionId)
+        )}
         savedJobs={savedJobs.slice(0, 6).map((job) => ({
           id: job.id,
           role: job.role,

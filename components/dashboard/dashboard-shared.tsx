@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { SuggestedFollowUp } from "@/lib/applications/insights";
 import { appEventLabel, formatDay } from "@/lib/applications/utils";
 import { buildHrefForPersona } from "@/lib/profile/persona";
+import type { ResumeSearchDoc } from "@/lib/resume/search";
 import type { ResumeVersion } from "@/lib/resume/db-types";
 
 export type DashboardStat = { label: string; value: string };
@@ -54,6 +55,7 @@ export type DashboardHomeData = {
   upcoming: DashboardUpcoming[];
   suggestedFollowUps: SuggestedFollowUp[];
   recentVersions: DashboardDocPreview[];
+  searchDocs: ResumeSearchDoc[];
   savedJobs: DashboardSavedJobPreview[];
   prepCandidates: DashboardAppPreview[];
 };
