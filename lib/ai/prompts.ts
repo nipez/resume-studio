@@ -3,26 +3,40 @@ import {
   answerLengthInstruction,
   extractAnswerLengthLimit,
 } from "@/lib/ai/answer-length";
+import {
+  buildSystemGuidelinesBlock,
+  type SystemGuidelines,
+} from "@/lib/ai/system-guidelines";
+
+type SystemGuidelinesInput = Pick<
+  SystemGuidelines,
+  "guidelines" | "bannedPhrases"
+> | null;
 
 export function buildPositioningContext(
   positioning: string,
-  userName?: string
+  userName?: string,
+  systemGuidelines?: SystemGuidelinesInput
 ): string {
+  const guidelinesBlock = systemGuidelines
+    ? buildSystemGuidelinesBlock(systemGuidelines)
+    : "";
   const name = userName?.trim() || "the candidate";
   const notes = positioning.trim();
-  if (notes) {
-    return [
-      `${name.toUpperCase()} — POSITIONING CONTEXT (use to inform all generated content; never invent facts beyond this):`,
-      notes,
-    ].join("\n");
-  }
-  return [
-    `${name.toUpperCase()} — POSITIONING CONTEXT:`,
-    "- Use only facts present in the resume and job description.",
-    "- Position the candidate as a capable professional aligned to the target role.",
-    "- Do NOT invent companies, titles, dates, or metrics.",
-    "- Reframe and emphasize existing experience; speak in outcomes and specifics.",
-  ].join("\n");
+  const positioningBlock = notes
+    ? [
+        `${name.toUpperCase()} — POSITIONING CONTEXT (use to inform all generated content; never invent facts beyond this):`,
+        notes,
+      ].join("\n")
+    : [
+        `${name.toUpperCase()} — POSITIONING CONTEXT:`,
+        "- Use only facts present in the resume and job description.",
+        "- Position the candidate as a capable professional aligned to the target role.",
+        "- Do NOT invent companies, titles, dates, or metrics.",
+        "- Reframe and emphasize existing experience; speak in outcomes and specifics.",
+      ].join("\n");
+
+  return guidelinesBlock + positioningBlock;
 }
 
 export function buildExtraContextBlock(contextNotes: string): string {
@@ -74,10 +88,11 @@ export function tailorMetaPrompt(
   jobCompany: string,
   jobDesc: string,
   data: ResumeData,
-  contextNotes = ""
+  contextNotes = "",
+  systemGuidelines?: SystemGuidelinesInput
 ): string {
   const ctx =
-    buildPositioningContext(positioning, userName) +
+    buildPositioningContext(positioning, userName, systemGuidelines) +
     "\n\n" +
     buildExtraContextBlock(contextNotes) +
     "TARGET ROLE: " +
@@ -110,7 +125,8 @@ export function tailorDeepRolesPrompt(
   jobDesc: string,
   data: ResumeData,
   roles: { index: number; company: string; title: string; dates: string; bullets: string[] }[],
-  contextNotes = ""
+  contextNotes = "",
+  systemGuidelines?: SystemGuidelinesInput
 ): string {
   const block = roles
     .map((e) => {
@@ -130,7 +146,7 @@ export function tailorDeepRolesPrompt(
     .join("\n");
 
   const ctx =
-    buildPositioningContext(positioning, userName) +
+    buildPositioningContext(positioning, userName, systemGuidelines) +
     "\n\n" +
     buildExtraContextBlock(contextNotes) +
     "TARGET ROLE: " +
@@ -168,10 +184,11 @@ export function tailorLightPrompt(
   jobCompany: string,
   jobDesc: string,
   data: ResumeData,
-  contextNotes = ""
+  contextNotes = "",
+  systemGuidelines?: SystemGuidelinesInput
 ): string {
   const ctx =
-    buildPositioningContext(positioning, userName) +
+    buildPositioningContext(positioning, userName, systemGuidelines) +
     "\n\n" +
     buildExtraContextBlock(contextNotes) +
     "TARGET ROLE: " +
@@ -207,10 +224,11 @@ export function coverLetterPrompt(
   jobDesc: string,
   hiringManager: string,
   summary: string,
-  contextNotes = ""
+  contextNotes = "",
+  systemGuidelines?: SystemGuidelinesInput
 ): string {
   return (
-    buildPositioningContext(positioning, userName) +
+    buildPositioningContext(positioning, userName, systemGuidelines) +
     buildExtraContextBlock(contextNotes) +
     "\n\nWrite a concise, confident cover letter (250-320 words) for " +
     userName +
@@ -240,7 +258,8 @@ export function answerQuestionPrompt(
   jobCompany: string,
   jobDesc: string,
   question: string,
-  summary: string
+  summary: string,
+  systemGuidelines?: SystemGuidelinesInput
 ): string {
   const lengthLimit = extractAnswerLengthLimit(question);
   const lengthRule = answerLengthInstruction(lengthLimit);
@@ -249,7 +268,7 @@ export function answerQuestionPrompt(
     : "\n\n";
 
   return (
-    buildPositioningContext(positioning, userName) +
+    buildPositioningContext(positioning, userName, systemGuidelines) +
     "\n\nAnswer the following job-application question as " +
     userName +
     " — first person, confident and specific, " +
@@ -281,10 +300,11 @@ export function appInsightPrompt(
   jobDesc: string,
   summary: string,
   skills: string[],
-  coverLetter: string
+  coverLetter: string,
+  systemGuidelines?: SystemGuidelinesInput
 ): string {
   return (
-    buildPositioningContext(positioning, userName) +
+    buildPositioningContext(positioning, userName, systemGuidelines) +
     "\n\nTASK: Assess how well this application's materials fit the target job and what would most increase the odds of a response or interview. Be specific and candid. Return ONLY valid minified JSON, no markdown:\n" +
     '{"fitScore":<integer 0-100>,"strengths":["2-4 short bullets on what aligns well with the JD"],"gaps":["2-4 short bullets on what is missing or weak vs the JD"],"advice":"1-2 sentences naming the single highest-impact change"}\n\n' +
     "TARGET ROLE: " +
@@ -312,10 +332,11 @@ export function interviewPrepPrompt(
   jobRole: string,
   jobCompany: string,
   jobDesc: string,
-  summary: string
+  summary: string,
+  systemGuidelines?: SystemGuidelinesInput
 ): string {
   return (
-    buildPositioningContext(positioning, userName) +
+    buildPositioningContext(positioning, userName, systemGuidelines) +
     "\n\nTASK: Prepare " +
     userName +
     " for an interview for this role. Ground everything in their real background. Return ONLY valid minified JSON, no markdown:\n" +
@@ -343,7 +364,8 @@ export function interviewDebriefPrompt(
   coverLetter: string,
   prepQuestions: string[],
   transcript: string,
-  focusNote?: string
+  focusNote?: string,
+  systemGuidelines?: SystemGuidelinesInput
 ): string {
   const prepBlock =
     prepQuestions.length > 0
@@ -355,7 +377,7 @@ export function interviewDebriefPrompt(
     : "";
 
   return (
-    buildPositioningContext(positioning, userName) +
+    buildPositioningContext(positioning, userName, systemGuidelines) +
     "\n\nTASK: Analyze this interview transcript for " +
     userName +
     ". Ground everything in what was actually said and how it maps to the target role and materials they sent. Be candid and practical. Return ONLY valid minified JSON, no markdown:\n" +
@@ -390,10 +412,11 @@ export function resumeAssistPrompt(
   question?: string,
   sectionId?: string,
   sectionIndex?: number,
-  targetPages = 2
+  targetPages = 2,
+  systemGuidelines?: SystemGuidelinesInput
 ): string {
   const ctx =
-    buildPositioningContext(positioning, userName) +
+    buildPositioningContext(positioning, userName, systemGuidelines) +
     "\n\nRESUME (JSON):\n" +
     JSON.stringify(data) +
     "\n\n";
@@ -492,10 +515,11 @@ export function applyResumeContextPrompt(
   positioning: string,
   userName: string,
   data: ResumeData,
-  contextNotes: string
+  contextNotes: string,
+  systemGuidelines?: SystemGuidelinesInput
 ): string {
   return (
-    buildPositioningContext(positioning, userName) +
+    buildPositioningContext(positioning, userName, systemGuidelines) +
     "\n\n" +
     buildExtraContextBlock(contextNotes) +
     "CURRENT RESUME (JSON):\n" +
@@ -511,11 +535,12 @@ export function combineResumesPrompt(
   userName: string,
   primary: ResumeData,
   secondary: ResumeData,
-  emphasis: string
+  emphasis: string,
+  systemGuidelines?: SystemGuidelinesInput
 ): string {
   const notes = emphasis.trim();
   return (
-    buildPositioningContext(positioning, userName) +
+    buildPositioningContext(positioning, userName, systemGuidelines) +
     "\n\n" +
     "COMBINE TWO RESUMES INTO ONE HYBRID.\n" +
     "The candidate has two generated cuts (for example marketing/growth vs product/AI). " +

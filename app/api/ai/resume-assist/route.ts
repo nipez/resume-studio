@@ -65,7 +65,8 @@ export async function POST(request: Request) {
       promptText,
       body.sectionId,
       body.sectionIndex,
-      body.targetPages
+      body.targetPages,
+      auth.systemGuidelines
     );
     const { text, mock } = await completeWithFallback(
       prompt,

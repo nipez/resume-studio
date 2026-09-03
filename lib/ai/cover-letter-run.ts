@@ -2,12 +2,14 @@ import { aiCallOptions } from "@/lib/ai/context";
 import { completeWithFallback } from "@/lib/ai/mock";
 import { coverLetterPrompt } from "@/lib/ai/prompts";
 import type { PlanTier } from "@/lib/ai/config";
+import type { SystemGuidelines } from "@/lib/ai/system-guidelines";
 
 export type CoverLetterAuth = {
   user: { id: string; email?: string | null };
   userName: string;
   positioning: string;
   planTier: PlanTier;
+  systemGuidelines: SystemGuidelines;
 };
 
 export type CoverLetterInput = {
@@ -37,7 +39,8 @@ export async function runCoverLetter(
     input.jobDesc,
     input.hiringManager ?? "",
     input.summary,
-    input.contextNotes ?? ""
+    input.contextNotes ?? "",
+    auth.systemGuidelines
   );
   const { text, mock } = await completeWithFallback(
     prompt,
