@@ -157,6 +157,40 @@ export function mockComplete(prompt: string): string {
     }
   }
 
+  if (prompt.includes("REBUILD MASTER RESUME FROM RECENT TAILORED CUTS")) {
+    const primaryMatch = prompt.match(
+      /CURRENT PRIMARY \/ MASTER RESUME[\s\S]*?\):\n([\s\S]+?)\n\nRECENT CUT/
+    );
+    const primary = primaryMatch?.[1]
+      ? extractJSON<ResumeData>(primaryMatch[1])
+      : null;
+    const cutMatches = Array.from(
+      prompt.matchAll(
+        /RECENT CUT \d+[\s\S]*?\n([\s\S]+?)(?=\n\nRECENT CUT|\n\nTASK:)/g
+      )
+    );
+    const cuts = cutMatches
+      .map((match) => extractJSON<ResumeData>(match[1]))
+      .filter(Boolean) as ResumeData[];
+
+    if (primary && cuts.length > 0) {
+      const merged = cuts.reduce(
+        (acc, cut) => mergeResumeData(acc, cut),
+        primary
+      );
+      return JSON.stringify({
+        ...merged,
+        headline: merged.headline || "Updated master · demo rebuild",
+        summary:
+          (merged.summary || "") +
+          (merged.summary ? " " : "") +
+          `[Demo master rebuild from ${cuts.length} recent cut${
+            cuts.length === 1 ? "" : "s"
+          }. Add ANTHROPIC_API_KEY for a full AI refresh.]`,
+      });
+    }
+  }
+
   if (prompt.includes("COMBINE TWO RESUMES INTO ONE HYBRID")) {
     const primaryMatch = prompt.match(
       /PRIMARY RESUME \(keep contact[\s\S]*?\):\n([\s\S]+?)\n\nSECONDARY RESUME/

@@ -14,6 +14,7 @@ import {
   resolveResumeName,
 } from "@/lib/library/cover-letters";
 import type { CoverLetter } from "@/lib/cover/types";
+import type { RebuildMasterSource } from "@/lib/resume/rebuild-master-sources";
 import type { ResumeVersion } from "@/lib/resume/db-types";
 import { useEffect, useMemo, useState } from "react";
 
@@ -28,6 +29,7 @@ type LibraryViewProps = {
   versionJobs?: Record<string, VersionJobLink[]>;
   allJobLinks?: VersionJobLink[];
   coverLetters?: CoverLetter[];
+  rebuildSources?: RebuildMasterSource[];
   isStudent?: boolean;
 };
 
@@ -91,6 +93,7 @@ export function LibraryView({
   versionJobs = {},
   allJobLinks = [],
   coverLetters = [],
+  rebuildSources = [],
   isStudent = false,
 }: LibraryViewProps) {
   const [tab, setTab] = useState<"all" | "active" | "archived" | "covers">("all");
@@ -234,7 +237,10 @@ export function LibraryView({
   return (
     <>
       {showDefaultHero && defaultVersion ? (
-        <DefaultResumeHero version={defaultVersion} />
+        <DefaultResumeHero
+          version={defaultVersion}
+          rebuildSources={rebuildSources}
+        />
       ) : null}
 
       <div className="mb-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
