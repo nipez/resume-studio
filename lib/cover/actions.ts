@@ -103,6 +103,7 @@ export async function saveCoverLetter(input: {
       return { ok: false, error: friendlyDbError(error?.message ?? "") };
     }
     revalidatePath("/cover");
+    revalidatePath("/library");
     return { ok: true, letter: mapRow(data) };
   }
 
@@ -119,6 +120,7 @@ export async function saveCoverLetter(input: {
     return { ok: false, error: friendlyDbError(error?.message ?? "") };
   }
   revalidatePath("/cover");
+  revalidatePath("/library");
   return { ok: true, letter: mapRow(data) };
 }
 
@@ -135,5 +137,6 @@ export async function deleteCoverLetter(
 
   if (error) return { ok: false, error: friendlyDbError(error.message) };
   revalidatePath("/cover");
+  revalidatePath("/library");
   return { ok: true };
 }

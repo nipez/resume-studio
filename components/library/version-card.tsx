@@ -4,6 +4,8 @@ import { EditableVersionName } from "@/components/library/editable-version-name"
 import { LogApplicationButton } from "@/components/applications/log-application-button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import type { VersionJobLink } from "@/lib/applications/types";
+import { coverLetterHref } from "@/lib/library/cover-letters";
+import type { CoverLetter } from "@/lib/cover/types";
 import {
   archiveResumeVersion,
   createResumeVersion,
@@ -25,6 +27,7 @@ type VersionCardProps = {
   isDefault: boolean;
   appCount?: number;
   jobLinks?: VersionJobLink[];
+  coverLetters?: CoverLetter[];
   archived?: boolean;
   isStudent?: boolean;
 };
@@ -34,6 +37,7 @@ export function VersionCard({
   isDefault,
   appCount = 0,
   jobLinks = [],
+  coverLetters = [],
   archived = false,
   isStudent = false,
 }: VersionCardProps) {
@@ -114,6 +118,32 @@ export function VersionCard({
               +{jobLinks.length - 1} more applications
             </p>
           ) : null}
+        </div>
+      ) : null}
+
+      {coverLetters.length > 0 ? (
+        <div className="mt-3 rounded-[10px] border border-[#EDE9FF] bg-[#FAFAFF] px-3 py-2.5">
+          <p className="text-[10.5px] font-bold uppercase tracking-[0.05em] text-[#8A7AD6]">
+            Cover letters
+          </p>
+          <ul className="mt-1.5 space-y-1">
+            {coverLetters.slice(0, 4).map((letter) => (
+              <li key={letter.id}>
+                <Link
+                  href={coverLetterHref(letter)}
+                  className="block truncate text-[12.5px] font-semibold text-[#5638E0] hover:underline"
+                  title={letter.title}
+                >
+                  {letter.title}
+                </Link>
+              </li>
+            ))}
+            {coverLetters.length > 4 ? (
+              <li className="text-[11px] font-semibold text-muted">
+                +{coverLetters.length - 4} more
+              </li>
+            ) : null}
+          </ul>
         </div>
       ) : null}
 
