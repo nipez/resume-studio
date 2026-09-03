@@ -3,6 +3,7 @@ import { extractJSON } from "@/lib/ai/extract-json";
 import { completeWithFallback } from "@/lib/ai/mock";
 import { combineResumesPrompt } from "@/lib/ai/prompts";
 import type { PlanTier } from "@/lib/ai/config";
+import type { SystemGuidelines } from "@/lib/ai/system-guidelines";
 import { normalizeResumeData } from "@/lib/resume/defaults";
 import {
   isUsableCombinedResume,
@@ -16,6 +17,7 @@ export type CombineAuth = {
   userName: string;
   positioning: string;
   planTier: PlanTier;
+  systemGuidelines: SystemGuidelines;
 };
 
 export type CombineResult = {
@@ -37,7 +39,8 @@ export async function runCombineResumes(
     auth.userName,
     normalizeResumeData(input.primary),
     normalizeResumeData(input.secondary),
-    input.emphasis ?? ""
+    input.emphasis ?? "",
+    auth.systemGuidelines
   );
 
   const { text, mock } = await completeWithFallback(

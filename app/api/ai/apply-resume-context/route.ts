@@ -35,7 +35,8 @@ export async function POST(request: Request) {
       positioning,
       userName,
       data,
-      contextNotes
+      contextNotes,
+      auth.systemGuidelines
     );
     const { text, mock } = await completeWithFallback(
       prompt,

@@ -8,6 +8,7 @@ import {
 } from "@/lib/ai/prompts";
 import type { AICompletionOptions } from "@/lib/ai/mock";
 import type { PlanTier } from "@/lib/ai/config";
+import type { SystemGuidelines } from "@/lib/ai/system-guidelines";
 import type { ResumeData } from "@/lib/types/resume";
 
 export type TailorAuth = {
@@ -15,6 +16,7 @@ export type TailorAuth = {
   userName: string;
   positioning: string;
   planTier: PlanTier;
+  systemGuidelines: SystemGuidelines;
 };
 
 export type TailorInput = {
@@ -83,7 +85,7 @@ async function tailorDeepRoleBatch(
   },
   options: AICompletionOptions
 ): Promise<TailorRole[]> {
-  const { userName, positioning } = auth;
+  const { userName, positioning, systemGuidelines } = auth;
   const rp = tailorDeepRolesPrompt(
     positioning,
     userName,
@@ -92,7 +94,8 @@ async function tailorDeepRoleBatch(
     input.jobDesc,
     input.data,
     input.roles,
-    input.contextNotes
+    input.contextNotes,
+    systemGuidelines
   );
   const { text } = await completeWithFallback(rp, options);
   const part = extractJSON<{ roles?: TailorRole[] }>(text);
@@ -104,7 +107,7 @@ export async function runTailor(
   auth: TailorAuth,
   input: TailorInput
 ): Promise<TailorResult> {
-  const { userName, positioning } = auth;
+  const { userName, positioning, systemGuidelines } = auth;
   const { jobRole, jobCompany, jobDesc, depth, data, contextNotes = "" } =
     input;
 
@@ -115,7 +118,8 @@ export async function runTailor(
     jobCompany,
     jobDesc,
     data,
-    contextNotes
+    contextNotes,
+    systemGuidelines
   );
   const { text: metaText, mock } = await completeWithFallback(
     metaPrompt,
@@ -192,7 +196,8 @@ export async function runTailor(
       jobCompany,
       jobDesc,
       data,
-      contextNotes
+      contextNotes,
+      systemGuidelines
     );
     const { text } = await completeWithFallback(
       lp,

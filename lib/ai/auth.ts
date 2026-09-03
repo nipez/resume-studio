@@ -1,4 +1,5 @@
 import { resolveEffectivePlanTier, type PlanTier } from "@/lib/ai/config";
+import { getSystemGuidelines } from "@/lib/ai/system-guidelines";
 import { getAuthedDb } from "@/lib/auth";
 import { resolveDisplayName } from "@/lib/profile/utils";
 
@@ -30,11 +31,14 @@ export async function requireAIUser() {
     isStudent: profile?.is_student,
   });
 
+  const systemGuidelines = await getSystemGuidelines();
+
   return {
     user,
     profile,
     userName,
     positioning: profile?.positioning ?? "",
     planTier,
+    systemGuidelines,
   };
 }

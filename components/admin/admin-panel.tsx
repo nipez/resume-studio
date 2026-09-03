@@ -8,11 +8,13 @@ import {
   type DemoUser,
 } from "@/lib/admin/actions";
 import { AdminPlansTab } from "@/components/admin/admin-plans-tab";
+import { AdminGuidelinesTab } from "@/components/admin/admin-guidelines-tab";
 import { AdminSupportTab } from "@/components/admin/admin-support-tab";
 import { AdminAIUsageTab } from "@/components/admin/admin-ai-usage-tab";
 import type { AdminDashboardStats, AdminUserRow } from "@/lib/admin/types";
 import { formatUsdCost, type AdminAIUsageDashboard } from "@/lib/admin/ai-usage-types";
 import type { AdminSupportTicket } from "@/lib/support/types";
+import type { SystemGuidelines } from "@/lib/ai/system-guidelines";
 import type { BillingPlanId } from "@/lib/billing/plans";
 import { BILLING_PLANS } from "@/lib/billing/plans";
 import {
@@ -33,14 +35,15 @@ type AdminPanelProps = {
   supportTickets: AdminSupportTicket[];
   openSupportCount: number;
   aiUsage: AdminAIUsageDashboard;
+  systemGuidelines: SystemGuidelines;
   aiEnforcePlanTiers?: boolean;
   supportLoadFailed?: boolean;
   aiLoadFailed?: boolean;
 };
 
-type Tab = "users" | "demos" | "support" | "ai" | "plans";
+type Tab = "users" | "demos" | "support" | "ai" | "plans" | "guidelines";
 
-const TAB_IDS: Tab[] = ["users", "demos", "support", "ai", "plans"];
+const TAB_IDS: Tab[] = ["users", "demos", "support", "ai", "plans", "guidelines"];
 
 function parseTab(value: string | null): Tab {
   return TAB_IDS.includes(value as Tab) ? (value as Tab) : "users";
@@ -64,6 +67,7 @@ export function AdminPanel({
   supportTickets,
   openSupportCount,
   aiUsage,
+  systemGuidelines,
   aiEnforcePlanTiers = false,
   supportLoadFailed = false,
   aiLoadFailed = false,
@@ -346,6 +350,9 @@ export function AdminPanel({
           <TabButton active={tab === "plans"} onClick={() => switchTab("plans")}>
             Plans
           </TabButton>
+          <TabButton active={tab === "guidelines"} onClick={() => switchTab("guidelines")}>
+            AI guidelines
+          </TabButton>
         </div>
 
         {error ? (
@@ -489,6 +496,8 @@ export function AdminPanel({
           <AdminAIUsageTab data={aiUsage} />
         ) : tab === "plans" ? (
           <AdminPlansTab />
+        ) : tab === "guidelines" ? (
+          <AdminGuidelinesTab guidelines={systemGuidelines} />
         ) : (
           <>
             <div className="mt-4 rounded-2xl border border-border bg-white p-6">

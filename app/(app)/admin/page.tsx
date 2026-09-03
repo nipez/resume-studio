@@ -12,6 +12,7 @@ import {
 } from "@/lib/support/actions";
 import { AI_ENFORCE_PLAN_TIERS } from "@/lib/ai/config";
 import { getAdminAIUsageDashboard } from "@/lib/admin/ai-usage";
+import { getAdminSystemGuidelines } from "@/lib/admin/guidelines-actions";
 import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
@@ -27,9 +28,10 @@ export default async function AdminPage() {
     redirect("/library");
   }
 
-  const [{ users, stats }, demoUsers] = await Promise.all([
+  const [{ users, stats }, demoUsers, systemGuidelines] = await Promise.all([
     getAdminDashboardData(),
     listDemoUsers(),
+    getAdminSystemGuidelines(),
   ]);
 
   let supportLoadFailed = false;
@@ -71,6 +73,7 @@ export default async function AdminPage() {
       supportTickets={supportTickets}
       openSupportCount={openSupportCount}
       aiUsage={aiUsageData}
+      systemGuidelines={systemGuidelines}
       aiEnforcePlanTiers={AI_ENFORCE_PLAN_TIERS}
       supportLoadFailed={supportLoadFailed}
       aiLoadFailed={aiLoadFailed}

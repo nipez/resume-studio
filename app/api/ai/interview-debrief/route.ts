@@ -46,7 +46,8 @@ export async function POST(request: Request) {
       body.coverLetter ?? "",
       body.prepQuestions ?? [],
       body.transcript,
-      body.focusNote
+      body.focusNote,
+      auth.systemGuidelines
     );
     const { text, mock } = await completeWithFallback(
       prompt,

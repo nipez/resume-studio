@@ -34,7 +34,8 @@ export async function POST(request: Request) {
       body.jobRole,
       body.jobCompany,
       body.jobDesc,
-      body.summary
+      body.summary,
+      auth.systemGuidelines
     );
     const { text, mock } = await completeWithFallback(
       prompt,
