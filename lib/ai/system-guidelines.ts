@@ -69,14 +69,3 @@ export async function getSystemGuidelines(): Promise<SystemGuidelines> {
     return EMPTY_GUIDELINES;
   }
 }
-
-export function parseBannedPhrasesInput(raw: string): string[] {
-  return raw
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean);
-}
-
-export function formatBannedPhrasesInput(phrases: string[]): string {
-  return phrases.join("\n");
-}

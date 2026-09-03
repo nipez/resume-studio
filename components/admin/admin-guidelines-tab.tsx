@@ -1,9 +1,7 @@
 "use client";
 
-import {
-  formatBannedPhrasesInput,
-  updateSystemGuidelines,
-} from "@/lib/admin/guidelines-actions";
+import { updateSystemGuidelines } from "@/lib/admin/guidelines-actions";
+import { formatBannedPhrasesInput } from "@/lib/ai/system-guidelines-utils";
 import type { SystemGuidelines } from "@/lib/ai/system-guidelines";
 import { Toast } from "@/components/ui/toast";
 import { useRouter } from "next/navigation";
@@ -14,11 +12,16 @@ type AdminGuidelinesTabProps = {
 };
 
 export function AdminGuidelinesTab({ guidelines }: AdminGuidelinesTabProps) {
+  const safe = guidelines ?? {
+    guidelines: "",
+    bannedPhrases: [],
+    updatedAt: null,
+  };
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [rules, setRules] = useState(guidelines.guidelines);
+  const [rules, setRules] = useState(safe.guidelines);
   const [bannedPhrasesText, setBannedPhrasesText] = useState(
-    formatBannedPhrasesInput(guidelines.bannedPhrases)
+    formatBannedPhrasesInput(safe.bannedPhrases)
   );
   const [error, setError] = useState("");
   const [toast, setToast] = useState<string | null>(null);
@@ -107,10 +110,10 @@ export function AdminGuidelinesTab({ guidelines }: AdminGuidelinesTabProps) {
         >
           {pending ? "Saving…" : "Save guidelines"}
         </button>
-        {guidelines.updatedAt ? (
+        {safe.updatedAt ? (
           <span className="text-[12.5px] text-muted">
             Last saved{" "}
-            {new Date(guidelines.updatedAt).toLocaleString(undefined, {
+            {new Date(safe.updatedAt).toLocaleString(undefined, {
               month: "short",
               day: "numeric",
               hour: "numeric",
