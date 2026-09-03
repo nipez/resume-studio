@@ -2,12 +2,11 @@
 
 import { isAdminUser } from "@/lib/auth/admin";
 import {
-  formatBannedPhrasesInput,
   getSystemGuidelines,
   invalidateSystemGuidelinesCache,
-  parseBannedPhrasesInput,
   type SystemGuidelines,
 } from "@/lib/ai/system-guidelines";
+import { parseBannedPhrasesInput } from "@/lib/ai/system-guidelines-utils";
 import { getAuthUser } from "@/lib/auth";
 import { createServiceClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
@@ -61,4 +60,3 @@ export async function updateSystemGuidelines(input: {
   };
 }
 
-export { formatBannedPhrasesInput };
