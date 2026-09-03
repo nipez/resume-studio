@@ -1,18 +1,24 @@
 "use client";
 
 import { ResumePreviewModal } from "@/components/applications/resume-preview-modal";
+import { RebuildMasterButton } from "@/components/library/rebuild-master-button";
 import { openPrintHtml } from "@/lib/resume/build-cover-html";
 import { buildResumeHTML } from "@/lib/resume/build-resume-html";
 import type { ResumeVersion } from "@/lib/resume/db-types";
+import type { RebuildMasterSource } from "@/lib/resume/rebuild-master-sources";
 import { versionCardMeta } from "@/lib/resume/utils";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
 type DefaultResumeHeroProps = {
   version: ResumeVersion;
+  rebuildSources?: RebuildMasterSource[];
 };
 
-export function DefaultResumeHero({ version }: DefaultResumeHeroProps) {
+export function DefaultResumeHero({
+  version,
+  rebuildSources = [],
+}: DefaultResumeHeroProps) {
   const [previewOpen, setPreviewOpen] = useState(false);
   const meta = versionCardMeta(version);
   const previewHtml = useMemo(
@@ -91,6 +97,7 @@ export function DefaultResumeHero({ version }: DefaultResumeHeroProps) {
               >
                 Tailor from this
               </Link>
+              <RebuildMasterButton sources={rebuildSources} />
             </div>
           </div>
 

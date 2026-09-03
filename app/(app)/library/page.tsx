@@ -1,22 +1,32 @@
 import { LibraryActions } from "@/components/library/library-actions";
 import { LibraryView } from "@/components/library/library-view";
 import { buildHref } from "@/components/dashboard/dashboard-shared";
-import { getLibraryVersionLinks } from "@/lib/applications/actions";
+import { getLibraryVersionLinks, getApplicationsList } from "@/lib/applications/actions";
 import { listCoverLetters } from "@/lib/cover/actions";
 import { getUserProfileContext } from "@/lib/profile/actions";
 import { resolveGreetingFirstName } from "@/lib/profile/utils";
 import { getLibraryData } from "@/lib/resume/actions";
+import { selectRebuildMasterSources } from "@/lib/resume/rebuild-master-sources";
 import Link from "next/link";
 
 export default async function LibraryPage() {
-  const [{ versions, archivedVersions, defaultVersionId, userName, userEmail }, links, profile, coverLetters] =
+  const [{ versions, archivedVersions, defaultVersionId, userName, userEmail }, links, profile, coverLetters, applicationsList] =
     await Promise.all([
       getLibraryData(),
       getLibraryVersionLinks(),
       getUserProfileContext(),
       listCoverLetters(),
+      getApplicationsList(),
     ]);
   const { versionCounts, versionJobs, allJobLinks } = links;
+  const rebuildSources = selectRebuildMasterSources({
+    defaultVersionId,
+    activeVersions: versions,
+    applications: [
+      ...applicationsList.applications,
+      ...applicationsList.archivedApplications,
+    ],
+  });
   const hasVersions = versions.length > 0 || archivedVersions.length > 0;
   const buildLink = buildHref(profile.isStudent);
   const firstName = resolveGreetingFirstName(userName, userEmail);
@@ -79,6 +89,7 @@ export default async function LibraryPage() {
             versionJobs={versionJobs}
             allJobLinks={allJobLinks}
             coverLetters={coverLetters}
+            rebuildSources={rebuildSources}
             isStudent={profile.isStudent}
           />
         ) : (

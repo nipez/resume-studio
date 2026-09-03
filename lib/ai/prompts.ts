@@ -570,6 +570,45 @@ export function combineResumesPrompt(
   );
 }
 
+export function rebuildMasterPrompt(
+  positioning: string,
+  userName: string,
+  primary: ResumeData,
+  secondaries: ResumeData[],
+  systemGuidelines?: SystemGuidelinesInput
+): string {
+  const blocks = secondaries
+    .map(
+      (resume, index) =>
+        `RECENT CUT ${index + 1} (tailored or sent for an application — pull the strongest unique bullets, skills, and phrasing):\n` +
+        JSON.stringify(resume)
+    )
+    .join("\n\n");
+
+  return (
+    buildPositioningContext(positioning, userName, systemGuidelines) +
+    "\n\n" +
+    "REBUILD MASTER RESUME FROM RECENT TAILORED CUTS.\n" +
+    "The candidate's primary resume is stale. Merge the best factual content from their recent job-specific versions back into one updated master resume they can use as their new default.\n\n" +
+    "CURRENT PRIMARY / MASTER RESUME (keep contact info, name, and overall voice — refresh headline, summary, skills, and bullets):\n" +
+    JSON.stringify(primary) +
+    "\n\n" +
+    blocks +
+    "\n\n" +
+    "TASK: Produce one refreshed master resume.\n" +
+    "Rules:\n" +
+    "- Use ONLY facts present in the primary resume or the recent cuts above. Do NOT invent companies, titles, dates, metrics, awards, or skills.\n" +
+    "- Keep contact fields (name, phone, email, location, linkedin) exactly as in the primary resume.\n" +
+    "- Rewrite headline and summary to reflect the candidate's current positioning using the strongest themes across recent cuts.\n" +
+    "- Union skills; drop exact duplicates (case-insensitive).\n" +
+    "- For each company+title role: merge bullets — prefer sharper, outcome-led bullets from recent cuts; dedupe near-duplicates.\n" +
+    "- Keep all real roles; preserve reverse-chronological order.\n" +
+    "- Do not drop experience just to shorten — trim weak duplicate bullets instead.\n" +
+    "- The result should read as one coherent master resume, not a keyword dump.\n" +
+    'Return ONLY valid minified JSON with the full resume: {"name":"","headline":"","phone":"","email":"","location":"","linkedin":"","summary":"","skills":[],"experience":[{"company":"","title":"","dates":"","blurb":"","bullets":[]}],"activities":[],"education":[{"school":"","degree":"","year":""}],"awards":[]}'
+  );
+}
+
 export function hiringContactsPrompt(
   jobRole: string,
   jobCompany: string,
