@@ -5,11 +5,11 @@ import { getCoverPrepSeedForVersion } from "@/lib/cover/prep-seed";
 import { getLibraryData } from "@/lib/resume/actions";
 
 type PageProps = {
-  searchParams: Promise<{ v?: string; job?: string }>;
+  searchParams: Promise<{ v?: string; job?: string; letter?: string }>;
 };
 
 export default async function CoverPage({ searchParams }: PageProps) {
-  const { v, job } = await searchParams;
+  const { v, job, letter } = await searchParams;
   const [{ versions, defaultVersionId }, savedLetters] = await Promise.all([
     getLibraryData(),
     listCoverLetters(),
@@ -37,6 +37,7 @@ export default async function CoverPage({ searchParams }: PageProps) {
             defaultVersionId={defaultVersionId}
             savedLetters={savedLetters}
             initialVersionId={initialVersionId}
+            initialLetterId={letter ?? null}
             prepFlowResultId={initialVersionId}
             savedJobId={job ?? null}
             prepSeed={coverPrepSeed}

@@ -2,17 +2,19 @@ import { LibraryActions } from "@/components/library/library-actions";
 import { LibraryView } from "@/components/library/library-view";
 import { buildHref } from "@/components/dashboard/dashboard-shared";
 import { getLibraryVersionLinks } from "@/lib/applications/actions";
+import { listCoverLetters } from "@/lib/cover/actions";
 import { getUserProfileContext } from "@/lib/profile/actions";
 import { resolveGreetingFirstName } from "@/lib/profile/utils";
 import { getLibraryData } from "@/lib/resume/actions";
 import Link from "next/link";
 
 export default async function LibraryPage() {
-  const [{ versions, archivedVersions, defaultVersionId, userName, userEmail }, links, profile] =
+  const [{ versions, archivedVersions, defaultVersionId, userName, userEmail }, links, profile, coverLetters] =
     await Promise.all([
       getLibraryData(),
       getLibraryVersionLinks(),
       getUserProfileContext(),
+      listCoverLetters(),
     ]);
   const { versionCounts, versionJobs, allJobLinks } = links;
   const hasVersions = versions.length > 0 || archivedVersions.length > 0;
@@ -76,6 +78,7 @@ export default async function LibraryPage() {
             versionCounts={versionCounts}
             versionJobs={versionJobs}
             allJobLinks={allJobLinks}
+            coverLetters={coverLetters}
             isStudent={profile.isStudent}
           />
         ) : (

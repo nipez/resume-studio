@@ -1,9 +1,19 @@
 "use client";
 
 import { DefaultResumeHero } from "@/components/library/default-resume-hero";
+import {
+  CoverLetterRow,
+  CoverLetterTableHeader,
+} from "@/components/library/cover-letter-row";
 import { VersionCard } from "@/components/library/version-card";
 import { VersionRow, VersionTableHeader } from "@/components/library/version-row";
 import type { VersionJobLink } from "@/lib/applications/types";
+import {
+  coverLetterMatchesQuery,
+  groupCoverLettersByResume,
+  resolveResumeName,
+} from "@/lib/library/cover-letters";
+import type { CoverLetter } from "@/lib/cover/types";
 import type { ResumeVersion } from "@/lib/resume/db-types";
 import { useEffect, useMemo, useState } from "react";
 
@@ -17,6 +27,7 @@ type LibraryViewProps = {
   versionCounts: Record<string, number>;
   versionJobs?: Record<string, VersionJobLink[]>;
   allJobLinks?: VersionJobLink[];
+  coverLetters?: CoverLetter[];
   isStudent?: boolean;
 };
 
@@ -79,9 +90,10 @@ export function LibraryView({
   versionCounts,
   versionJobs = {},
   allJobLinks = [],
+  coverLetters = [],
   isStudent = false,
 }: LibraryViewProps) {
-  const [tab, setTab] = useState<"all" | "active" | "archived">("all");
+  const [tab, setTab] = useState<"all" | "active" | "archived" | "covers">("all");
   const [layout, setLayout] = useState<LibraryLayout>("table");
   const [ready, setReady] = useState(false);
   const [query, setQuery] = useState("");
@@ -97,6 +109,29 @@ export function LibraryView({
   }
 
   const effectiveLayout = ready ? layout : "table";
+
+  const allVersions = useMemo(
+    () => [...activeVersions, ...archivedVersions],
+    [activeVersions, archivedVersions]
+  );
+
+  const lettersByResume = useMemo(
+    () => groupCoverLettersByResume(coverLetters),
+    [coverLetters]
+  );
+
+  const filteredCoverLetters = useMemo(() => {
+    const q = query.trim();
+    return coverLetters.filter((letter) => coverLetterMatchesQuery(letter, q));
+  }, [coverLetters, query]);
+
+  const orphanCoverLetters = useMemo(() => {
+    const versionIds = new Set(allVersions.map((v) => v.id));
+    return filteredCoverLetters.filter(
+      (letter) =>
+        !letter.resume_version_id || !versionIds.has(letter.resume_version_id)
+    );
+  }, [filteredCoverLetters, allVersions]);
 
   const defaultVersion = useMemo(() => {
     if (!defaultVersionId) return null;
@@ -188,6 +223,14 @@ export function LibraryView({
     defaultVersionId,
   ]);
 
+  function lettersForVersion(versionId: string): CoverLetter[] {
+    return (lettersByResume.get(versionId) ?? []).filter((letter) =>
+      coverLetterMatchesQuery(letter, query)
+    );
+  }
+
+  const showCoverLettersInAll = tab === "all" && effectiveLayout === "table";
+
   return (
     <>
       {showDefaultHero && defaultVersion ? (
@@ -212,6 +255,11 @@ export function LibraryView({
                 id: "archived" as const,
                 label: "Archived",
                 count: archivedVersions.length,
+              },
+              {
+                id: "covers" as const,
+                label: "Cover letters",
+                count: coverLetters.length,
               },
             ] as const
           ).map((item) => {
@@ -277,24 +325,93 @@ export function LibraryView({
         </div>
       ) : null}
 
-      {visibleVersions.length > 0 ? (
+      {tab === "covers" ? (
+        filteredCoverLetters.length > 0 ? (
+          effectiveLayout === "table" ? (
+            <div className="overflow-x-auto pb-1">
+              <div className="flex min-w-[880px] flex-col gap-2.5">
+                <CoverLetterTableHeader showResumeColumn />
+                {filteredCoverLetters.map((letter) => (
+                  <CoverLetterRow
+                    key={letter.id}
+                    letter={letter}
+                    resumeName={resolveResumeName(
+                      letter.resume_version_id,
+                      allVersions
+                    )}
+                    showResumeColumn
+                  />
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(330px,1fr))] gap-[18px]">
+              {filteredCoverLetters.map((letter) => (
+                <CoverLetterRow
+                  key={letter.id}
+                  letter={letter}
+                  resumeName={resolveResumeName(
+                    letter.resume_version_id,
+                    allVersions
+                  )}
+                  showResumeColumn
+                />
+              ))}
+            </div>
+          )
+        ) : (
+          <div className="rounded-2xl border border-dashed border-border bg-white px-6 py-10 text-center">
+            <p className="text-[14px] text-muted">
+              {query.trim()
+                ? `No cover letters match “${query.trim()}”.`
+                : "No saved cover letters yet. Generate one from any resume's Cover link."}
+            </p>
+          </div>
+        )
+      ) : visibleVersions.length > 0 || (showCoverLettersInAll && orphanCoverLetters.length > 0) ? (
         effectiveLayout === "table" ? (
           <div className="overflow-x-auto pb-1">
             <div className="flex min-w-[880px] flex-col gap-2.5">
               <VersionTableHeader />
-              {visibleVersions.map((version, index) => (
-                <VersionRow
-                  key={version.id}
-                  version={version}
-                  isDefault={version.id === defaultVersionId}
-                  appCount={versionCounts[version.id] ?? 0}
-                  jobLinks={versionJobs[version.id] ?? []}
-                  allJobLinks={allJobLinks}
-                  archived={Boolean(version.archived_at)}
-                  isStudent={isStudent}
-                  striped={index % 2 === 1}
-                />
-              ))}
+              {visibleVersions.map((version, index) => {
+                const nestedLetters = showCoverLettersInAll
+                  ? lettersForVersion(version.id)
+                  : [];
+                return (
+                  <div key={version.id} className="flex flex-col gap-2">
+                    <VersionRow
+                      version={version}
+                      isDefault={version.id === defaultVersionId}
+                      appCount={versionCounts[version.id] ?? 0}
+                      jobLinks={versionJobs[version.id] ?? []}
+                      allJobLinks={allJobLinks}
+                      archived={Boolean(version.archived_at)}
+                      isStudent={isStudent}
+                      striped={index % 2 === 1}
+                    />
+                    {nestedLetters.map((letter) => (
+                      <CoverLetterRow
+                        key={letter.id}
+                        letter={letter}
+                        nested
+                      />
+                    ))}
+                  </div>
+                );
+              })}
+              {showCoverLettersInAll && orphanCoverLetters.length > 0 ? (
+                <>
+                  <div className="mt-2 flex items-center gap-3">
+                    <h3 className="text-[12px] font-bold uppercase tracking-[0.07em] text-[#5A6573]">
+                      Cover letters (no linked resume)
+                    </h3>
+                    <div className="h-px flex-1 bg-[#E2E5EA]" aria-hidden />
+                  </div>
+                  {orphanCoverLetters.map((letter) => (
+                    <CoverLetterRow key={letter.id} letter={letter} />
+                  ))}
+                </>
+              ) : null}
             </div>
           </div>
         ) : (
@@ -306,6 +423,11 @@ export function LibraryView({
                 isDefault={version.id === defaultVersionId}
                 appCount={versionCounts[version.id] ?? 0}
                 jobLinks={versionJobs[version.id] ?? []}
+                coverLetters={
+                  tab === "all"
+                    ? lettersForVersion(version.id)
+                    : []
+                }
                 archived={Boolean(version.archived_at)}
                 isStudent={isStudent}
               />

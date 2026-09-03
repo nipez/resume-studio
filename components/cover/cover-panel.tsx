@@ -27,13 +27,14 @@ import { useJobDraft } from "@/lib/job-draft/use-job-draft";
 import { buildCoverHTML, openPrintHtml } from "@/lib/resume/build-cover-html";
 import type { ResumeVersion } from "@/lib/resume/db-types";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type CoverPanelProps = {
   versions: ResumeVersion[];
   defaultVersionId: string | null;
   savedLetters?: CoverLetter[];
   initialVersionId?: string | null;
+  initialLetterId?: string | null;
   /** When set, show the prep flow stepper (from Tailor → Cover). */
   prepFlowResultId?: string | null;
   savedJobId?: string | null;
@@ -57,6 +58,7 @@ export function CoverPanel({
   defaultVersionId,
   savedLetters = [],
   initialVersionId = null,
+  initialLetterId = null,
   prepFlowResultId = null,
   savedJobId = null,
   prepSeed = null,
@@ -75,6 +77,28 @@ export function CoverPanel({
   const [deleteLetterId, setDeleteLetterId] = useState<string | null>(null);
 
   const base = versions.find((v) => v.id === baseId) ?? versions[0];
+
+  useEffect(() => {
+    if (!initialLetterId) return;
+    const letter =
+      letters.find((l) => l.id === initialLetterId) ??
+      savedLetters.find((l) => l.id === initialLetterId);
+    if (!letter) return;
+    update({
+      coverText: letter.body,
+      jobRole: letter.role,
+      jobCompany: letter.company,
+    });
+    setCurrentLetterId(letter.id);
+    if (
+      letter.resume_version_id &&
+      versions.some((v) => v.id === letter.resume_version_id)
+    ) {
+      setBaseId(letter.resume_version_id);
+    }
+    // Only hydrate from URL on first mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function handleGenerate() {
     if (!draft.jobDesc.trim()) {
