@@ -530,6 +530,34 @@ export function applyResumeContextPrompt(
   );
 }
 
+export function applyResumeUpdateRequestPrompt(
+  positioning: string,
+  userName: string,
+  data: ResumeData,
+  updateRequest: string,
+  systemGuidelines?: SystemGuidelinesInput
+): string {
+  return (
+    buildPositioningContext(positioning, userName, systemGuidelines) +
+    "\n\n" +
+    "USER UPDATE REQUEST (apply this change):\n" +
+    updateRequest.trim() +
+    "\n\n" +
+    "CURRENT RESUME (JSON):\n" +
+    JSON.stringify(data) +
+    "\n\n" +
+    "TASK: Apply the user's update request to this resume and return the full updated resume JSON.\n" +
+    "Rules:\n" +
+    "- Honor explicit edit requests (e.g. rename a title, rephrase a bullet, tweak the summary, reorder emphasis).\n" +
+    "- If they ask to change an existing title, company label, dates, or wording that already appears on the resume, do that change.\n" +
+    "- Do NOT invent new employers, roles, dates, or metrics that are not already on the resume or explicitly stated in the request.\n" +
+    "- Keep contact fields (name, phone, email, location, linkedin) exactly unless the request asks to change them.\n" +
+    "- Preserve all roles and overall structure unless the request asks to remove or merge something.\n" +
+    "- Change only what the request requires; leave unrelated content intact.\n" +
+    'Return ONLY valid minified JSON with the same shape as the input resume: {"name":"","headline":"","phone":"","email":"","location":"","linkedin":"","summary":"","skills":[],"experience":[{"company":"","title":"","dates":"","blurb":"","bullets":[]}],"education":[{"school":"","degree":"","year":""}],"awards":[]}'
+  );
+}
+
 export function combineResumesPrompt(
   positioning: string,
   userName: string,
