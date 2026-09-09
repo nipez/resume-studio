@@ -17,6 +17,7 @@ import { JobUrlImport } from "@/components/shared/job-url-import";
 import { PrepFlowStepper } from "@/components/shared/prep-flow-stepper";
 import { ResumeContextNotesField } from "@/components/shared/resume-context-notes-field";
 import { TailorProgressOverlay } from "@/components/tailor/tailor-progress-overlay";
+import { TailorAiUpdateCard } from "@/components/tailor/tailor-ai-update-card";
 import { Spinner } from "@/components/ui/spinner";
 import { useJobDraft } from "@/lib/job-draft/use-job-draft";
 import { buildResumeHTML } from "@/lib/resume/build-resume-html";
@@ -465,6 +466,14 @@ export function TailorPanel({
               </div>
               <p className="text-[13.4px] leading-[1.6] text-[#C7CDD6]">{matchNotes}</p>
             </div>
+
+            {saveStatus === "saved" && resultId && resultData ? (
+              <TailorAiUpdateCard
+                versionId={resultId}
+                data={resultData}
+                onApplied={setResultData}
+              />
+            ) : null}
 
             {saveStatus === "saved" && resultId ? (
               <div className="rounded-2xl border border-[#E6E8EC] bg-white px-5 py-4">

@@ -105,6 +105,61 @@ export function mockComplete(prompt: string): string {
     return JSON.stringify({ roles });
   }
 
+  if (prompt.includes("Apply the user's update request to this resume")) {
+    const resumeMatch = prompt.match(
+      /CURRENT RESUME \(JSON\):\n([\s\S]+?)\n\nTASK:/
+    );
+    const requestMatch = prompt.match(
+      /USER UPDATE REQUEST \(apply this change\):\n([\s\S]+?)\n\nCURRENT RESUME/
+    );
+    const base = resumeMatch?.[1] ? extractJSON<ResumeData>(resumeMatch[1]) : null;
+    const request = requestMatch?.[1]?.trim() || "your requested edit";
+    if (base) {
+      const titleChange =
+        request.match(
+          /change\s+(?:my\s+)?(.+?)\s+title\s+at\s+(.+?)\s+to\s+(?:say\s+)?(.+)/i
+        ) ||
+        request.match(
+          /change\s+(?:my\s+)?(.+?)\s+at\s+(.+?)\s+to\s+(?:say\s+)?(.+)/i
+        );
+      let experience = base.experience ?? [];
+      if (titleChange) {
+        const [, oldTitle, company, newTitle] = titleChange;
+        experience = experience.map((role) => {
+          const companyMatch = role.company
+            .toLowerCase()
+            .includes(company.trim().toLowerCase());
+          const titleMatch = role.title
+            .toLowerCase()
+            .includes(oldTitle.trim().toLowerCase());
+          if (companyMatch && titleMatch) {
+            return { ...role, title: newTitle.trim().replace(/\.$/, "") };
+          }
+          return role;
+        });
+      }
+      return JSON.stringify({
+        ...base,
+        experience,
+        summary:
+          (base.summary || "") +
+          (base.summary ? " " : "") +
+          `[Demo update applied for: ${request.slice(0, 80)}${
+            request.length > 80 ? "…" : ""
+          }]`,
+      });
+    }
+    return JSON.stringify({
+      name: "Demo Resume",
+      headline: "Professional · Demo mode",
+      summary:
+        "Demo mode — configure ANTHROPIC_API_KEY to apply freeform resume update requests.",
+      skills: ["Communication", "Leadership"],
+      experience: [],
+      education: [],
+    });
+  }
+
   if (prompt.includes("Refine this resume so the user's context notes")) {
     const resumeMatch = prompt.match(/CURRENT RESUME \(JSON\):\n([\s\S]+?)\n\nTASK:/);
     const notesMatch = prompt.match(
