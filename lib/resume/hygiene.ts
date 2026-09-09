@@ -71,15 +71,20 @@ export function normalizeDocumentTitle(input: {
         .replace(/[\s,|·–—-]+$/, "")
         .trim();
     } else {
-      // Truncated company glued into role: "Alcoho" from "Alcohol"
+      // Trailing ", Fragment" after a comma — truncated company/title garbage
+      // e.g. "Sr. Account Executive, Alcoho" when company is shown separately.
       const maybePrefix = role.match(/[,|·–—-]\s*([A-Za-z]{3,})$/);
       const fragment = maybePrefix?.[1]?.toLowerCase() ?? "";
-      if (
-        fragment &&
-        companyLower.startsWith(fragment) &&
-        fragment.length < companyLower.length
-      ) {
-        role = role.replace(/[,|·–—-]\s*[A-Za-z]{3,}$/, "").trim();
+      if (fragment) {
+        const isCompanyPrefix =
+          companyLower.startsWith(fragment) && fragment.length < companyLower.length;
+        const looksTruncated =
+          fragment !== companyLower &&
+          fragment.length <= 10 &&
+          !/\s/.test(fragment);
+        if (isCompanyPrefix || looksTruncated) {
+          role = role.replace(/[,|·–—-]\s*[A-Za-z]{3,}$/, "").trim();
+        }
       }
     }
   }
@@ -109,12 +114,17 @@ export function pickPreferredBaseVersionId(input: {
       (v) => v.id === defaultVersionId && !isCopyVersionName(v.name)
     );
     if (preferred) return preferred.id;
-    const defaultRow = pool.find((v) => v.id === defaultVersionId);
-    if (defaultRow) return defaultRow.id;
+    // Default points at a stale "(copy)" — fall through to a real master when one exists.
   }
 
   const nonCopy = pool.find((v) => !isCopyVersionName(v.name));
-  return nonCopy?.id ?? pool[0]?.id ?? "";
+  if (nonCopy) return nonCopy.id;
+
+  if (defaultVersionId && pool.some((v) => v.id === defaultVersionId)) {
+    return defaultVersionId;
+  }
+
+  return pool[0]?.id ?? "";
 }
 
 /** Drop internal probe versions from user-facing lists. */
