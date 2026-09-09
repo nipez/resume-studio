@@ -1,7 +1,6 @@
 "use client";
 
 import { ApplyToNewJobButton } from "@/components/applications/apply-to-new-job-button";
-import { LogApplicationButton } from "@/components/applications/log-application-button";
 import { SaveJobButton } from "@/components/applications/save-job-button";
 import { SavedJobsSection } from "@/components/applications/saved-jobs-section";
 import type { Application, ApplicationStatus } from "@/lib/applications/types";
@@ -428,16 +427,6 @@ export function ApplicationsList({
             )}
             <div className="flex flex-wrap items-center gap-2 sm:justify-end">
               <SaveJobButton className={secondaryBtnClass} />
-              {defaultVersionId ? (
-                <LogApplicationButton
-                  versionId={defaultVersionId}
-                  resumeVersionName={defaultVersionName ?? "Resume"}
-                  initialRole={defaultVersionRole}
-                  initialCompany={defaultVersionCompany}
-                  isStudent={isStudent}
-                  className={secondaryBtnClass}
-                />
-              ) : null}
             </div>
           </div>
         </div>
@@ -592,16 +581,6 @@ export function ApplicationsList({
                   Build your resume first
                 </Link>
               )}
-              {defaultVersionId ? (
-                <LogApplicationButton
-                  versionId={defaultVersionId}
-                  resumeVersionName={defaultVersionName ?? "Resume"}
-                  initialRole={defaultVersionRole}
-                  initialCompany={defaultVersionCompany}
-                  isStudent={isStudent}
-                  className="inline-flex items-center gap-1.5 rounded-[11px] border border-[#D6E4FF] bg-white px-[17px] py-[11px] text-[13.5px] font-semibold text-[#2456D6] transition-colors hover:border-accent hover:bg-[#F5F8FF]"
-                />
-              ) : null}
             </>
           }
         />

@@ -34,7 +34,7 @@ supabase link --project-ref YOUR_PROJECT_REF
 supabase db push
 ```
 
-4. In the dashboard, enable **Email** auth (password sign-in). Magic links are only used for invite and password-reset flows via `/set-password`.
+4. In the dashboard, enable **Email** auth (password sign-in). email/password are only used for invite and password-reset flows via `/set-password`.
 5. Create private Storage buckets: `resume-uploads`, `generated-pdfs` (RLS per-user prefix — PR #9).
 
 ## Railway deploy

@@ -1,5 +1,11 @@
 "use client";
 
+import {
+  dedupeCopyVersions,
+  filterVisibleVersions,
+  pickPreferredBaseVersionId,
+} from "@/lib/resume/hygiene";
+
 import { ResumePreview } from "@/components/resume/resume-preview";
 import { EditableVersionName } from "@/components/library/editable-version-name";
 import {
@@ -68,8 +74,16 @@ export function TailorPanel({
 }: TailorPanelProps) {
   const router = useRouter();
   const { draft, update, reset } = useJobDraft();
-  const [baseId, setBaseId] = useState(
-    initialVersionId ?? defaultVersionId ?? versions[0]?.id ?? ""
+  const selectableVersions = useMemo(
+    () => dedupeCopyVersions(filterVisibleVersions(versions)),
+    [versions]
+  );
+  const [baseId, setBaseId] = useState(() =>
+    pickPreferredBaseVersionId({
+      versions: selectableVersions.length > 0 ? selectableVersions : versions,
+      defaultVersionId,
+      initialVersionId: typeof initialVersionId === "undefined" ? null : initialVersionId,
+    })
   );
   const [depth, setDepth] = useState<"light" | "deep">("light");
   const [phase, setPhase] = useState<"input" | "result">(
@@ -534,7 +548,7 @@ export function TailorPanel({
                   </div>
                 ) : null}
                 <VersionSelect
-                  versions={versions}
+                  versions={selectableVersions.length > 0 ? selectableVersions : versions}
                   value={baseId}
                   onChange={setBaseId}
                   defaultVersionId={defaultVersionId}

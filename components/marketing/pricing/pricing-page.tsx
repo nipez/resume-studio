@@ -151,7 +151,7 @@ export function PricingPage() {
 
       <MarketingPageCta
         title={`Start free — ${PILOT_CTA.toLowerCase()}`}
-        description="Full Pro access while we pilot with early users. Sign in with a magic link — no credit card."
+        description="Full Pro access while we pilot with early users. Sign in with email and password — no credit card."
         secondaryHref="/faq"
         secondaryLabel="Read the FAQ →"
       />

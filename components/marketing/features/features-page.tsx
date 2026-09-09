@@ -168,9 +168,9 @@ export function FeaturesPage() {
             <span className="eyebrow" style={{ background: "var(--cream)" }}>
               Templates
             </span>
-            <h2>Three templates, print-ready.</h2>
+            <h2>Layouts & Accent, print-ready.</h2>
             <p>
-              Classic, Two-Column, and Editorial — custom accent color and full
+              Classic, Two-Column, and Editorial layouts plus Accent color — and full
               PDF export in the editor.
             </p>
           </Reveal>
@@ -195,7 +195,7 @@ export function FeaturesPage() {
               <div className="features-compare-link">
                 <Link href="/#compare">Compare to resume generators →</Link>
               </div>
-              <div className="fine">No credit card · Magic link sign-in</div>
+              <div className="fine">No credit card · Email & password sign-in</div>
             </div>
           </Reveal>
         </div>

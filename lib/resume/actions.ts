@@ -8,6 +8,11 @@ import { getAuthedDb, getAuthUser } from "@/lib/auth";
 import { createServiceClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { resolveDisplayName } from "@/lib/profile/utils";
+import {
+  dedupeCopyVersions,
+  filterVisibleVersions,
+  pickPreferredBaseVersionId,
+} from "@/lib/resume/hygiene";
 
 function mapRow(row: Record<string, unknown>): ResumeVersion {
   return {
@@ -57,17 +62,27 @@ export async function getLibraryData() {
   const activeVersions = allVersions.filter(isActiveVersion);
   const archivedVersions = allVersions.filter((v) => !isActiveVersion(v));
 
+  const visibleVersions = dedupeCopyVersions(
+    filterVisibleVersions(activeVersions)
+  );
+  const visibleArchived = filterVisibleVersions(archivedVersions);
+
   let defaultVersionId = profile?.default_version_id ?? null;
   if (
     defaultVersionId &&
-    !activeVersions.some((version) => version.id === defaultVersionId)
+    !visibleVersions.some((version) => version.id === defaultVersionId)
   ) {
-    defaultVersionId = activeVersions[0]?.id ?? null;
+    defaultVersionId = null;
   }
+  defaultVersionId =
+    pickPreferredBaseVersionId({
+      versions: visibleVersions,
+      defaultVersionId,
+    }) || null;
 
   return {
-    versions: activeVersions,
-    archivedVersions,
+    versions: visibleVersions,
+    archivedVersions: visibleArchived,
     defaultVersionId,
     userEmail: user.email ?? "",
     userName: resolveDisplayName({

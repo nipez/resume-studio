@@ -20,7 +20,7 @@ export const PILOT_CTA = "Free during pilot";
 export const PILOT_START_CTA = "Start free during pilot";
 
 export const PILOT_FINE_PRINT =
-  "Full Pro access while we build with early users. No credit card · Magic link sign-in";
+  "Full Pro access while we build with early users. No credit card · Email & password sign-in";
 
 export const BETA_BANNER =
   "Free during pilot — full Pro unlocked while we refine the product. Pricing below previews launch tiers; invite codes for friends & family testers coming soon.";
@@ -277,9 +277,9 @@ export const FEATURE_CAPABILITIES = [
       "Log an application and freeze the exact resume, cover letter, and Q&A you sent — so insights stay honest as your master evolves.",
   },
   {
-    title: "Three print-ready templates",
+    title: "Four ways to style your resume",
     description:
-      "Classic, Two-Column, and Editorial — custom accent color, PDF export, and page-aware preview.",
+      "Classic, Two-Column, and Editorial layouts — plus Accent color controls, PDF export, and page-aware preview.",
   },
   {
     title: "Shared job context",
@@ -347,7 +347,7 @@ export const STUDENT_START_STEPS = [
     step: "01",
     title: "Pick a template",
     description:
-      "Classic, Two-Column, or Editorial — all three look professional on paper and export cleanly to PDF.",
+      "Classic, Two-Column, or Editorial layouts, with Accent colors you can customize — all look professional on paper and export cleanly to PDF.",
   },
   {
     step: "02",
@@ -501,12 +501,12 @@ export const STUDENT_FAQ_ITEMS = [
   {
     question: "Can I use this for college applications?",
     answer:
-      "Many schools accept or request a resume supplement. Export a PDF from any of the three templates and upload alongside your application materials.",
+      "Many schools accept or request a resume supplement. Export a PDF from any layout and upload alongside your application materials.",
   },
   {
     question: "How much does the Student plan cost?",
     answer:
-      "Right now it's completely free for students during our pilot — full access while we build with early users. You get the guided builder, activities sections, 3 templates, PDF export, and AI cover letters. Paid student pricing comes at launch.",
+      "Right now it's completely free for students during our pilot — full access while we build with early users. You get the guided builder, activities sections, three layouts plus Accent colors, PDF export, and AI cover letters. Paid student pricing comes at launch.",
   },
 ] as const;
 
@@ -580,7 +580,7 @@ export const FAQ_ITEMS = [
   {
     question: "Can I export PDFs?",
     answer:
-      "Yes. Three print-ready templates (Classic, Two-Column, Editorial) with one-click PDF export for resumes and cover letters.",
+      "Yes. Three print-ready layouts (Classic, Two-Column, Editorial) plus Accent color controls, with one-click PDF export for resumes and cover letters.",
   },
 ];
 

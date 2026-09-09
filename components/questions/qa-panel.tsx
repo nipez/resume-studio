@@ -1,5 +1,11 @@
 "use client";
 
+import {
+  dedupeCopyVersions,
+  filterVisibleVersions,
+  pickPreferredBaseVersionId,
+} from "@/lib/resume/hygiene";
+
 import { LogApplicationButton } from "@/components/applications/log-application-button";
 import {
   JobCompanyField,
@@ -16,14 +22,7 @@ import { qaScopeKey, uid, type QAItem } from "@/lib/job-draft/storage";
 import { useJobDraft } from "@/lib/job-draft/use-job-draft";
 import { useQADraft } from "@/lib/job-draft/use-qa-draft";
 import type { ResumeVersion } from "@/lib/resume/db-types";
-import {
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-  type TextareaHTMLAttributes,
-} from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type TextareaHTMLAttributes } from "react";
 
 type QAPanelProps = {
   versions: ResumeVersion[];
@@ -89,11 +88,20 @@ export function QAPanel({
     maybeStale,
     dismissScopeReset,
   } = useQADraft({ scopeKey });
-  const [baseId, setBaseId] = useState(
-    prepFlowResultId && versions.some((v) => v.id === prepFlowResultId)
-      ? prepFlowResultId
-      : (defaultVersionId ?? versions[0]?.id ?? "")
+  const selectableVersions = useMemo(
+    () => dedupeCopyVersions(filterVisibleVersions(versions)),
+    [versions]
   );
+  const [baseId, setBaseId] = useState(() => {
+    const pool = selectableVersions.length > 0 ? selectableVersions : versions;
+    if (prepFlowResultId && pool.some((v) => v.id === prepFlowResultId)) {
+      return prepFlowResultId;
+    }
+    return pickPreferredBaseVersionId({
+      versions: pool,
+      defaultVersionId,
+    });
+  });
   const [mockMode, setMockMode] = useState(false);
   const [busyIds, setBusyIds] = useState<Set<string>>(new Set());
   const [toast, setToast] = useState<string | null>(null);
@@ -332,7 +340,7 @@ export function QAPanel({
         {contextOpen ? (
           <div className="mt-3 space-y-3.5 border-t border-[#E8ECF1] bg-white px-1 pt-3">
             <VersionSelect
-              versions={versions}
+              versions={selectableVersions.length > 0 ? selectableVersions : versions}
               value={baseId}
               onChange={setBaseId}
               label="Resume context"

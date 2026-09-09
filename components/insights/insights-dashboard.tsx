@@ -53,8 +53,7 @@ export function InsightsDashboard({ data }: { data: InsightsData }) {
           </h1>
           <p className="mt-2 max-w-[620px] text-[14.5px] leading-relaxed text-muted">
             Your pipeline funnel, what each resume version is actually getting,
-            and what&apos;s coming up — based on each application&apos;s current
-            status.
+            and what&apos;s coming up — based on the furthest stage each application has reached.
           </p>
         </div>
 
@@ -104,7 +103,7 @@ export function InsightsDashboard({ data }: { data: InsightsData }) {
                   Pipeline funnel
                 </h2>
                 <p className="mt-1 text-[12.5px] text-muted">
-                  How far your applications are right now, by current status.
+                  Furthest stage reached across your submitted applications.
                 </p>
                 <div className="mt-5 space-y-4">
                   {data.funnel.map((stage) => {
@@ -199,7 +198,6 @@ export function InsightsDashboard({ data }: { data: InsightsData }) {
                           </div>
                           <div className="truncate text-[12px] text-muted">
                             {event.appTitle}
-                            {event.company ? ` · ${event.company}` : ""}
                           </div>
                         </div>
                       </Link>

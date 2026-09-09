@@ -37,7 +37,7 @@ const TESTIMONIAL_AVATARS = ["var(--ink)", "var(--teal)", "var(--coral)"];
 
 const TESTIMONIAL_INITIALS = ["JM", "PK", "AR"];
 
-// Deep-link straight into the student guided builder (after magic-link sign-in).
+// Deep-link straight into the student guided builder (after email/password sign-in).
 const STUDENT_BUILD_HREF = `/login?next=${encodeURIComponent("/build?mode=student")}`;
 
 const STUDENT_SECTION_CHIPS = [
@@ -312,9 +312,9 @@ export function MarketingHomePage() {
         <div className="wrap">
           <Reveal className="sec-head" style={{ maxWidth: 560 }}>
             <span className="eyebrow" style={{ background: "var(--cream)" }}>Templates</span>
-            <h2>Three templates, print-ready.</h2>
+            <h2>Layouts & Accent, print-ready.</h2>
             <p>
-              Classic, Two-Column, and Editorial — with full PDF export.{" "}
+              Classic, Two-Column, and Editorial layouts plus Accent colors — with full PDF export.{" "}
               <Link href="/features#templates" className="features-inline-link">
                 See templates →
               </Link>

@@ -20,7 +20,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
     title: "Information we collect",
     paragraphs: ["We collect information in three ways:"],
     bullets: [
-      "Account information — when you sign in with a magic link, we store your email address and basic auth metadata through our authentication provider.",
+      "Account information — when you create an account with email and password, we store your email address and basic auth metadata through our authentication provider.",
       "Content you create — resumes, cover letters, application notes, job descriptions, and related workspace data you save in your account.",
       "Usage and technical data — pages visited, device/browser type, and diagnostic logs used to keep the service secure and reliable.",
     ],
@@ -33,7 +33,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
       "Authenticate you and keep your account secure",
       "Generate AI-assisted drafts when you request them",
       "Respond to support requests and product feedback",
-      "Send essential service messages (for example, sign-in links)",
+      "Send essential service messages (for example, password reset and security emails)",
     ],
   },
   {

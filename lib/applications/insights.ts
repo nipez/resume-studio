@@ -1,6 +1,6 @@
 import type { Application, ApplicationStatus } from "@/lib/applications/types";
 import {
-  applicationCurrentRank,
+  applicationPeakRank,
   applicationInsightsTitle,
   computeApplicationStats,
   todayISO,
@@ -9,6 +9,10 @@ import {
   computeSuggestedFollowUps,
   type SuggestedFollowUp,
 } from "@/lib/applications/follow-up-recommendations";
+import {
+  dedupeApplicationsByJob,
+  filterVisibleApplications,
+} from "@/lib/resume/hygiene";
 
 export type FunnelStage = {
   key: string;
@@ -52,20 +56,20 @@ export type InsightsData = {
   hasData: boolean;
 };
 
+function forInsights(apps: Application[]): Application[] {
+  return dedupeApplicationsByJob(filterVisibleApplications(apps));
+}
+
 export function computeInsights(apps: Application[]): InsightsData {
-  const stats = computeApplicationStats(apps);
+  const visible = forInsights(apps);
+  const funnelApps = visible.filter((app) => app.status !== "not_applied");
+  const stats = computeApplicationStats(funnelApps);
   const total = stats.total;
   const pct = (n: number) => (total ? Math.round((n / total) * 100) : 0);
 
-  let responded = 0;
-  let interviewed = 0;
-  let offers = 0;
-  for (const app of apps) {
-    const rank = applicationCurrentRank(app);
-    if (rank >= 1) responded += 1;
-    if (rank >= 2) interviewed += 1;
-    if (rank >= 3) offers += 1;
-  }
+  const responded = stats.respondedCount;
+  const interviewed = stats.interviewCount;
+  const offers = stats.offerCount;
 
   const funnel: FunnelStage[] = [
     { key: "applied", label: "Applied", count: total, pctOfTotal: 100 },
@@ -94,14 +98,15 @@ export function computeInsights(apps: Application[]): InsightsData {
     "not_applied",
   ];
   const counts: Record<string, number> = {};
-  for (const app of apps) counts[app.status] = (counts[app.status] ?? 0) + 1;
+  for (const app of visible) counts[app.status] = (counts[app.status] ?? 0) + 1;
   const statusCounts = statusOrder
     .map((status) => ({ status, count: counts[status] ?? 0 }))
     .filter((entry) => entry.count > 0);
 
   const versionMap = new Map<string, VersionPerformance>();
-  for (const app of apps) {
-    const key = app.resume_version_id ?? `name:${app.resume_version_name ?? "Unknown"}`;
+  for (const app of funnelApps) {
+    const key =
+      app.resume_version_id ?? `name:${app.resume_version_name ?? "Unknown"}`;
     const name =
       app.resume_version_name || app.resume_snapshot?.name || "Unknown version";
     let perf = versionMap.get(key);
@@ -118,21 +123,27 @@ export function computeInsights(apps: Application[]): InsightsData {
       versionMap.set(key, perf);
     }
     perf.sent += 1;
-    const rank = applicationCurrentRank(app);
+    const rank = applicationPeakRank(app);
     if (rank >= 1) perf.responded += 1;
     if (rank >= 2) perf.interviewed += 1;
     if (rank >= 3) perf.offers += 1;
   }
   const versions = Array.from(versionMap.values())
-    .map((perf) => ({
-      ...perf,
-      respRate: perf.sent ? Math.round((perf.responded / perf.sent) * 100) : 0,
-    }))
+    .map((perf) => {
+      const interviewed = Math.min(perf.interviewed, perf.responded);
+      const offers = Math.min(perf.offers, interviewed);
+      return {
+        ...perf,
+        interviewed,
+        offers,
+        respRate: perf.sent ? Math.round((perf.responded / perf.sent) * 100) : 0,
+      };
+    })
     .sort((a, b) => b.sent - a.sent || b.respRate - a.respRate);
 
   const today = todayISO();
   const upcoming: UpcomingEvent[] = [];
-  for (const app of apps) {
+  for (const app of funnelApps) {
     for (const event of app.events ?? []) {
       if (event.done || !event.date) continue;
       upcoming.push({
@@ -149,7 +160,7 @@ export function computeInsights(apps: Application[]): InsightsData {
   }
   upcoming.sort((a, b) => a.date.localeCompare(b.date));
 
-  const suggestedFollowUps = computeSuggestedFollowUps(apps, today);
+  const suggestedFollowUps = computeSuggestedFollowUps(funnelApps, today);
 
   return {
     stats,

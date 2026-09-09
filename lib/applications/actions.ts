@@ -1,5 +1,10 @@
 "use server";
 
+import {
+  dedupeApplicationsByJob,
+  filterVisibleApplications,
+} from "@/lib/resume/hygiene";
+
 import type {
   AppInsight,
   AppPrep,
@@ -190,11 +195,14 @@ export async function getApplicationsList(): Promise<{
     }
   });
 
-  const applications = allApplications.filter((app) => !app.archived_at);
-  const archivedApplications = allApplications.filter((app) => app.archived_at);
+  const cleaned = dedupeApplicationsByJob(
+    filterVisibleApplications(allApplications)
+  );
+  const applications = cleaned.filter((app) => !app.archived_at);
+  const archivedApplications = cleaned.filter((app) => app.archived_at);
 
   const versionCounts: Record<string, number> = {};
-  for (const app of allApplications) {
+  for (const app of cleaned) {
     if (app.resume_version_id) {
       versionCounts[app.resume_version_id] =
         (versionCounts[app.resume_version_id] ?? 0) + 1;

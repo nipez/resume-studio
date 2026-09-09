@@ -20,7 +20,7 @@ starter/
 2. **Add these files**: move `railway.json` + `.env.example` to the root, copy `supabase/` to the root.
    Add a tiny health endpoint at `app/api/health/route.ts` returning `{ ok: true }` (Railway healthcheck).
 3. **Supabase**: create a project, then `supabase link` and `supabase db push` to apply `0001_init.sql`.
-   In the dashboard, enable **Email (magic link)** + **Google** auth, and create two private Storage
+   In the dashboard, enable **Email (password)** + **Google** auth, and create two private Storage
    buckets: `resume-uploads` and `generated-pdfs` (add per-user prefix RLS policies).
 4. **Railway**: create a project from the GitHub repo. Add every var from `.env.example` (except `PORT`,
    which Railway injects). Deploy — the healthcheck hits `/api/health`.
