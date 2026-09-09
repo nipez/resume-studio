@@ -43,9 +43,15 @@ export function MarketingFooter() {
               <Link href="/application-os" className="transition hover:text-white">
                 vs. AI generators
               </Link>
-              <span>vs. Teal — full loop + snapshots</span>
-              <span>vs. Jobscan — 8× cheaper entry</span>
-              <span>vs. Resume.io — no trial traps</span>
+              <Link href="/#compare" className="transition hover:text-white">
+                vs. Teal — full loop + snapshots
+              </Link>
+              <Link href="/#compare" className="transition hover:text-white">
+                vs. Jobscan — 8× cheaper entry
+              </Link>
+              <Link href="/#compare" className="transition hover:text-white">
+                vs. Resume.io — no trial traps
+              </Link>
             </div>
           </div>
 
@@ -80,12 +86,6 @@ export function MarketingFooter() {
             </span>
           </div>
           <div className="flex flex-wrap items-center gap-4">
-            <Link href="/privacy" className="transition hover:text-white">
-              Privacy
-            </Link>
-            <Link href="/terms" className="transition hover:text-white">
-              Terms
-            </Link>
             <span>Built for serious job searches.</span>
           </div>
         </div>

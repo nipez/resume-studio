@@ -35,7 +35,7 @@ Key facts about the prototype:
 - **Railway** — hosts the app. Deploy a **Next.js (App Router, TypeScript)** project (web + API routes),
   or split into a Next web service + a small Node/Express API service if you prefer. One Railway project,
   environment variables for secrets. Add a `railway.json`/Dockerfile as needed.
-- **Supabase** — Postgres (data), Auth (email magic-link + Google OAuth), Row Level Security, and
+- **Supabase** — Postgres (data), Auth (email/password + Google OAuth), Row Level Security, and
   Storage (for uploaded resume files + generated PDFs). Use the Supabase JS client on the server
   (service role for migrations/admin) and the anon client + RLS on the browser.
 - **LLM** — server-side calls to the Anthropic Messages API (or OpenAI). **Never expose the key to the
@@ -168,7 +168,7 @@ available, keeping a tolerant fallback.
 
 1. **Scaffold**: Next.js + TS + Tailwind, GitHub repo, Railway deploy of a hello-world, Supabase project
    linked, env vars wired (`SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE`, `ANTHROPIC_API_KEY`).
-2. **Auth + schema**: Supabase Auth (magic link + Google), the tables above as SQL migrations, RLS so a
+2. **Auth + schema**: Supabase Auth (email/password + Google), the tables above as SQL migrations, RLS so a
    user only sees their own rows. A `profiles` row is created on signup.
 3. **Design system**: port fonts, colors, the sidebar shell, and the three resume HTML/CSS templates into
    reusable components. Recreate the inline-style look with Tailwind tokens. Pixel-match the prototype.

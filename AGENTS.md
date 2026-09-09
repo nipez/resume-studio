@@ -34,12 +34,10 @@ PORT=3000
 ### Non-obvious gotchas
 
 - **Open the app at `http://127.0.0.1:3000`, not `http://localhost:3000`.** Supabase's
-  default `auth.site_url` (in `supabase/config.toml`) is `http://127.0.0.1:3000`, so a
-  magic-link redirect to a `localhost` origin is rejected ("Email link is invalid").
-  Keeping the same `127.0.0.1` origin throughout also preserves the PKCE verifier.
-- **Auth is passwordless magic link.** After clicking "Send magic link", open the email
-  in **Mailpit** at `http://127.0.0.1:54324`, then click the link **once** (links are
-  single-use). It signs you in and redirects to `/library`.
+  default `auth.site_url` (in `supabase/config.toml`) is `http://127.0.0.1:3000`. Using the
+  same origin avoids auth redirect mismatches during local development.
+- **Auth is email + password.** Sign up or sign in at `/login`. Password-reset emails are
+  captured by **Mailpit** at `http://127.0.0.1:54324` in local dev.
 - **`supabase/seed.sql` grants table privileges** to `anon`/`authenticated`/`service_role`.
   A bare local Postgres lacks the default privileges hosted Supabase ships with, so
   without this seed every authenticated query fails with "permission denied". RLS still

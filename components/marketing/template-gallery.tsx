@@ -17,8 +17,8 @@ export function TemplateGallery() {
       <div className="relative">
         <SectionHeader
           eyebrow="Templates"
-          title="Three templates, print-ready"
-          description="Classic, Two-Column, and Editorial — ported pixel-for-pixel from the prototype with full PDF export support."
+          title="Layouts & Accent, print-ready"
+          description="Classic, Two-Column, and Editorial layouts plus Accent colors — ported pixel-for-pixel from the prototype with full PDF export support."
         />
 
         <div className="mt-14 flex flex-wrap justify-center gap-10 lg:justify-start">

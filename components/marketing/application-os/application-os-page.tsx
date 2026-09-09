@@ -23,7 +23,7 @@ const PHASES = [
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="5" rx="1.5" /><rect x="4" y="11" width="16" height="5" rx="1.5" /><path d="M7 19h10" /></svg>
     ),
-    body: "A resume library with multiple cuts, three templates, and a default starting point. Your master stays clean while tailored versions branch off it.",
+    body: "A resume library with multiple cuts, three layouts plus Accent colors, and a default starting point. Your master stays clean while tailored versions branch off it.",
   },
   {
     step: "02",

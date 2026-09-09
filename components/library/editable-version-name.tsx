@@ -1,5 +1,7 @@
 "use client";
 
+import { stripCopySuffix as stripCopySuffixShared } from "@/lib/resume/hygiene";
+
 import { updateResumeVersion } from "@/lib/resume/actions";
 import { isGenericResumeName } from "@/lib/resume/utils";
 import { useRouter } from "next/navigation";
@@ -17,7 +19,7 @@ type EditableVersionNameProps = {
 };
 
 function stripCopySuffix(value: string) {
-  return value.replace(/(?:\s*\(copy\))+\s*$/i, "").trim();
+  return stripCopySuffixShared(value);
 }
 
 function hasCopySuffix(value: string) {

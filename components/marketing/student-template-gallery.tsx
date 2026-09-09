@@ -30,7 +30,7 @@ export function StudentTemplateGallery() {
             Templates
           </p>
           <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
-            Three templates built for students
+            Layouts & Accent built for students
           </h2>
           <p className="mt-4 text-[15px] leading-relaxed text-muted">
             Same professional layouts as the full workspace — previewed with

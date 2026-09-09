@@ -1,6 +1,12 @@
 "use client";
 
 import {
+  dedupeCopyVersions,
+  filterVisibleVersions,
+  pickPreferredBaseVersionId,
+} from "@/lib/resume/hygiene";
+
+import {
   JobCompanyField,
   JobDescField,
   JobRoleField,
@@ -27,7 +33,7 @@ import { useJobDraft } from "@/lib/job-draft/use-job-draft";
 import { buildCoverHTML, openPrintHtml } from "@/lib/resume/build-cover-html";
 import type { ResumeVersion } from "@/lib/resume/db-types";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 type CoverPanelProps = {
   versions: ResumeVersion[];
@@ -64,8 +70,16 @@ export function CoverPanel({
   prepSeed = null,
 }: CoverPanelProps) {
   const { draft, update } = useJobDraft(prepSeed);
-  const [baseId, setBaseId] = useState(
-    initialVersionId ?? defaultVersionId ?? versions[0]?.id ?? ""
+  const selectableVersions = useMemo(
+    () => dedupeCopyVersions(filterVisibleVersions(versions)),
+    [versions]
+  );
+  const [baseId, setBaseId] = useState(() =>
+    pickPreferredBaseVersionId({
+      versions: selectableVersions.length > 0 ? selectableVersions : versions,
+      defaultVersionId,
+      initialVersionId: typeof initialVersionId === "undefined" ? null : initialVersionId,
+    })
   );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -288,7 +302,7 @@ export function CoverPanel({
               Demo mode — add ANTHROPIC_API_KEY for production-quality letters.
             </div>
           ) : null}
-          <VersionSelect versions={versions} value={baseId} onChange={setBaseId} />
+          <VersionSelect versions={selectableVersions.length > 0 ? selectableVersions : versions} value={baseId} onChange={setBaseId} />
           <JobUrlImport
             urlOnly
             onImported={(fields) =>

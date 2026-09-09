@@ -1,3 +1,4 @@
+import { normalizeDocumentTitle } from "@/lib/resume/hygiene";
 import { parseApplicationNotes } from "@/lib/applications/notes";
 import type {
   Application,
@@ -95,17 +96,23 @@ export function activeApplications(apps: Application[]): Application[] {
 }
 
 export function computeApplicationStats(apps: Application[]) {
-  const total = apps.length;
+  // Submitted applications only — "not_applied" must not inflate the funnel.
+  const funnelApps = apps.filter((app) => app.status !== "not_applied");
+  const total = funnelApps.length;
   let respondedCount = 0;
   let interviewCount = 0;
   let offerCount = 0;
 
-  for (const app of apps) {
-    const rank = applicationCurrentRank(app);
+  for (const app of funnelApps) {
+    // Peak rank keeps the funnel monotonic (interview always counts as a response).
+    const rank = applicationPeakRank(app);
     if (rank >= 1) respondedCount += 1;
     if (rank >= 2) interviewCount += 1;
     if (rank >= 3) offerCount += 1;
   }
+
+  interviewCount = Math.min(interviewCount, respondedCount);
+  offerCount = Math.min(offerCount, interviewCount);
 
   const respRate = total ? Math.round((respondedCount / total) * 100) : 0;
 
@@ -209,13 +216,15 @@ export function applicationListHeading(app: Application): {
   primary: string;
   secondary: string | null;
 } {
-  const role = app.role?.trim() ?? "";
-  const company = app.company?.trim() ?? "";
-
-  if (role && company) return { primary: role, secondary: company };
-  if (role) return { primary: role, secondary: null };
-  if (company) return { primary: company, secondary: null };
-  return { primary: "Untitled application", secondary: null };
+  const title = normalizeDocumentTitle({ role: app.role, company: app.company });
+  const parts = title.split(" · ");
+  if (parts.length >= 2) {
+    return {
+      primary: parts.slice(0, -1).join(" · "),
+      secondary: parts[parts.length - 1] ?? null,
+    };
+  }
+  return { primary: title || "Untitled application", secondary: null };
 }
 
 /** Client-side filter for the applications list search box. */
@@ -254,17 +263,11 @@ export function filterApplicationsBySearch(
 }
 
 export function applicationDetailTitle(app: Application): string {
-  const role = app.role?.trim() ?? "";
-  const company = app.company?.trim() ?? "";
-
-  if (role && company) return `${role} · ${company}`;
-  if (role) return role;
-  if (company) return company;
-  return "Untitled application";
+  return normalizeDocumentTitle({ role: app.role, company: app.company });
 }
 
 export function applicationInsightsTitle(app: Application): string {
-  return applicationDetailTitle(app);
+  return normalizeDocumentTitle({ role: app.role, company: app.company });
 }
 
 export function normalizeCompanyKey(company: string): string {

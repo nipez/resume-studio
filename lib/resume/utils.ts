@@ -1,3 +1,4 @@
+import { normalizeDocumentTitle } from "@/lib/resume/hygiene";
 import { templateLabel } from "@/lib/resume/build-resume-html";
 import type { ResumeVersion } from "@/lib/resume/db-types";
 
@@ -18,10 +19,7 @@ export function formatRelativeTime(iso: string): string {
 }
 
 export function formatJobAssociationLabel(role?: string, company?: string) {
-  const r = role?.trim() ?? "";
-  const c = company?.trim() ?? "";
-  if (r && c) return `${r} · ${c}`;
-  return r || c || "";
+  return normalizeDocumentTitle({ role, company, name: "" });
 }
 
 export function suggestedNameFromJob(role?: string, company?: string) {

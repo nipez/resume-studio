@@ -41,7 +41,7 @@ export function AccentColorPicker({ value, onChange }: AccentColorPickerProps) {
           className="h-4 w-4 rounded-full border border-black/10 shadow-inner"
           style={{ backgroundColor: current }}
         />
-        Accent
+        Accent color
       </button>
 
       {open ? (

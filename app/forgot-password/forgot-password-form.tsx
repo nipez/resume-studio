@@ -34,7 +34,7 @@ export default function ForgotPasswordForm() {
             Reset password
           </h1>
           <p className="mt-1.5 text-[14px] leading-relaxed text-[#5c5269]">
-            We&apos;ll email a one-time link to set a new password.
+            We&apos;ll email a secure link to set a new password.
           </p>
 
           {sent ? (

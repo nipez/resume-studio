@@ -206,7 +206,7 @@ export function AboutPage() {
               <Link href="/login" className="btn btn-dark">
                 Open {SITE_NAME}
               </Link>
-              <div className="fine">No credit card · Magic link sign-in</div>
+              <div className="fine">No credit card · Email & password sign-in</div>
             </div>
           </Reveal>
         </div>
