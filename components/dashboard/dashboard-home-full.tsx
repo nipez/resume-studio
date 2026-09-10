@@ -9,6 +9,7 @@ import {
   buildHref,
   formatShortDate,
 } from "@/components/dashboard/dashboard-shared";
+import { DashboardResumeSearch } from "@/components/dashboard/dashboard-resume-search";
 import { StudentWelcomePanel } from "@/components/dashboard/student-welcome-panel";
 import { formatRelativeTime } from "@/lib/resume/utils";
 
@@ -91,6 +92,7 @@ export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
     upcoming,
     suggestedFollowUps,
     recentVersions,
+    searchDocs,
     savedJobs,
     prepCandidates,
   } = data;
@@ -115,6 +117,7 @@ export function DashboardHomeFull({ data }: { data: DashboardHomeData }) {
               ? "Build a master resume once — then tailor a cut for every role you apply to."
               : "Apply to a role: copy from your master resume, tailor to the job description, and track what you send."}
           </p>
+          {searchDocs.length > 0 ? <DashboardResumeSearch docs={searchDocs} /> : null}
         </div>
 
         {isStudent && isNew ? (

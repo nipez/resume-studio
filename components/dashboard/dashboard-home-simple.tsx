@@ -8,6 +8,7 @@ import {
   ChecklistSection,
   UpcomingSection,
 } from "@/components/dashboard/dashboard-shared";
+import { DashboardResumeSearch } from "@/components/dashboard/dashboard-resume-search";
 import { FirstRunPathPicker } from "@/components/dashboard/first-run-path-picker";
 import { StudentWelcomePanel } from "@/components/dashboard/student-welcome-panel";
 import Link from "next/link";
@@ -26,6 +27,7 @@ export function DashboardHomeSimple({ data }: { data: DashboardHomeData }) {
     upcoming,
     suggestedFollowUps,
     recentVersions,
+    searchDocs,
     savedJobs,
   } = data;
 
@@ -114,6 +116,7 @@ export function DashboardHomeSimple({ data }: { data: DashboardHomeData }) {
                 : "Build a master resume once, then tailor a cut for every role you apply to."
               : "Apply to a role: copy from your master resume, tailor to the job description, and track what you send."}
           </p>
+          {searchDocs.length > 0 ? <DashboardResumeSearch docs={searchDocs} /> : null}
         </div>
 
         {isStudent && !hasResume && !showPathPicker ? (
