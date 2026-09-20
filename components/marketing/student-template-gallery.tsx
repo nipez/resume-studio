@@ -10,6 +10,11 @@ const TEMPLATES: { style: TemplateStyle; label: string; note: string }[] = [
     note: "Clean and familiar — great for counselors and first applications.",
   },
   {
+    style: "modern",
+    label: "Modern",
+    note: "Light two-column layout — achievements and skills beside your story.",
+  },
+  {
     style: "twocol",
     label: "Two-Column",
     note: "Skills and school on the left — fits lots of activities on one page.",

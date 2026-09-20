@@ -514,6 +514,8 @@ export function buildResumeHTML(
     built = buildTwocolHTML(d, interactive);
   } else if (style === "editorial") {
     built = buildEditorialHTML(d, interactive);
+  } else if (style === "modern") {
+    built = buildModernHTML(d, interactive);
   } else {
     built = buildClassicHTML(d, interactive);
   }
@@ -530,5 +532,193 @@ export function buildResumeHTML(
 export function templateLabel(style: TemplateStyle): string {
   if (style === "twocol") return "Two-Column";
   if (style === "editorial") return "Editorial";
+  if (style === "modern") return "Modern";
   return "Classic";
+}
+
+/** Light two-column layout inspired by contemporary resume builders (main + sidebar). */
+function buildModernHTML(
+  d: ResumeData,
+  interactive: boolean
+): { css: string; body: string } {
+  const skills = d.skills || [];
+  const exp = d.experience || [];
+  const act = d.activities || [];
+  const edu = d.education || [];
+  const awards = (d.awards || []).filter(Boolean);
+  const { accent } = resolveAccentPalette(d.accentColor || "#2F6BFF");
+
+  const contactBits: string[] = [];
+  if (d.phone) contactBits.push(`<span class="ci">${esc(d.phone)}</span>`);
+  if (d.email) contactBits.push(`<span class="ci">${esc(d.email)}</span>`);
+  if (d.linkedin) contactBits.push(`<span class="ci link">${esc(d.linkedin)}</span>`);
+  if (d.location) contactBits.push(`<span class="ci">${esc(d.location)}</span>`);
+
+  const css =
+    "*{box-sizing:border-box}body{margin:0;font-family:'Instrument Sans',Arial,sans-serif;color:#2a2f38;font-size:9.4pt;line-height:1.45}" +
+    `.page{max-width:8.5in;margin:0 auto;min-height:11in;padding:.48in .5in .4in;background:#fff}` +
+    `.r-name{font-family:'Space Grotesk',sans-serif;font-size:22pt;font-weight:700;letter-spacing:.01em;color:#111827;line-height:1.05;text-transform:uppercase}` +
+    `.r-role{margin-top:5px;font-size:10pt;font-weight:600;color:${accent}}` +
+    `.contact{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:10px;padding-bottom:12px;border-bottom:1.5px solid #111827}` +
+    `.ci{font-size:8.5pt;color:#3a4350}` +
+    `.ci.link{color:${accent};font-weight:600}` +
+    `.grid{display:grid;grid-template-columns:1.55fr 1fr;gap:22px;margin-top:14px;align-items:start}` +
+    `.r-h{font-family:'Space Grotesk',sans-serif;font-size:9.5pt;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#111827;margin:0 0 8px;padding-bottom:4px;border-bottom:2px solid #111827}` +
+    `.main .r-h{margin-top:14px}.main .r-h:first-child{margin-top:0}` +
+    `.side .r-h{margin-top:14px}.side .r-h:first-child{margin-top:0}` +
+    `.r-p{font-size:9.3pt;line-height:1.55;color:#3a4350}` +
+    `.exp{margin-bottom:12px}` +
+    `.row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}` +
+    `.r-job{font-weight:700;font-size:10pt;color:#111827}` +
+    `.r-co{color:${accent};font-weight:700;font-size:9.2pt;margin-top:1px}` +
+    `.r-meta{display:flex;flex-wrap:wrap;gap:8px 12px;margin-top:2px;font-size:8.3pt;color:#6b7280;font-weight:500}` +
+    `.r-li{position:relative;padding-left:11px;margin-top:3px;font-size:9.1pt;line-height:1.45;color:#3a4350}` +
+    `.r-li::before{content:'';position:absolute;left:0;top:.5em;width:3.5px;height:3.5px;border-radius:50%;background:${accent}}` +
+    `.ach{margin-bottom:10px}` +
+    `.ach-t{font-weight:700;font-size:9.3pt;color:#111827;margin-bottom:2px}` +
+    `.ach-d{font-size:8.8pt;line-height:1.45;color:#4b5563}` +
+    `.skills{font-size:9pt;line-height:1.55;color:#3a4350}` +
+    `.edu{margin-bottom:10px}` +
+    `.edu-t{font-weight:700;font-size:9.3pt;color:#111827}` +
+    `.edu-d{font-size:8.8pt;color:${accent};font-weight:600;margin-top:1px}` +
+    `.edu-y{font-size:8.3pt;color:#6b7280;margin-top:1px}` +
+    `.interest{margin-bottom:9px}` +
+    `.interest-t{font-weight:700;font-size:9.2pt;color:#111827}` +
+    `.interest-d{font-size:8.7pt;line-height:1.45;color:#4b5563;margin-top:2px}` +
+    (interactive ? INTERACTIVE_CSS : "") +
+    PRINT_BASE;
+
+  function splitAchievement(line: string): { title: string; detail: string } {
+    const sep = line.includes(" — ")
+      ? " — "
+      : line.includes(": ")
+        ? ": "
+        : line.includes(" - ")
+          ? " - "
+          : null;
+    if (!sep) return { title: line, detail: "" };
+    const [title, ...rest] = line.split(sep);
+    return { title: title.trim(), detail: rest.join(sep).trim() };
+  }
+
+  const modernEntry = (section: string) => (e: ResumeExperience, i: number) =>
+    editZone(
+      interactive,
+      section,
+      `<div class="exp">` +
+        `<div class="row">${e.title ? `<span class="r-job">${esc(e.title)}</span>` : ""}</div>` +
+        (e.company ? `<div class="r-co">${esc(e.company)}</div>` : "") +
+        (e.dates ? `<div class="r-meta">${esc(e.dates)}</div>` : "") +
+        (e.blurb
+          ? `<div class="r-p" style="margin-top:3px;font-style:italic">${esc(e.blurb)}</div>`
+          : "") +
+        bullets(e.bullets) +
+        `</div>`,
+      i
+    );
+
+  const expH = exp.map(modernEntry("experience")).join("");
+
+  const awardsH = awards
+    .map((line) => {
+      const { title, detail } = splitAchievement(line);
+      return (
+        `<div class="ach">` +
+        `<div class="ach-t">${esc(title)}</div>` +
+        (detail ? `<div class="ach-d">${esc(detail)}</div>` : "") +
+        `</div>`
+      );
+    })
+    .join("");
+
+  const skillsH = skills.length
+    ? `<div class="skills">${esc(skills.join(", "))}</div>`
+    : "";
+
+  const eduH = edu
+    .map(
+      (e: ResumeEducation) =>
+        `<div class="edu">` +
+        (e.degree ? `<div class="edu-t">${esc(e.degree)}</div>` : "") +
+        (e.school ? `<div class="edu-d">${esc(e.school)}</div>` : "") +
+        (e.year ? `<div class="edu-y">${esc(e.year)}</div>` : "") +
+        `</div>`
+    )
+    .join("");
+
+  const interestsH = act
+    .map((a) => {
+      const detail =
+        a.blurb?.trim() ||
+        (a.bullets || []).filter(Boolean).slice(0, 2).join(" ") ||
+        [a.company, a.dates].filter(Boolean).join(" · ");
+      return (
+        `<div class="interest">` +
+        `<div class="interest-t">${esc(a.title || a.company || "Activity")}</div>` +
+        (detail ? `<div class="interest-d">${esc(detail)}</div>` : "") +
+        `</div>`
+      );
+    })
+    .join("");
+
+  const body =
+    `<div class="page">` +
+    editZone(
+      interactive,
+      "header",
+      `<div class="r-name">${esc(d.name || "Your Name")}</div>` +
+        (d.headline ? `<div class="r-role">${esc(d.headline)}</div>` : "") +
+        (contactBits.length
+          ? `<div class="contact">${contactBits.join("")}</div>`
+          : `<div class="contact"><span class="ci" style="opacity:.45">Add phone, email, LinkedIn…</span></div>`)
+    ) +
+    `<div class="grid">` +
+    `<div class="main">` +
+    (d.summary
+      ? editZone(
+          interactive,
+          "summary",
+          `<div class="r-h">Summary</div><div class="r-p">${esc(d.summary)}</div>`
+        )
+      : editZone(
+          interactive,
+          "summary",
+          `<div class="r-h">Summary</div><div class="r-p" style="opacity:.45">Click to add a summary…</div>`
+        )) +
+    (expH
+      ? `<div class="r-h">Experience</div>${expH}`
+      : `<div class="r-h">Experience</div><div class="r-p" style="opacity:.45">Add your roles…</div>`) +
+    `</div>` +
+    `<div class="side">` +
+    (awardsH
+      ? editZone(
+          interactive,
+          "awards",
+          `<div class="r-h">Key Achievements</div>${awardsH}`
+        )
+      : "") +
+    (skillsH
+      ? editZone(
+          interactive,
+          "skills",
+          `<div class="r-h">Skills</div>${skillsH}`
+        )
+      : editZone(
+          interactive,
+          "skills",
+          `<div class="r-h">Skills</div><div class="skills" style="opacity:.45">Click to add skills…</div>`
+        )) +
+    (eduH
+      ? editZone(
+          interactive,
+          "education",
+          `<div class="r-h">Education</div>${eduH}`
+        )
+      : "") +
+    (interestsH
+      ? `<div class="r-h">Interests</div>${interestsH}`
+      : "") +
+    `</div></div></div>`;
+
+  return { css, body };
 }

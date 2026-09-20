@@ -79,6 +79,50 @@ export function MarketingHomeTemplates() {
 
       <div className="tcard">
         <div className="paper">
+          <div className="modern">
+            <div className="r-name">Jordan Avery</div>
+            <div className="r-role">Senior Product Designer</div>
+            <div className="contact">
+              <span>jordan.avery@email.com</span>
+              <span>(415) 555-0182</span>
+              <span>San Francisco</span>
+            </div>
+            <div className="grid">
+              <div className="main">
+                <div className="r-h">Summary</div>
+                <div className="r-p">
+                  Product designer with 8+ years shaping B2B SaaS end-to-end —
+                  systems, research, and 0→1 launches.
+                </div>
+                <div className="r-h">Experience</div>
+                <div className="r-job">Senior Product Designer</div>
+                <div className="r-co">Northwind Labs</div>
+                <div className="r-meta">2021 — Present</div>
+                <div className="r-li">Dashboard redesign — +34% weekly active use.</div>
+                <div className="r-li">Scaled a 60-component design system org-wide.</div>
+              </div>
+              <div className="side">
+                <div className="r-h">Key Achievements</div>
+                <div className="ach-t">Design system adoption</div>
+                <div className="ach-d">Rolled out across 4 product teams in 6 months.</div>
+                <div className="r-h">Skills</div>
+                <div className="skills">
+                  Figma, Prototyping, Research, Design Systems
+                </div>
+                <div className="r-h">Education</div>
+                <div className="edu-t">B.F.A. Interaction Design</div>
+                <div className="edu-d">RISD</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="tname">
+          Modern <span className="pill">Light columns</span>
+        </div>
+      </div>
+
+      <div className="tcard">
+        <div className="paper">
           <div className="twocol">
             <div className="side">
               <div className="avatar">JA</div>

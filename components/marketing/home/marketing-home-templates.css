@@ -2,7 +2,7 @@
 
 .marketing-home .tgrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 20px;
   margin-top: 48px;
 }
@@ -204,6 +204,122 @@
   border-radius: 4px;
   padding: 2.5px 6px;
   white-space: nowrap;
+}
+
+/* Modern — light two-column */
+.marketing-home .modern {
+  font-family: var(--font-marketing), system-ui, sans-serif;
+  padding: 18px 16px 0;
+  color: #2a2f38;
+}
+
+.marketing-home .modern .r-name {
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: #111827;
+}
+
+.marketing-home .modern .r-role {
+  margin-top: 3px;
+  font-size: 8px;
+  color: #2f6bff;
+}
+
+.marketing-home .modern .contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin-top: 6px;
+  padding-bottom: 7px;
+  border-bottom: 1.5px solid #111827;
+  font-size: 6.5px;
+  color: #3a4350;
+}
+
+.marketing-home .modern .grid {
+  display: grid;
+  grid-template-columns: 1.45fr 1fr;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.marketing-home .modern .r-h {
+  font-size: 7px;
+  letter-spacing: 0.06em;
+  margin: 8px 0 4px;
+  padding-bottom: 2px;
+  border-bottom: 1.5px solid #111827;
+}
+
+.marketing-home .modern .main .r-h:first-child,
+.marketing-home .modern .side .r-h:first-child {
+  margin-top: 0;
+}
+
+.marketing-home .modern .r-p {
+  font-size: 6.5px;
+  line-height: 1.45;
+}
+
+.marketing-home .modern .r-job {
+  font-size: 7.5px;
+  white-space: normal;
+}
+
+.marketing-home .modern .r-co {
+  color: #2f6bff;
+  font-size: 7px;
+  font-weight: 700;
+  white-space: normal;
+}
+
+.marketing-home .modern .r-meta {
+  font-size: 6px;
+  color: #6b7280;
+  margin-top: 1px;
+}
+
+.marketing-home .modern .r-li {
+  font-size: 6.5px;
+  line-height: 1.4;
+  padding-left: 8px;
+  margin-top: 2px;
+}
+
+.marketing-home .modern .r-li::before {
+  background: #2f6bff;
+}
+
+.marketing-home .modern .ach-t {
+  font-size: 7px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.marketing-home .modern .ach-d {
+  font-size: 6.5px;
+  line-height: 1.4;
+  color: #4b5563;
+  margin: 1px 0 5px;
+}
+
+.marketing-home .modern .skills {
+  font-size: 6.5px;
+  line-height: 1.4;
+  color: #3a4350;
+}
+
+.marketing-home .modern .edu-t {
+  font-size: 7px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.marketing-home .modern .edu-d {
+  font-size: 6.5px;
+  font-weight: 600;
+  color: #2f6bff;
 }
 
 /* Two-column */

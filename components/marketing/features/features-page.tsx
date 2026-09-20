@@ -170,7 +170,7 @@ export function FeaturesPage() {
             </span>
             <h2>Three templates, print-ready.</h2>
             <p>
-              Classic, Two-Column, and Editorial — custom accent color and full
+              Classic, Modern, Two-Column, and Editorial — custom accent color and full
               PDF export in the editor.
             </p>
           </Reveal>

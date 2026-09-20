@@ -6,6 +6,7 @@ import type { TemplateStyle } from "@/lib/types/resume";
 
 const TEMPLATES: { style: TemplateStyle; label: string }[] = [
   { style: "classic", label: "Classic" },
+  { style: "modern", label: "Modern" },
   { style: "twocol", label: "Two-Column" },
   { style: "editorial", label: "Editorial" },
 ];
@@ -17,8 +18,8 @@ export function TemplateGallery() {
       <div className="relative">
         <SectionHeader
           eyebrow="Templates"
-          title="Three templates, print-ready"
-          description="Classic, Two-Column, and Editorial — ported pixel-for-pixel from the prototype with full PDF export support."
+          title="Print-ready templates"
+          description="Classic, Modern, Two-Column, and Editorial — clean layouts with full PDF export."
         />
 
         <div className="mt-14 flex flex-wrap justify-center gap-10 lg:justify-start">
