@@ -1,6 +1,10 @@
 import Link from "next/link";
 import type { SuggestedFollowUp } from "@/lib/applications/insights";
 import { appEventLabel, formatDay } from "@/lib/applications/utils";
+import type {
+  DashboardSearchApp,
+  DashboardSearchDoc,
+} from "@/lib/dashboard/search";
 import { buildHrefForPersona } from "@/lib/profile/persona";
 import type { ResumeVersion } from "@/lib/resume/db-types";
 
@@ -56,6 +60,8 @@ export type DashboardHomeData = {
   recentVersions: DashboardDocPreview[];
   savedJobs: DashboardSavedJobPreview[];
   prepCandidates: DashboardAppPreview[];
+  searchApps: DashboardSearchApp[];
+  searchDocs: DashboardSearchDoc[];
 };
 
 export const DASHBOARD_VIEW_STORAGE_KEY = "resumetrakr-dashboard-view";

@@ -2,6 +2,10 @@ import { DashboardHome } from "@/components/dashboard/dashboard-home";
 import { ExitViewAsFailedNotice } from "@/components/admin/exit-view-as-failed-notice";
 import { getApplicationsList } from "@/lib/applications/actions";
 import { computeInsights } from "@/lib/applications/insights";
+import type {
+  DashboardSearchApp,
+  DashboardSearchDoc,
+} from "@/lib/dashboard/search";
 import { getUserProfileContext } from "@/lib/profile/actions";
 import { resolveGreetingFirstName } from "@/lib/profile/utils";
 import { getLibraryData } from "@/lib/resume/actions";
@@ -17,9 +21,10 @@ export default async function DashboardPage() {
     getSavedJobsList(),
   ]);
 
-  const { applications, versionCounts } = appsList;
+  const { applications, archivedApplications, versionCounts } = appsList;
   const insights = computeInsights(applications);
   const versions = library.versions;
+  const archivedVersions = library.archivedVersions;
   const primaryVersionId =
     library.defaultVersionId ?? versions[0]?.id ?? null;
   const hasTailored = versions.some((v) => v.tailored_for);
@@ -52,6 +57,36 @@ export default async function DashboardPage() {
       hasPrep: Boolean(app.prep),
     }));
 
+  const searchApps: DashboardSearchApp[] = [
+    ...applications,
+    ...archivedApplications,
+  ].map((app) => ({
+    id: app.id,
+    role: app.role,
+    company: app.company,
+    status: app.status,
+    resumeName: app.resume_version_name ?? app.resume_snapshot?.name ?? null,
+    appliedAt: app.applied_at,
+    archived: Boolean(app.archived_at),
+  }));
+
+  const searchDocs: DashboardSearchDoc[] = [...versions, ...archivedVersions].map(
+    (version) => ({
+      id: version.id,
+      name: version.name,
+      headline: version.data?.headline ?? "",
+      tailoredLabel: version.tailored_for
+        ? `${version.tailored_for.role ?? "Role"}${
+            version.tailored_for.company
+              ? ` @ ${version.tailored_for.company}`
+              : ""
+          }`
+        : null,
+      updatedAt: version.updated_at,
+      archived: Boolean(version.archived_at),
+    })
+  );
+
   return (
     <>
       <ExitViewAsFailedNotice />
@@ -80,6 +115,8 @@ export default async function DashboardPage() {
           company: job.company,
         }))}
         prepCandidates={prepCandidates}
+        searchApps={searchApps}
+        searchDocs={searchDocs}
       />
     </>
   );
